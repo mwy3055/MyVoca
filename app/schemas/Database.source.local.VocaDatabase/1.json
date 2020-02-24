@@ -1,0 +1,57 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "c66c18744096d84bcf8bc1ea0474f38c",
+    "entities": [
+      {
+        "tableName": "Vocabulary",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eng` TEXT NOT NULL, `kor` TEXT, `add_time` INTEGER NOT NULL, `last_update` INTEGER NOT NULL, `memo` TEXT, PRIMARY KEY(`eng`))",
+        "fields": [
+          {
+            "fieldPath": "eng",
+            "columnName": "eng",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kor",
+            "columnName": "kor",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "addedTime",
+            "columnName": "add_time",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastUpdatedTime",
+            "columnName": "last_update",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memo",
+            "columnName": "memo",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "eng"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"c66c18744096d84bcf8bc1ea0474f38c\")"
+    ]
+  }
+}

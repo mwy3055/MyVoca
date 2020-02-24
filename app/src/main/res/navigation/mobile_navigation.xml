@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="hsk.practice.myvoca.ui.home.HomeFragment"
+        android:label="@string/menu_main"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/nav_see_all"
+        android:name="hsk.practice.myvoca.ui.seeall.SeeAllFragment"
+        android:label="@string/menu_show_all"
+        tools:layout="@layout/fragment_see_all" />
+
+    <fragment
+        android:id="@+id/nav_slideshow"
+        android:name="hsk.practice.myvoca.ui.slideshow.SlideshowFragment"
+        android:label="@string/menu_slideshow"
+        tools:layout="@layout/fragment_slideshow" />
+
+    <fragment
+        android:id="@+id/nav_tools"
+        android:name="hsk.practice.myvoca.ui.tools.ToolsFragment"
+        android:label="@string/menu_tools"
+        tools:layout="@layout/fragment_tools" />
+
+    <fragment
+        android:id="@+id/nav_share"
+        android:name="hsk.practice.myvoca.ui.share.ShareFragment"
+        android:label="@string/menu_share"
+        tools:layout="@layout/fragment_share" />
+
+    <fragment
+        android:id="@+id/nav_go_blog"
+        android:name="hsk.practice.myvoca.ui.goblog.SendFragment"
+        android:label="개발자 블로그"
+        tools:layout="@layout/fragment_go_blog"/>
+
+</navigation>
