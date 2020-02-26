@@ -69,6 +69,7 @@ public class ShowNotificationService extends LifecycleService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("HSK APP", "ShowNotificationService onStartCommand()");
+        AppHelper.loadInstance(getApplicationContext());
         if (intent != null && intent.getSerializableExtra(SHOW_VOCA) != null) {
             Vocabulary vocabulary = (Vocabulary) intent.getSerializableExtra(SHOW_VOCA);
             showWordOnNotification(vocabulary);
@@ -79,7 +80,6 @@ public class ShowNotificationService extends LifecycleService {
             Log.d("HSK APP", "show random word on notification");
         } else if (intent != null && intent.getBooleanExtra(RestartService.RESTART_SERVICE, false)) {
             Log.d("HSK APP", "restart notification service");
-            AppHelper.loadInstance(getApplicationContext());
             setAlarmTimer();
         }
         return super.onStartCommand(intent, flags, startId);
