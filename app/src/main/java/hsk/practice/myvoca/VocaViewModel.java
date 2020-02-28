@@ -58,6 +58,10 @@ public class VocaViewModel extends ViewModel {
     }
 
     public LiveData<Vocabulary> getRandomVocabulary() {
+        if (allVocabularies == null || allVocabularies.getValue() == null) {
+            loadVocabularies();
+        }
+
         Random random = new Random();
         int index = random.nextInt(allVocabularies.getValue().size());
         return new MutableLiveData<>(allVocabularies.getValue().get(index));

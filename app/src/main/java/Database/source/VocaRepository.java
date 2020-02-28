@@ -53,7 +53,7 @@ public class VocaRepository {
     }
 
     public LiveData<List<Vocabulary>> getAllVocabulary() {
-        if (allVocabulary == null) {
+        if (allVocabulary == null || allVocabulary.getValue() == null) {
             allVocabulary = vocaDao.loadAllVocabulary();
         }
         return allVocabulary;

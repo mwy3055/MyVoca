@@ -70,6 +70,7 @@ public class ShowNotificationService extends LifecycleService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("HSK APP", "ShowNotificationService onStartCommand()");
         AppHelper.loadInstance(getApplicationContext());
+        isRunning = true;
         if (intent != null && intent.getSerializableExtra(SHOW_VOCA) != null) {
             Vocabulary vocabulary = (Vocabulary) intent.getSerializableExtra(SHOW_VOCA);
             showWordOnNotification(vocabulary);

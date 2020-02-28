@@ -83,6 +83,7 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
     private RecyclerView vocaRecyclerView;
 
     private SearchView searchView;
+    private boolean isSearchMode = false;
 
     private LinearLayout deleteLayout;
     private Button deleteVocabularyButton;
@@ -218,7 +219,9 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         vocaRecyclerViewAdapter.getCurrentVocabulary().observe(getViewLifecycleOwner(), new Observer<List<Vocabulary>>() {
             @Override
             public void onChanged(List<Vocabulary> vocabularies) {
-                vocaSizeText.setText(Integer.toString(vocabularies.size()));
+                if (isSearchMode) {
+                    vocaSizeText.setText(Integer.toString(vocabularies.size()));
+                }
             }
         });
     }
@@ -234,6 +237,7 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
 
         int animationDuration = 500;
         if (show) {
+            isSearchMode = true;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 int width = toolbar.getWidth() -
                         (containsOverflow ? getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material) : 0) -
@@ -249,6 +253,7 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
                 toolbar.startAnimation(translateAnimation);
             }
         } else {
+            isSearchMode = false;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 int width = toolbar.getWidth() -
                         (containsOverflow ? getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material) : 0) -

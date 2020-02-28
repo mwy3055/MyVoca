@@ -9,9 +9,8 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
-import java.util.Calendar;
-
 import Database.Vocabulary;
+import hsk.practice.myvoca.AppHelper;
 import hsk.practice.myvoca.R;
 
 public class VocaView extends LinearLayout {
@@ -60,16 +59,6 @@ public class VocaView extends LinearLayout {
     }
 
     public void setLastEditTime(int time) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis((long) time * 1000);
-
-        int year = cal.get(Calendar.YEAR);
-        int mon = cal.get(Calendar.MONTH);
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-        int hour = cal.get(Calendar.HOUR_OF_DAY);
-        int min = cal.get(Calendar.MINUTE);
-        int sec = cal.get(Calendar.SECOND);
-        lastEditTime.setText(String.format("%d.%02d.%02d. %02d:%02d:%02d", year, mon + 1, day, hour, min, sec));
+        lastEditTime.setText(AppHelper.getTimeString((long) time * 1000));
     }
-
 }
