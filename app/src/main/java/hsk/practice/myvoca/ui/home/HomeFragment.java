@@ -68,12 +68,18 @@ public class HomeFragment extends Fragment {
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if (vocaViewModel.isEmpty()) {
-                    Snackbar.make(v, "버튼을 눌러 단어를 추가해 주세요.", Snackbar.LENGTH_LONG).show();
-                } else {
-                    showRandomVocabulary();
-                }
+            public void onClick(final View v) {
+                LiveData<Boolean> isEmpty = vocaViewModel.isEmpty();
+                isEmpty.observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(Boolean aBoolean) {
+                        if (aBoolean) {
+                            Snackbar.make(v, "버튼을 눌러 단어를 추가해 주세요.", Snackbar.LENGTH_LONG).show();
+                        } else {
+                            showRandomVocabulary();
+                        }
+                    }
+                });
             }
         });
 
@@ -105,18 +111,30 @@ public class HomeFragment extends Fragment {
     }
 
     private void tryShowRandomVocabulary() {
-        if (showVocaWhenFragmentPause && !vocaViewModel.isEmpty()) {
-            showRandomVocabulary();
-            showVocaWhenFragmentPause = false;
-            button.setVisibility(View.VISIBLE);
-        }
+        final LiveData<Boolean> isEmpty = vocaViewModel.isEmpty();
+        isEmpty.observeForever(new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (showVocaWhenFragmentPause && !aBoolean) {
+                    showRandomVocabulary();
+                    showVocaWhenFragmentPause = false;
+                    button.setVisibility(View.VISIBLE);
+                }
+                isEmpty.removeObserver(this);
+            }
+        });
     }
 
     private void showRandomVocabulary() {
-        int index = random.nextInt(allVocabulary.getValue().size());
-        Vocabulary vocabulary = allVocabulary.getValue().get(index);
-        homeEng.setText(vocabulary.eng);
-        homeKor.setText(vocabulary.kor);
+        final LiveData<Vocabulary> randomVocabulary = vocaViewModel.getRandomVocabulary();
+        randomVocabulary.observeForever(new Observer<Vocabulary>() {
+            @Override
+            public void onChanged(Vocabulary vocabulary) {
+                homeEng.setText(vocabulary.eng);
+                homeKor.setText(vocabulary.kor);
+                randomVocabulary.removeObserver(this);
+            }
+        });
     }
 
     private void showVocaNumber(int number) {

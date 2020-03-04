@@ -61,4 +61,10 @@
 
     <!-- for xml/searchable -->
     <string name="searchable_search_voca_hint">단어 입력</string>
+
+    <!-- for layout/activity_widget_setting -->
+    <string name="widget_setting_activity_message">위젯이 추가되었습니다.</string>
+
+    <!-- for layout/widget_layout -->
+    <string name="widget_layout_show_voca">다른 단어</string>
 </resources>

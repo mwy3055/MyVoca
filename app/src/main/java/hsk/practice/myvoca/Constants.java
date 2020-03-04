@@ -19,4 +19,7 @@ public class Constants {
     public static final int ADD_NEW_VOCA_OK = 14;
     public static final int ADD_NEW_VOCA_CANCEL = 15;
     public static final String ADDED_VOCA = "VOCABULARY";
+
+    /* used for Widget */
+    public static final String VOCA_TO_WIDGET = "VOCA_TO_WIDGET";
 }

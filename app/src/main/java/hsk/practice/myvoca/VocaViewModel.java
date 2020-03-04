@@ -2,10 +2,10 @@ package hsk.practice.myvoca;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import java.util.List;
-import java.util.Random;
 
 import Database.Vocabulary;
 import Database.source.VocaRepository;
@@ -23,17 +23,27 @@ public class VocaViewModel extends ViewModel {
     }
 
     public LiveData<List<Vocabulary>> getAllVocabulary() {
-        if (allVocabularies == null) {
+        if (allVocabularies == null || allVocabularies.getValue() == null) {
             loadVocabularies();
         }
         return allVocabularies;
     }
 
-    public int getVocabularyCount() {
-        if (allVocabularies == null) {
+    public LiveData<Integer> getVocabularyCount() {
+        final MutableLiveData<Integer> result = new MutableLiveData<>();
+        if (allVocabularies == null || allVocabularies.getValue() == null) {
             loadVocabularies();
+            allVocabularies.observeForever(new Observer<List<Vocabulary>>() {
+                @Override
+                public void onChanged(List<Vocabulary> vocabularies) {
+                    result.setValue(vocabularies.size());
+                    allVocabularies.removeObserver(this);
+                }
+            });
+        } else {
+            result.setValue(allVocabularies.getValue().size());
         }
-        return allVocabularies.getValue().size();
+        return result;
     }
 
     public void deleteVocabulary(Vocabulary... vocabularies) {
@@ -48,7 +58,7 @@ public class VocaViewModel extends ViewModel {
         vocaRepo.insertVocabulary(vocabularies);
     }
 
-    private void loadVocabularies() {
+    private synchronized void loadVocabularies() {
         // do what?
         allVocabularies = vocaRepo.getAllVocabulary();
     }
@@ -58,16 +68,23 @@ public class VocaViewModel extends ViewModel {
     }
 
     public LiveData<Vocabulary> getRandomVocabulary() {
-        if (allVocabularies == null || allVocabularies.getValue() == null) {
-            loadVocabularies();
-        }
-
-        Random random = new Random();
-        int index = random.nextInt(allVocabularies.getValue().size());
-        return new MutableLiveData<>(allVocabularies.getValue().get(index));
+        return vocaRepo.getRandomVocabulary();
     }
 
-    public boolean isEmpty() {
-        return allVocabularies.getValue().isEmpty();
+    public LiveData<Boolean> isEmpty() {
+        final MutableLiveData<Boolean> result = new MutableLiveData<>(true);
+        if (allVocabularies == null || allVocabularies.getValue() == null) {
+            loadVocabularies();
+            allVocabularies.observeForever(new Observer<List<Vocabulary>>() {
+                @Override
+                public void onChanged(List<Vocabulary> vocabularies) {
+                    result.setValue(vocabularies.size() == 0);
+                    allVocabularies.removeObserver(this);
+                }
+            });
+        } else {
+            result.setValue(allVocabularies.getValue().size() == 0);
+        }
+        return result;
     }
 }

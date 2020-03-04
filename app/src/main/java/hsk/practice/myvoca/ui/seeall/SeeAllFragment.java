@@ -40,6 +40,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -154,7 +155,7 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
             }
         });
 
-        vocaSizeText.setText(Integer.toString(vocaViewModel.getVocabularyCount()));
+        showVocaSize();
 
 
         final LoadAdapterTask task = new LoadAdapterTask();
@@ -171,6 +172,16 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         ItemTouchHelper.SimpleCallback callback = new VocabularyTouchHelper(0, ItemTouchHelper.LEFT, this);
         new ItemTouchHelper(callback).attachToRecyclerView(vocaRecyclerView);
         return root;
+    }
+
+    private void showVocaSize() {
+        final LiveData<Integer> vocaSize = vocaViewModel.getVocabularyCount();
+        vocaSize.observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                vocaSizeText.setText(Integer.toString(integer));
+            }
+        });
     }
 
     @Override
@@ -424,7 +435,7 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
             @Override
             public void onChanged(List<Vocabulary> vocabularies) {
                 Log.d("HSK APP", "setAdapter() -> onChanged()");
-                vocaSizeText.setText(Integer.toString(vocaViewModel.getVocabularyCount()));
+                showVocaSize();
                 vocaRecyclerViewAdapter.observe();
             }
         });

@@ -88,7 +88,12 @@ public class EditVocaActivity extends AppCompatActivity {
         int time = (int) (Calendar.getInstance().getTimeInMillis() / 1000);
 
         Vocabulary newVocabulary = new Vocabulary(eng, kor, vocabulary.addedTime, time, memo);
-        vocaViewModel.editVocabulary(newVocabulary);
+        if (vocabulary.eng.equals(newVocabulary.eng)) {
+            vocaViewModel.editVocabulary(newVocabulary);
+        } else {
+            vocaViewModel.deleteVocabulary(vocabulary);
+            vocaViewModel.insertVocabulary(newVocabulary);
+        }
         Toast.makeText(getApplication(), "수정 완료!", Toast.LENGTH_LONG).show();
     }
 

@@ -14,6 +14,7 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.lifecycle.LifecycleService;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 import java.util.Calendar;
 
@@ -67,22 +68,29 @@ public class ShowNotificationService extends LifecycleService {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(final Intent intent, int flags, int startId) {
         Log.d("HSK APP", "ShowNotificationService onStartCommand()");
         AppHelper.loadInstance(getApplicationContext());
         isRunning = true;
-        if (intent != null && intent.getSerializableExtra(SHOW_VOCA) != null) {
-            Vocabulary vocabulary = (Vocabulary) intent.getSerializableExtra(SHOW_VOCA);
-            showWordOnNotification(vocabulary);
-            Log.d("HSK APP", "show voca on notification: " + vocabulary.eng);
-        } else if (intent != null && !intent.getBooleanExtra(RestartService.RESTART_SERVICE, false) && !vocaViewModel.isEmpty()) {
-            // only when starting with app and database not empty
-            showRandomWordOnNotification();
-            Log.d("HSK APP", "show random word on notification");
-        } else if (intent != null && intent.getBooleanExtra(RestartService.RESTART_SERVICE, false)) {
-            Log.d("HSK APP", "restart notification service");
-            setAlarmTimer();
-        }
+        final LiveData<Boolean> isEmpty = vocaViewModel.isEmpty();
+        isEmpty.observeForever(new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (intent != null && intent.getSerializableExtra(SHOW_VOCA) != null) {
+                    Vocabulary vocabulary = (Vocabulary) intent.getSerializableExtra(SHOW_VOCA);
+                    showWordOnNotification(vocabulary);
+                    Log.d("HSK APP", "show voca on notification: " + vocabulary.eng);
+                } else if (intent != null && !intent.getBooleanExtra(RestartService.RESTART_SERVICE, false) && !aBoolean) {
+                    // only when starting with app and database not empty
+                    showRandomWordOnNotification();
+                    Log.d("HSK APP", "show random word on notification");
+                } else if (intent != null && intent.getBooleanExtra(RestartService.RESTART_SERVICE, false)) {
+                    Log.d("HSK APP", "restart notification service");
+                    setAlarmTimer();
+                }
+                isEmpty.removeObserver(this);
+            }
+        });
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -92,10 +100,16 @@ public class ShowNotificationService extends LifecycleService {
         isRunning = false;
         Log.d("HSK APP", "ShowNotificationService onDestroy()");
 
-        if (!vocaViewModel.isEmpty()) {
-            setAlarmTimer();
-        }
-
+        final LiveData<Boolean> isEmpty = vocaViewModel.isEmpty();
+        isEmpty.observeForever(new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (!aBoolean) {
+                    setAlarmTimer();
+                }
+                isEmpty.removeObserver(this);
+            }
+        });
         unregisterReceiver(receiver);
     }
 
@@ -129,7 +143,6 @@ public class ShowNotificationService extends LifecycleService {
         Intent showVocaIntent = new Intent(SHOW_RANDOM_VOCA_ACTION_NAME);
         PendingIntent showVocaPI = PendingIntent.getBroadcast(getApplicationContext(), SHOW_RANDOM_VOCA_ACTION_ID, showVocaIntent, 0);
         NotificationCompat.Action action = new NotificationCompat.Action(R.drawable.thinking_face, SHOW_RANDOM_VOCA, showVocaPI);
-
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), VOCA_NOTIFICATION_ID)
                 .setSmallIcon(R.drawable.baseline_bookmark_border_24)
@@ -165,7 +178,7 @@ public class ShowNotificationService extends LifecycleService {
     public class ShowVocaNotificationReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("HSK APP", "onReceive()");
+            Log.d("HSK APP", "NotificationReceiver onReceive()");
             if (intent.getAction().equalsIgnoreCase(SHOW_RANDOM_VOCA_ACTION_NAME)) {
                 // TODO: wait until vocaViewModel is not null
                 Log.d("HSK APP", "Show voca on notification");

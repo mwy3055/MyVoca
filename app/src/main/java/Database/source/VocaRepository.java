@@ -1,10 +1,18 @@
 package Database.source;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import java.util.List;
-import java.util.concurrent.Executor;
+import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 
 import Database.Vocabulary;
 import Database.source.local.VocaDao;
@@ -14,7 +22,7 @@ import Database.source.local.VocaDatabase;
 public class VocaRepository {
 
     private VocaDao vocaDao;
-    private final Executor executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = Executors.newCachedThreadPool();
 
     private static VocaRepository instance;
     private VocaDatabase database;
@@ -32,31 +40,57 @@ public class VocaRepository {
         synchronized (VocaRepository.class) {
             if (instance == null) {
                 instance = new VocaRepository();
-                instance.vocaDao = VocaDatabase.getInstance().vocaDao();
                 instance.database = VocaDatabase.getInstance();
+                instance.vocaDao = VocaDatabase.getInstance().vocaDao();
             }
         }
     }
 
+    private void loadVocabulary() {
+        try {
+            executor.execute(LoadTask);
+            allVocabulary = LoadTask.get(10, TimeUnit.SECONDS);
+            allVocabulary.observeForever(new Observer<List<Vocabulary>>() {
+                @Override
+                public void onChanged(List<Vocabulary> vocabularies) {
+                    Log.d("HSK APP", "load complete, " + vocabularies.size());
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public LiveData<List<Vocabulary>> getVocabulary(final String eng) {
-       /* MutableLiveData<List<Vocabulary>> rtn = new MutableLiveData<>();
-
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                rtn.setValue(vocaDao.loadVocabulary(eng));
-            }
-        });*/
-
-
         return vocaDao.loadVocabulary(eng);
     }
 
     public LiveData<List<Vocabulary>> getAllVocabulary() {
         if (allVocabulary == null || allVocabulary.getValue() == null) {
-            allVocabulary = vocaDao.loadAllVocabulary();
+            loadVocabulary();
         }
         return allVocabulary;
+    }
+
+    public LiveData<Vocabulary> getRandomVocabulary() {
+        final MutableLiveData<Vocabulary> result = new MutableLiveData<>();
+        final Random random = new Random();
+
+        if (allVocabulary == null || allVocabulary.getValue() == null) {
+            loadVocabulary();
+            allVocabulary.observeForever(new Observer<List<Vocabulary>>() {
+                @Override
+                public void onChanged(List<Vocabulary> vocabularies) {
+                    int index = random.nextInt(vocabularies.size());
+                    result.setValue(vocabularies.get(index));
+                    allVocabulary.removeObserver(this);
+                }
+            });
+        } else {
+            int index = random.nextInt(allVocabulary.getValue().size());
+            result.setValue(allVocabulary.getValue().get(index));
+        }
+        return result;
     }
 
     public void insertVocabulary(final Vocabulary... vocabularies) {
@@ -85,4 +119,13 @@ public class VocaRepository {
             }
         });
     }
+
+    private FutureTask<LiveData<List<Vocabulary>>> LoadTask = new FutureTask<LiveData<List<Vocabulary>>>(
+            new Callable<LiveData<List<Vocabulary>>>() {
+                @Override
+                public LiveData<List<Vocabulary>> call() throws Exception {
+                    return vocaDao.loadAllVocabulary();
+                }
+            }
+    );
 }
