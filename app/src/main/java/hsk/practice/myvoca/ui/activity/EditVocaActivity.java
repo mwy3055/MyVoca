@@ -67,7 +67,10 @@ public class EditVocaActivity extends AppCompatActivity {
         buttonOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editVocabulary();
+                if (!editVocabulary()) {
+                    Toast.makeText(getApplicationContext(), "단어를 입력해 주세요.", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 exitCode = Constants.EDIT_NEW_VOCA_OK;
                 finish();
             }
@@ -81,11 +84,15 @@ public class EditVocaActivity extends AppCompatActivity {
         });
     }
 
-    private void editVocabulary() {
+    private boolean editVocabulary() {
         String eng = inputEng.getText().toString();
         String kor = inputKor.getText().toString();
         String memo = inputMemo.getText().toString();
         int time = (int) (Calendar.getInstance().getTimeInMillis() / 1000);
+
+        if (eng == null || eng.equals("")) {
+            return false;
+        }
 
         Vocabulary newVocabulary = new Vocabulary(eng, kor, vocabulary.addedTime, time, memo);
         if (vocabulary.eng.equals(newVocabulary.eng)) {
@@ -95,6 +102,7 @@ public class EditVocaActivity extends AppCompatActivity {
             vocaViewModel.insertVocabulary(newVocabulary);
         }
         Toast.makeText(getApplication(), "수정 완료!", Toast.LENGTH_LONG).show();
+        return true;
     }
 
     @Override
