@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import Database.Vocabulary;
 import Database.source.local.VocaDao;
 import Database.source.local.VocaDatabase;
+import hsk.practice.myvoca.AppHelper;
 
 // Singleton
 public class VocaRepository {
@@ -61,8 +62,14 @@ public class VocaRepository {
         }
     }
 
-    public LiveData<List<Vocabulary>> getVocabulary(final String eng) {
-        return vocaDao.loadVocabulary(eng);
+    public LiveData<List<Vocabulary>> getVocabulary(String query) {
+        if (AppHelper.isStringOnlyAlphabet(query)) {
+            Log.d("HSK APP", "search by eng: " + query);
+            return vocaDao.loadVocabularyByEng(query);
+        } else {
+            Log.d("HSK APP", "search by kor: " + query);
+            return vocaDao.loadVocabularyByKor(query);
+        }
     }
 
     public LiveData<List<Vocabulary>> getAllVocabulary() {

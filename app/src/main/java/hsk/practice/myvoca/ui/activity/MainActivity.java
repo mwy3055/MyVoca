@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
 
         // TODO: look if battery permission is required to background service
+        // result: required
         // getIgnoreBatteryOptPermission();
     }
 

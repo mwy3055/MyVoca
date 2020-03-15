@@ -50,8 +50,8 @@ public class VocaViewModel extends ViewModel {
         vocaRepo.deleteVocabularies(vocabularies);
     }
 
-    public LiveData<List<Vocabulary>> getVocabulary(String eng) {
-        return vocaRepo.getVocabulary(eng);
+    public LiveData<List<Vocabulary>> getVocabulary(String query) {
+        return vocaRepo.getVocabulary(query);
     }
 
     public void insertVocabulary(Vocabulary... vocabularies) {

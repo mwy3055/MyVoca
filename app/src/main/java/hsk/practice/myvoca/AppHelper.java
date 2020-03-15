@@ -69,4 +69,16 @@ public class AppHelper {
         VocaDatabase.loadInstance(context);
         VocaRepository.loadInstance();
     }
+
+    public static boolean isStringOnlyAlphabet(String str) {
+        if (str == null || str.equals("")) {
+            return false;
+        }
+        for (char c : str.toCharArray()) {
+            if (!Character.isAlphabetic(c) && c != '%') {
+                return false;
+            }
+        }
+        return true;
+    }
 }

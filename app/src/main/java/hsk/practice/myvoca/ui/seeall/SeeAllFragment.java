@@ -26,8 +26,11 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -79,6 +82,9 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
     private SeeAllViewModel seeAllViewModel;
 
     private VocaViewModel vocaViewModel;
+
+    private Spinner sortSpinner;
+    private static int sortState = 0;
 
     private TextView vocaSizeText;
     private RecyclerView vocaRecyclerView;
@@ -156,6 +162,9 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         });
 
         showVocaSize();
+
+        sortSpinner = root.findViewById(R.id.spinner_sort);
+        showSpinner();
 
 
         final LoadAdapterTask task = new LoadAdapterTask();
@@ -365,6 +374,31 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
             snackbar.setActionTextColor(Color.YELLOW);
             snackbar.show();
         }
+    }
+
+    private void showSpinner() {
+        String[] items = getResources().getStringArray(R.array.sort_method);
+        ArrayAdapter<String> sortAdapter = new ArrayAdapter<String>(parentActivity.getApplicationContext(), R.layout.spinner_item, items);
+        sortSpinner.setAdapter(sortAdapter);
+
+        sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (sortState == position) {
+                    return;
+                }
+                sortState = position;
+                vocaRecyclerViewAdapter.sortItems(sortState);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                sortState = 0;
+                vocaRecyclerViewAdapter.sortItems(sortState);
+            }
+        });
+        sortSpinner.setPrompt("정렬 방법");
+        sortSpinner.setSelection(sortState);
     }
 
 

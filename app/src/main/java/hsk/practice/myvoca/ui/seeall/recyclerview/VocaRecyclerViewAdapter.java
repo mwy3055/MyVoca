@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,9 +20,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
+import Database.VocaComparator;
 import Database.Vocabulary;
 import hsk.practice.myvoca.Constants;
 import hsk.practice.myvoca.R;
@@ -49,6 +52,7 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
     }
 
     private static VocaRecyclerViewAdapter instance;
+    private static int sortState = 0;
 
     private ViewModelProvider viewModelProvider;
 
@@ -236,6 +240,7 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
         if (searchMode) {
             searchMode = false;
             currentVocabulary = vocaViewModel.getAllVocabulary();
+            sortItems(sortState);
             notifyDataSetChanged();
         }
     }
@@ -246,6 +251,7 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
             @Override
             public void onChanged(List<Vocabulary> vocabularies) {
                 Log.d("HSK APP", "Searched " + query + ": " + (currentVocabulary.getValue() == null ? -1 : currentVocabulary.getValue().size()));
+                sortItems(sortState);
                 notifyDataSetChanged();
             }
         });
@@ -277,6 +283,23 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
         notifyItemInserted(position);
 
         vocaViewModel.insertVocabulary(vocabulary);
+    }
+
+    /* for sorting items */
+    public void sortItems(int method) {
+        if (currentVocabulary == null || currentVocabulary.getValue() == null) {
+            return;
+        }
+        sortState = method;
+        if (sortState == 0) {
+            Collections.sort(currentVocabulary.getValue(), VocaComparator.getEngComparator());
+        } else if (sortState == 1) {
+            Collections.sort(currentVocabulary.getValue(), VocaComparator.getAddedTimeComparator());
+        } else {
+            sortState = 0;
+            Toast.makeText(activity.getApplicationContext(), "정렬할 수 없습니다: " + method, Toast.LENGTH_LONG).show();
+        }
+        notifyDataSetChanged();
     }
 
     /* See SeeAllFragment.onDeleteModeEnabled() Method */

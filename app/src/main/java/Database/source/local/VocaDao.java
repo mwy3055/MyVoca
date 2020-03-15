@@ -28,5 +28,8 @@ public interface VocaDao {
     public LiveData<List<Vocabulary>> loadAllVocabulary(); // 모든 단어의 영어, 뜻만 load
 
     @Query("SELECT * from Vocabulary WHERE eng LIKE :eng")
-    public LiveData<List<Vocabulary>> loadVocabulary(String eng); // 그 단어의 모든 정보 load
+    public LiveData<List<Vocabulary>> loadVocabularyByEng(String eng); // 그 단어의 모든 정보 load
+
+    @Query("SELECT * from Vocabulary WHERE kor LIKE :kor")
+    public LiveData<List<Vocabulary>> loadVocabularyByKor(String kor);
 }

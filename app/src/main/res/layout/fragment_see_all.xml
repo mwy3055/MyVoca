@@ -50,6 +50,15 @@
 
         </LinearLayout>
 
+        <Spinner
+            android:id="@+id/spinner_sort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@drawable/spinner_background"
+            android:spinnerMode="dialog"
+            android:theme="@style/SpinnerTheme" />
+
     </LinearLayout>
 
     <ImageView
