@@ -75,7 +75,7 @@ public class AppHelper {
             return false;
         }
         for (char c : str.toCharArray()) {
-            if (!Character.isAlphabetic(c) && c != '%') {
+            if (!('a' <= c && c <= 'z') && !('A' <= c && c <= 'Z') && c != '%') {
                 return false;
             }
         }

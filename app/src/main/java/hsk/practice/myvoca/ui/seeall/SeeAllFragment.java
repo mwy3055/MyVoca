@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -399,6 +400,7 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         });
         sortSpinner.setPrompt("정렬 방법");
         sortSpinner.setSelection(sortState);
+        sortSpinner.setGravity(Gravity.CENTER);
     }
 
 
