@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.List;
 
-import Database.Vocabulary;
-import Database.source.VocaRepository;
+import database.Vocabulary;
+import database.source.VocaRepository;
 
 
 public class VocaViewModel extends ViewModel {

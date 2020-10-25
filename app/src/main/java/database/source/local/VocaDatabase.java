@@ -1,4 +1,4 @@
-package Database.source.local;
+package database.source.local;
 
 import android.content.Context;
 
@@ -6,8 +6,8 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-import Database.Vocabulary;
-import Database.source.VocaRepository;
+import database.Vocabulary;
+import database.source.VocaRepository;
 
 @Database(entities = Vocabulary.class, version = 1)
 public abstract class VocaDatabase extends RoomDatabase {

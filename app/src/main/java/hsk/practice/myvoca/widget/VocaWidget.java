@@ -16,8 +16,8 @@ import androidx.lifecycle.Observer;
 
 import java.util.concurrent.Callable;
 
-import Database.Vocabulary;
-import Database.source.VocaRepository;
+import database.Vocabulary;
+import database.source.VocaRepository;
 import hsk.practice.myvoca.AppHelper;
 import hsk.practice.myvoca.R;
 

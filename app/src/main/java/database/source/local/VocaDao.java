@@ -1,4 +1,4 @@
-package Database.source.local;
+package database.source.local;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -9,7 +9,7 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import Database.Vocabulary;
+import database.Vocabulary;
 
 import static androidx.room.OnConflictStrategy.REPLACE;
 

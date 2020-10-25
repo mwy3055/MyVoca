@@ -13,8 +13,8 @@ import androidx.lifecycle.Observer;
 
 import java.util.List;
 
-import Database.Vocabulary;
-import Database.source.VocaRepository;
+import database.Vocabulary;
+import database.source.VocaRepository;
 import hsk.practice.myvoca.AppHelper;
 import hsk.practice.myvoca.services.notification.ShowNotificationService;
 

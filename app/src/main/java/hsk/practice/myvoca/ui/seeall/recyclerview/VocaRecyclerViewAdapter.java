@@ -24,8 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-import Database.VocaComparator;
-import Database.Vocabulary;
+import database.VocaComparator;
+import database.Vocabulary;
 import hsk.practice.myvoca.Constants;
 import hsk.practice.myvoca.R;
 import hsk.practice.myvoca.VocaViewModel;
