@@ -5,7 +5,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import database.Vocabulary;
 import database.source.VocaRepository;
@@ -69,6 +71,17 @@ public class VocaViewModel extends ViewModel {
 
     public LiveData<Vocabulary> getRandomVocabulary() {
         return vocaRepo.getRandomVocabulary();
+    }
+
+    public List<Vocabulary> getRandomVocabularies(int count, Vocabulary notInclude) {
+        ArrayList<Vocabulary> result = new ArrayList<>();
+        while (result.size() < count) {
+            Vocabulary voca = vocaRepo.getRandomVocabulary().getValue();
+            if (!Objects.equals(voca, notInclude)) {
+                result.add(voca);
+            }
+        }
+        return result;
     }
 
     public LiveData<Boolean> isEmpty() {
