@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -131,18 +132,33 @@ public class QuizFragment extends Fragment {
     }
 
     public void quizItemSelected(int index) {
+        boolean isCorrect;
         Context context = getContext();
         if (answerIndex == index) {
+            isCorrect = true;
             answerCount++;
             PreferenceManager.setInt(context, PreferenceManager.QUIZ_CORRECT, answerCount);
             versusView.setLeftValue(answerCount);
 //            Toast.makeText(context, String.format("정답: %d", answerCount), Toast.LENGTH_LONG).show();
         } else {
+            isCorrect = false;
             wrongCount++;
             PreferenceManager.setInt(context, PreferenceManager.QUIZ_WRONG, wrongCount);
             versusView.setRightValue(wrongCount);
 //            Toast.makeText(context, String.format("오답: %d", wrongCount), Toast.LENGTH_LONG).show();
         }
+        showVocaDialog(answerVoca, isCorrect);
         showQuizWord();
+    }
+
+
+    public void showVocaDialog(Vocabulary voca, boolean isCorrect) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle(isCorrect ? "맞았습니다!!" : "틀렸습니다");
+        builder.setMessage(String.format("%s: %s", voca.eng, formatString(voca.kor)));
+        builder.setPositiveButton(android.R.string.ok, null);
+
+        final AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

@@ -57,7 +57,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="10"
+            android:layout_weight="12"
             android:orientation="horizontal">
 
             <View
@@ -78,28 +78,28 @@
                 <TextView
                     android:id="@+id/quiz_option1"
                     style="@style/QuizOptionStyle"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/quiz_option_example" />
 
                 <TextView
                     android:id="@+id/quiz_option2"
                     style="@style/QuizOptionStyle"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/quiz_option_example" />
 
                 <TextView
                     android:id="@+id/quiz_option3"
                     style="@style/QuizOptionStyle"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/quiz_option_example" />
 
                 <TextView
                     android:id="@+id/quiz_option4"
                     style="@style/QuizOptionStyle"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/quiz_option_example" />
 
