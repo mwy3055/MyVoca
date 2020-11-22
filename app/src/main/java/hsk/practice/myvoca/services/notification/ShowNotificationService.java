@@ -18,7 +18,7 @@ import androidx.lifecycle.Observer;
 
 import java.util.Calendar;
 
-import Database.Vocabulary;
+import database.Vocabulary;
 import hsk.practice.myvoca.AppHelper;
 import hsk.practice.myvoca.R;
 import hsk.practice.myvoca.VocaViewModel;

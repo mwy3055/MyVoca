@@ -24,8 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-import Database.VocaComparator;
-import Database.Vocabulary;
+import database.VocaComparator;
+import database.Vocabulary;
 import hsk.practice.myvoca.Constants;
 import hsk.practice.myvoca.R;
 import hsk.practice.myvoca.VocaViewModel;
@@ -402,11 +402,11 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
             }
             MenuItem edit = menu.add(Menu.NONE, Constants.EDIT_CODE, 1, "수정");
             MenuItem delete = menu.add(Menu.NONE, Constants.DELETE_CODE, 2, "삭제");
-            MenuItem showOnNotification = menu.add(Menu.NONE, Constants.SHOW_ON_NOTIFICATION_CODE, 3, "알림에 보이기");
+//            MenuItem showOnNotification = menu.add(Menu.NONE, Constants.SHOW_ON_NOTIFICATION_CODE, 3, "알림에 보이기");
 
             edit.setOnMenuItemClickListener(onMenuItemClickListener);
             delete.setOnMenuItemClickListener(onMenuItemClickListener);
-            showOnNotification.setOnMenuItemClickListener(onMenuItemClickListener);
+//            showOnNotification.setOnMenuItemClickListener(onMenuItemClickListener);
         }
 
         public void setVocabulary(Vocabulary vocabulary) {

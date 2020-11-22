@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
-import Database.Vocabulary;
+import database.Vocabulary;
 import hsk.practice.myvoca.AppHelper;
 import hsk.practice.myvoca.R;
 

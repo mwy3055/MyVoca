@@ -1,6 +1,6 @@
 package hsk.practice.myvoca.ui.seeall;
 
-import Database.Vocabulary;
+import database.Vocabulary;
 
 public interface OnEditVocabularyListener {
 

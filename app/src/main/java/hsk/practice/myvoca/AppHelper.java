@@ -10,8 +10,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import Database.source.VocaRepository;
-import Database.source.local.VocaDatabase;
+import database.source.VocaRepository;
+import database.source.local.VocaDatabase;
 import hsk.practice.myvoca.ui.activity.MainActivity;
 
 public class AppHelper {

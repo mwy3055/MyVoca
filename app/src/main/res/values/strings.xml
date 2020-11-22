@@ -17,7 +17,7 @@
     <!-- for menu/activity_main_drawer -->
     <string name="menu_main">하나씩 보기</string>
     <string name="menu_show_all">모두 보기</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_quiz">단어 퀴즈</string>
     <string name="menu_tools">Tools</string>
     <string name="menu_category_communicate">Communicate</string>
     <string name="menu_share">Share</string>
@@ -33,6 +33,12 @@
     <string name="see_all_fragment_number_word_gae">개</string>
     <string name="see_all_fragment_delete">삭제</string>
     <string name="see_all_fragment_cancel">취소</string>
+
+    <!-- for layout/fragment_quiz -->
+    <string name="quiz_no_vocabulary">퀴즈를 풀기 위해서는 단어를 5개 이상 등록해야 합니다.</string>
+    <string name="current_voca_count">현재 등록된 단어: %d개</string>
+    <string name="quiz_word_example">keyword</string>
+    <string name="quiz_option_example">잠을 자다</string>
 
     <!-- for layout/toolbar_search_view -->
     <string name="toolbar_search_view_search_button">단어 검색하기</string>
@@ -67,4 +73,5 @@
 
     <!-- for layout/widget_layout -->
     <string name="widget_layout_show_voca">다른 단어</string>
+    <string name="zero">0</string>
 </resources>

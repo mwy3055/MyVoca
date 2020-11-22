@@ -18,10 +18,10 @@
         tools:layout="@layout/fragment_see_all" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="hsk.practice.myvoca.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:id="@+id/nav_quiz"
+        android:name="hsk.practice.myvoca.ui.quiz.QuizFragment"
+        android:label="@string/menu_quiz"
+        tools:layout="@layout/fragment_quiz" />
 
     <fragment
         android:id="@+id/nav_tools"

@@ -22,7 +22,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.List;
 import java.util.Random;
 
-import Database.Vocabulary;
+import database.Vocabulary;
 import hsk.practice.myvoca.R;
 import hsk.practice.myvoca.VocaViewModel;
 

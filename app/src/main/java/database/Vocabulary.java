@@ -1,6 +1,7 @@
-package Database;
+package database;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -30,5 +31,14 @@ public class Vocabulary implements Serializable {
         this.addedTime = addedTime;
         this.lastEditedTime = lastEditedTime;
         this.memo = memo;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null)
+            return false;
+        if (!(obj instanceof Vocabulary))
+            return false;
+        return this.eng.contentEquals(((Vocabulary) obj).eng);
     }
 }

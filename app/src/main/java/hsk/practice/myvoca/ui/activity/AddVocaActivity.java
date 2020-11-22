@@ -17,7 +17,7 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Calendar;
 
-import Database.Vocabulary;
+import database.Vocabulary;
 import hsk.practice.myvoca.Constants;
 import hsk.practice.myvoca.R;
 import hsk.practice.myvoca.VocaViewModel;

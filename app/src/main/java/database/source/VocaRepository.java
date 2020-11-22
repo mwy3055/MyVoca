@@ -1,4 +1,4 @@
-package Database.source;
+package database.source;
 
 import android.util.Log;
 
@@ -14,9 +14,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
-import Database.Vocabulary;
-import Database.source.local.VocaDao;
-import Database.source.local.VocaDatabase;
+import database.Vocabulary;
+import database.source.local.VocaDao;
+import database.source.local.VocaDatabase;
 import hsk.practice.myvoca.AppHelper;
 
 // Singleton

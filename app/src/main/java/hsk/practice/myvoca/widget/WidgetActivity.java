@@ -17,7 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.List;
 
-import Database.Vocabulary;
+import database.Vocabulary;
 import hsk.practice.myvoca.AppHelper;
 import hsk.practice.myvoca.R;
 import hsk.practice.myvoca.VocaViewModel;

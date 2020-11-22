@@ -13,8 +13,8 @@ import androidx.lifecycle.Observer;
 
 import java.util.List;
 
-import Database.Vocabulary;
-import Database.source.VocaRepository;
+import database.Vocabulary;
+import database.source.VocaRepository;
 import hsk.practice.myvoca.AppHelper;
 import hsk.practice.myvoca.services.notification.ShowNotificationService;
 
@@ -33,7 +33,7 @@ public class SplashActivity extends AppCompatActivity {
         VocaRepository.getInstance().getAllVocabulary().observe(this, new Observer<List<Vocabulary>>() {
             @Override
             public void onChanged(List<Vocabulary> vocabularies) {
-                startVocaProviderService();
+                // startVocaProviderService();
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
