@@ -10,6 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter;
 
+/**
+ * Touch helper class.
+ * Related to swipe actions at the SeeAllFragment.VocaRecyclerView
+ */
 public class VocabularyTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     public interface VocabularyTouchHelperListener {

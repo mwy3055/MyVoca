@@ -2,6 +2,13 @@ package database;
 
 import java.util.Comparator;
 
+/**
+ * Classes for comparing vocabulary.
+ * Implemented as Singleton to save resources.
+ *
+ * Supports comparing with eng, add_time
+ * Used in SeeAllFragment to sort the RecyclerView with specific criteria.
+ */
 public class VocaComparator {
 
     private static AddedTimeComparator addedTimeComparator;

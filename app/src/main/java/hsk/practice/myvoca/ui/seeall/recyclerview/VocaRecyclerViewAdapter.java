@@ -32,9 +32,16 @@ import hsk.practice.myvoca.VocaViewModel;
 import hsk.practice.myvoca.ui.seeall.OnDeleteModeListener;
 import hsk.practice.myvoca.ui.seeall.OnEditVocabularyListener;
 
+/**
+ * RecyclerAdapter for each vocabulary.
+ * Implemented as Singleton to manage the view more easily.
+ *
+ * For further information, Please refer the comments above some methods.
+ */
 public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerViewAdapter.VocaViewHolder>
         implements OnDeleteModeListener {
 
+    // Custom listener interfaces. Will be used in the ViewHolder below.
     public interface OnVocaClickListener {
         void onVocaClick(VocaViewHolder holder, View view, int position);
 
@@ -114,6 +121,7 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
         return holder;
     }
 
+    // Bind the content to the item
     @Override
     public void onBindViewHolder(@NonNull VocaViewHolder holder, int position) {
         if (currentVocabulary.getValue() == null) {
@@ -137,12 +145,12 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
         }
     }
 
-    /* this should be used only when setting observer to LiveData object
-     */
+    // this should be used only when setting observer to LiveData object
     public LiveData<List<Vocabulary>> getCurrentVocabulary() {
         return currentVocabulary;
     }
 
+    // Methods for general adapter
     @Override
     public int getItemCount() {
         if (currentVocabulary.getValue() == null) {
@@ -164,7 +172,7 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
         return currentVocabulary.getValue().indexOf(vocabulary);
     }
 
-    /* Getter/Setters of Listeners */
+    // Getter/Setters of Listeners
     public OnVocaClickListener getVocaClickListener() {
         return vocaClickListener;
     }
@@ -186,7 +194,7 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
     }
 
 
-    /* Methods for selected state */
+    // Methods for managing select state
     public boolean isSelected(int position) {
         return getSelectedItems().contains(position);
     }
@@ -231,7 +239,7 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
         }
     }
 
-    /* for search mode */
+    // for search mode
     public void enableSearchMode() {
         searchMode = true;
     }
@@ -257,7 +265,7 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
         });
     }
 
-    /* for remove and restore item */
+    // for remove and restore item with swiping
     public void removeItem(int position) {
         Vocabulary deletedVocabulary = currentVocabulary.getValue().get(position);
         currentVocabulary.getValue().remove(position);
@@ -285,7 +293,9 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
         vocaViewModel.insertVocabulary(vocabulary);
     }
 
-    /* for sorting items */
+    // Sort items
+    // state 0: sort alphabetically
+    // state 1: sort by latest edited time
     public void sortItems(int method) {
         if (currentVocabulary == null || currentVocabulary.getValue() == null) {
             return;
@@ -302,7 +312,7 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
         notifyDataSetChanged();
     }
 
-    /* See SeeAllFragment.onDeleteModeEnabled() Method */
+    // See SeeAllFragment.onDeleteModeEnabled() Method
     @Override
     public void enableDeleteMode() {
         Log.d("HSK APP", "DELETE MODE ENABLED");
@@ -313,7 +323,7 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
         }
     }
 
-    /* See SeeAllFragment.onDeleteModeDisabled() Method */
+    // See SeeAllFragment.onDeleteModeDisabled() Method
     @Override
     public void disableDeleteMode() {
         Log.d("HSK APP", "DELETE MODE DISABLED");
@@ -323,7 +333,10 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
         }
     }
 
-
+    /**
+     * ViewHolder for vocabulary object.
+     * Manages the content of the item and action when the item is clicked or long-clicked.
+     */
     public class VocaViewHolder extends RecyclerView.ViewHolder
             implements View.OnCreateContextMenuListener {
 
@@ -333,6 +346,7 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
 
         public RelativeLayout viewForeground, viewBackground;
 
+        // long-click listener
         private MenuItem.OnMenuItemClickListener onMenuItemClickListener = new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -395,6 +409,7 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
             vocaView.setOnCreateContextMenuListener(this);
         }
 
+        // Create drop-down menu when item is long-clicked
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             if (VocaRecyclerViewAdapter.getInstance(activity).deleteMode) {

@@ -26,7 +26,11 @@ import database.Vocabulary;
 import hsk.practice.myvoca.R;
 import hsk.practice.myvoca.VocaViewModel;
 
-
+/**
+ * First-shown fragment
+ * Shows a random word. Press the button to change the word.
+ * If there is no word in the database, notification text will be shown instead.
+ */
 public class HomeFragment extends Fragment {
 
     private ViewModelProvider viewModelProvider;

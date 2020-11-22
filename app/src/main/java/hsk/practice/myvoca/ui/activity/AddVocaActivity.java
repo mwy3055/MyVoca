@@ -22,6 +22,11 @@ import hsk.practice.myvoca.Constants;
 import hsk.practice.myvoca.R;
 import hsk.practice.myvoca.VocaViewModel;
 
+/**
+ * Activity where users can add word.
+ * inputEng must not be empty because it is the Primary Key of the database.
+ * Other fields can be empty.
+ */
 public class AddVocaActivity extends AppCompatActivity {
 
     private TextInputEditText inputEng;
@@ -47,6 +52,7 @@ public class AddVocaActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar_activity_new_voca);
         setSupportActionBar(toolbar);
 
+        // Show back arrow icon in the Action Bar
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayOptions(ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE);
 
@@ -61,6 +67,11 @@ public class AddVocaActivity extends AppCompatActivity {
         buttonOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String eng = inputEng.getText().toString();
+                if (eng == null || eng.isEmpty()) {
+                    Toast.makeText(getApplication(), "단어를 입력해 주세요.", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 addVocabulary();
                 finish();
             }

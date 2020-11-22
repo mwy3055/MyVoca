@@ -11,6 +11,10 @@ import androidx.annotation.Nullable;
 
 import hsk.practice.myvoca.R;
 
+/**
+ * Custom view which compares two values and show proper graphics.
+ * Hard to explain in text, just see the QuizFragment!
+ */
 public class VersusView extends LinearLayout {
 
     private int BAR_HEIGHT = 50;

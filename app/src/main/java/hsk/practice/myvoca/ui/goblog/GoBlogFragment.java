@@ -16,7 +16,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import hsk.practice.myvoca.R;
 
-
+/**
+ * Just for fun
+ * Maybe some features will be added here...
+ */
 public class GoBlogFragment extends Fragment {
 
     private GoBlogViewModel goBlogViewModel;
@@ -26,7 +29,7 @@ public class GoBlogFragment extends Fragment {
         goBlogViewModel = new ViewModelProvider(this).get(GoBlogViewModel.class);
         View root = inflater.inflate(R.layout.fragment_go_blog, container, false);
         final TextView textView = root.findViewById(R.id.text_send);
-        goBlogViewModel.getText().observe(this, new Observer<String>() {
+        goBlogViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);

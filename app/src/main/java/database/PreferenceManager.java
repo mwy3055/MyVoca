@@ -3,6 +3,11 @@ package database;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+/**
+ * Manages SharedPreferences values.
+ * Now supports String, boolean, int, long type value.
+ * All operations should be done with a proper String key.
+ */
 public class PreferenceManager {
 
     public static final String PREFERENCE_NAME = "PREFERENCE";
@@ -10,6 +15,7 @@ public class PreferenceManager {
     public static final String QUIZ_CORRECT = "QUIZ_CORRECT";
     public static final String QUIZ_WRONG = "QUIZ_WRONG";
 
+    // Default values for each type: returned when a given key doesn't exist
     private static final String DEFAULT_VALUE_STRING = "";
     private static final boolean DEFAULT_VALUE_BOOLEAN = false;
     private static final int DEFAULT_VALUE_INT = 0;

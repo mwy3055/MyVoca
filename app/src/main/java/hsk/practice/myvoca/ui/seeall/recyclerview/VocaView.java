@@ -13,6 +13,10 @@ import database.Vocabulary;
 import hsk.practice.myvoca.AppHelper;
 import hsk.practice.myvoca.R;
 
+/**
+ * Custom view which shows a vocabulary object in the database.
+ * Shows english word, korean meaning and the last-edited time.
+ */
 public class VocaView extends LinearLayout {
 
     private LinearLayout vocaLayout;

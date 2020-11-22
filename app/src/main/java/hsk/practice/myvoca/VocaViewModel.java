@@ -12,7 +12,15 @@ import java.util.Objects;
 import database.Vocabulary;
 import database.source.VocaRepository;
 
-
+/**
+ * VocaViewModel is at the top of the database abstraction.
+ * ViewModel interacts with the UI classes directly.
+ * All database operations must be done through this class.
+ *
+ * Also, all methods work asynchronously because database access is costly.
+ * Methods return the LiveData immediately when the method is called. Actual result will be filled into LiveData later.
+ * UI classes should observe the LiveData and define what to do when the operation is actually finished.
+ */
 public class VocaViewModel extends ViewModel {
 
     private LiveData<List<Vocabulary>> allVocabularies;
