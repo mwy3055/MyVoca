@@ -4,6 +4,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+/**
+ * No use
+ */
 public class SeeAllViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;

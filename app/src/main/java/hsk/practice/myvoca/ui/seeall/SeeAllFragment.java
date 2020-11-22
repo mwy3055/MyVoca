@@ -64,7 +64,34 @@ import hsk.practice.myvoca.services.notification.ShowNotificationService;
 import hsk.practice.myvoca.ui.activity.EditVocaActivity;
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter;
 
-
+/**
+ * Most important fragment in this application!
+ * This fragment shows all vocabularies in the database with RecyclerView.
+ * <p>
+ * A user can edit the vocabulary.
+ * To edit the vocabulary, long-click the item and select '수정' option.
+ * Then EditVocabulary will be shown.
+ * <p>
+ * A user can delete vocabulary in two ways.
+ * 1. To delete the vocabulary, long-click the item and select '삭제' option.
+ * Then the delete-mode is enabled.
+ * When delete-mode is enabled, user can select items to delete.
+ * Press the '삭제' button at the bottom to delete the item permanently.
+ * 2. Swipe the item you want to delete.
+ * Then the item will be deleted and a SnackBar will be shown in the bottom.
+ * If you want to restore the item, click the '실행 취소' button at the SnackBar.
+ * Note that the SnackBar fades away in a few seconds.
+ * <p>
+ * A user can search the word. Supports both english word search and korean meaning search.
+ * Click the search button at the right top, type a word to search, and press the button at the keyboard.
+ * Then the result will be shown at the RecyclerView.
+ * You can edit and delete vocabularies at the result, same as above.
+ * <p>
+ * A user can sort vocabularies in two ways.
+ * Click the TextView at the right to choose the criteria.
+ * 1. Sort vocabularies in an alphabetic order of the field 'eng'. This is the default sorting method.
+ * 2. Sort vocabularies by latest edited time.
+ */
 public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.OnSelectModeListener,
         VocaRecyclerViewAdapter.showVocaOnNotification,
         VocabularyTouchHelper.VocabularyTouchHelperListener,
@@ -100,7 +127,10 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
     private VocaRecyclerViewAdapter vocaRecyclerViewAdapter;
 
     private Handler handler = new Handler();
+    private Runnable updateWordSizeRunnable;
     private final int loadAdapterDelay = 10;
+
+    private boolean isFragmentShown = false;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -115,6 +145,8 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         seeAllViewModel = viewModelProvider.get(SeeAllViewModel.class);
         vocaViewModel = viewModelProvider.get(VocaViewModel.class);
 
+        isFragmentShown = true;
+
         View root = inflater.inflate(R.layout.fragment_see_all, container, false);
         seeAllLayout = root.findViewById(R.id.layout_see_all);
 
@@ -125,6 +157,7 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         vocaSizeText = root.findViewById(R.id.text_voca_number);
         vocaRecyclerView = root.findViewById(R.id.recycler_view_voca);
 
+        // For delete method 1
         deleteLayout = root.findViewById(R.id.layout_delete);
         deleteVocabularyButton = root.findViewById(R.id.button_delete_vocabulary);
         deleteVocabularyButton.setOnClickListener(new View.OnClickListener() {
@@ -162,12 +195,26 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
             }
         });
 
+        updateWordSizeRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (isFragmentShown) {
+                    final LiveData<Integer> vocaSize = vocaViewModel.getVocabularyCount();
+                    vocaSize.observe(getViewLifecycleOwner(), new Observer<Integer>() {
+                        @Override
+                        public void onChanged(Integer integer) {
+                            vocaSizeText.setText(Integer.toString(integer));
+                        }
+                    });
+                }
+            }
+        };
         showVocaSize();
 
         sortSpinner = root.findViewById(R.id.spinner_sort);
         showSpinner();
 
-
+        // Loading vocabulary from the database is costly, so execute it asynchronously
         final LoadAdapterTask task = new LoadAdapterTask();
         handler.postDelayed(new Runnable() {
             @Override
@@ -184,16 +231,33 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         return root;
     }
 
+    /**
+     * Update the number of the vocabulary in the database.
+     * Why postDelayed(): Considered the delay the adapter is shown
+     */
     private void showVocaSize() {
-        final LiveData<Integer> vocaSize = vocaViewModel.getVocabularyCount();
-        vocaSize.observe(getViewLifecycleOwner(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                vocaSizeText.setText(Integer.toString(integer));
-            }
-        });
+        handler.postDelayed(updateWordSizeRunnable, 50);
     }
 
+    @Override
+    public void onResume() {
+        isFragmentShown = true;
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        isFragmentShown = false;
+        super.onPause();
+    }
+
+    /**
+     * Inflates options menu.
+     * Here, only a search button will be shown.
+     *
+     * @param menu menu object where the menu bar is shown
+     * @param inflater MenuInflater
+     */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.main, menu);
@@ -235,6 +299,11 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         });
     }
 
+    /**
+     * Search the vocabulary and show the result
+     *
+     * @param query query string to search, only english supported.
+     */
     private void searchVocabulary(String query) {
         vocaRecyclerViewAdapter.searchVocabulary(query);
         vocaRecyclerViewAdapter.getCurrentVocabulary().observe(getViewLifecycleOwner(), new Observer<List<Vocabulary>>() {
@@ -247,7 +316,11 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         });
     }
 
-    /* for drawing search animations on toolbar */
+    /**
+     * Open and close the search view at the ActionBar.
+     *
+     * @param show Show search layout if true, otherwise hide the layout
+     */
     public void animateSearchToolbar(int numberOfMenuIcon, boolean containsOverflow, boolean show) {
         toolbar.setBackgroundColor(ContextCompat.getColor(parentActivity, R.color.design_default_color_primary));
         if (window == null) {
@@ -320,10 +393,21 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         }
     }
 
+    /**
+     * Check if direction of the swipe is right-to-left
+     *
+     * @param resources resource swiped
+     * @return true if direction is right-to-left, false otherwise
+     */
     private boolean isRtl(Resources resources) {
         return resources.getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
     }
 
+    /**
+     * Finds color of the current theme.
+     *
+     * @return Appropriate background color for the theme
+     */
     private static int getThemeColor(Context context, int id) {
         Resources.Theme theme = context.getTheme();
         TypedArray a = theme.obtainStyledAttributes(new int[]{id});
@@ -353,6 +437,14 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         });
     }
 
+    /**
+     * Callback method when a item is swiped.
+     * Only supports right-to-left swipe(deletes a word).
+     *
+     * @param viewHolder ViewHolder of the item
+     * @param direction direction of the swipe action
+     * @param position position of the item in the RecyclerView
+     */
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, final int position) {
         if (viewHolder instanceof VocaRecyclerViewAdapter.VocaViewHolder) {
@@ -377,6 +469,9 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         }
     }
 
+    /**
+     * Shows sort options at the dialog menu
+     */
     private void showSpinner() {
         String[] items = getResources().getStringArray(R.array.sort_method);
         ArrayAdapter<String> sortAdapter = new ArrayAdapter<String>(parentActivity.getApplicationContext(), R.layout.spinner_item, items);
@@ -403,8 +498,7 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         sortSpinner.setGravity(Gravity.CENTER);
     }
 
-
-    /* Implementations of interfaces */
+    // Implements interfaces
     @Override
     public void onDeleteModeEnabled() {
         deleteLayout.setVisibility(View.VISIBLE);
@@ -416,6 +510,11 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         deleteLayout.setVisibility(View.GONE);
     }
 
+    /**
+     * Call EditVocaActivity to edit the vocabulary.
+     * @param position position of the item in the adapter.
+     * @param vocabulary actual vocabulary object at the position.
+     */
     @Override
     public void editVocabulary(int position, Vocabulary vocabulary) {
         Intent intent = new Intent(parentActivity.getApplicationContext(), EditVocaActivity.class);
@@ -424,6 +523,10 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         startActivityForResult(intent, Constants.CALL_EDIT_VOCA_ACTIVITY);
     }
 
+    /**
+     * Show a vocabulary at the notification.
+     * @param vocabulary vocabulary to show at the notification
+     */
     @Override
     public void showVocabularyOnNotification(Vocabulary vocabulary) {
         Intent intent = new Intent(getContext(), ShowNotificationService.class);
@@ -432,7 +535,6 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
 
         Snackbar.make(seeAllLayout, "알림에 보임: " + vocabulary.eng, Snackbar.LENGTH_LONG).show();
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -446,7 +548,9 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         }
     }
 
-
+    /**
+     * Show adapter when LoadAdapterTask is complete
+     */
     private void setAdapter() {
         vocaRecyclerViewAdapter.setOnEditVocabularyListener(this);
         vocaRecyclerViewAdapter.setOnDeleteModeListener(this);
@@ -478,23 +582,22 @@ public class SeeAllFragment extends Fragment implements VocaRecyclerViewAdapter.
         vocaRecyclerView.setAdapter(vocaRecyclerViewAdapter);
     }
 
+    /**
+     * AsyncTask which shows all vocabulary in the database.
+     * Operate asynchronously to prevent the main thread from blocking for a long time.
+     */
     private class LoadAdapterTask extends AsyncTask<Void, Void, Void> {
-
-        private SeeAllFragment thisFragment;
 
         @Override
         protected Void doInBackground(Void... voids) {
             // TODO: 로딩화면 표시?
-            thisFragment = SeeAllFragment.this;
             vocaRecyclerViewAdapter = VocaRecyclerViewAdapter.getInstance(parentActivity);
-
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
             setAdapter();
         }
     }

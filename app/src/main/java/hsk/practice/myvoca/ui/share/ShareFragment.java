@@ -14,7 +14,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import hsk.practice.myvoca.R;
 
-
+/**
+ * Created by Android Studio. Left for further use.
+ */
 public class ShareFragment extends Fragment {
     private ViewModelProvider viewModelProvider;
 

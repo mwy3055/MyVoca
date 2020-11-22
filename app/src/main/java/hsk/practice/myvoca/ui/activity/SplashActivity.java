@@ -18,6 +18,11 @@ import database.source.VocaRepository;
 import hsk.practice.myvoca.AppHelper;
 import hsk.practice.myvoca.services.notification.ShowNotificationService;
 
+/**
+ * SplashActivity shows splash screen, while preparing the database in the same time.
+ * Also requires storage permission only one time to interact with the database.
+ * When database is loaded, MainActivity is shown.
+ */
 public class SplashActivity extends AppCompatActivity {
 
     private int permissionRequestCode = 1;
@@ -30,6 +35,7 @@ public class SplashActivity extends AppCompatActivity {
         getPermissions();
 
         AppHelper.loadInstance(this);
+        // when database is loaded...
         VocaRepository.getInstance().getAllVocabulary().observe(this, new Observer<List<Vocabulary>>() {
             @Override
             public void onChanged(List<Vocabulary> vocabularies) {

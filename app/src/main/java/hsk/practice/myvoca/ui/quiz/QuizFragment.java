@@ -2,6 +2,8 @@ package hsk.practice.myvoca.ui.quiz;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +28,15 @@ import hsk.practice.myvoca.R;
 import hsk.practice.myvoca.VocaViewModel;
 import hsk.practice.myvoca.ui.customview.VersusView;
 
-
+/**
+ * Shows word quiz to user.
+ * There should be at least 5 words in the database to make the quiz shown.
+ * When the word is not enough, notification text will be shown instead.
+ * User should choose the correct meaning of the quiz word. Four options will be provided.
+ * When user selects the option, quiz word and the VersusView at the bottom of the fragment will be updated.
+ * <p>
+ * Numbers of correct and wrong answers are stored in the SharedPreferences and updated in real time.
+ */
 public class QuizFragment extends Fragment {
     private ViewModelProvider viewModelProvider;
 
@@ -52,12 +62,17 @@ public class QuizFragment extends Fragment {
     int answerCount = 0;
     int wrongCount = 0;
 
+    Handler handler;
+    Runnable showQuizRunnable;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         viewModelProvider = new ViewModelProvider(this);
         quizViewModel = viewModelProvider.get(QuizViewModel.class);
         vocaViewModel = viewModelProvider.get(VocaViewModel.class);
         View root = inflater.inflate(R.layout.fragment_quiz, container, false);
+
+        handler = new Handler();
 
         noVocaLayout = root.findViewById(R.id.layout_no_voca);
         vocaCountText = root.findViewById(R.id.text_view_cur_voca);
@@ -87,23 +102,58 @@ public class QuizFragment extends Fragment {
         wrongCount = PreferenceManager.getInt(getContext(), PreferenceManager.QUIZ_WRONG);
         versusView.setValues(answerCount, wrongCount);
 
-        vocaViewModel.getVocabularyCount().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+        showQuizRunnable = new Runnable() {
             @Override
-            public void onChanged(Integer integer) {
-                if (integer > 0) {
-                    showQuizWord();
-                } else {
-                    setEmptyVocaLayout();
-                }
+            public void run() {
+                vocaViewModel.getVocabularyCount().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+                    @Override
+                    public void onChanged(Integer integer) {
+                        Log.d("HSK APP", integer.toString());
+                        if (integer > 4) {
+                            hideEmptyVocaLayout();
+                            showQuizLayout();
+                            showQuizWord();
+                        } else {
+                            hideQuizLayout();
+                            showEmptyVocaLayout(integer);
+                        }
+                    }
+                });
             }
-        });
+        };
+        tryShowQuizWord();
 
         return root;
     }
 
-    public void setEmptyVocaLayout() {
+    @Override
+    public void onResume() {
+        super.onResume();
+        tryShowQuizWord();
+    }
+
+    public void showEmptyVocaLayout(int vocaCount) {
         noVocaLayout.setVisibility(View.VISIBLE);
+        vocaCountText.setText(getString(R.string.current_voca_count, vocaCount));
+    }
+
+    public void hideEmptyVocaLayout() {
+        noVocaLayout.setVisibility(View.GONE);
+        vocaCountText.setVisibility(View.GONE);
+    }
+
+    public void showQuizLayout() {
+        quizLayout.setVisibility(View.VISIBLE);
+        quizWordText.setVisibility(View.VISIBLE);
+    }
+
+    public void hideQuizLayout() {
         quizLayout.setVisibility(View.GONE);
+        quizWordText.setVisibility(View.GONE);
+    }
+
+    public void tryShowQuizWord() {
+        handler.postDelayed(showQuizRunnable, 50);
     }
 
     public void showQuizWord() {
@@ -127,6 +177,7 @@ public class QuizFragment extends Fragment {
         }
     }
 
+    // replace new line character to the space
     public String formatString(String str) {
         return str.replace("\n", " ");
     }
@@ -151,7 +202,7 @@ public class QuizFragment extends Fragment {
         showQuizWord();
     }
 
-
+    // shows whether the selection is correct
     public void showVocaDialog(Vocabulary voca, boolean isCorrect) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle(isCorrect ? "맞았습니다!!" : "틀렸습니다");

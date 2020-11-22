@@ -1,11 +1,7 @@
 package hsk.practice.myvoca.ui.activity;
 
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -26,6 +22,14 @@ import hsk.practice.myvoca.Constants;
 import hsk.practice.myvoca.R;
 import hsk.practice.myvoca.services.notification.ShowNotificationService;
 
+/**
+ * MainActivity shows major fragments of the application.
+ * Follows the design pattern of Navigation Drawer Activity template.
+ *
+ * Fragment list: HomeFragment, SeeAllFragment, QuizFragment, GoBlogFragment(for fun!).
+ * See res/navigation/mobile_navigation.xml for reference.
+ * Other fragments were left for future features.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
@@ -48,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // button on the right bottom.
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,10 +74,6 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-
-        // TODO: look if battery permission is required to background service
-        // result: required
-        // getIgnoreBatteryOptPermission();
     }
 
     @Override
@@ -116,19 +117,5 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
-    }
-
-    private void getIgnoreBatteryOptPermission() {
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        boolean isWhiteListed = false;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            isWhiteListed = powerManager.isIgnoringBatteryOptimizations(getPackageName());
-        }
-        if (!isWhiteListed) {
-            Intent intent = new Intent();
-            intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-            intent.setData(Uri.parse("package:" + getPackageName()));
-            startActivity(intent);
-        }
     }
 }

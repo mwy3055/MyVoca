@@ -1,5 +1,8 @@
 package hsk.practice.myvoca;
 
+/**
+ * Constant values which is used at the whole application.
+ */
 public class Constants {
 
     /* Used at VocaRecyclerViewAdapter */

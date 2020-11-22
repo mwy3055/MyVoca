@@ -19,7 +19,12 @@ import database.source.local.VocaDao;
 import database.source.local.VocaDatabase;
 import hsk.practice.myvoca.AppHelper;
 
-// Singleton
+/**
+ * VocaRepository mediates between VocaViewModel and VocaRepository.
+ * Executes operations at the separate thread.
+ *
+ * Implemented as Singleton: To unify the management process
+ */
 public class VocaRepository {
 
     private VocaDao vocaDao;

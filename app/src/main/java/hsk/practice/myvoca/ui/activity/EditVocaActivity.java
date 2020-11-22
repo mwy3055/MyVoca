@@ -23,6 +23,13 @@ import hsk.practice.myvoca.Constants;
 import hsk.practice.myvoca.R;
 import hsk.practice.myvoca.VocaViewModel;
 
+/**
+ * Activity where users can modify the word.
+ * inputEng must not be null, with the same reason in the AddVocaActivity.
+ *
+ * If the field 'eng' is edited, activity erases the previous word and add the new word.
+ * Otherwise, activity just edits the database. See editVocabulary().
+ */
 public class EditVocaActivity extends AppCompatActivity {
 
     private int position;
@@ -84,6 +91,7 @@ public class EditVocaActivity extends AppCompatActivity {
         });
     }
 
+    // returns true if vocabulary is edited (or added) successfully, false otherwise
     private boolean editVocabulary() {
         String eng = inputEng.getText().toString();
         String kor = inputKor.getText().toString();
