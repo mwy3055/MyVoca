@@ -61,8 +61,10 @@ public class HomeFragment extends Fragment {
         allVocabulary.observe(getViewLifecycleOwner(), new Observer<List<Vocabulary>>() {
             @Override
             public void onChanged(List<Vocabulary> vocabularies) {
-                showVocaNumber(vocabularies.size());
-                tryShowRandomVocabulary();
+                if (vocabularies.size() > 0) {
+                    showVocaNumber(vocabularies.size());
+                    tryShowRandomVocabulary();
+                }
             }
         });
 
