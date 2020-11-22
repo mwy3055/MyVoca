@@ -61,6 +61,11 @@ public class AddVocaActivity extends AppCompatActivity {
         buttonOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String eng = inputEng.getText().toString();
+                if (eng == null || eng.isEmpty()) {
+                    Toast.makeText(getApplication(), "단어를 입력해 주세요.", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 addVocabulary();
                 finish();
             }
