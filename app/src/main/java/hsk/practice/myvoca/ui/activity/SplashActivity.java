@@ -33,7 +33,7 @@ public class SplashActivity extends AppCompatActivity {
         VocaRepository.getInstance().getAllVocabulary().observe(this, new Observer<List<Vocabulary>>() {
             @Override
             public void onChanged(List<Vocabulary> vocabularies) {
-                // startVocaProviderService();
+                startVocaProviderService();
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
