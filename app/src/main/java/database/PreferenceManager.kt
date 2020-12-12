@@ -9,17 +9,17 @@ import android.content.SharedPreferences
  * All operations should be done with a proper String key.
  */
 object PreferenceManager {
-    val PREFERENCE_NAME: String? = "PREFERENCE"
-    val QUIZ_CORRECT: String? = "QUIZ_CORRECT"
-    val QUIZ_WRONG: String? = "QUIZ_WRONG"
+    private const val PREFERENCE_NAME: String = "PREFERENCE"
+    const val QUIZ_CORRECT: String = "QUIZ_CORRECT"
+    const val QUIZ_WRONG: String = "QUIZ_WRONG"
 
     // Default values for each type: returned when a given key doesn't exist
-    private val DEFAULT_VALUE_STRING: String? = ""
+    private const val DEFAULT_VALUE_STRING: String = ""
     private const val DEFAULT_VALUE_BOOLEAN = false
     private const val DEFAULT_VALUE_INT = 0
     private const val DEFAULT_VALUE_LONG = 0L
-    private fun getPreferences(context: Context?): SharedPreferences? {
-        return context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+    private fun getPreferences(context: Context?): SharedPreferences {
+        return context!!.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
     }
 
     fun setString(context: Context?, key: String?, value: String?) {

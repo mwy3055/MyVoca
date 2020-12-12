@@ -7,11 +7,11 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.textfield.TextInputEditText
 import database.Vocabulary
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.VocaViewModel
+import hsk.practice.myvoca.databinding.ActivityEditVocaBinding
 import java.util.*
 
 /**
@@ -23,17 +23,18 @@ import java.util.*
  */
 class EditVocaActivity : AppCompatActivity() {
     private var position = 0
-    private var vocabulary: Vocabulary? = null
+    private lateinit var vocabulary: Vocabulary
     private var exitCode = 0
-    private var inputEng: TextInputEditText? = null
-    private var inputKor: TextInputEditText? = null
-    private var inputMemo: TextInputEditText? = null
-    private var buttonOK: Button? = null
-    private var buttonCancel: Button? = null
+
+    private lateinit var binding: ActivityEditVocaBinding
+
     var vocaViewModel: VocaViewModel? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_edit_voca)
+
+        binding = ActivityEditVocaBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         val intent = intent
         position = intent.getIntExtra(Constants.POSITION, 0)
         vocabulary = intent.getSerializableExtra(Constants.EDIT_VOCA) as Vocabulary
@@ -41,44 +42,38 @@ class EditVocaActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar?>(R.id.toolbar_activity_edit_voca)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_HOME_AS_UP or ActionBar.DISPLAY_SHOW_TITLE)
-        inputEng = findViewById(R.id.edit_input_eng)
-        inputKor = findViewById(R.id.edit_input_kor)
-        inputMemo = findViewById(R.id.edit_input_memo)
-        inputEng.setText(vocabulary.eng)
-        inputKor.setText(vocabulary.kor)
-        inputMemo.setText(vocabulary.memo)
-        buttonOK = findViewById(R.id.edit_button_ok)
-        buttonCancel = findViewById(R.id.edit_button_cancel)
-        buttonOK.setOnClickListener(View.OnClickListener {
+        actionBar?.displayOptions = ActionBar.DISPLAY_HOME_AS_UP or ActionBar.DISPLAY_SHOW_TITLE
+
+        binding.editButtonOk.setOnClickListener {
             if (!editVocabulary()) {
                 Toast.makeText(applicationContext, "단어를 입력해 주세요.", Toast.LENGTH_LONG).show()
-                return@OnClickListener
+                return@setOnClickListener
             }
             exitCode = Constants.EDIT_NEW_VOCA_OK
             finish()
-        })
-        buttonCancel.setOnClickListener(View.OnClickListener {
+        }
+
+        binding.editButtonCancel.setOnClickListener {
             exitCode = Constants.EDIT_NEW_VOCA_CANCEL
             finish()
-        })
+        }
     }
 
     // returns true if vocabulary is edited (or added) successfully, false otherwise
     private fun editVocabulary(): Boolean {
-        val eng = inputEng.getText().toString()
-        val kor = inputKor.getText().toString()
-        val memo = inputMemo.getText().toString()
-        val time = (Calendar.getInstance().timeInMillis / 1000) as Int
-        if (eng == null || eng == "") {
+        val eng = binding.editInputEng.text.toString()
+        val kor = binding.editInputKor.text.toString()
+        val memo = binding.editInputMemo.text.toString()
+        val time = (Calendar.getInstance().timeInMillis / 1000).toInt()
+        if (eng == "") {
             return false
         }
         val newVocabulary = Vocabulary(eng, kor, vocabulary.addedTime, time, memo)
         if (vocabulary.eng == newVocabulary.eng) {
-            vocaViewModel.editVocabulary(newVocabulary)
+            vocaViewModel?.editVocabulary(newVocabulary)
         } else {
-            vocaViewModel.deleteVocabulary(vocabulary)
-            vocaViewModel.insertVocabulary(newVocabulary)
+            vocaViewModel?.deleteVocabulary(vocabulary)
+            vocaViewModel?.insertVocabulary(newVocabulary)
         }
         Toast.makeText(application, "수정 완료!", Toast.LENGTH_LONG).show()
         return true

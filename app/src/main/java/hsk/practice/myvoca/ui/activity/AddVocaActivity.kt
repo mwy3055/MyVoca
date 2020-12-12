@@ -7,11 +7,11 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.textfield.TextInputEditText
 import database.Vocabulary
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.VocaViewModel
+import hsk.practice.myvoca.databinding.ActivityAddVocaBinding
 import java.util.*
 
 /**
@@ -20,50 +20,46 @@ import java.util.*
  * Other fields can be empty.
  */
 class AddVocaActivity : AppCompatActivity() {
-    private var inputEng: TextInputEditText? = null
-    private var inputKor: TextInputEditText? = null
-    private var inputMemo: TextInputEditText? = null
-    private var buttonOK: Button? = null
-    private var buttonCancel: Button? = null
+
+    private lateinit var binding: ActivityAddVocaBinding
+
     private var viewModelProvider: ViewModelProvider? = null
     private var vocaViewModel: VocaViewModel? = null
     private var resultCode = Constants.ADD_NEW_VOCA_CANCEL
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_voca)
+
+        binding = ActivityAddVocaBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         viewModelProvider = ViewModelProvider(this)
-        vocaViewModel = viewModelProvider.get(VocaViewModel::class.java)
+        vocaViewModel = viewModelProvider!!.get(VocaViewModel::class.java)
         val toolbar = findViewById<Toolbar?>(R.id.toolbar_activity_new_voca)
         setSupportActionBar(toolbar)
 
         // Show back arrow icon in the Action Bar
         val actionBar = supportActionBar
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_HOME_AS_UP or ActionBar.DISPLAY_SHOW_TITLE)
-        inputEng = findViewById(R.id.add_input_eng)
-        inputKor = findViewById(R.id.add_input_kor)
-        inputMemo = findViewById(R.id.add_input_memo)
-        buttonOK = findViewById(R.id.add_button_ok)
-        buttonCancel = findViewById(R.id.add_button_cancel)
-        buttonOK.setOnClickListener(View.OnClickListener {
-            val eng = inputEng.getText().toString()
-            if (eng == null || eng.isEmpty()) {
+        actionBar?.displayOptions = ActionBar.DISPLAY_HOME_AS_UP or ActionBar.DISPLAY_SHOW_TITLE
+        binding.addButtonOk.setOnClickListener {
+            val eng = binding.addInputEng.text.toString()
+            if (eng.isEmpty()) {
                 Toast.makeText(application, "단어를 입력해 주세요.", Toast.LENGTH_LONG).show()
-                return@OnClickListener
+                return@setOnClickListener
             }
             addVocabulary()
             finish()
-        })
-        buttonCancel.setOnClickListener(View.OnClickListener { finish() })
+        }
+        binding.addButtonCancel.setOnClickListener { finish() }
     }
 
     private fun addVocabulary() {
         resultCode = Constants.ADD_NEW_VOCA_OK
-        val eng = inputEng.getText().toString()
-        val kor = inputKor.getText().toString()
-        val memo = inputMemo.getText().toString()
-        val time = (Calendar.getInstance().timeInMillis / 1000) as Int
+        val eng = binding.addInputEng.text.toString()
+        val kor = binding.addInputKor.text.toString()
+        val memo = binding.addInputMemo.text.toString()
+        val time = (Calendar.getInstance().timeInMillis / 1000).toInt()
         val vocabulary = Vocabulary(eng, kor, time, time, memo)
-        vocaViewModel.insertVocabulary(vocabulary)
+        vocaViewModel?.insertVocabulary(vocabulary)
         Toast.makeText(application, "추가 완료!", Toast.LENGTH_LONG).show()
     }
 

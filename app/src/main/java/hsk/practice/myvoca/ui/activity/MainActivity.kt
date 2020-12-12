@@ -15,6 +15,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
+import hsk.practice.myvoca.databinding.ActivityMainBinding
 import hsk.practice.myvoca.services.notification.ShowNotificationService
 
 /**
@@ -26,8 +27,11 @@ import hsk.practice.myvoca.services.notification.ShowNotificationService
  * Other fragments were left for future features.
  */
 class MainActivity : AppCompatActivity() {
-    private var mAppBarConfiguration: AppBarConfiguration? = null
-    private var drawer: DrawerLayout? = null
+    private lateinit var binding: ActivityMainBinding
+
+    private lateinit var mAppBarConfiguration: AppBarConfiguration
+    private lateinit var drawer: DrawerLayout
+
     @Synchronized
     override fun onStart() {
         super.onStart()
@@ -37,7 +41,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("HSK APP", "MainActivity onCreate()")
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         val toolbar = findViewById<Toolbar?>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
@@ -48,7 +54,8 @@ class MainActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
             startActivityForResult(intent, Constants.CALL_ADD_VOCA_ACTIVITY)
         }
-        drawer = findViewById(R.id.drawer_layout)
+
+        drawer = binding.drawerLayout
         val navigationView = findViewById<NavigationView?>(R.id.nav_view)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.

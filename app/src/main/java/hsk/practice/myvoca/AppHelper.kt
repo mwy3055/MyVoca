@@ -26,8 +26,8 @@ object AppHelper {
     fun getPermissionList(): ArrayList<String?>? {
         if (permissionsList == null) {
             permissionsList = ArrayList()
-            permissionsList.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-            permissionsList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            permissionsList!!.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            permissionsList!!.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
         return permissionsList
     }

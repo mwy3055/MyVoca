@@ -9,10 +9,10 @@ class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val restartIntent = Intent(context, RestartService::class.java)
-            context.startForegroundService(restartIntent)
+            context?.startForegroundService(restartIntent)
         } else {
             val restartIntent = Intent(context, ShowNotificationService::class.java)
-            context.startService(restartIntent)
+            context?.startService(restartIntent)
         }
     }
 }

@@ -14,23 +14,18 @@ import hsk.practice.myvoca.R
  * Custom view which shows a vocabulary object in the database.
  * Shows english word, korean meaning and the last-edited time.
  */
-class VocaView : LinearLayout {
+class VocaView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
+    : LinearLayout(context, attrs, defStyleAttr) {
+
     private var vocaLayout: LinearLayout? = null
     private var vocaKor: TextView? = null
     private var vocaEng: TextView? = null
     private var lastEditTime: TextView? = null
     var deleteCheckBox: CheckBox? = null
 
-    constructor(context: Context?) : super(context) {
-        init(context)
-    }
-
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
-        init(context)
-    }
 
     private fun init(context: Context?) {
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val inflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         inflater.inflate(R.layout.voca_layout, this, true)
         vocaLayout = findViewById(R.id.voca_layout)
         vocaKor = findViewById(R.id.voca_kor)
@@ -40,20 +35,26 @@ class VocaView : LinearLayout {
     }
 
     fun setVocabulary(vocabulary: Vocabulary?) {
-        setVocaKor(vocabulary.kor)
-        setVocaEng(vocabulary.eng)
-        setLastEditTime(vocabulary.lastEditedTime)
+        if (vocabulary != null) {
+            setVocaKor(vocabulary.kor)
+        }
+        if (vocabulary != null) {
+            setVocaEng(vocabulary.eng)
+        }
+        if (vocabulary != null) {
+            setLastEditTime(vocabulary.lastEditedTime)
+        }
     }
 
     fun setVocaKor(kor: String?) {
-        vocaKor.setText(kor)
+        vocaKor?.text = kor
     }
 
     fun setVocaEng(eng: String?) {
-        vocaEng.setText(eng)
+        vocaEng?.text = eng
     }
 
     fun setLastEditTime(time: Int) {
-        lastEditTime.setText(AppHelper.getTimeString(time as Long * 1000))
+        lastEditTime?.text = AppHelper.getTimeString(time as Long * 1000)
     }
 }

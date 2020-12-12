@@ -2,12 +2,11 @@ package hsk.practice.myvoca.ui.activity
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.*
+import android.os.Bundle
+import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
-import database.Vocabulary
 import database.source.VocaRepository
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.services.notification.ShowNotificationService
@@ -18,26 +17,28 @@ import hsk.practice.myvoca.services.notification.ShowNotificationService
  * When database is loaded, MainActivity is shown.
  */
 class SplashActivity : AppCompatActivity() {
+
     private val permissionRequestCode = 1
-    private val handler: Handler? = Handler()
+    private val handler: Handler = Handler()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getPermissions()
         AppHelper.loadInstance(this)
         // when database is loaded...
-        VocaRepository.Companion.getInstance().getAllVocabulary().observe(this, Observer<MutableList<Vocabulary?>?> {
+        VocaRepository.getInstance()?.getAllVocabulary()?.observe(this, {
             startVocaProviderService()
-            handler.post(Runnable {
+            handler.post {
                 val intent = Intent(applicationContext, MainActivity::class.java)
                 startActivity(intent)
                 finish()
-            })
+            }
         })
     }
 
     private fun getPermissions() {
-        for (permission in AppHelper.getPermissionList()) {
-            val check = ContextCompat.checkSelfPermission(applicationContext, permission)
+        for (permission in AppHelper.getPermissionList()!!) {
+            val check = permission?.let { ContextCompat.checkSelfPermission(applicationContext, it) }
             if (check == PackageManager.PERMISSION_DENIED) {
                 ActivityCompat.requestPermissions(this, arrayOf(permission), permissionRequestCode)
             }
@@ -45,7 +46,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun startVocaProviderService() {
-        if (!ShowNotificationService.Companion.isRunning()) {
+        if (!ShowNotificationService.isRunning()) {
             val intent = Intent(applicationContext, ShowNotificationService::class.java)
             startService(intent)
         }

@@ -39,6 +39,7 @@
     <string name="current_voca_count">현재 등록된 단어: %d개</string>
     <string name="quiz_word_example">keyword</string>
     <string name="quiz_option_example">잠을 자다</string>
+    <string name="quiz_option_format">%d. %s</string>
 
     <!-- for layout/toolbar_search_view -->
     <string name="toolbar_search_view_search_button">단어 검색하기</string>

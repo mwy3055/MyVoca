@@ -26,27 +26,31 @@ object VocaComparator {
         return engComparator
     }
 
-    private class AddedTimeComparator : Comparator<Vocabulary?> {
+    class AddedTimeComparator : Comparator<Vocabulary?> {
         // last added first
         override fun compare(o1: Vocabulary?, o2: Vocabulary?): Int {
-            return o2.addedTime - o1.addedTime
+            return if (o1 != null && o2 != null) {
+                o2.addedTime - o1.addedTime
+            } else 1
         }
 
-        override fun equals(obj: Any?): Boolean {
-            return if (obj is AddedTimeComparator) {
-                this === obj as AddedTimeComparator?
+        override fun equals(other: Any?): Boolean {
+            return if (other is AddedTimeComparator) {
+                this === other as AddedTimeComparator?
             } else false
         }
     }
 
-    private class EngComparator : Comparator<Vocabulary?> {
+    class EngComparator : Comparator<Vocabulary?> {
         override fun compare(o1: Vocabulary?, o2: Vocabulary?): Int {
-            return o1.eng.compareTo(o2.eng)
+            return if (o1 != null && o2 != null) {
+                o1.eng.compareTo(o2.eng)
+            } else 1
         }
 
-        override fun equals(obj: Any?): Boolean {
-            return if (obj is EngComparator) {
-                this === obj as EngComparator?
+        override fun equals(other: Any?): Boolean {
+            return if (other is EngComparator) {
+                this === other as EngComparator?
             } else false
         }
     }

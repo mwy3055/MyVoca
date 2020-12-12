@@ -6,6 +6,6 @@ package hsk.practice.myvoca.ui.seeall
  * To enter the delete mode, long-click the item in the SeeAllFragment and select the '삭제' option.
  */
 interface OnDeleteModeListener {
-    open fun enableDeleteMode()
-    open fun disableDeleteMode()
+    fun enableDeleteMode()
+    fun disableDeleteMode()
 }

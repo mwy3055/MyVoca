@@ -15,6 +15,6 @@ class QuizViewModel : ViewModel() {
 
     init {
         mText = MutableLiveData()
-        mText.setValue("This is slideshow fragment")
+        mText.value = "This is slideshow fragment"
     }
 }

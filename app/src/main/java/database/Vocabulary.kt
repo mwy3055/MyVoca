@@ -17,32 +17,24 @@ import java.io.Serializable
  * memo: Memo for the word.
  */
 @Entity
-class Vocabulary(eng: String?, kor: String?, addedTime: Int, lastEditedTime: Int, memo: String?) : Serializable {
+class Vocabulary(@kotlin.jvm.JvmField @PrimaryKey var eng: String, kor: String, addedTime: Int, lastEditedTime: Int, memo: String) : Serializable {
+
     @kotlin.jvm.JvmField
-    @PrimaryKey
-    var eng: String
-    @kotlin.jvm.JvmField
-    var kor: String?
+    var kor: String? = kor
 
     @kotlin.jvm.JvmField
     @ColumnInfo(name = "add_time")
-    var addedTime: Int
+    var addedTime: Int = addedTime
 
     @kotlin.jvm.JvmField
     @ColumnInfo(name = "last_update")
-    var lastEditedTime: Int
+    var lastEditedTime: Int = lastEditedTime
+
     @kotlin.jvm.JvmField
-    var memo: String?
-    override fun equals(obj: Any?): Boolean {
-        if (obj == null) return false
-        return if (obj !is Vocabulary) false else eng.contentEquals((obj as Vocabulary?).eng)
+    var memo: String? = memo
+    override fun equals(other: Any?): Boolean {
+        if (other == null) return false
+        return if (other is Vocabulary) eng.contentEquals(other.eng) else false
     }
 
-    init {
-        this.eng = eng
-        this.kor = kor
-        this.addedTime = addedTime
-        this.lastEditedTime = lastEditedTime
-        this.memo = memo
-    }
 }

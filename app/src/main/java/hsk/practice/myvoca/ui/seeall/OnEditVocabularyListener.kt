@@ -7,5 +7,5 @@ import database.Vocabulary
  * Implemented at SeeAllFragment.editVocabulary().
  */
 interface OnEditVocabularyListener {
-    open fun editVocabulary(position: Int, vocabulary: Vocabulary?)
+    fun editVocabulary(position: Int, vocabulary: Vocabulary?)
 }

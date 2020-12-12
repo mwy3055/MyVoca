@@ -16,6 +16,6 @@ class GoBlogViewModel : ViewModel() {
 
     init {
         mText = MutableLiveData()
-        mText.setValue("개발자 블로그로 이동합니다.")
+        mText.value = "개발자 블로그로 이동합니다."
     }
 }
