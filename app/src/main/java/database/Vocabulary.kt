@@ -1,12 +1,9 @@
-package database;
+package database
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
-
-import java.io.Serializable;
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import java.io.Serializable
 
 /**
  * SQL Entity Object of Vocabulary.
@@ -20,36 +17,32 @@ import java.io.Serializable;
  * memo: Memo for the word.
  */
 @Entity
-public class Vocabulary implements Serializable {
+class Vocabulary(eng: String?, kor: String?, addedTime: Int, lastEditedTime: Int, memo: String?) : Serializable {
+    @kotlin.jvm.JvmField
+    @PrimaryKey
+    var eng: String
+    @kotlin.jvm.JvmField
+    var kor: String?
 
-    @PrimaryKey()
-    @NonNull
-    public String eng;
-
-    public String kor;
-
+    @kotlin.jvm.JvmField
     @ColumnInfo(name = "add_time")
-    public int addedTime;
+    var addedTime: Int
 
+    @kotlin.jvm.JvmField
     @ColumnInfo(name = "last_update")
-    public int lastEditedTime;
-
-    public String memo;
-
-    public Vocabulary(String eng, String kor, int addedTime, int lastEditedTime, String memo) {
-        this.eng = eng;
-        this.kor = kor;
-        this.addedTime = addedTime;
-        this.lastEditedTime = lastEditedTime;
-        this.memo = memo;
+    var lastEditedTime: Int
+    @kotlin.jvm.JvmField
+    var memo: String?
+    override fun equals(obj: Any?): Boolean {
+        if (obj == null) return false
+        return if (obj !is Vocabulary) false else eng.contentEquals((obj as Vocabulary?).eng)
     }
 
-    @Override
-    public boolean equals(@Nullable Object obj) {
-        if (obj == null)
-            return false;
-        if (!(obj instanceof Vocabulary))
-            return false;
-        return this.eng.contentEquals(((Vocabulary) obj).eng);
+    init {
+        this.eng = eng
+        this.kor = kor
+        this.addedTime = addedTime
+        this.lastEditedTime = lastEditedTime
+        this.memo = memo
     }
 }

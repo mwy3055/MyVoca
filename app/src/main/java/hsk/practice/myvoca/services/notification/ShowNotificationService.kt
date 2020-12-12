@@ -1,150 +1,118 @@
-package hsk.practice.myvoca.services.notification;
+package hsk.practice.myvoca.services.notification
 
-import android.app.AlarmManager;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Build;
-import android.util.Log;
+import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.*
+import android.os.Build
+import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.lifecycle.*
+import database.Vocabulary
+import hsk.practice.myvoca.AppHelper
+import hsk.practice.myvoca.R
+import hsk.practice.myvoca.VocaViewModel
+import hsk.practice.myvoca.ui.activity.SplashActivity
+import java.util.*
 
-import androidx.core.app.NotificationCompat;
-import androidx.lifecycle.LifecycleService;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
-
-import java.util.Calendar;
-
-import database.Vocabulary;
-import hsk.practice.myvoca.AppHelper;
-import hsk.practice.myvoca.R;
-import hsk.practice.myvoca.VocaViewModel;
-import hsk.practice.myvoca.ui.activity.SplashActivity;
-
-public class ShowNotificationService extends LifecycleService {
-
-    private static boolean isRunning = false;
-
-    private ShowVocaNotificationReceiver receiver;
-
-    private VocaViewModel vocaViewModel;
-    private NotificationManager notificationManager;
-
-    private final String VOCA_NOTIFICATION_CHANNEL_ID = "VOCA_NOTIFICATION";
-    private final String VOCA_NOTIFICATION_CHANNEL_NAME = "단어 보이기";
-    private final String VOCA_NOTIFICATION_ID = "1";
-    private final int NOTIFICATION_ID = 20;
-
-    public static final String SHOW_VOCA = "단어";
-
-    private final String SHOW_RANDOM_VOCA = "다른 단어";
-    private final String SHOW_RANDOM_VOCA_ACTION_NAME = "action.showvoca.notification";
-    private final int SHOW_RANDOM_VOCA_ACTION_ID = 200;
-
-    private final String START_APP_ACTION_NAME = "action.showvoca.startapp";
-    private final int START_APP_ACTION_ID = 201;
-
-    private final int RESTART_SERVICE_CODE = 220;
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        Log.d("HSK APP", "ShowNotificationService onCreate()");
-        AppHelper.loadInstance(getApplicationContext());
-        vocaViewModel = new VocaViewModel();
-        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-        receiver = new ShowVocaNotificationReceiver();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(SHOW_RANDOM_VOCA_ACTION_NAME);
-        filter.addAction(START_APP_ACTION_NAME);
-        registerReceiver(receiver, filter);
-
-        isRunning = true;
+class ShowNotificationService : LifecycleService() {
+    private var receiver: ShowVocaNotificationReceiver? = null
+    private var vocaViewModel: VocaViewModel? = null
+    private var notificationManager: NotificationManager? = null
+    private val VOCA_NOTIFICATION_CHANNEL_ID: String? = "VOCA_NOTIFICATION"
+    private val VOCA_NOTIFICATION_CHANNEL_NAME: String? = "단어 보이기"
+    private val VOCA_NOTIFICATION_ID: String? = "1"
+    private val NOTIFICATION_ID = 20
+    private val SHOW_RANDOM_VOCA: String? = "다른 단어"
+    private val SHOW_RANDOM_VOCA_ACTION_NAME: String? = "action.showvoca.notification"
+    private val SHOW_RANDOM_VOCA_ACTION_ID = 200
+    private val START_APP_ACTION_NAME: String? = "action.showvoca.startapp"
+    private val START_APP_ACTION_ID = 201
+    private val RESTART_SERVICE_CODE = 220
+    override fun onCreate() {
+        super.onCreate()
+        Log.d("HSK APP", "ShowNotificationService onCreate()")
+        AppHelper.loadInstance(applicationContext)
+        vocaViewModel = VocaViewModel()
+        notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        receiver = ShowVocaNotificationReceiver()
+        val filter = IntentFilter()
+        filter.addAction(SHOW_RANDOM_VOCA_ACTION_NAME)
+        filter.addAction(START_APP_ACTION_NAME)
+        registerReceiver(receiver, filter)
+        isRunning = true
     }
 
-    @Override
-    public int onStartCommand(final Intent intent, int flags, int startId) {
-        Log.d("HSK APP", "ShowNotificationService onStartCommand()");
-        AppHelper.loadInstance(getApplicationContext());
-        isRunning = true;
-        final LiveData<Boolean> isEmpty = vocaViewModel.isEmpty();
-        isEmpty.observeForever(new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d("HSK APP", "ShowNotificationService onStartCommand()")
+        AppHelper.loadInstance(applicationContext)
+        isRunning = true
+        val isEmpty = vocaViewModel.isEmpty()
+        isEmpty.observeForever(object : Observer<Boolean?> {
+            override fun onChanged(aBoolean: Boolean?) {
                 if (intent != null && intent.getSerializableExtra(SHOW_VOCA) != null) {
-                    Vocabulary vocabulary = (Vocabulary) intent.getSerializableExtra(SHOW_VOCA);
-                    showWordOnNotification(vocabulary);
-                    Log.d("HSK APP", "show voca on notification: " + vocabulary.eng);
-                } else if (intent != null && !intent.getBooleanExtra(RestartService.RESTART_SERVICE, false) && !aBoolean) {
+                    val vocabulary = intent.getSerializableExtra(SHOW_VOCA) as Vocabulary
+                    showWordOnNotification(vocabulary)
+                    Log.d("HSK APP", "show voca on notification: " + vocabulary.eng)
+                } else if (intent != null && !intent.getBooleanExtra(RestartService.Companion.RESTART_SERVICE, false) && !aBoolean) {
                     // only when starting with app and database not empty
-                    showRandomWordOnNotification();
-                    Log.d("HSK APP", "show random word on notification");
-                } else if (intent != null && intent.getBooleanExtra(RestartService.RESTART_SERVICE, false)) {
-                    Log.d("HSK APP", "restart notification service");
-                    setAlarmTimer();
+                    showRandomWordOnNotification()
+                    Log.d("HSK APP", "show random word on notification")
+                } else if (intent != null && intent.getBooleanExtra(RestartService.Companion.RESTART_SERVICE, false)) {
+                    Log.d("HSK APP", "restart notification service")
+                    setAlarmTimer()
                 }
-                isEmpty.removeObserver(this);
+                isEmpty.removeObserver(this)
             }
-        });
-        return super.onStartCommand(intent, flags, startId);
+        })
+        return super.onStartCommand(intent, flags, startId)
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        isRunning = false;
-        Log.d("HSK APP", "ShowNotificationService onDestroy()");
-
-        final LiveData<Boolean> isEmpty = vocaViewModel.isEmpty();
-        isEmpty.observeForever(new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
+    override fun onDestroy() {
+        super.onDestroy()
+        isRunning = false
+        Log.d("HSK APP", "ShowNotificationService onDestroy()")
+        val isEmpty = vocaViewModel.isEmpty()
+        isEmpty.observeForever(object : Observer<Boolean?> {
+            override fun onChanged(aBoolean: Boolean?) {
                 if (!aBoolean) {
-                    setAlarmTimer();
+                    setAlarmTimer()
                 }
-                isEmpty.removeObserver(this);
+                isEmpty.removeObserver(this)
             }
-        });
-        unregisterReceiver(receiver);
+        })
+        unregisterReceiver(receiver)
     }
 
     /* set alarm timer to restart this service */
-    private void setAlarmTimer() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.MILLISECOND, 500);
-        Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
-        PendingIntent sendAlarmPI = PendingIntent.getBroadcast(getApplicationContext(), RESTART_SERVICE_CODE, intent, 0);
-
-        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sendAlarmPI);
+    private fun setAlarmTimer() {
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = System.currentTimeMillis()
+        calendar.add(Calendar.MILLISECOND, 500)
+        val intent = Intent(applicationContext, AlarmReceiver::class.java)
+        val sendAlarmPI = PendingIntent.getBroadcast(applicationContext, RESTART_SERVICE_CODE, intent, 0)
+        val manager = getSystemService(ALARM_SERVICE) as AlarmManager
+        manager[AlarmManager.RTC_WAKEUP, calendar.timeInMillis] = sendAlarmPI
     }
 
-
     /* methods for showing notification */
-    private void createNotificationChannel() {
+    private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(VOCA_NOTIFICATION_CHANNEL_ID, VOCA_NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
-            channel.setSound(null, null);
-            channel.setShowBadge(false);
-            notificationManager.createNotificationChannel(channel);
+            val channel = NotificationChannel(VOCA_NOTIFICATION_CHANNEL_ID, VOCA_NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW)
+            channel.setSound(null, null)
+            channel.setShowBadge(false)
+            notificationManager.createNotificationChannel(channel)
         }
     }
 
-    private NotificationCompat.Builder getBuilder(Vocabulary vocabulary) {
-        Intent startAppIntent = new Intent(START_APP_ACTION_NAME);
-        PendingIntent startAppPI = PendingIntent.getBroadcast(getApplicationContext(), START_APP_ACTION_ID, startAppIntent, 0);
-
-        Intent showVocaIntent = new Intent(SHOW_RANDOM_VOCA_ACTION_NAME);
-        PendingIntent showVocaPI = PendingIntent.getBroadcast(getApplicationContext(), SHOW_RANDOM_VOCA_ACTION_ID, showVocaIntent, 0);
-        NotificationCompat.Action action = new NotificationCompat.Action(R.drawable.thinking_face, SHOW_RANDOM_VOCA, showVocaPI);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), VOCA_NOTIFICATION_ID)
+    private fun getBuilder(vocabulary: Vocabulary?): NotificationCompat.Builder? {
+        val startAppIntent = Intent(START_APP_ACTION_NAME)
+        val startAppPI = PendingIntent.getBroadcast(applicationContext, START_APP_ACTION_ID, startAppIntent, 0)
+        val showVocaIntent = Intent(SHOW_RANDOM_VOCA_ACTION_NAME)
+        val showVocaPI = PendingIntent.getBroadcast(applicationContext, SHOW_RANDOM_VOCA_ACTION_ID, showVocaIntent, 0)
+        val action = NotificationCompat.Action(R.drawable.thinking_face, SHOW_RANDOM_VOCA, showVocaPI)
+        return NotificationCompat.Builder(applicationContext, VOCA_NOTIFICATION_ID)
                 .setSmallIcon(R.drawable.baseline_bookmark_border_24)
                 .setContentTitle(vocabulary.eng)
                 .setContentText(vocabulary.kor)
@@ -153,45 +121,42 @@ public class ShowNotificationService extends LifecycleService {
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setChannelId(VOCA_NOTIFICATION_CHANNEL_ID)
                 .addAction(action)
-                .setContentIntent(startAppPI);
-
-        return builder;
+                .setContentIntent(startAppPI)
     }
 
-    private void showRandomWordOnNotification() {
-        LiveData<Vocabulary> vocabulary = vocaViewModel.getRandomVocabulary();
-        showWordOnNotification(vocabulary.getValue());
+    private fun showRandomWordOnNotification() {
+        val vocabulary = vocaViewModel.getRandomVocabulary()
+        showWordOnNotification(vocabulary.value)
     }
 
-    private void showWordOnNotification(Vocabulary vocabulary) {
-        createNotificationChannel();
-
-        NotificationCompat.Builder builder = getBuilder(vocabulary);
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
+    private fun showWordOnNotification(vocabulary: Vocabulary?) {
+        createNotificationChannel()
+        val builder = getBuilder(vocabulary)
+        notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
 
-
-    public static boolean isRunning() {
-        return isRunning;
-    }
-
-    public class ShowVocaNotificationReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("HSK APP", "NotificationReceiver onReceive()");
-            if (intent.getAction().equalsIgnoreCase(SHOW_RANDOM_VOCA_ACTION_NAME)) {
+    inner class ShowVocaNotificationReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            Log.d("HSK APP", "NotificationReceiver onReceive()")
+            if (intent.getAction().equals(SHOW_RANDOM_VOCA_ACTION_NAME, ignoreCase = true)) {
                 // TODO: wait until vocaViewModel is not null
-                Log.d("HSK APP", "Show voca on notification");
-
-                showRandomWordOnNotification();
-            } else if (intent.getAction().equalsIgnoreCase(START_APP_ACTION_NAME)
-                    && !AppHelper.isForeground(ShowNotificationService.this)) {
-                Log.d("HSK APP", "Start app");
-
-                Intent startAppIntent = new Intent(getApplicationContext(), SplashActivity.class);
-                startAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(startAppIntent);
+                Log.d("HSK APP", "Show voca on notification")
+                showRandomWordOnNotification()
+            } else if (intent.getAction().equals(START_APP_ACTION_NAME, ignoreCase = true)
+                    && !AppHelper.isForeground(this@ShowNotificationService)) {
+                Log.d("HSK APP", "Start app")
+                val startAppIntent = Intent(applicationContext, SplashActivity::class.java)
+                startAppIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                startActivity(startAppIntent)
             }
+        }
+    }
+
+    companion object {
+        private var isRunning = false
+        val SHOW_VOCA: String? = "단어"
+        fun isRunning(): Boolean {
+            return isRunning
         }
     }
 }

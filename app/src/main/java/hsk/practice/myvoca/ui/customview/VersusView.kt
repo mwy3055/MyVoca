@@ -1,79 +1,69 @@
-package hsk.practice.myvoca.ui.customview;
+package hsk.practice.myvoca.ui.customview
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import androidx.annotation.Nullable;
-
-import hsk.practice.myvoca.R;
+import android.content.Context
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
+import hsk.practice.myvoca.R
 
 /**
  * Custom view which compares two values and show proper graphics.
  * Hard to explain in text, just see the QuizFragment!
  */
-public class VersusView extends LinearLayout {
+class VersusView : LinearLayout {
+    private val BAR_HEIGHT = 50
+    private var leftValue = 0
+    private var rightValue = 0
+    var leftTextView: TextView? = null
+    var rightTextView: TextView? = null
+    var leftBar: View? = null
+    var rightBar: View? = null
 
-    private int BAR_HEIGHT = 50;
-    private int leftValue = 0;
-    private int rightValue = 0;
-
-    TextView leftTextView;
-    TextView rightTextView;
-
-    View leftBar;
-    View rightBar;
-
-    public VersusView(Context context) {
-        super(context);
-        init(context);
+    constructor(context: Context?) : super(context) {
+        init(context)
     }
 
-    public VersusView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        init(context);
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+        init(context)
     }
 
-    private void init(Context context) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.versus_view, this, true);
-
-        leftTextView = findViewById(R.id.count_left);
-        rightTextView = findViewById(R.id.count_right);
-
-        leftBar = findViewById(R.id.left_bar);
-        rightBar = findViewById(R.id.right_bar);
+    private fun init(context: Context?) {
+        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        inflater.inflate(R.layout.versus_view, this, true)
+        leftTextView = findViewById(R.id.count_left)
+        rightTextView = findViewById(R.id.count_right)
+        leftBar = findViewById(R.id.left_bar)
+        rightBar = findViewById(R.id.right_bar)
     }
 
-    public void setValues(int left, int right) {
-        setLeftValue(left);
-        setRightValue(right);
+    fun setValues(left: Int, right: Int) {
+        setLeftValue(left)
+        setRightValue(right)
     }
 
-    public void setLeftValue(int value) {
+    fun setLeftValue(value: Int) {
         if (value < 0) {
-            return;
+            return
         }
-        leftValue = value;
-        leftTextView.setText(Integer.toString(leftValue));
-        refreshView();
+        leftValue = value
+        leftTextView.setText(Integer.toString(leftValue))
+        refreshView()
     }
 
-    public void setRightValue(int value) {
+    fun setRightValue(value: Int) {
         if (value < 0) {
-            return;
+            return
         }
-        rightValue = value;
-        rightTextView.setText(Integer.toString(rightValue));
-        refreshView();
+        rightValue = value
+        rightTextView.setText(Integer.toString(rightValue))
+        refreshView()
     }
 
-    public void refreshView() {
+    fun refreshView() {
         // Weights should be set oppositely to get correct result
-        leftBar.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, BAR_HEIGHT, rightValue));
-        rightBar.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, BAR_HEIGHT, leftValue));
+        leftBar.setLayoutParams(LayoutParams(LayoutParams.WRAP_CONTENT, BAR_HEIGHT, rightValue))
+        rightBar.setLayoutParams(LayoutParams(LayoutParams.WRAP_CONTENT, BAR_HEIGHT, leftValue))
     }
 }

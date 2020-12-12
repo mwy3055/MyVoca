@@ -1,70 +1,51 @@
-package hsk.practice.myvoca.ui.seeall;
+package hsk.practice.myvoca.ui.seeall
 
-import android.graphics.Canvas;
-import android.view.View;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.RecyclerView;
-
-import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter;
+import android.graphics.Canvas
+import android.view.View
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
+import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.VocaViewHolder
 
 /**
  * Touch helper class.
  * Related to swipe actions at the SeeAllFragment.VocaRecyclerView
  */
-public class VocabularyTouchHelper extends ItemTouchHelper.SimpleCallback {
-
-    public interface VocabularyTouchHelperListener {
-        void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position);
+class VocabularyTouchHelper(dragDirs: Int, swipeDirs: Int, private val listener: VocabularyTouchHelperListener?) : ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {
+    interface VocabularyTouchHelperListener {
+        open fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int, position: Int)
     }
 
-    private VocabularyTouchHelperListener listener;
-
-    public VocabularyTouchHelper(int dragDirs, int swipeDirs, VocabularyTouchHelperListener listener) {
-        super(dragDirs, swipeDirs);
-        this.listener = listener;
+    override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+        return true
     }
 
-    @Override
-    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-        return true;
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        listener.onSwiped(viewHolder, direction, viewHolder.adapterPosition)
     }
 
-    @Override
-    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-        listener.onSwiped(viewHolder, direction, viewHolder.getAdapterPosition());
-    }
-
-    @Override
-    public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
+    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         if (viewHolder != null) {
-            final View foregroundView = ((VocaRecyclerViewAdapter.VocaViewHolder) viewHolder).viewForeground;
-            getDefaultUIUtil().onSelected(foregroundView);
+            val foregroundView: View? = (viewHolder as VocaViewHolder?).viewForeground
+            getDefaultUIUtil().onSelected(foregroundView)
         }
     }
 
-    @Override
-    public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        View foregroundView = ((VocaRecyclerViewAdapter.VocaViewHolder) viewHolder).viewForeground;
-        getDefaultUIUtil().onDraw(c, recyclerView, foregroundView, dX, dY, actionState, isCurrentlyActive);
+    override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
+        val foregroundView: View? = (viewHolder as VocaViewHolder).viewForeground
+        getDefaultUIUtil().onDraw(c, recyclerView, foregroundView, dX, dY, actionState, isCurrentlyActive)
     }
 
-    @Override
-    public void onChildDrawOver(@NonNull Canvas c, @NonNull RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        View foregroundView = ((VocaRecyclerViewAdapter.VocaViewHolder) viewHolder).viewForeground;
-        getDefaultUIUtil().onDrawOver(c, recyclerView, foregroundView, dX, dY, actionState, isCurrentlyActive);
+    override fun onChildDrawOver(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder?, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
+        val foregroundView: View? = (viewHolder as VocaViewHolder?).viewForeground
+        getDefaultUIUtil().onDrawOver(c, recyclerView, foregroundView, dX, dY, actionState, isCurrentlyActive)
     }
 
-    @Override
-    public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-        View foregroundView = ((VocaRecyclerViewAdapter.VocaViewHolder) viewHolder).viewForeground;
-        getDefaultUIUtil().clearView(foregroundView);
+    override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+        val foregroundView: View? = (viewHolder as VocaViewHolder).viewForeground
+        getDefaultUIUtil().clearView(foregroundView)
     }
 
-    @Override
-    public int convertToAbsoluteDirection(int flags, int layoutDirection) {
-        return super.convertToAbsoluteDirection(flags, layoutDirection);
+    override fun convertToAbsoluteDirection(flags: Int, layoutDirection: Int): Int {
+        return super.convertToAbsoluteDirection(flags, layoutDirection)
     }
 }

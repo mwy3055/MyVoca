@@ -1,36 +1,29 @@
-package hsk.practice.myvoca.ui.seeall.recyclerview;
+package hsk.practice.myvoca.ui.seeall.recyclerview
 
-import android.os.Handler;
-import android.util.Log;
-import android.util.SparseBooleanArray;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.ListIterator;
-
-import database.VocaComparator;
-import database.Vocabulary;
-import hsk.practice.myvoca.Constants;
-import hsk.practice.myvoca.R;
-import hsk.practice.myvoca.VocaViewModel;
-import hsk.practice.myvoca.ui.seeall.OnDeleteModeListener;
-import hsk.practice.myvoca.ui.seeall.OnEditVocabularyListener;
+import android.os.*
+import android.util.Log
+import android.util.SparseBooleanArray
+import android.view.*
+import android.view.ContextMenu.ContextMenuInfo
+import android.view.View.OnCreateContextMenuListener
+import android.view.View.OnLongClickListener
+import android.widget.RelativeLayout
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
+import database.VocaComparator
+import database.Vocabulary
+import hsk.practice.myvoca.Constants
+import hsk.practice.myvoca.R
+import hsk.practice.myvoca.VocaViewModel
+import hsk.practice.myvoca.ui.seeall.OnDeleteModeListener
+import hsk.practice.myvoca.ui.seeall.OnEditVocabularyListener
+import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter
+import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.VocaViewHolder
+import java.util.*
 
 /**
  * RecyclerAdapter for each vocabulary.
@@ -38,298 +31,246 @@ import hsk.practice.myvoca.ui.seeall.OnEditVocabularyListener;
  *
  * For further information, Please refer the comments above some methods.
  */
-public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerViewAdapter.VocaViewHolder>
-        implements OnDeleteModeListener {
-
+class VocaRecyclerViewAdapter private constructor(private val activity: AppCompatActivity?) : RecyclerView.Adapter<VocaViewHolder?>(), OnDeleteModeListener {
     // Custom listener interfaces. Will be used in the ViewHolder below.
-    public interface OnVocaClickListener {
-        void onVocaClick(VocaViewHolder holder, View view, int position);
-
-        boolean onVocaLongClick(VocaViewHolder holder, View view, int position);
+    interface OnVocaClickListener {
+        open fun onVocaClick(holder: VocaViewHolder?, view: View?, position: Int)
+        open fun onVocaLongClick(holder: VocaViewHolder?, view: View?, position: Int): Boolean
     }
 
-    public interface showVocaOnNotification {
-        void showVocabularyOnNotification(Vocabulary vocabulary);
+    interface showVocaOnNotification {
+        open fun showVocabularyOnNotification(vocabulary: Vocabulary?)
     }
 
-    public interface OnSelectModeListener {
-        void onDeleteModeEnabled();
-
-        void onDeleteModeDisabled();
+    interface OnSelectModeListener {
+        open fun onDeleteModeEnabled()
+        open fun onDeleteModeDisabled()
     }
 
-    private static VocaRecyclerViewAdapter instance;
-    private static int sortState = 0;
-
-    private ViewModelProvider viewModelProvider;
-
-    private OnVocaClickListener vocaClickListener;
-    private showVocaOnNotification showVocaOnNotification;
-
-    private AppCompatActivity activity;
-    private LiveData<List<Vocabulary>> currentVocabulary;
-    private VocaViewModel vocaViewModel;
-
-    private SparseBooleanArray selectedItems = new SparseBooleanArray();
-    private boolean deleteMode = false;
-    private OnSelectModeListener onDeleteModeListener;
-
-    private OnEditVocabularyListener onEditVocabularyListener;
-
-    private boolean searchMode = false;
-
-    private Handler handler;
-    private int observeDelay = 400;
-
-    public static VocaRecyclerViewAdapter getInstance(AppCompatActivity activity) {
-        if (instance == null) {
-            synchronized (VocaRecyclerViewAdapter.class) {
-                instance = new VocaRecyclerViewAdapter(activity);
-            }
-        }
-        return instance;
-    }
-
-    private VocaRecyclerViewAdapter(final AppCompatActivity activity) {
-        this.activity = activity;
-        viewModelProvider = new ViewModelProvider(activity);
-        vocaViewModel = viewModelProvider.get(VocaViewModel.class);
-
-        currentVocabulary = vocaViewModel.getAllVocabulary();
-    }
+    private val viewModelProvider: ViewModelProvider?
+    private var vocaClickListener: OnVocaClickListener? = null
+    private var showVocaOnNotification: showVocaOnNotification? = null
+    private var currentVocabulary: LiveData<MutableList<Vocabulary?>?>?
+    private val vocaViewModel: VocaViewModel?
+    private val selectedItems: SparseBooleanArray? = SparseBooleanArray()
+    private var deleteMode = false
+    private var onDeleteModeListener: OnSelectModeListener? = null
+    private var onEditVocabularyListener: OnEditVocabularyListener? = null
+    private var searchMode = false
+    private var handler: Handler? = null
+    private val observeDelay = 400
 
     /* Notify adapter to show added item on screen immediately */
-    public void observe() {
+    fun observe() {
         if (handler == null) {
-            handler = new Handler();
+            handler = Handler()
         }
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                notifyDataSetChanged();
-            }
-        }, observeDelay);
+        handler.postDelayed(Runnable { notifyDataSetChanged() }, observeDelay.toLong())
     }
 
-    @NonNull
-    @Override
-    public VocaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        VocaView view = new VocaView(activity);
-        VocaViewHolder holder = new VocaViewHolder(view, this, onEditVocabularyListener);
-
-        holder.setVocaClickListener(vocaClickListener);
-        return holder;
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VocaViewHolder {
+        val view = VocaView(activity)
+        val holder = VocaViewHolder(view, this, onEditVocabularyListener)
+        holder.setVocaClickListener(vocaClickListener)
+        return holder
     }
 
     // Bind the content to the item
-    @Override
-    public void onBindViewHolder(@NonNull VocaViewHolder holder, int position) {
+    override fun onBindViewHolder(holder: VocaViewHolder, position: Int) {
         if (currentVocabulary.getValue() == null) {
-            holder.setVocabulary(new Vocabulary("null", "널입니다.", (int) (System.currentTimeMillis() / 1000), (int) (System.currentTimeMillis() / 1000), ""));
-            holder.setVocaClickListener(vocaClickListener);
-            return;
+            holder.setVocabulary(Vocabulary("null", "널입니다.", (System.currentTimeMillis() / 1000) as Int, (System.currentTimeMillis() / 1000) as Int, ""))
+            holder.setVocaClickListener(vocaClickListener)
+            return
         }
-
-        Vocabulary vocabulary = currentVocabulary.getValue().get(position);
-        holder.setVocabulary(vocabulary);
-        holder.setVocaClickListener(vocaClickListener);
-
-        CheckBox checkBox = holder.vocaView.deleteCheckBox;
+        val vocabulary = currentVocabulary.getValue().get(position)
+        holder.setVocabulary(vocabulary)
+        holder.setVocaClickListener(vocaClickListener)
+        val checkBox = holder.vocaView.deleteCheckBox
         if (deleteMode) {
-            checkBox.setVisibility(View.VISIBLE);
-            checkBox.setChecked(selectedItems.get(position));
-            holder.vocaView.invalidate();
+            checkBox.visibility = View.VISIBLE
+            checkBox.isChecked = selectedItems.get(position)
+            holder.vocaView.invalidate()
         } else {
-            checkBox.setVisibility(View.GONE);
-            checkBox.setChecked(false);
+            checkBox.visibility = View.GONE
+            checkBox.isChecked = false
         }
     }
 
     // this should be used only when setting observer to LiveData object
-    public LiveData<List<Vocabulary>> getCurrentVocabulary() {
-        return currentVocabulary;
+    fun getCurrentVocabulary(): LiveData<MutableList<Vocabulary?>?>? {
+        return currentVocabulary
     }
 
     // Methods for general adapter
-    @Override
-    public int getItemCount() {
-        if (currentVocabulary.getValue() == null) {
-            return -1;
-        }
-        return currentVocabulary.getValue().size();
+    override fun getItemCount(): Int {
+        return if (currentVocabulary.getValue() == null) {
+            -1
+        } else currentVocabulary.getValue().size
     }
 
-    public Object getItem(int position) {
-        return currentVocabulary.getValue().get(position);
+    fun getItem(position: Int): Any? {
+        return currentVocabulary.getValue().get(position)
     }
 
-    @Override
-    public long getItemId(int position) {
-        return (long) position;
+    override fun getItemId(position: Int): Long {
+        return position as Long
     }
 
-    public int getItemPosition(Vocabulary vocabulary) {
-        return currentVocabulary.getValue().indexOf(vocabulary);
+    fun getItemPosition(vocabulary: Vocabulary?): Int {
+        return currentVocabulary.getValue().indexOf(vocabulary)
     }
 
     // Getter/Setters of Listeners
-    public OnVocaClickListener getVocaClickListener() {
-        return vocaClickListener;
+    fun getVocaClickListener(): OnVocaClickListener? {
+        return vocaClickListener
     }
 
-    public void setOnDeleteModeListener(OnSelectModeListener listener) {
-        this.onDeleteModeListener = listener;
+    fun setOnDeleteModeListener(listener: OnSelectModeListener?) {
+        onDeleteModeListener = listener
     }
 
-    public void setVocaClickListener(OnVocaClickListener vocaClickListener) {
-        this.vocaClickListener = vocaClickListener;
+    fun setVocaClickListener(vocaClickListener: OnVocaClickListener?) {
+        this.vocaClickListener = vocaClickListener
     }
 
-    public void setOnEditVocabularyListener(OnEditVocabularyListener listener) {
-        this.onEditVocabularyListener = listener;
+    fun setOnEditVocabularyListener(listener: OnEditVocabularyListener?) {
+        onEditVocabularyListener = listener
     }
 
-    public void setShowVocaOnNotificationListener(showVocaOnNotification notificationListener) {
-        this.showVocaOnNotification = notificationListener;
+    fun setShowVocaOnNotificationListener(notificationListener: showVocaOnNotification?) {
+        showVocaOnNotification = notificationListener
     }
-
 
     // Methods for managing select state
-    public boolean isSelected(int position) {
-        return getSelectedItems().contains(position);
+    fun isSelected(position: Int): Boolean {
+        return getSelectedItems().contains(position)
     }
 
-    public void switchSelectedState(int position) {
+    fun switchSelectedState(position: Int) {
         if (selectedItems.get(position)) {
-            selectedItems.delete(position);
+            selectedItems.delete(position)
         } else {
-            selectedItems.put(position, true);
+            selectedItems.put(position, true)
         }
-        notifyItemChanged(position);
+        notifyItemChanged(position)
     }
 
-    public void clearSelectedState() {
-        selectedItems.clear();
-        notifyItemsChanged();
+    fun clearSelectedState() {
+        selectedItems.clear()
+        notifyItemsChanged()
     }
 
-    public int getSelectedItemCount() {
-        return selectedItems.size();
+    fun getSelectedItemCount(): Int {
+        return selectedItems.size()
     }
 
-    public List<Integer> getSelectedItems() {
-        List<Integer> items = new ArrayList<>(selectedItems.size());
-        for (int i = 0; i < selectedItems.size(); i++) {
-            items.add(selectedItems.keyAt(i));
+    fun getSelectedItems(): MutableList<Int?>? {
+        val items: MutableList<Int?> = ArrayList(selectedItems.size())
+        for (i in 0 until selectedItems.size()) {
+            items.add(selectedItems.keyAt(i))
         }
-        return items;
+        return items
     }
 
-    public void setDeleteMode(boolean deleteMode) {
-        this.deleteMode = deleteMode;
+    fun setDeleteMode(deleteMode: Boolean) {
+        this.deleteMode = deleteMode
     }
 
-    public boolean isDeleteMode() {
-        return this.deleteMode;
+    fun isDeleteMode(): Boolean {
+        return deleteMode
     }
 
-    public void notifyItemsChanged() {
-        for (int i = 0; i < currentVocabulary.getValue().size(); i++) {
-            notifyItemChanged(i);
+    fun notifyItemsChanged() {
+        for (i in currentVocabulary.getValue().indices) {
+            notifyItemChanged(i)
         }
     }
 
     // for search mode
-    public void enableSearchMode() {
-        searchMode = true;
+    fun enableSearchMode() {
+        searchMode = true
     }
 
-    public void disableSearchMode() {
+    fun disableSearchMode() {
         if (searchMode) {
-            searchMode = false;
-            currentVocabulary = vocaViewModel.getAllVocabulary();
-            sortItems(sortState);
-            notifyDataSetChanged();
+            searchMode = false
+            currentVocabulary = vocaViewModel.getAllVocabulary()
+            sortItems(sortState)
+            notifyDataSetChanged()
         }
     }
 
-    public void searchVocabulary(final String query) {
-        currentVocabulary = vocaViewModel.getVocabulary("%" + query + "%");
-        currentVocabulary.observe(activity, new Observer<List<Vocabulary>>() {
-            @Override
-            public void onChanged(List<Vocabulary> vocabularies) {
-                Log.d("HSK APP", "Searched " + query + ": " + (currentVocabulary.getValue() == null ? -1 : currentVocabulary.getValue().size()));
-                sortItems(sortState);
-                notifyDataSetChanged();
-            }
-        });
+    fun searchVocabulary(query: String?) {
+        currentVocabulary = vocaViewModel.getVocabulary("%$query%")
+        currentVocabulary.observe(activity, Observer {
+            Log.d("HSK APP", "Searched " + query + ": " + if (currentVocabulary.getValue() == null) -1 else currentVocabulary.getValue().size)
+            sortItems(sortState)
+            notifyDataSetChanged()
+        })
     }
 
     // for remove and restore item with swiping
-    public void removeItem(int position) {
-        Vocabulary deletedVocabulary = currentVocabulary.getValue().get(position);
-        currentVocabulary.getValue().remove(position);
-        notifyItemRemoved(position);
-
-        vocaViewModel.deleteVocabulary(deletedVocabulary);
+    fun removeItem(position: Int) {
+        val deletedVocabulary = currentVocabulary.getValue().get(position)
+        currentVocabulary.getValue().removeAt(position)
+        notifyItemRemoved(position)
+        vocaViewModel.deleteVocabulary(deletedVocabulary)
     }
 
-    public void deleteVocabulary() {
-        List<Integer> selected = getSelectedItems();
+    fun deleteVocabulary() {
+        val selected = getSelectedItems()
         // reverse iteration
-        for (ListIterator iterator = selected.listIterator(selected.size()); iterator.hasPrevious(); ) {
-            Vocabulary vocabulary = (Vocabulary) getItem((int) iterator.previous());
-            vocaViewModel.deleteVocabulary(vocabulary);
+        val iterator: MutableListIterator<*> = selected.listIterator(selected.size)
+        while (iterator.hasPrevious()) {
+            val vocabulary = getItem(iterator.previous() as Int) as Vocabulary?
+            vocaViewModel.deleteVocabulary(vocabulary)
         }
         if (isDeleteMode()) {
-            disableDeleteMode();
+            disableDeleteMode()
         }
     }
 
-    public void restoreItem(Vocabulary vocabulary, int position) {
-        currentVocabulary.getValue().add(position, vocabulary);
-        notifyItemInserted(position);
-
-        vocaViewModel.insertVocabulary(vocabulary);
+    fun restoreItem(vocabulary: Vocabulary?, position: Int) {
+        currentVocabulary.getValue().add(position, vocabulary)
+        notifyItemInserted(position)
+        vocaViewModel.insertVocabulary(vocabulary)
     }
 
     // Sort items
     // state 0: sort alphabetically
     // state 1: sort by latest edited time
-    public void sortItems(int method) {
+    fun sortItems(method: Int) {
         if (currentVocabulary == null || currentVocabulary.getValue() == null) {
-            return;
+            return
         }
-        sortState = method;
+        sortState = method
         if (sortState == 0) {
-            Collections.sort(currentVocabulary.getValue(), VocaComparator.getEngComparator());
+            Collections.sort(currentVocabulary.getValue(), VocaComparator.getEngComparator())
         } else if (sortState == 1) {
-            Collections.sort(currentVocabulary.getValue(), VocaComparator.getAddedTimeComparator());
+            Collections.sort(currentVocabulary.getValue(), VocaComparator.getAddedTimeComparator())
         } else {
-            sortState = 0;
-            Toast.makeText(activity.getApplicationContext(), "정렬할 수 없습니다: " + method, Toast.LENGTH_LONG).show();
+            sortState = 0
+            Toast.makeText(activity.getApplicationContext(), "정렬할 수 없습니다: $method", Toast.LENGTH_LONG).show()
         }
-        notifyDataSetChanged();
+        notifyDataSetChanged()
     }
 
     // See SeeAllFragment.onDeleteModeEnabled() Method
-    @Override
-    public void enableDeleteMode() {
-        Log.d("HSK APP", "DELETE MODE ENABLED");
-        setDeleteMode(true);
-        notifyItemsChanged();
+    override fun enableDeleteMode() {
+        Log.d("HSK APP", "DELETE MODE ENABLED")
+        setDeleteMode(true)
+        notifyItemsChanged()
         if (onDeleteModeListener != null) {
-            onDeleteModeListener.onDeleteModeEnabled();
+            onDeleteModeListener.onDeleteModeEnabled()
         }
     }
 
     // See SeeAllFragment.onDeleteModeDisabled() Method
-    @Override
-    public void disableDeleteMode() {
-        Log.d("HSK APP", "DELETE MODE DISABLED");
-        setDeleteMode(false);
+    override fun disableDeleteMode() {
+        Log.d("HSK APP", "DELETE MODE DISABLED")
+        setDeleteMode(false)
         if (onDeleteModeListener != null) {
-            onDeleteModeListener.onDeleteModeDisabled();
+            onDeleteModeListener.onDeleteModeDisabled()
         }
     }
 
@@ -337,99 +278,95 @@ public class VocaRecyclerViewAdapter extends RecyclerView.Adapter<VocaRecyclerVi
      * ViewHolder for vocabulary object.
      * Manages the content of the item and action when the item is clicked or long-clicked.
      */
-    public class VocaViewHolder extends RecyclerView.ViewHolder
-            implements View.OnCreateContextMenuListener {
-
-        OnVocaClickListener vocaClickListener;
-        OnDeleteModeListener onDeleteModeListener;
-        OnEditVocabularyListener onEditVocabularyListener;
-
-        public RelativeLayout viewForeground, viewBackground;
+    inner class VocaViewHolder(vocaView: View,
+                               onDeleteModeListener: OnDeleteModeListener?,
+                               onEditVocabularyListener: OnEditVocabularyListener?) : RecyclerView.ViewHolder(vocaView), OnCreateContextMenuListener {
+        var vocaClickListener: OnVocaClickListener? = null
+        var onDeleteModeListener: OnDeleteModeListener?
+        var onEditVocabularyListener: OnEditVocabularyListener?
+        var viewForeground: RelativeLayout?
+        var viewBackground: RelativeLayout?
 
         // long-click listener
-        private MenuItem.OnMenuItemClickListener onMenuItemClickListener = new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int position = getAdapterPosition();
-                Vocabulary vocabulary = currentVocabulary.getValue().get(position);
-                Log.d("HSK APP", Integer.toString(position));
-                switch (item.getItemId()) {
-                    case Constants.EDIT_CODE:
-                        Log.d("HSK APP", "edit: " + vocabulary.eng);
-                        onEditVocabularyListener.editVocabulary(position, vocabulary);
-                        break;
-                    case Constants.DELETE_CODE:
-                        VocaRecyclerViewAdapter adapter = VocaRecyclerViewAdapter.this;
-                        adapter.enableDeleteMode();
-                        adapter.switchSelectedState(position);
-                        break;
-                    case Constants.SHOW_ON_NOTIFICATION_CODE:
-                        // TODO: show selected vocabulary on notification
-                        showVocaOnNotification.showVocabularyOnNotification(vocabulary);
-                        break;
+        private val onMenuItemClickListener: MenuItem.OnMenuItemClickListener? = MenuItem.OnMenuItemClickListener { item ->
+            val position = adapterPosition
+            val vocabulary = currentVocabulary.getValue().get(position)
+            Log.d("HSK APP", Integer.toString(position))
+            when (item.itemId) {
+                Constants.EDIT_CODE -> {
+                    Log.d("HSK APP", "edit: " + vocabulary.eng)
+                    onEditVocabularyListener.editVocabulary(position, vocabulary)
                 }
-                return true;
+                Constants.DELETE_CODE -> {
+                    val adapter = this@VocaRecyclerViewAdapter
+                    adapter.enableDeleteMode()
+                    adapter.switchSelectedState(position)
+                }
+                Constants.SHOW_ON_NOTIFICATION_CODE ->                         // TODO: show selected vocabulary on notification
+                    showVocaOnNotification.showVocabularyOnNotification(vocabulary)
             }
-        };
-
-        public VocaView vocaView;
-
-        public VocaViewHolder(@NonNull View vocaView,
-                              OnDeleteModeListener onDeleteModeListener,
-                              OnEditVocabularyListener onEditVocabularyListener) {
-            super(vocaView);
-
-            viewBackground = vocaView.findViewById(R.id.view_background);
-            viewForeground = vocaView.findViewById(R.id.view_foreground);
-
-            this.vocaView = (VocaView) vocaView;
-            this.vocaView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (vocaClickListener != null) {
-                        int position = getAdapterPosition();
-                        vocaClickListener.onVocaClick(VocaViewHolder.this, v, position);
-                    }
-                }
-            });
-            this.vocaView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if (vocaClickListener != null) {
-                        int position = getAdapterPosition();
-                        return vocaClickListener.onVocaLongClick(VocaViewHolder.this, v, position);
-                    }
-                    return false;
-                }
-            });
-
-            this.onDeleteModeListener = onDeleteModeListener;
-            this.onEditVocabularyListener = onEditVocabularyListener;
-
-            vocaView.setOnCreateContextMenuListener(this);
+            true
         }
+        var vocaView: VocaView?
 
         // Create drop-down menu when item is long-clicked
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            if (VocaRecyclerViewAdapter.getInstance(activity).deleteMode) {
-                return;
+        override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenuInfo?) {
+            if (getInstance(activity).deleteMode) {
+                return
             }
-            MenuItem edit = menu.add(Menu.NONE, Constants.EDIT_CODE, 1, "수정");
-            MenuItem delete = menu.add(Menu.NONE, Constants.DELETE_CODE, 2, "삭제");
-//            MenuItem showOnNotification = menu.add(Menu.NONE, Constants.SHOW_ON_NOTIFICATION_CODE, 3, "알림에 보이기");
-
-            edit.setOnMenuItemClickListener(onMenuItemClickListener);
-            delete.setOnMenuItemClickListener(onMenuItemClickListener);
-//            showOnNotification.setOnMenuItemClickListener(onMenuItemClickListener);
+            val edit = menu.add(Menu.NONE, Constants.EDIT_CODE, 1, "수정")
+            val delete = menu.add(Menu.NONE, Constants.DELETE_CODE, 2, "삭제")
+            //            MenuItem showOnNotification = menu.add(Menu.NONE, Constants.SHOW_ON_NOTIFICATION_CODE, 3, "알림에 보이기");
+            edit.setOnMenuItemClickListener(onMenuItemClickListener)
+            delete.setOnMenuItemClickListener(onMenuItemClickListener)
+            //            showOnNotification.setOnMenuItemClickListener(onMenuItemClickListener);
         }
 
-        public void setVocabulary(Vocabulary vocabulary) {
-            vocaView.setVocabulary(vocabulary);
+        fun setVocabulary(vocabulary: Vocabulary?) {
+            vocaView.setVocabulary(vocabulary)
         }
 
-        public void setVocaClickListener(OnVocaClickListener vocaClickListener) {
-            this.vocaClickListener = vocaClickListener;
+        fun setVocaClickListener(vocaClickListener: OnVocaClickListener?) {
+            this.vocaClickListener = vocaClickListener
         }
+
+        init {
+            viewBackground = vocaView.findViewById(R.id.view_background)
+            viewForeground = vocaView.findViewById(R.id.view_foreground)
+            this.vocaView = vocaView as VocaView
+            this.vocaView.setOnClickListener(View.OnClickListener { v ->
+                if (vocaClickListener != null) {
+                    val position = adapterPosition
+                    vocaClickListener.onVocaClick(this@VocaViewHolder, v, position)
+                }
+            })
+            this.vocaView.setOnLongClickListener(OnLongClickListener { v ->
+                if (vocaClickListener != null) {
+                    val position = adapterPosition
+                    return@OnLongClickListener vocaClickListener.onVocaLongClick(this@VocaViewHolder, v, position)
+                }
+                false
+            })
+            this.onDeleteModeListener = onDeleteModeListener
+            this.onEditVocabularyListener = onEditVocabularyListener
+            vocaView.setOnCreateContextMenuListener(this)
+        }
+    }
+
+    companion object {
+        private var instance: VocaRecyclerViewAdapter? = null
+        private var sortState = 0
+        fun getInstance(activity: AppCompatActivity?): VocaRecyclerViewAdapter? {
+            if (instance == null) {
+                synchronized(VocaRecyclerViewAdapter::class.java) { instance = VocaRecyclerViewAdapter(activity) }
+            }
+            return instance
+        }
+    }
+
+    init {
+        viewModelProvider = ViewModelProvider(activity)
+        vocaViewModel = viewModelProvider.get(VocaViewModel::class.java)
+        currentVocabulary = vocaViewModel.getAllVocabulary()
     }
 }

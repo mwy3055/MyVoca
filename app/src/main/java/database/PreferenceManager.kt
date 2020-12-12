@@ -1,91 +1,87 @@
-package database;
+package database
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Context
+import android.content.SharedPreferences
 
 /**
  * Manages SharedPreferences values.
  * Now supports String, boolean, int, long type value.
  * All operations should be done with a proper String key.
  */
-public class PreferenceManager {
-
-    public static final String PREFERENCE_NAME = "PREFERENCE";
-
-    public static final String QUIZ_CORRECT = "QUIZ_CORRECT";
-    public static final String QUIZ_WRONG = "QUIZ_WRONG";
+object PreferenceManager {
+    val PREFERENCE_NAME: String? = "PREFERENCE"
+    val QUIZ_CORRECT: String? = "QUIZ_CORRECT"
+    val QUIZ_WRONG: String? = "QUIZ_WRONG"
 
     // Default values for each type: returned when a given key doesn't exist
-    private static final String DEFAULT_VALUE_STRING = "";
-    private static final boolean DEFAULT_VALUE_BOOLEAN = false;
-    private static final int DEFAULT_VALUE_INT = 0;
-    private static final long DEFAULT_VALUE_LONG = 0L;
-
-    private static SharedPreferences getPreferences(Context context) {
-        return context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
+    private val DEFAULT_VALUE_STRING: String? = ""
+    private const val DEFAULT_VALUE_BOOLEAN = false
+    private const val DEFAULT_VALUE_INT = 0
+    private const val DEFAULT_VALUE_LONG = 0L
+    private fun getPreferences(context: Context?): SharedPreferences? {
+        return context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
     }
 
-    public static void setString(Context context, String key, String value) {
-        SharedPreferences prefs = getPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(key, value);
-        editor.apply();
+    fun setString(context: Context?, key: String?, value: String?) {
+        val prefs = getPreferences(context)
+        val editor = prefs.edit()
+        editor.putString(key, value)
+        editor.apply()
     }
 
-    public static void setBoolean(Context context, String key, boolean value) {
-        SharedPreferences prefs = getPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(key, value);
-        editor.apply();
+    fun setBoolean(context: Context?, key: String?, value: Boolean) {
+        val prefs = getPreferences(context)
+        val editor = prefs.edit()
+        editor.putBoolean(key, value)
+        editor.apply()
     }
 
-    public static void setInt(Context context, String key, int value) {
-        SharedPreferences prefs = getPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt(key, value);
-        editor.apply();
+    fun setInt(context: Context?, key: String?, value: Int) {
+        val prefs = getPreferences(context)
+        val editor = prefs.edit()
+        editor.putInt(key, value)
+        editor.apply()
     }
 
-    public static void setLong(Context context, String key, long value) {
-        SharedPreferences prefs = getPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong(key, value);
-        editor.apply();
+    fun setLong(context: Context?, key: String?, value: Long) {
+        val prefs = getPreferences(context)
+        val editor = prefs.edit()
+        editor.putLong(key, value)
+        editor.apply()
     }
 
-    public static String getString(Context context, String key) {
-        SharedPreferences prefs = getPreferences(context);
-        return prefs.getString(key, DEFAULT_VALUE_STRING);
+    fun getString(context: Context?, key: String?): String? {
+        val prefs = getPreferences(context)
+        return prefs.getString(key, DEFAULT_VALUE_STRING)
     }
 
-    public static boolean getBoolean(Context context, String key) {
-        SharedPreferences prefs = getPreferences(context);
-        return prefs.getBoolean(key, DEFAULT_VALUE_BOOLEAN);
+    fun getBoolean(context: Context?, key: String?): Boolean {
+        val prefs = getPreferences(context)
+        return prefs.getBoolean(key, DEFAULT_VALUE_BOOLEAN)
     }
 
-    public static int getInt(Context context, String key) {
-        SharedPreferences prefs = getPreferences(context);
-        return prefs.getInt(key, DEFAULT_VALUE_INT);
+    fun getInt(context: Context?, key: String?): Int {
+        val prefs = getPreferences(context)
+        return prefs.getInt(key, DEFAULT_VALUE_INT)
     }
 
-    public static long getLong(Context context, String key) {
-        SharedPreferences prefs = getPreferences(context);
-        return prefs.getLong(key, DEFAULT_VALUE_LONG);
+    fun getLong(context: Context?, key: String?): Long {
+        val prefs = getPreferences(context)
+        return prefs.getLong(key, DEFAULT_VALUE_LONG)
     }
 
-    public static void removeKey(Context context, String key) {
-        SharedPreferences prefs = getPreferences(context);
-        SharedPreferences.Editor edit = prefs.edit();
-        edit.remove(key);
-        edit.apply();
+    fun removeKey(context: Context?, key: String?) {
+        val prefs = getPreferences(context)
+        val edit = prefs.edit()
+        edit.remove(key)
+        edit.apply()
     }
 
     // Clear all preference values
-    public static void clear(Context context) {
-        SharedPreferences prefs = getPreferences(context);
-        SharedPreferences.Editor edit = prefs.edit();
-        edit.clear();
-        edit.apply();
+    fun clear(context: Context?) {
+        val prefs = getPreferences(context)
+        val edit = prefs.edit()
+        edit.clear()
+        edit.apply()
     }
-
 }

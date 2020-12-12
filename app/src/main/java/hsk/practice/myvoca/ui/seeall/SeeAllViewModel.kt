@@ -1,22 +1,20 @@
-package hsk.practice.myvoca.ui.seeall;
+package hsk.practice.myvoca.ui.seeall
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
 /**
  * No use
  */
-public class SeeAllViewModel extends ViewModel {
-
-    private MutableLiveData<String> mText;
-
-    public SeeAllViewModel() {
-        mText = new MutableLiveData<>();
-        //mText.setValue("dtd");
+class SeeAllViewModel : ViewModel() {
+    private val mText: MutableLiveData<String?>?
+    fun getText(): LiveData<String?>? {
+        return mText
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    init {
+        mText = MutableLiveData()
+        //mText.setValue("dtd");
     }
 }

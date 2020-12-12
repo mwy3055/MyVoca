@@ -1,8 +1,8 @@
-package hsk.practice.myvoca.ui.home;
+package hsk.practice.myvoca.ui.home
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
 /**
  * ViewModel provides data used in the fragment.
@@ -10,16 +10,14 @@ import androidx.lifecycle.ViewModel;
  * There is no fragment-dependent data in this application, so each ViewModel has nothing to do.
  * Just left for further use.
  */
-public class HomeViewModel extends ViewModel {
-
-    private MutableLiveData<String> mText;
-
-    public HomeViewModel() {
-        mText = new MutableLiveData<>();
-        //mText.setValue("dtd");
+class HomeViewModel : ViewModel() {
+    private val mText: MutableLiveData<String?>?
+    fun getText(): LiveData<String?>? {
+        return mText
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    init {
+        mText = MutableLiveData()
+        //mText.setValue("dtd");
     }
 }

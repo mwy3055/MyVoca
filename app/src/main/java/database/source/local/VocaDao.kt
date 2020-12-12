@@ -1,30 +1,21 @@
-package database.source.local;
+package database.source.local
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import java.util.List;
-
-import database.Vocabulary;
-
-import static androidx.room.OnConflictStrategy.REPLACE;
+import androidx.lifecycle.LiveData
+import androidx.room.*
+import database.Vocabulary
 
 /**
  * DAO class creates actual SQL query.
  */
 @Dao
-public interface VocaDao {
+interface VocaDao {
     /**
      * Inserts given vocabularies to the database.
      *
      * @param vocabularies objects to insert to the database
      */
-    @Insert(onConflict = REPLACE)
-    public void insertVocabulary(Vocabulary... vocabularies);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertVocabulary(vararg vocabularies: Vocabulary?)
 
     /**
      * Updates given vocabularies.
@@ -32,7 +23,7 @@ public interface VocaDao {
      * @param vocabularies objects to update from the database
      */
     @Update
-    public void updateVocabulary(Vocabulary... vocabularies);
+    fun updateVocabulary(vararg vocabularies: Vocabulary?)
 
     /**
      * Deletes given vocabularies from the database.
@@ -40,14 +31,14 @@ public interface VocaDao {
      * @param vocabularies objects to delete from the database
      */
     @Delete
-    public void deleteVocabulary(Vocabulary... vocabularies);
+    fun deleteVocabulary(vararg vocabularies: Vocabulary?)
 
     /**
      * Loads all vocabulary and sort the result by ascending alphabetic order.
      * @return all vocabulary
      */
     @Query("SELECT * FROM Vocabulary ORDER BY eng ASC")
-    public LiveData<List<Vocabulary>> loadAllVocabulary();
+    fun loadAllVocabulary(): LiveData<MutableList<Vocabulary?>?>?
 
     /**
      * Loads vocabularies that matches with the english word
@@ -56,7 +47,7 @@ public interface VocaDao {
      * @return vocabularies whose word is similar to eng
      */
     @Query("SELECT * from Vocabulary WHERE eng LIKE :eng")
-    public LiveData<List<Vocabulary>> loadVocabularyByEng(String eng);
+    fun loadVocabularyByEng(eng: String?): LiveData<MutableList<Vocabulary?>?>?
 
     /**
      * Loads vocabularies that matches with the korean meaning
@@ -64,5 +55,5 @@ public interface VocaDao {
      * @return vocabularies whose meaning is similar to kor
      */
     @Query("SELECT * from Vocabulary WHERE kor LIKE :kor")
-    public LiveData<List<Vocabulary>> loadVocabularyByKor(String kor);
+    fun loadVocabularyByKor(kor: String?): LiveData<MutableList<Vocabulary?>?>?
 }

@@ -1,19 +1,17 @@
-package hsk.practice.myvoca.ui.share;
+package hsk.practice.myvoca.ui.share
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
-public class ShareViewModel extends ViewModel {
-
-    private MutableLiveData<String> mText;
-
-    public ShareViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is share fragment");
+class ShareViewModel : ViewModel() {
+    private val mText: MutableLiveData<String?>?
+    fun getText(): LiveData<String?>? {
+        return mText
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    init {
+        mText = MutableLiveData()
+        mText.setValue("This is share fragment")
     }
 }

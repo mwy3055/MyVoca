@@ -1,85 +1,66 @@
-package hsk.practice.myvoca.widget;
+package hsk.practice.myvoca.widget
 
-import android.app.PendingIntent;
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProvider;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.os.AsyncTask;
-import android.util.Log;
-import android.widget.RemoteViews;
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProvider
+import android.content.*
+import android.os.AsyncTask
+import android.util.Log
+import android.widget.RemoteViews
+import androidx.lifecycle.*
+import database.Vocabulary
+import database.source.VocaRepository
+import hsk.practice.myvoca.AppHelper
+import hsk.practice.myvoca.R
+import java.util.concurrent.Callable
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
-
-import java.util.concurrent.Callable;
-
-import database.Vocabulary;
-import database.source.VocaRepository;
-import hsk.practice.myvoca.AppHelper;
-import hsk.practice.myvoca.R;
-
-public class VocaWidget extends AppWidgetProvider {
-
-    private VocaRepository repository = VocaRepository.getInstance();
-    private AppWidgetManager manager;
-
-    private RemoteViews remoteView;
-
-    private AsyncTask<Void, Void, LiveData<Vocabulary>> showVocaTask;
-    private Callable myTask;
-
-    private UpdateWidgetReceiver receiver;
-    private int UPDATE_WIDGET_ID = 17;
-    public static final String UPDATE_WIDGET = "action.updatewidget.update";
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        Log.d("HSK APP", "VocaWidget onReceive(): " + intent.getAction());
-        init(context);
-        super.onReceive(context, intent);
-
-        if (intent.getAction().equalsIgnoreCase(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
-            int widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
-            int[] widgetIds;
-            if (widgetId != -1) {
-                Log.d("HSK APP", "Widget here");
-                widgetIds = new int[]{widgetId};
+class VocaWidget : AppWidgetProvider() {
+    private val repository: VocaRepository? = VocaRepository.Companion.getInstance()
+    private var manager: AppWidgetManager? = null
+    private var remoteView: RemoteViews? = null
+    private val showVocaTask: AsyncTask<Void?, Void?, LiveData<Vocabulary?>?>? = null
+    private val myTask: Callable<*>? = null
+    private val receiver: UpdateWidgetReceiver? = null
+    private val UPDATE_WIDGET_ID = 17
+    override fun onReceive(context: Context?, intent: Intent?) {
+        Log.d("HSK APP", "VocaWidget onReceive(): " + intent.getAction())
+        init(context)
+        super.onReceive(context, intent)
+        if (intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE, ignoreCase = true)) {
+            val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1)
+            val widgetIds: IntArray?
+            widgetIds = if (widgetId != -1) {
+                Log.d("HSK APP", "Widget here")
+                intArrayOf(widgetId)
             } else {
-                Log.d("HSK APP", "Widget here 2");
-                ComponentName componentName = new ComponentName(context, VocaWidget.class);
-                widgetIds = manager.getAppWidgetIds(componentName);
+                Log.d("HSK APP", "Widget here 2")
+                val componentName = ComponentName(context, VocaWidget::class.java)
+                manager.getAppWidgetIds(componentName)
             }
-            this.onUpdate(context, manager, widgetIds);
-            showRandomVocabulary(context, widgetIds);
+            onUpdate(context, manager, widgetIds)
+            showRandomVocabulary(context, widgetIds)
         }
     }
 
-    @Override
-    public void onEnabled(Context context) {
-        Log.d("HSK APP", "VocaWidget onEnabled()");
-        super.onEnabled(context);
-        init(context);
-
-        AppHelper.loadInstance(context);
+    override fun onEnabled(context: Context?) {
+        Log.d("HSK APP", "VocaWidget onEnabled()")
+        super.onEnabled(context)
+        init(context)
+        AppHelper.loadInstance(context)
     }
 
-    @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        Log.d("HSK APP", "VocaWidget onUpdate()");
-        AppHelper.loadInstance(context.getApplicationContext());
-        String temp = "";
-        for (int id : appWidgetIds) {
-            temp += id + " ";
+    override fun onUpdate(context: Context?, appWidgetManager: AppWidgetManager?, appWidgetIds: IntArray?) {
+        Log.d("HSK APP", "VocaWidget onUpdate()")
+        AppHelper.loadInstance(context.getApplicationContext())
+        var temp = ""
+        for (id in appWidgetIds) {
+            temp += "$id "
         }
-        Log.d("HSK APP", "Widget ids in onUpdate(): " + temp);
-
-        ComponentName componentName = new ComponentName(context, VocaWidget.class);
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
-        setPendingIntent(context, remoteViews, appWidgetIds, componentName);
-     /*   Intent intent = new Intent(context, VocaWidget.class);
+        Log.d("HSK APP", "Widget ids in onUpdate(): $temp")
+        val componentName = ComponentName(context, VocaWidget::class.java)
+        val remoteViews = RemoteViews(context.getPackageName(), R.layout.widget_layout)
+        setPendingIntent(context, remoteViews, appWidgetIds, componentName)
+        /*   Intent intent = new Intent(context, VocaWidget.class);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[0]);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context,5, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -88,64 +69,62 @@ public class VocaWidget extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);*/
     }
 
-    private void init(Context context) {
+    private fun init(context: Context?) {
         if (remoteView == null) {
-            remoteView = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
+            remoteView = RemoteViews(context.getPackageName(), R.layout.widget_layout)
         }
         if (manager == null) {
-            manager = AppWidgetManager.getInstance(context);
+            manager = AppWidgetManager.getInstance(context)
         }
     }
 
-    private void setPendingIntent(Context context, RemoteViews remoteViews, int[] appWidgetIds, ComponentName componentName) {
-        Intent intent = new Intent(context, VocaWidget.class);
-        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[0]);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), appWidgetIds[0], intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        remoteViews.setOnClickPendingIntent(R.id.widget_voca_button, pendingIntent);
-
-        manager.updateAppWidget(componentName, remoteViews);
-
-        manager.updateAppWidget(appWidgetIds, remoteViews);
+    private fun setPendingIntent(context: Context?, remoteViews: RemoteViews?, appWidgetIds: IntArray?, componentName: ComponentName?) {
+        val intent = Intent(context, VocaWidget::class.java)
+        intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds.get(0))
+        val pendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), appWidgetIds.get(0), intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        remoteViews.setOnClickPendingIntent(R.id.widget_voca_button, pendingIntent)
+        manager.updateAppWidget(componentName, remoteViews)
+        manager.updateAppWidget(appWidgetIds, remoteViews)
     }
 
-    @Override
-    public void onDeleted(Context context, int[] appWidgetIds) {
-        Log.d("HSK APP", "Widget onDeleted()");
-        super.onDeleted(context, appWidgetIds);
+    override fun onDeleted(context: Context?, appWidgetIds: IntArray?) {
+        Log.d("HSK APP", "Widget onDeleted()")
+        super.onDeleted(context, appWidgetIds)
     }
 
-    private void showRandomVocabulary(final Context context, final int[] widgetIds) {
-        final LiveData<Vocabulary> randomVocabulary = VocaRepository.getInstance().getRandomVocabulary();
-        randomVocabulary.observeForever(new Observer<Vocabulary>() {
-            @Override
-            public void onChanged(Vocabulary vocabulary) {
-                Log.d("HSK APP", "show: " + vocabulary.eng);
-                RemoteViews remoteView = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
-                remoteView.setTextViewText(R.id.widget_eng, vocabulary.eng);
-                remoteView.setTextViewText(R.id.widget_kor, vocabulary.kor);
-                ComponentName componentName = new ComponentName(context, VocaWidget.class);
-                setPendingIntent(context, remoteView, widgetIds, componentName);
-
-                String temp = "";
-                for (int id : widgetIds) {
-                    temp += id + " ";
+    private fun showRandomVocabulary(context: Context?, widgetIds: IntArray?) {
+        val randomVocabulary: LiveData<Vocabulary?> = VocaRepository.Companion.getInstance().getRandomVocabulary()
+        randomVocabulary.observeForever(object : Observer<Vocabulary?> {
+            override fun onChanged(vocabulary: Vocabulary?) {
+                Log.d("HSK APP", "show: " + vocabulary.eng)
+                val remoteView = RemoteViews(context.getPackageName(), R.layout.widget_layout)
+                remoteView.setTextViewText(R.id.widget_eng, vocabulary.eng)
+                remoteView.setTextViewText(R.id.widget_kor, vocabulary.kor)
+                val componentName = ComponentName(context, VocaWidget::class.java)
+                setPendingIntent(context, remoteView, widgetIds, componentName)
+                var temp = ""
+                for (id in widgetIds) {
+                    temp += "$id "
                 }
-                Log.d("HSK APP", "Widget ids in showRandomVoca(): " + temp);
-                randomVocabulary.removeObserver(this);
+                Log.d("HSK APP", "Widget ids in showRandomVoca(): $temp")
+                randomVocabulary.removeObserver(this)
             }
-        });
+        })
     }
 
-    public class UpdateWidgetReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("HSK APP", "WidgetReceiver onReceive()");
-            if (intent.getAction().equalsIgnoreCase(UPDATE_WIDGET)) {
-                ComponentName widgetName = new ComponentName(context.getPackageName(), VocaWidget.class.getName());
-                int[] widgetId = manager.getAppWidgetIds(widgetName);
-                showRandomVocabulary(context, widgetId);
+    inner class UpdateWidgetReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            Log.d("HSK APP", "WidgetReceiver onReceive()")
+            if (intent.getAction().equals(UPDATE_WIDGET, ignoreCase = true)) {
+                val widgetName = ComponentName(context.getPackageName(), VocaWidget::class.java.name)
+                val widgetId = manager.getAppWidgetIds(widgetName)
+                showRandomVocabulary(context, widgetId)
             }
         }
+    }
+
+    companion object {
+        val UPDATE_WIDGET: String? = "action.updatewidget.update"
     }
 }

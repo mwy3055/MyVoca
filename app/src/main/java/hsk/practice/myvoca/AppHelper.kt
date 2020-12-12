@@ -1,39 +1,35 @@
-package hsk.practice.myvoca;
+package hsk.practice.myvoca
 
-import android.Manifest;
-import android.content.Context;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-
-import database.source.VocaRepository;
-import database.source.local.VocaDatabase;
-import hsk.practice.myvoca.ui.activity.MainActivity;
+import android.Manifest
+import android.content.Context
+import database.source.VocaRepository
+import database.source.local.VocaDatabase
+import hsk.practice.myvoca.ui.activity.MainActivity
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
+import java.util.*
 
 /**
  * Application helper class. Common methods are defined here.
  * All methods are static.
  */
-public class AppHelper {
-
-    private static ArrayList<String> permissionsList;
+object AppHelper {
+    private var permissionsList: ArrayList<String?>? = null
 
     /**
      * Returns a permission list of the application.
      *
      * @return permission list of the application
      */
-    public static ArrayList<String> getPermissionList() {
+    fun getPermissionList(): ArrayList<String?>? {
         if (permissionsList == null) {
-            permissionsList = new ArrayList<>();
-            permissionsList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-            permissionsList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            permissionsList = ArrayList()
+            permissionsList.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            permissionsList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
-        return permissionsList;
+        return permissionsList
     }
 
     /**
@@ -42,24 +38,23 @@ public class AppHelper {
      *
      * @param text string to write to a file
      */
-    public static void writeLog(String text) {
-        File logFile = new File("sdcard/MyVoca/log.txt");
+    fun writeLog(text: String?) {
+        val logFile = File("sdcard/MyVoca/log.txt")
         if (!logFile.exists()) {
             try {
-                logFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
+                logFile.createNewFile()
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
         }
-
-        String timeString = getTimeString(System.currentTimeMillis());
+        val timeString = getTimeString(System.currentTimeMillis())
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, true));
-            bw.append(timeString + ": " + text);
-            bw.newLine();
-            bw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            val bw = BufferedWriter(FileWriter(logFile, true))
+            bw.append("$timeString: $text")
+            bw.newLine()
+            bw.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
     }
 
@@ -69,17 +64,16 @@ public class AppHelper {
      * @param timeInMilis Unix epoch timestamp to convert to string
      * @return Time string of the timestamp
      */
-    public static String getTimeString(long timeInMilis) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(timeInMilis);
-
-        int year = cal.get(Calendar.YEAR);
-        int mon = cal.get(Calendar.MONTH);
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-        int hour = cal.get(Calendar.HOUR_OF_DAY);
-        int min = cal.get(Calendar.MINUTE);
-        int sec = cal.get(Calendar.SECOND);
-        return String.format("%d.%02d.%02d. %02d:%02d:%02d", year, mon + 1, day, hour, min, sec);
+    fun getTimeString(timeInMilis: Long): String? {
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = timeInMilis
+        val year = cal[Calendar.YEAR]
+        val mon = cal[Calendar.MONTH]
+        val day = cal[Calendar.DAY_OF_MONTH]
+        val hour = cal[Calendar.HOUR_OF_DAY]
+        val min = cal[Calendar.MINUTE]
+        val sec = cal[Calendar.SECOND]
+        return String.format("%d.%02d.%02d. %02d:%02d:%02d", year, mon + 1, day, hour, min, sec)
     }
 
     /**
@@ -88,8 +82,8 @@ public class AppHelper {
      * @param context context of the application.
      * @return true if application is on the foreground, else otherwise
      */
-    public static boolean isForeground(Context context) {
-        return MainActivity.isRunning();
+    fun isForeground(context: Context?): Boolean {
+        return MainActivity.Companion.isRunning()
     }
 
     /**
@@ -97,9 +91,9 @@ public class AppHelper {
      *
      * @param context context of the application(mainly SplashActivity)
      */
-    public static void loadInstance(Context context) {
-        VocaDatabase.loadInstance(context);
-        VocaRepository.loadInstance();
+    fun loadInstance(context: Context?) {
+        VocaDatabase.Companion.loadInstance(context)
+        VocaRepository.Companion.loadInstance()
     }
 
     /**
@@ -108,15 +102,15 @@ public class AppHelper {
      * @param str string to check
      * @return true if string contains only alphabet, false otherwise
      */
-    public static boolean isStringOnlyAlphabet(String str) {
-        if (str == null || str.equals("")) {
-            return false;
+    fun isStringOnlyAlphabet(str: String?): Boolean {
+        if (str == null || str == "") {
+            return false
         }
-        for (char c : str.toCharArray()) {
+        for (c in str.toCharArray()) {
             if (!('a' <= c && c <= 'z') && !('A' <= c && c <= 'Z') && c != '%') {
-                return false;
+                return false
             }
         }
-        return true;
+        return true
     }
 }

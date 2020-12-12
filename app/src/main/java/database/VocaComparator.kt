@@ -1,6 +1,6 @@
-package database;
+package database
 
-import java.util.Comparator;
+import java.util.*
 
 /**
  * Classes for comparing vocabulary.
@@ -9,56 +9,45 @@ import java.util.Comparator;
  * Supports comparing with eng, add_time
  * Used in SeeAllFragment to sort the RecyclerView with specific criteria.
  */
-public class VocaComparator {
-
-    private static AddedTimeComparator addedTimeComparator;
-    private static EngComparator engComparator;
-
-    public static AddedTimeComparator getAddedTimeComparator() {
+object VocaComparator {
+    private var addedTimeComparator: AddedTimeComparator? = null
+    private var engComparator: EngComparator? = null
+    fun getAddedTimeComparator(): AddedTimeComparator? {
         if (addedTimeComparator == null) {
-            synchronized (AddedTimeComparator.class) {
-                addedTimeComparator = new AddedTimeComparator();
-            }
+            synchronized(AddedTimeComparator::class.java) { addedTimeComparator = AddedTimeComparator() }
         }
-        return addedTimeComparator;
+        return addedTimeComparator
     }
 
-    public static EngComparator getEngComparator() {
+    fun getEngComparator(): EngComparator? {
         if (engComparator == null) {
-            synchronized (EngComparator.class) {
-                engComparator = new EngComparator();
-            }
+            synchronized(EngComparator::class.java) { engComparator = EngComparator() }
         }
-        return engComparator;
+        return engComparator
     }
 
-    private static class AddedTimeComparator implements Comparator<Vocabulary> { // last added first
-        @Override
-        public int compare(Vocabulary o1, Vocabulary o2) {
-            return o2.addedTime - o1.addedTime;
+    private class AddedTimeComparator : Comparator<Vocabulary?> {
+        // last added first
+        override fun compare(o1: Vocabulary?, o2: Vocabulary?): Int {
+            return o2.addedTime - o1.addedTime
         }
 
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof AddedTimeComparator) {
-                return this == (AddedTimeComparator) obj;
-            }
-            return false;
+        override fun equals(obj: Any?): Boolean {
+            return if (obj is AddedTimeComparator) {
+                this === obj as AddedTimeComparator?
+            } else false
         }
     }
 
-    private static class EngComparator implements Comparator<Vocabulary> {
-        @Override
-        public int compare(Vocabulary o1, Vocabulary o2) {
-            return o1.eng.compareTo(o2.eng);
+    private class EngComparator : Comparator<Vocabulary?> {
+        override fun compare(o1: Vocabulary?, o2: Vocabulary?): Int {
+            return o1.eng.compareTo(o2.eng)
         }
 
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof EngComparator) {
-                return this == (EngComparator) obj;
-            }
-            return false;
+        override fun equals(obj: Any?): Boolean {
+            return if (obj is EngComparator) {
+                this === obj as EngComparator?
+            } else false
         }
     }
 }

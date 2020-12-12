@@ -1,16 +1,9 @@
-package hsk.practice.myvoca;
+package hsk.practice.myvoca
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import database.Vocabulary;
-import database.source.VocaRepository;
+import androidx.lifecycle.*
+import database.Vocabulary
+import database.source.VocaRepository
+import java.util.*
 
 /**
  * VocaViewModel is at the top of the database abstraction.
@@ -21,91 +14,88 @@ import database.source.VocaRepository;
  * Methods return the LiveData immediately when the method is called. Actual result will be filled into LiveData later.
  * UI classes should observe the LiveData and define what to do when the operation is actually finished.
  */
-public class VocaViewModel extends ViewModel {
-
-    private LiveData<List<Vocabulary>> allVocabularies;
-    private Vocabulary vocabulary;
-    private VocaRepository vocaRepo;
-
-    public VocaViewModel() {
-        this.vocaRepo = VocaRepository.getInstance();
-        loadVocabularies();
-    }
-
-    public LiveData<List<Vocabulary>> getAllVocabulary() {
+class VocaViewModel : ViewModel() {
+    private var allVocabularies: LiveData<MutableList<Vocabulary?>?>? = null
+    private val vocabulary: Vocabulary? = null
+    private val vocaRepo: VocaRepository?
+    fun getAllVocabulary(): LiveData<MutableList<Vocabulary?>?>? {
         if (allVocabularies == null || allVocabularies.getValue() == null) {
-            loadVocabularies();
+            loadVocabularies()
         }
-        return allVocabularies;
+        return allVocabularies
     }
 
-    public LiveData<Integer> getVocabularyCount() {
-        final MutableLiveData<Integer> result = new MutableLiveData<>();
+    fun getVocabularyCount(): LiveData<Int?>? {
+        val result = MutableLiveData<Int?>()
         if (allVocabularies == null || allVocabularies.getValue() == null) {
-            loadVocabularies();
-            allVocabularies.observeForever(new Observer<List<Vocabulary>>() {
-                @Override
-                public void onChanged(List<Vocabulary> vocabularies) {
-                    result.setValue(vocabularies.size());
-                    allVocabularies.removeObserver(this);
+            loadVocabularies()
+            allVocabularies.observeForever(object : Observer<MutableList<Vocabulary?>?> {
+                override fun onChanged(vocabularies: MutableList<Vocabulary?>?) {
+                    result.setValue(vocabularies.size)
+                    allVocabularies.removeObserver(this)
                 }
-            });
+            })
         } else {
-            result.setValue(allVocabularies.getValue().size());
+            result.setValue(allVocabularies.getValue().size)
         }
-        return result;
+        return result
     }
 
-    public void deleteVocabulary(Vocabulary... vocabularies) {
-        vocaRepo.deleteVocabularies(vocabularies);
+    fun deleteVocabulary(vararg vocabularies: Vocabulary?) {
+        vocaRepo.deleteVocabularies(*vocabularies)
     }
 
-    public LiveData<List<Vocabulary>> getVocabulary(String query) {
-        return vocaRepo.getVocabulary(query);
+    fun getVocabulary(query: String?): LiveData<MutableList<Vocabulary?>?>? {
+        return vocaRepo.getVocabulary(query)
     }
 
-    public void insertVocabulary(Vocabulary... vocabularies) {
-        vocaRepo.insertVocabulary(vocabularies);
+    fun insertVocabulary(vararg vocabularies: Vocabulary?) {
+        vocaRepo.insertVocabulary(*vocabularies)
     }
 
-    private synchronized void loadVocabularies() {
+    @Synchronized
+    private fun loadVocabularies() {
         // do what?
-        allVocabularies = vocaRepo.getAllVocabulary();
+        allVocabularies = vocaRepo.getAllVocabulary()
     }
 
-    public void editVocabulary(Vocabulary vocabulary) {
-        vocaRepo.editVocabulary(vocabulary);
+    fun editVocabulary(vocabulary: Vocabulary?) {
+        vocaRepo.editVocabulary(vocabulary)
     }
 
-    public LiveData<Vocabulary> getRandomVocabulary() {
-        return vocaRepo.getRandomVocabulary();
+    fun getRandomVocabulary(): LiveData<Vocabulary?>? {
+        return vocaRepo.getRandomVocabulary()
     }
 
-    public List<Vocabulary> getRandomVocabularies(int count, Vocabulary notInclude) {
-        ArrayList<Vocabulary> result = new ArrayList<>();
-        while (result.size() < count) {
-            Vocabulary voca = vocaRepo.getRandomVocabulary().getValue();
-            if (!Objects.equals(voca, notInclude)) {
-                result.add(voca);
+    fun getRandomVocabularies(count: Int, notInclude: Vocabulary?): MutableList<Vocabulary?>? {
+        val result = ArrayList<Vocabulary?>()
+        while (result.size < count) {
+            val voca = vocaRepo.getRandomVocabulary().value
+            if (voca != notInclude) {
+                result.add(voca)
             }
         }
-        return result;
+        return result
     }
 
-    public LiveData<Boolean> isEmpty() {
-        final MutableLiveData<Boolean> result = new MutableLiveData<>(true);
+    fun isEmpty(): LiveData<Boolean?>? {
+        val result = MutableLiveData(true)
         if (allVocabularies == null || allVocabularies.getValue() == null) {
-            loadVocabularies();
-            allVocabularies.observeForever(new Observer<List<Vocabulary>>() {
-                @Override
-                public void onChanged(List<Vocabulary> vocabularies) {
-                    result.setValue(vocabularies.size() == 0);
-                    allVocabularies.removeObserver(this);
+            loadVocabularies()
+            allVocabularies.observeForever(object : Observer<MutableList<Vocabulary?>?> {
+                override fun onChanged(vocabularies: MutableList<Vocabulary?>?) {
+                    result.setValue(vocabularies.size == 0)
+                    allVocabularies.removeObserver(this)
                 }
-            });
+            })
         } else {
-            result.setValue(allVocabularies.getValue().size() == 0);
+            result.setValue(allVocabularies.getValue().size == 0)
         }
-        return result;
+        return result
+    }
+
+    init {
+        vocaRepo = VocaRepository.Companion.getInstance()
+        loadVocabularies()
     }
 }
