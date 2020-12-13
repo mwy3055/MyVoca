@@ -11,21 +11,25 @@ import database.Vocabulary
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.VocaViewModel
+import hsk.practice.myvoca.databinding.ActivityWidgetSettingBinding
 
 class WidgetActivity : AppCompatActivity() {
-    private var vocaViewModel: VocaViewModel? = null
+    private lateinit var binding:ActivityWidgetSettingBinding
+
+    private lateinit var vocaViewModel: VocaViewModel
     private var widgetId = 0
-    private val eng: TextView? = null
-    private val kor: TextView? = null
-    private val showVocaButton: Button? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_widget_setting)
+
+        binding=ActivityWidgetSettingBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         AppHelper.loadInstance(this)
         vocaViewModel = ViewModelProvider(this).get(VocaViewModel::class.java)
         widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
         val allVocabulary = vocaViewModel.getAllVocabulary()
-        allVocabulary.observeForever(object : Observer<MutableList<Vocabulary?>?> {
+        allVocabulary?.observeForever(object : Observer<MutableList<Vocabulary?>?> {
             override fun onChanged(vocabularies: MutableList<Vocabulary?>?) {
                 showWidget()
                 allVocabulary.removeObserver(this)
@@ -43,15 +47,18 @@ class WidgetActivity : AppCompatActivity() {
         randomVocabulary.observeForever(object : Observer<Vocabulary?> {
             override fun onChanged(vocabulary: Vocabulary?) {
                 val widgetManager = AppWidgetManager.getInstance(this@WidgetActivity)
+
                 val remoteView = RemoteViews(packageName, R.layout.widget_layout)
-                remoteView.setTextViewText(R.id.widget_eng, vocabulary.eng)
-                remoteView.setTextViewText(R.id.widget_kor, vocabulary.kor)
+                remoteView.setTextViewText(R.id.widget_eng, vocabulary?.eng)
+                remoteView.setTextViewText(R.id.widget_kor, vocabulary?.kor)
                 widgetManager.updateAppWidget(widgetId, remoteView)
+
                 val intent = Intent()
                 intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
                 setResult(RESULT_OK, intent)
-                finish()
                 randomVocabulary.removeObserver(this)
+
+                finish()
             }
         })
     }

@@ -17,6 +17,7 @@ import android.widget.AdapterView.OnItemSelectedListener
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -157,7 +158,7 @@ class SeeAllFragment : Fragment(),
         updateWordSizeRunnable = Runnable {
             if (isFragmentShown) {
                 val vocaSize = vocaViewModel.getVocabularyCount()
-                vocaSize?.observe(viewLifecycleOwner, { integer -> vocaNumberText.text = integer?.toString() })
+                vocaSize.observe(viewLifecycleOwner, { integer -> vocaNumberText.text = integer?.toString() })
             }
         }
         showVocaSize()
@@ -168,9 +169,10 @@ class SeeAllFragment : Fragment(),
         val task = LoadAdapterTask()
         handler.postDelayed({ task.execute() }, loadAdapterDelay.toLong())
         vocaRecyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        vocaRecyclerView.addItemDecoration(DividerItemDecoration(vocaRecyclerView.getContext(), LinearLayoutManager(parentActivity).orientation))
+        vocaRecyclerView.addItemDecoration(DividerItemDecoration(vocaRecyclerView.context, LinearLayoutManager(parentActivity).orientation))
         val callback: ItemTouchHelper.SimpleCallback = VocabularyTouchHelper(0, ItemTouchHelper.LEFT, this)
         ItemTouchHelper(callback).attachToRecyclerView(vocaRecyclerView)
+
         return binding.root
     }
 
@@ -190,6 +192,11 @@ class SeeAllFragment : Fragment(),
     override fun onPause() {
         isFragmentShown = false
         super.onPause()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     /**
@@ -259,7 +266,7 @@ class SeeAllFragment : Fragment(),
     fun animateSearchToolbar(numberOfMenuIcon: Int, containsOverflow: Boolean, show: Boolean) {
         toolbar.setBackgroundColor(ContextCompat.getColor(parentActivity, R.color.design_default_color_primary))
         if (window == null) {
-            window = parentActivity.getWindow()
+            window = parentActivity.window
         }
         // set status bar color
         // window.setStatusBarColor(ContextCompat.getColor(parentActivity, android.R.color.white));
@@ -469,7 +476,7 @@ class SeeAllFragment : Fragment(),
                 showVocaSize()
                 observe()
             }
-            vocaRecyclerView.adapter = vocaRecyclerViewAdapter
+            vocaRecyclerView.adapter = this
         }
     }
 

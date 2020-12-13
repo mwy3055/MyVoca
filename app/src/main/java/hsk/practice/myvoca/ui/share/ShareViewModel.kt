@@ -12,6 +12,6 @@ class ShareViewModel : ViewModel() {
 
     init {
         mText = MutableLiveData()
-        mText.setValue("This is share fragment")
+        mText.value = "This is share fragment"
     }
 }

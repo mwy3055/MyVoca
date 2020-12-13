@@ -7,7 +7,6 @@ import android.view.*
 import android.view.ContextMenu.ContextMenuInfo
 import android.view.View.OnCreateContextMenuListener
 import android.view.View.OnLongClickListener
-import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
@@ -15,9 +14,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import database.VocaComparator
 import database.Vocabulary
+import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.Constants
-import hsk.practice.myvoca.R
 import hsk.practice.myvoca.VocaViewModel
+import hsk.practice.myvoca.databinding.VocaViewBinding
 import hsk.practice.myvoca.ui.seeall.OnDeleteModeListener
 import hsk.practice.myvoca.ui.seeall.OnEditVocabularyListener
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.VocaViewHolder
@@ -29,7 +29,9 @@ import java.util.*
  *
  * For further information, Please refer the comments above some methods.
  */
-class VocaRecyclerViewAdapter private constructor(private val activity: AppCompatActivity) : RecyclerView.Adapter<VocaViewHolder?>(), OnDeleteModeListener {
+class VocaRecyclerViewAdapter private constructor(private val activity: AppCompatActivity)
+    : RecyclerView.Adapter<VocaViewHolder?>(), OnDeleteModeListener {
+
     // Custom listener interfaces. Will be used in the ViewHolder below.
     interface OnVocaClickListener {
         fun onVocaClick(holder: VocaViewHolder?, view: View?, position: Int)
@@ -78,8 +80,9 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VocaViewHolder {
-        val view = VocaView(activity)
-        val holder = VocaViewHolder(view, this, onEditVocabularyListener)
+        val vocaBinding = VocaViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
+        val holder = VocaViewHolder(vocaBinding, this, onEditVocabularyListener)
         holder.setVocaClickListener(vocaClickListener)
         return holder
     }
@@ -87,24 +90,20 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
     // Bind the content to the item
     override fun onBindViewHolder(holder: VocaViewHolder, position: Int) {
         if (currentVocabulary?.value == null) {
-            holder.setVocabulary(Vocabulary("null", "널입니다.", (System.currentTimeMillis() / 1000).toInt(), (System.currentTimeMillis() / 1000).toInt(), ""))
+            holder.setVocabulary(Vocabulary.nullVocabulary)
             holder.setVocaClickListener(vocaClickListener)
-            return
-        }
-        val vocabulary = currentVocabulary!!.value?.get(position)
-        holder.setVocabulary(vocabulary)
-        holder.setVocaClickListener(vocaClickListener)
-        val checkBox = holder.vocaView?.deleteCheckBox
-        if (deleteMode) {
-            checkBox?.apply {
-                visibility = View.VISIBLE
-                isChecked = selectedItems.get(position)
-            }
-            holder.vocaView?.invalidate()
         } else {
-            checkBox?.apply {
-                visibility = View.GONE
-                isChecked = false
+            val vocabulary = currentVocabulary!!.value?.get(position)
+            holder.setVocabulary(vocabulary)
+            holder.setVocaClickListener(vocaClickListener)
+            holder.vocaBinding.deleteCheckBox.apply {
+                if (deleteMode) {
+                    visibility = View.VISIBLE
+                    isChecked = selectedItems.get(position)
+                } else {
+                    visibility = View.GONE
+                    isChecked = false
+                }
             }
         }
     }
@@ -114,9 +113,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
 
     // Methods for general adapter
     override fun getItemCount(): Int {
-        return if (currentVocabulary?.value == null) {
-            -1
-        } else currentVocabulary!!.value!!.size
+        return if (currentVocabulary?.value == null) -1 else currentVocabulary!!.value!!.size
     }
 
     fun getItem(position: Int) = currentVocabulary?.value?.get(position)
@@ -145,7 +142,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
     }
 
     // Methods for managing select state
-    fun isSelected(position: Int) = getSelectedItems()?.contains(position) ?: false
+    fun isSelected(position: Int) = getSelectedItems().contains(position) ?: false
 
     fun switchSelectedState(position: Int) {
         if (selectedItems.get(position)) {
@@ -219,7 +216,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
         // reverse iteration
         val iterator: MutableListIterator<*> = selected.listIterator(selected.size)
         while (iterator.hasPrevious()) {
-            val vocabulary = getItem(iterator.previous() as Int) as Vocabulary?
+            val vocabulary = getItem(iterator.previous() as Int)
             vocaViewModel.deleteVocabulary(vocabulary)
         }
         if (isDeleteMode()) {
@@ -271,14 +268,15 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
      * ViewHolder for vocabulary object.
      * Manages the content of the item and action when the item is clicked or long-clicked.
      */
-    inner class VocaViewHolder(vocaView: View,
+    inner class VocaViewHolder(val vocaBinding: VocaViewBinding,
                                onDeleteModeListener: OnDeleteModeListener?,
-                               onEditVocabularyListener: OnEditVocabularyListener?) : RecyclerView.ViewHolder(vocaView), OnCreateContextMenuListener {
+                               onEditVocabularyListener: OnEditVocabularyListener?) : RecyclerView.ViewHolder(vocaBinding.root), OnCreateContextMenuListener {
+
         var vocaClickListener: OnVocaClickListener? = null
         var onDeleteModeListener: OnDeleteModeListener?
         var onEditVocabularyListener: OnEditVocabularyListener?
-        var viewForeground: RelativeLayout? = vocaView.findViewById(R.id.view_foreground)
-        var viewBackground: RelativeLayout? = vocaView.findViewById(R.id.view_background)
+        var viewForeground = vocaBinding.viewForeground
+        var viewBackground = vocaBinding.viewBackground
 
         // long-click listener
         private val onMenuItemClickListener: MenuItem.OnMenuItemClickListener = MenuItem.OnMenuItemClickListener { item ->
@@ -305,8 +303,6 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
             true
         }
 
-        var vocaView = vocaView as VocaView
-
         // Create drop-down menu when item is long-clicked
         override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenuInfo?) {
             if (getInstance(activity)?.deleteMode == true) {
@@ -321,7 +317,11 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
         }
 
         fun setVocabulary(vocabulary: Vocabulary?) {
-            vocaView.setVocabulary(vocabulary)
+            vocabulary?.apply {
+                vocaBinding.vocaEng.text = eng
+                vocaBinding.vocaKor.text = kor
+                vocaBinding.lastEditTime.text = AppHelper.getTimeString(lastEditedTime.toLong() * 1000)
+            }
         }
 
         @JvmName("setVocaClickListener1")
@@ -330,13 +330,13 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
         }
 
         init {
-            this.vocaView.setOnClickListener(View.OnClickListener { v ->
+            vocaBinding.root.setOnClickListener { v ->
                 if (vocaClickListener != null) {
                     val position = adapterPosition
                     vocaClickListener!!.onVocaClick(this@VocaViewHolder, v, position)
                 }
-            })
-            this.vocaView.setOnLongClickListener(OnLongClickListener { v ->
+            }
+            vocaBinding.root.setOnLongClickListener(OnLongClickListener { v ->
                 if (vocaClickListener != null) {
                     val position = adapterPosition
                     return@OnLongClickListener vocaClickListener!!.onVocaLongClick(this@VocaViewHolder, v, position)
@@ -345,7 +345,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
             })
             this.onDeleteModeListener = onDeleteModeListener
             this.onEditVocabularyListener = onEditVocabularyListener
-            vocaView.setOnCreateContextMenuListener(this)
+            vocaBinding.root.setOnCreateContextMenuListener(this)
         }
     }
 
@@ -359,6 +359,4 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
             return instance
         }
     }
-
-
 }

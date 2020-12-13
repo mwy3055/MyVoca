@@ -1,6 +1,9 @@
 package hsk.practice.myvoca
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import database.Vocabulary
 import database.source.VocaRepository
 import java.util.*
@@ -15,62 +18,58 @@ import java.util.*
  * UI classes should observe the LiveData and define what to do when the operation is actually finished.
  */
 class VocaViewModel : ViewModel() {
+
     private var allVocabularies: LiveData<MutableList<Vocabulary?>?>? = null
     private val vocabulary: Vocabulary? = null
-    private val vocaRepo: VocaRepository?
+    private val vocaRepo: VocaRepository? = VocaRepository.getInstance()
+
     fun getAllVocabulary(): LiveData<MutableList<Vocabulary?>?>? {
-        if (allVocabularies == null || allVocabularies.getValue() == null) {
+        if (allVocabularies?.value == null) {
             loadVocabularies()
         }
         return allVocabularies
     }
 
-    fun getVocabularyCount(): LiveData<Int?>? {
+    fun getVocabularyCount(): LiveData<Int?> {
         val result = MutableLiveData<Int?>()
-        if (allVocabularies == null || allVocabularies.getValue() == null) {
+        if (allVocabularies?.value == null) {
             loadVocabularies()
-            allVocabularies.observeForever(object : Observer<MutableList<Vocabulary?>?> {
+            allVocabularies?.observeForever(object : Observer<MutableList<Vocabulary?>?> {
                 override fun onChanged(vocabularies: MutableList<Vocabulary?>?) {
-                    result.setValue(vocabularies.size)
-                    allVocabularies.removeObserver(this)
+                    result.setValue(vocabularies?.size)
+                    allVocabularies?.removeObserver(this)
                 }
             })
         } else {
-            result.setValue(allVocabularies.getValue().size)
+            result.setValue(allVocabularies!!.value?.size)
         }
         return result
     }
 
     fun deleteVocabulary(vararg vocabularies: Vocabulary?) {
-        vocaRepo.deleteVocabularies(*vocabularies)
+        vocaRepo?.deleteVocabularies(*vocabularies)
     }
 
-    fun getVocabulary(query: String?): LiveData<MutableList<Vocabulary?>?>? {
-        return vocaRepo.getVocabulary(query)
-    }
+    fun getVocabulary(query: String?): LiveData<MutableList<Vocabulary?>?>? = vocaRepo?.getVocabulary(query)
 
-    fun insertVocabulary(vararg vocabularies: Vocabulary?) {
-        vocaRepo.insertVocabulary(*vocabularies)
-    }
+    fun insertVocabulary(vararg vocabularies: Vocabulary?) = vocaRepo?.insertVocabulary(*vocabularies)
 
     @Synchronized
     private fun loadVocabularies() {
         // do what?
-        allVocabularies = vocaRepo.getAllVocabulary()
+        allVocabularies = vocaRepo?.getAllVocabulary()
     }
 
     fun editVocabulary(vocabulary: Vocabulary?) {
-        vocaRepo.editVocabulary(vocabulary)
+        vocaRepo?.editVocabulary(vocabulary)
     }
 
-    fun getRandomVocabulary(): LiveData<Vocabulary?>? {
-        return vocaRepo.getRandomVocabulary()
-    }
+    fun getRandomVocabulary() = vocaRepo?.getRandomVocabulary()
 
     fun getRandomVocabularies(count: Int, notInclude: Vocabulary?): MutableList<Vocabulary?>? {
         val result = ArrayList<Vocabulary?>()
         while (result.size < count) {
-            val voca = vocaRepo.getRandomVocabulary().value
+            val voca = vocaRepo?.getRandomVocabulary()?.value
             if (voca != notInclude) {
                 result.add(voca)
             }
@@ -78,24 +77,23 @@ class VocaViewModel : ViewModel() {
         return result
     }
 
-    fun isEmpty(): LiveData<Boolean?>? {
+    fun isEmpty(): LiveData<Boolean?> {
         val result = MutableLiveData(true)
-        if (allVocabularies == null || allVocabularies.getValue() == null) {
+        if (allVocabularies?.value == null) {
             loadVocabularies()
-            allVocabularies.observeForever(object : Observer<MutableList<Vocabulary?>?> {
+            allVocabularies?.observeForever(object : Observer<MutableList<Vocabulary?>?> {
                 override fun onChanged(vocabularies: MutableList<Vocabulary?>?) {
-                    result.setValue(vocabularies.size == 0)
-                    allVocabularies.removeObserver(this)
+                    result.value = (vocabularies?.size == 0)
+                    allVocabularies!!.removeObserver(this)
                 }
             })
         } else {
-            result.setValue(allVocabularies.getValue().size == 0)
+            result.setValue(allVocabularies!!.value?.size == 0)
         }
         return result
     }
 
     init {
-        vocaRepo = VocaRepository.Companion.getInstance()
         loadVocabularies()
     }
 }

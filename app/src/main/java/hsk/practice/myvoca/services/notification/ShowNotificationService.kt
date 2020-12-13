@@ -4,11 +4,15 @@ import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.*
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.Observer
 import database.Vocabulary
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.R
@@ -159,7 +163,7 @@ class ShowNotificationService : LifecycleService() {
                 Log.d("HSK APP", "Show voca on notification")
                 showRandomWordOnNotification()
             } else if (intent?.action.equals(START_APP_ACTION_NAME, ignoreCase = true)
-                    && !AppHelper.isForeground(this@ShowNotificationService)) {
+                    && !AppHelper.isForeground()) {
                 Log.d("HSK APP", "Start app")
                 val startAppIntent = Intent(applicationContext, SplashActivity::class.java)
                 startAppIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP

@@ -12,7 +12,7 @@ import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.VocaVi
  */
 class VocabularyTouchHelper(dragDirs: Int, swipeDirs: Int, private val listener: VocabularyTouchHelperListener?) : ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {
     interface VocabularyTouchHelperListener {
-        open fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int, position: Int)
+        fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int, position: Int)
     }
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
@@ -20,12 +20,12 @@ class VocabularyTouchHelper(dragDirs: Int, swipeDirs: Int, private val listener:
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        listener.onSwiped(viewHolder, direction, viewHolder.adapterPosition)
+        listener?.onSwiped(viewHolder, direction, viewHolder.adapterPosition)
     }
 
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         if (viewHolder != null) {
-            val foregroundView: View? = (viewHolder as VocaViewHolder?).viewForeground
+            val foregroundView: View? = (viewHolder as VocaViewHolder?)?.viewForeground
             getDefaultUIUtil().onSelected(foregroundView)
         }
     }
@@ -36,7 +36,7 @@ class VocabularyTouchHelper(dragDirs: Int, swipeDirs: Int, private val listener:
     }
 
     override fun onChildDrawOver(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder?, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
-        val foregroundView: View? = (viewHolder as VocaViewHolder?).viewForeground
+        val foregroundView: View? = (viewHolder as VocaViewHolder?)?.viewForeground
         getDefaultUIUtil().onDrawOver(c, recyclerView, foregroundView, dX, dY, actionState, isCurrentlyActive)
     }
 
@@ -45,7 +45,4 @@ class VocabularyTouchHelper(dragDirs: Int, swipeDirs: Int, private val listener:
         getDefaultUIUtil().clearView(foregroundView)
     }
 
-    override fun convertToAbsoluteDirection(flags: Int, layoutDirection: Int): Int {
-        return super.convertToAbsoluteDirection(flags, layoutDirection)
-    }
 }

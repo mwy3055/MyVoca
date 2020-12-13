@@ -46,7 +46,9 @@ class VocaRepository {
     }
 
     fun getAllVocabulary(): LiveData<MutableList<Vocabulary?>?>? {
-        allVocabulary.takeIf { it == null }?.let { loadVocabulary() }
+        if (allVocabulary == null) {
+            loadVocabulary()
+        }
 //        if (allVocabulary == null || allVocabulary.getValue() == null) {
 //            loadVocabulary()
 //        }

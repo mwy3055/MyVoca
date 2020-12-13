@@ -19,6 +19,15 @@ import java.io.Serializable
 @Entity
 class Vocabulary(@kotlin.jvm.JvmField @PrimaryKey var eng: String, kor: String, addedTime: Int, lastEditedTime: Int, memo: String) : Serializable {
 
+    companion object {
+        val nullVocabulary = Vocabulary(
+                "null",
+                "널입니다.",
+                (System.currentTimeMillis() / 1000).toInt(),
+                (System.currentTimeMillis() / 1000).toInt(),
+                "")
+    }
+
     @kotlin.jvm.JvmField
     var kor: String? = kor
 

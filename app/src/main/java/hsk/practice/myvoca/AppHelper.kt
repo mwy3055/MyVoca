@@ -61,12 +61,12 @@ object AppHelper {
     /**
      * Returns a time-formatted string by the given timestamp.
      *
-     * @param timeInMilis Unix epoch timestamp to convert to string
+     * @param timeInMillis Unix epoch timestamp to convert to string
      * @return Time string of the timestamp
      */
-    fun getTimeString(timeInMilis: Long): String? {
+    fun getTimeString(timeInMillis: Long): String? {
         val cal = Calendar.getInstance()
-        cal.timeInMillis = timeInMilis
+        cal.timeInMillis = timeInMillis
         val year = cal[Calendar.YEAR]
         val mon = cal[Calendar.MONTH]
         val day = cal[Calendar.DAY_OF_MONTH]
@@ -79,11 +79,10 @@ object AppHelper {
     /**
      * Check if the application is on the foreground.
      *
-     * @param context context of the application.
-     * @return true if application is on the foreground, else otherwise
+     * @return if application is on the foreground
      */
-    fun isForeground(context: Context?): Boolean {
-        return MainActivity.Companion.isRunning()
+    fun isForeground(): Boolean {
+        return MainActivity.isRunning()
     }
 
     /**
@@ -92,8 +91,8 @@ object AppHelper {
      * @param context context of the application(mainly SplashActivity)
      */
     fun loadInstance(context: Context?) {
-        VocaDatabase.Companion.loadInstance(context)
-        VocaRepository.Companion.loadInstance()
+        VocaDatabase.loadInstance(context)
+        VocaRepository.loadInstance()
     }
 
     /**
@@ -107,7 +106,7 @@ object AppHelper {
             return false
         }
         for (c in str.toCharArray()) {
-            if (!('a' <= c && c <= 'z') && !('A' <= c && c <= 'Z') && c != '%') {
+            if (c !in 'a'..'z' && c !in 'A'..'Z' && c != '%') {
                 return false
             }
         }

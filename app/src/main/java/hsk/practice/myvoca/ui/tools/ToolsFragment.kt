@@ -4,24 +4,30 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import hsk.practice.myvoca.R
+import hsk.practice.myvoca.databinding.FragmentToolsBinding
 
 /**
  * Created by Android Studio. Left for further use.
  */
 class ToolsFragment : Fragment() {
-    private var viewModelProvider: ViewModelProvider? = null
-    private var toolsViewModel: ToolsViewModel? = null
+    private var _binding: FragmentToolsBinding? = null
+
+    private val binding
+        get() = _binding!!
+
+    private lateinit var viewModelProvider: ViewModelProvider
+    private lateinit var toolsViewModel: ToolsViewModel
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        _binding = FragmentToolsBinding.inflate(inflater, container, false)
+
         viewModelProvider = ViewModelProvider(this)
         toolsViewModel = viewModelProvider.get(ToolsViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_tools, container, false)
-        val textView = root.findViewById<TextView?>(R.id.text_tools)
-        toolsViewModel.getText().observe(viewLifecycleOwner, { s -> textView.text = s })
-        return root
+
+        val textView = binding.textTools
+        toolsViewModel.getText()?.observe(viewLifecycleOwner, { s -> textView.text = s })
+        return binding.root
     }
 }
