@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginHorizontal="@dimen/activity_add_voca_horizontal_margin"
-    android:layout_marginVertical="@dimen/activity_add_voca_vertical_margin"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/activity_add_voca_horizontal_margin"
+    android:paddingVertical="@dimen/activity_add_voca_vertical_margin">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_activity_new_voca"

@@ -23,9 +23,10 @@ class AddVocaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddVocaBinding
 
-    private var viewModelProvider: ViewModelProvider? = null
-    private var vocaViewModel: VocaViewModel? = null
+    private lateinit var viewModelProvider: ViewModelProvider
+    private lateinit var vocaViewModel: VocaViewModel
     private var resultCode = Constants.ADD_NEW_VOCA_CANCEL
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -33,7 +34,7 @@ class AddVocaActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         viewModelProvider = ViewModelProvider(this)
-        vocaViewModel = viewModelProvider!!.get(VocaViewModel::class.java)
+        vocaViewModel = viewModelProvider.get(VocaViewModel::class.java)
         val toolbar = findViewById<Toolbar?>(R.id.toolbar_activity_new_voca)
         setSupportActionBar(toolbar)
 
