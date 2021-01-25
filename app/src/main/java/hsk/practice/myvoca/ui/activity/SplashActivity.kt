@@ -26,7 +26,7 @@ class SplashActivity : AppCompatActivity() {
         getPermissions()
         AppHelper.loadInstance(this)
         // when database is loaded...
-        VocaRepository.getInstance()?.getAllVocabulary()?.observe(this, {
+        VocaRepository.getAllVocabulary()?.observe(this, {
             startVocaProviderService()
             handler.post {
                 val intent = Intent(applicationContext, MainActivity::class.java)

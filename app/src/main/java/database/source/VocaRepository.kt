@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer
 import database.Vocabulary
 import database.source.local.VocaDao
 import database.source.local.VocaDatabase
+import database.source.local.VocaPersistence
 import hsk.practice.myvoca.AppHelper
 import java.util.*
 import java.util.concurrent.Executors
@@ -19,16 +20,26 @@ import java.util.concurrent.TimeUnit
  *
  * Implemented as Singleton: To unify the management process
  */
-class VocaRepository {
-    private var vocaDao: VocaDao? = null
+object VocaRepository {
+    private var vocaPersistence: VocaPersistence? = null
+
+    private lateinit var vocaDao: VocaDao
+    private lateinit var database: VocaDatabase
     private val executor = Executors.newCachedThreadPool()
-    private var database: VocaDatabase? = null
     private var allVocabulary: LiveData<MutableList<Vocabulary?>?>? = null
+
+    fun loadInstance(vocaPersistence: VocaPersistence? = null) {
+        synchronized(this::class.java) {
+            this.vocaPersistence = vocaPersistence
+            this.database = VocaDatabase.getInstance()!!
+            this.vocaDao = this.database.vocaDao()!!
+        }
+    }
 
     private fun loadVocabulary() {
         try {
-            executor.execute(LoadTask)
-            allVocabulary = LoadTask?.get(10, TimeUnit.SECONDS)
+            executor.execute(loadTask)
+            allVocabulary = loadTask.get(10, TimeUnit.SECONDS)
             allVocabulary?.observeForever { vocabularies -> Log.d("HSK APP", "load complete, " + vocabularies?.size) }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -38,10 +49,10 @@ class VocaRepository {
     fun getVocabulary(query: String?): LiveData<MutableList<Vocabulary?>?>? {
         return if (AppHelper.isStringOnlyAlphabet(query)) {
             Log.d("HSK APP", "search by eng: $query")
-            vocaDao?.loadVocabularyByEng(query)
+            vocaDao.loadVocabularyByEng(query)
         } else {
             Log.d("HSK APP", "search by kor: $query")
-            vocaDao?.loadVocabularyByKor(query)
+            vocaDao.loadVocabularyByKor(query)
         }
     }
 
@@ -61,10 +72,10 @@ class VocaRepository {
         allVocabulary.let {
             if (it == null || it.value == null) {
                 loadVocabulary()
-                it?.observeForever(object : Observer<MutableList<Vocabulary?>?> {
-                    override fun onChanged(vocabularies: MutableList<Vocabulary?>?) {
+                it?.observeForever(object : Observer<List<Vocabulary?>?> {
+                    override fun onChanged(vocabularies: List<Vocabulary?>?) {
                         val index = random.nextInt(vocabularies!!.size)
-                        result.setValue(vocabularies[index])
+                        result.value = vocabularies[index]
                         it.removeObserver(this)
                     }
                 })
@@ -90,36 +101,16 @@ class VocaRepository {
     }
 
     fun insertVocabulary(vararg vocabularies: Vocabulary?) {
-        executor.execute { vocaDao?.insertVocabulary(*vocabularies) }
+        executor.execute { vocaDao.insertVocabulary(*vocabularies) }
     }
 
     fun editVocabulary(vararg vocabularies: Vocabulary?) {
-        executor.execute { vocaDao?.updateVocabulary(*vocabularies) }
+        executor.execute { vocaDao.updateVocabulary(*vocabularies) }
     }
 
     fun deleteVocabularies(vararg vocabularies: Vocabulary?) {
-        executor.execute { vocaDao?.deleteVocabulary(*vocabularies) }
+        executor.execute { vocaDao.deleteVocabulary(*vocabularies) }
     }
 
-    private val LoadTask: FutureTask<LiveData<MutableList<Vocabulary?>?>?> = FutureTask { vocaDao?.loadAllVocabulary() }
-
-    companion object {
-        private var instance: VocaRepository? = null
-        fun getInstance(): VocaRepository? {
-            if (instance == null) {
-                loadInstance()
-            }
-            return instance
-        }
-
-        fun loadInstance() {
-            synchronized(VocaRepository::class.java) {
-                if (instance == null) {
-                    instance = VocaRepository()
-                    instance!!.database = VocaDatabase.Companion.getInstance()
-                    instance!!.vocaDao = VocaDatabase.Companion.getInstance()?.vocaDao()
-                }
-            }
-        }
-    }
+    private val loadTask = FutureTask { vocaDao.loadAllVocabulary() }
 }

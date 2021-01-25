@@ -136,16 +136,16 @@ class QuizFragment : Fragment() {
     }
 
     fun showQuizWord() {
-        val answer = vocaViewModel.getRandomVocabulary()?.value
-        val optionsList = vocaViewModel.getRandomVocabularies(3, answer)
-        optionsList?.add(answer)
+        val answer = vocaViewModel.getRandomVocabulary().value
+        val optionsList = vocaViewModel.getRandomVocabularies(3, answer).toMutableList()
+        optionsList.add(answer)
         if (answer != null) {
             quizWord.text = answer.eng
         }
 
-        optionsList?.shuffle()
+        optionsList.shuffle()
         for (i in 0..3) {
-            val option = optionsList?.get(i)
+            val option = optionsList[i]
             if (answer == option) {
                 answerVoca = option
                 answerIndex = i

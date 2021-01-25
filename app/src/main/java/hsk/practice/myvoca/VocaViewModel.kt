@@ -20,8 +20,6 @@ import java.util.*
 class VocaViewModel : ViewModel() {
 
     private var allVocabularies: LiveData<MutableList<Vocabulary?>?>? = null
-    private val vocabulary: Vocabulary? = null
-    private val vocaRepo: VocaRepository? = VocaRepository.getInstance()
 
     fun getAllVocabulary(): LiveData<MutableList<Vocabulary?>?>? {
         if (allVocabularies?.value == null) {
@@ -34,8 +32,8 @@ class VocaViewModel : ViewModel() {
         val result = MutableLiveData<Int?>()
         if (allVocabularies?.value == null) {
             loadVocabularies()
-            allVocabularies?.observeForever(object : Observer<MutableList<Vocabulary?>?> {
-                override fun onChanged(vocabularies: MutableList<Vocabulary?>?) {
+            allVocabularies?.observeForever(object : Observer<List<Vocabulary?>?> {
+                override fun onChanged(vocabularies: List<Vocabulary?>?) {
                     result.setValue(vocabularies?.size)
                     allVocabularies?.removeObserver(this)
                 }
@@ -47,29 +45,29 @@ class VocaViewModel : ViewModel() {
     }
 
     fun deleteVocabulary(vararg vocabularies: Vocabulary?) {
-        vocaRepo?.deleteVocabularies(*vocabularies)
+        VocaRepository.deleteVocabularies(*vocabularies)
     }
 
-    fun getVocabulary(query: String?): LiveData<MutableList<Vocabulary?>?>? = vocaRepo?.getVocabulary(query)
+    fun getVocabulary(query: String?) = VocaRepository.getVocabulary(query)
 
-    fun insertVocabulary(vararg vocabularies: Vocabulary?) = vocaRepo?.insertVocabulary(*vocabularies)
+    fun insertVocabulary(vararg vocabularies: Vocabulary?) = VocaRepository.insertVocabulary(*vocabularies)
 
     @Synchronized
     private fun loadVocabularies() {
         // do what?
-        allVocabularies = vocaRepo?.getAllVocabulary()
+        allVocabularies = VocaRepository.getAllVocabulary()
     }
 
     fun editVocabulary(vocabulary: Vocabulary?) {
-        vocaRepo?.editVocabulary(vocabulary)
+        VocaRepository.editVocabulary(vocabulary)
     }
 
-    fun getRandomVocabulary() = vocaRepo?.getRandomVocabulary()
+    fun getRandomVocabulary() = VocaRepository.getRandomVocabulary()
 
-    fun getRandomVocabularies(count: Int, notInclude: Vocabulary?): MutableList<Vocabulary?>? {
+    fun getRandomVocabularies(count: Int, notInclude: Vocabulary?): List<Vocabulary?> {
         val result = ArrayList<Vocabulary?>()
         while (result.size < count) {
-            val voca = vocaRepo?.getRandomVocabulary()?.value
+            val voca = VocaRepository.getRandomVocabulary().value
             if (voca != notInclude) {
                 result.add(voca)
             }
@@ -81,8 +79,8 @@ class VocaViewModel : ViewModel() {
         val result = MutableLiveData(true)
         if (allVocabularies?.value == null) {
             loadVocabularies()
-            allVocabularies?.observeForever(object : Observer<MutableList<Vocabulary?>?> {
-                override fun onChanged(vocabularies: MutableList<Vocabulary?>?) {
+            allVocabularies?.observeForever(object : Observer<List<Vocabulary?>?> {
+                override fun onChanged(vocabularies: List<Vocabulary?>?) {
                     result.value = (vocabularies?.size == 0)
                     allVocabularies!!.removeObserver(this)
                 }

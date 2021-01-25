@@ -20,7 +20,6 @@ import java.util.concurrent.Callable
 
 class VocaWidget : AppWidgetProvider() {
 
-    private val repository: VocaRepository? = VocaRepository.getInstance()
     private var manager: AppWidgetManager? = null
     private var remoteView: RemoteViews? = null
     private val showVocaTask: AsyncTask<Void?, Void?, LiveData<Vocabulary?>?>? = null
@@ -105,8 +104,8 @@ class VocaWidget : AppWidgetProvider() {
     }
 
     private fun showRandomVocabulary(context: Context?, widgetIds: IntArray?) {
-        val randomVocabulary = VocaRepository.getInstance()?.getRandomVocabulary()
-        randomVocabulary?.observeForever(object : Observer<Vocabulary?> {
+        val randomVocabulary = VocaRepository.getRandomVocabulary()
+        randomVocabulary.observeForever(object : Observer<Vocabulary?> {
             override fun onChanged(vocabulary: Vocabulary?) {
                 if (vocabulary != null) {
                     Log.d("HSK APP", "show: ${vocabulary.eng}")

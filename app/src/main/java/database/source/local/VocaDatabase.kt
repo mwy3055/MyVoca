@@ -13,15 +13,14 @@ import database.source.VocaRepository
  * Implemented as Singleton because creating database object is very costly.
  */
 @Database(entities = [Vocabulary::class], version = 1)
-abstract class VocaDatabase : RoomDatabase() {
+abstract class VocaDatabase : RoomDatabase(), VocaPersistence {
     abstract fun vocaDao(): VocaDao?
 
     companion object {
         private var instance: VocaDatabase? = null
+
         @Synchronized
-        fun getInstance(): VocaDatabase? {
-            return instance
-        }
+        fun getInstance() = instance
 
         fun loadInstance(context: Context?) {
             synchronized(VocaRepository::class.java) {

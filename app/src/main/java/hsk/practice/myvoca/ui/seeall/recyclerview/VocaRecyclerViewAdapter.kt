@@ -109,7 +109,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
     }
 
     // this should be used only when setting observer to LiveData object
-    fun getCurrentVocabulary(): LiveData<MutableList<Vocabulary?>?>? = currentVocabulary
+    fun getCurrentVocabulary() = currentVocabulary
 
     // Methods for general adapter
     override fun getItemCount(): Int {
@@ -142,7 +142,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
     }
 
     // Methods for managing select state
-    fun isSelected(position: Int) = getSelectedItems().contains(position) ?: false
+    fun isSelected(position: Int) = getSelectedItems().contains(position)
 
     fun switchSelectedState(position: Int) {
         if (selectedItems.get(position)) {
@@ -196,7 +196,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
 
     fun searchVocabulary(query: String?) {
         currentVocabulary = vocaViewModel.getVocabulary("%$query%")
-        currentVocabulary?.observe(activity!!, {
+        currentVocabulary?.observe(activity, {
             Log.d("HSK APP", "Searched " + query + ": " + if (currentVocabulary!!.value == null) -1 else currentVocabulary!!.value!!.size)
             sortItems(sortState)
             notifyDataSetChanged()
@@ -208,7 +208,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
         val deletedVocabulary = currentVocabulary?.value?.get(position)
         currentVocabulary?.value?.removeAt(position)
         notifyItemRemoved(position)
-        vocaViewModel?.deleteVocabulary(deletedVocabulary)
+        vocaViewModel.deleteVocabulary(deletedVocabulary)
     }
 
     fun deleteVocabulary() {

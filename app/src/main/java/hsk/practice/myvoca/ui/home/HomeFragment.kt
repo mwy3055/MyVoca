@@ -48,7 +48,7 @@ class HomeFragment : Fragment() {
         allVocabulary = vocaViewModel!!.getAllVocabulary()
         allVocabulary?.observe(viewLifecycleOwner, Observer { vocabularies ->
             if (vocabularies != null) {
-                if (vocabularies.size > 0) {
+                if (vocabularies.isNotEmpty()) {
                     showVocaNumber(vocabularies.size)
                     tryShowRandomVocabulary()
                 }
@@ -56,7 +56,7 @@ class HomeFragment : Fragment() {
         })
         button.setOnClickListener { v ->
             val isEmpty = vocaViewModel!!.isEmpty()
-            isEmpty?.observe(viewLifecycleOwner, { aBoolean ->
+            isEmpty.observe(viewLifecycleOwner, { aBoolean ->
                 if (aBoolean == true) {
                     Snackbar.make(v, "버튼을 눌러 단어를 추가해 주세요.", Snackbar.LENGTH_LONG).show()
                 } else {
