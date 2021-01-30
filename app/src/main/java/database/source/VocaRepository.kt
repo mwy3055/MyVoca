@@ -7,7 +7,7 @@ import androidx.lifecycle.Observer
 import database.Vocabulary
 import database.source.local.VocaDao
 import database.source.local.VocaDatabase
-import hsk.practice.myvoca.AppHelper
+import hsk.practice.myvoca.containsOnlyAlphabet
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.FutureTask
@@ -43,7 +43,7 @@ object VocaRepository {
     }
 
     fun getVocabulary(query: String?): LiveData<MutableList<Vocabulary?>?>? {
-        return if (AppHelper.isStringOnlyAlphabet(query)) {
+        return if (query.containsOnlyAlphabet()) {
             Log.d("HSK APP", "search by eng: $query")
             vocaDao.loadVocabularyByEng(query)
         } else {
