@@ -17,15 +17,15 @@ class VocaRepository(private val vocaPersistence: VocaPersistence) {
         return vocabularyList?.random()
     }
 
-    fun insertVocabulary(vararg vocabularies: Vocabulary) {
+    fun insertVocabulary(vararg vocabularies: Vocabulary?) {
         vocaPersistence.insertVocabulary(*vocabularies)
     }
 
-    fun updateVocabulary(vararg vocabularies: Vocabulary) {
+    fun updateVocabulary(vararg vocabularies: Vocabulary?) {
         vocaPersistence.updateVocabulary(*vocabularies)
     }
 
-    fun deleteVocabulary(vararg vocabularies: Vocabulary) {
+    fun deleteVocabulary(vararg vocabularies: Vocabulary?) {
         vocaPersistence.deleteVocabulary(*vocabularies)
     }
 
