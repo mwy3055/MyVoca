@@ -10,8 +10,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import database.PreferenceManager
 import database.Vocabulary
+import hsk.practice.myvoca.PreferenceManager
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.VocaViewModel
 import hsk.practice.myvoca.databinding.FragmentQuizBinding

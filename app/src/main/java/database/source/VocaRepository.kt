@@ -7,7 +7,6 @@ import androidx.lifecycle.Observer
 import database.Vocabulary
 import database.source.local.VocaDao
 import database.source.local.VocaDatabase
-import database.source.local.VocaPersistence
 import hsk.practice.myvoca.AppHelper
 import java.util.*
 import java.util.concurrent.Executors
@@ -21,16 +20,13 @@ import java.util.concurrent.TimeUnit
  * Implemented as Singleton: To unify the management process
  */
 object VocaRepository {
-    private var vocaPersistence: VocaPersistence? = null
-
     private lateinit var vocaDao: VocaDao
     private lateinit var database: VocaDatabase
     private val executor = Executors.newCachedThreadPool()
     private var allVocabulary: LiveData<MutableList<Vocabulary?>?>? = null
 
-    fun loadInstance(vocaPersistence: VocaPersistence? = null) {
+    fun loadInstance() {
         synchronized(this::class.java) {
-            this.vocaPersistence = vocaPersistence
             this.database = VocaDatabase.getInstance()!!
             this.vocaDao = this.database.vocaDao()!!
         }
