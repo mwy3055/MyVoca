@@ -7,7 +7,6 @@ import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import database.source.VocaRepository
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.services.notification.ShowNotificationService
 
@@ -26,14 +25,12 @@ class SplashActivity : AppCompatActivity() {
         getPermissions()
         AppHelper.loadInstance(this)
         // when database is loaded...
-        VocaRepository.getAllVocabulary()?.observe(this, {
-            startVocaProviderService()
-            handler.post {
-                val intent = Intent(applicationContext, MainActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
-        })
+        startVocaProviderService()
+        handler.post {
+            val intent = Intent(applicationContext, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun getPermissions() {

@@ -14,7 +14,11 @@ class VocaRepository(private val vocaPersistence: VocaPersistence) {
 
     fun getRandomVocabulary(): Vocabulary? {
         val vocabularyList = getAllVocabulary()
-        return vocabularyList?.random()
+        return try {
+            vocabularyList?.random()
+        } catch (e: NoSuchElementException) {
+            Vocabulary("null", "널", 0, 0, "")
+        }
     }
 
     fun insertVocabulary(vararg vocabularies: Vocabulary?) {

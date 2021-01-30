@@ -28,12 +28,14 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import database.Vocabulary
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
-import hsk.practice.myvoca.VocaViewModel
 import hsk.practice.myvoca.databinding.FragmentSeeAllBinding
+import hsk.practice.myvoca.framework.RoomVocabulary
+import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.services.notification.ShowNotificationService
+import hsk.practice.myvoca.ui.NewVocaViewModel
+import hsk.practice.myvoca.ui.NewVocaViewModelFactory
 import hsk.practice.myvoca.ui.activity.EditVocaActivity
 import hsk.practice.myvoca.ui.seeall.VocabularyTouchHelper.VocabularyTouchHelperListener
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter
@@ -72,7 +74,7 @@ import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.*
  * 2. Sort vocabularies by latest edited time.
  */
 class SeeAllFragment : Fragment(),
-        OnSelectModeListener, ShowVocaOnNotification, VocabularyTouchHelperListener, OnEditVocabularyListener {
+        OnSelectModeListener, ShowVocaOnNotification, VocabularyTouchHelperListener, OnVocabularyUpdateListener {
 
     private var _binding: FragmentSeeAllBinding? = null
 
@@ -82,7 +84,7 @@ class SeeAllFragment : Fragment(),
     private lateinit var parentActivity: AppCompatActivity
     private lateinit var viewModelProvider: ViewModelProvider
     private lateinit var seeAllViewModel: SeeAllViewModel
-    private lateinit var vocaViewModel: VocaViewModel
+    private lateinit var newVocaViewModel: NewVocaViewModel
 
     private lateinit var toolbar: Toolbar
     private lateinit var drawer: DrawerLayout
@@ -129,9 +131,8 @@ class SeeAllFragment : Fragment(),
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        viewModelProvider = ViewModelProvider(this)
-        seeAllViewModel = viewModelProvider.get(SeeAllViewModel::class.java)
-        vocaViewModel = viewModelProvider.get(VocaViewModel::class.java)
+
+        newVocaViewModel = ViewModelProvider(this, NewVocaViewModelFactory(VocaPersistenceDatabase(context))).get(NewVocaViewModel::class.java)
         isFragmentShown = true
 
         _binding = FragmentSeeAllBinding.inflate(inflater, container, false)
@@ -157,8 +158,8 @@ class SeeAllFragment : Fragment(),
         deleteCancelButton.setOnClickListener { vocaRecyclerViewAdapter?.disableDeleteMode() }
         updateWordSizeRunnable = Runnable {
             if (isFragmentShown) {
-                val vocaSize = vocaViewModel.getVocabularyCount()
-                vocaSize.observe(viewLifecycleOwner, { integer -> vocaNumberText.text = integer?.toString() })
+                val vocaSize = newVocaViewModel.getVocabularyCount()
+                vocaNumberText.text = vocaSize.toString()
             }
         }
         showVocaSize()
@@ -249,13 +250,8 @@ class SeeAllFragment : Fragment(),
      */
     private fun searchVocabulary(query: String?) {
         vocaRecyclerViewAdapter?.searchVocabulary(query)
-        vocaRecyclerViewAdapter?.getCurrentVocabulary()?.observe(viewLifecycleOwner, { vocabularies ->
-            if (isSearchMode) {
-                if (vocabularies != null) {
-                    vocaNumberText.text = vocabularies.size.toString()
-                }
-            }
-        })
+        val searchResult = vocaRecyclerViewAdapter?.getCurrentVocabulary()
+        if (isSearchMode) searchResult?.let { vocaNumberText.text = it.size.toString() }
     }
 
     /**
@@ -362,7 +358,7 @@ class SeeAllFragment : Fragment(),
      */
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int, position: Int) {
         if (viewHolder is VocaViewHolder) {
-            val deletedVocabulary = vocaRecyclerViewAdapter?.getItem(position) as Vocabulary
+            val deletedVocabulary = vocaRecyclerViewAdapter?.getItem(position) as RoomVocabulary
             val eng = deletedVocabulary.eng
             Log.d("HSK APP", "pos: $position")
             vocaRecyclerViewAdapter!!.removeItem(position)
@@ -418,7 +414,7 @@ class SeeAllFragment : Fragment(),
      * @param position position of the item in the adapter.
      * @param vocabulary actual vocabulary object at the position.
      */
-    override fun editVocabulary(position: Int, vocabulary: Vocabulary?) {
+    override fun editVocabulary(position: Int, vocabulary: RoomVocabulary?) {
         val intent = Intent(parentActivity.applicationContext, EditVocaActivity::class.java)
         intent.putExtra(Constants.POSITION, position)
         intent.putExtra(Constants.EDIT_VOCA, vocabulary)
@@ -429,9 +425,9 @@ class SeeAllFragment : Fragment(),
      * Show a vocabulary at the notification.
      * @param vocabulary vocabulary to show at the notification
      */
-    override fun showVocabularyOnNotification(vocabulary: Vocabulary?) {
+    override fun showVocabularyOnNotification(vocabulary: RoomVocabulary?) {
         val intent = Intent(context, ShowNotificationService::class.java)
-        intent.putExtra(ShowNotificationService.Companion.SHOW_VOCA, vocabulary)
+        intent.putExtra(ShowNotificationService.SHOW_VOCA, vocabulary)
         parentActivity.startService(intent)
         if (vocabulary != null) {
             Snackbar.make(seeAllLayout, "알림에 보임: ${vocabulary.eng}", Snackbar.LENGTH_LONG).show()
@@ -471,11 +467,12 @@ class SeeAllFragment : Fragment(),
                     return false
                 }
             })
-            getCurrentVocabulary()?.observeForever {
-                Log.d("HSK APP", "setAdapter() -> onChanged()")
-                showVocaSize()
-                observe()
-            }
+
+//            getCurrentVocabulary()?.observeForever {
+//                Log.d("HSK APP", "setAdapter() -> onChanged()")
+//                showVocaSize()
+//                observe()
+//            }
             vocaRecyclerView.adapter = this
         }
     }

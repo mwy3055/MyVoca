@@ -1,12 +1,15 @@
 package hsk.practice.myvoca.framework
 
 import android.content.Context
+import android.util.Log
 import com.hsk.data.VocaPersistence
 import com.hsk.domain.vocabulary.Vocabulary
+import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.containsOnlyAlphabet
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
-class VocaPersistenceDatabase(context: Context) : VocaPersistence {
+class VocaPersistenceDatabase(context: Context?) : VocaPersistence {
 
     private var databaseRoom: RoomVocaDatabase
     private val vocaDao: VocaDao
@@ -23,18 +26,23 @@ class VocaPersistenceDatabase(context: Context) : VocaPersistence {
     override fun getAllVocabulary(): List<Vocabulary?> {
         if (!::allVocabulary.isInitialized) {
             allVocabulary = runBlocking {
-                vocaDao.loadAllVocabulary()?.value.toVocabularyList() ?: emptyList()
+                // TODO: How to mix LiveData with coroutine
+                val list = vocaDao.loadAllVocabulary()?.toVocabularyList() ?: emptyList()
+                Log.d(AppHelper.LOG_TAG, "list empty? ${list.isEmpty()}")
+                delay(1000)
+                list
             }
         }
+        Log.d(AppHelper.LOG_TAG, "allVocabulary empty? ${allVocabulary.isEmpty()}")
         return allVocabulary
     }
 
     override fun getVocabulary(query: String): List<Vocabulary?>? {
         val resultList = runBlocking {
             if (query.containsOnlyAlphabet()) {
-                vocaDao.loadVocabularyByEng(query)?.value.toVocabularyList()
+                vocaDao.loadVocabularyByEng(query)?.toVocabularyList()
             } else {
-                vocaDao.loadVocabularyByKor(query)?.value.toVocabularyList()
+                vocaDao.loadVocabularyByKor(query)?.toVocabularyList()
             }
         }
         return resultList

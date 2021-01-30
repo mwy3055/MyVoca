@@ -1,6 +1,5 @@
 package hsk.practice.myvoca.framework
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 
 /**
@@ -14,7 +13,7 @@ interface VocaDao {
      * @param vocabularies objects to insert to the database
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertVocabulary(vararg vocabularies: RoomVocabulary?)
+    suspend fun insertVocabulary(vararg vocabularies: RoomVocabulary?)
 
     /**
      * Updates given vocabularies.
@@ -22,7 +21,7 @@ interface VocaDao {
      * @param vocabularies objects to update from the database
      */
     @Update
-    fun updateVocabulary(vararg vocabularies: RoomVocabulary?)
+    suspend fun updateVocabulary(vararg vocabularies: RoomVocabulary?)
 
     /**
      * Deletes given vocabularies from the database.
@@ -30,14 +29,14 @@ interface VocaDao {
      * @param vocabularies objects to delete from the database
      */
     @Delete
-    fun deleteVocabulary(vararg vocabularies: RoomVocabulary?)
+    suspend fun deleteVocabulary(vararg vocabularies: RoomVocabulary?)
 
     /**
      * Loads all vocabulary and sort the result by ascending alphabetic order.
      * @return all vocabulary
      */
     @Query("SELECT * FROM RoomVocabulary ORDER BY eng ASC")
-    fun loadAllVocabulary(): LiveData<List<RoomVocabulary?>?>?
+    suspend fun loadAllVocabulary(): List<RoomVocabulary?>?
 
     /**
      * Loads vocabularies that matches with the english word
@@ -46,7 +45,7 @@ interface VocaDao {
      * @return vocabularies whose word is similar to eng
      */
     @Query("SELECT * from RoomVocabulary WHERE eng LIKE :eng")
-    fun loadVocabularyByEng(eng: String?): LiveData<List<RoomVocabulary?>?>?
+    suspend fun loadVocabularyByEng(eng: String?): List<RoomVocabulary?>?
 
     /**
      * Loads vocabularies that matches with the korean meaning
@@ -54,5 +53,5 @@ interface VocaDao {
      * @return vocabularies whose meaning is similar to kor
      */
     @Query("SELECT * from RoomVocabulary WHERE kor LIKE :kor")
-    fun loadVocabularyByKor(kor: String?): LiveData<List<RoomVocabulary?>?>?
+    suspend fun loadVocabularyByKor(kor: String?): List<RoomVocabulary?>?
 }

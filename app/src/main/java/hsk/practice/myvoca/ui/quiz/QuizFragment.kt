@@ -2,7 +2,6 @@ package hsk.practice.myvoca.ui.quiz
 
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,11 +9,13 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import database.Vocabulary
 import hsk.practice.myvoca.PreferenceManager
 import hsk.practice.myvoca.R
-import hsk.practice.myvoca.VocaViewModel
 import hsk.practice.myvoca.databinding.FragmentQuizBinding
+import hsk.practice.myvoca.framework.RoomVocabulary
+import hsk.practice.myvoca.framework.VocaPersistenceDatabase
+import hsk.practice.myvoca.ui.NewVocaViewModel
+import hsk.practice.myvoca.ui.NewVocaViewModelFactory
 
 /**
  * Shows word quiz to user.
@@ -48,13 +49,11 @@ class QuizFragment : Fragment() {
     private val versusView
         get() = binding.versusView
 
-    private lateinit var viewModelProvider: ViewModelProvider
-    private lateinit var quizViewModel: QuizViewModel
-    private lateinit var vocaViewModel: VocaViewModel
+    private lateinit var newVocaViewModel: NewVocaViewModel
 
     var quizOptionsList: MutableList<TextView?>? = null
 
-    var answerVoca: Vocabulary? = null
+    var answerVoca: RoomVocabulary? = null
     var answerIndex = 0
     var answerCount = 0
     var wrongCount = 0
@@ -65,10 +64,7 @@ class QuizFragment : Fragment() {
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentQuizBinding.inflate(inflater, container, false)
 
-        viewModelProvider = ViewModelProvider(this)
-        quizViewModel = viewModelProvider.get(QuizViewModel::class.java)
-        vocaViewModel = viewModelProvider.get(VocaViewModel::class.java)
-
+        newVocaViewModel = ViewModelProvider(this, NewVocaViewModelFactory(VocaPersistenceDatabase(context))).get(NewVocaViewModel::class.java)
 
         quizOptionsList = mutableListOf(binding.quizOption1, binding.quizOption2, binding.quizOption3, binding.quizOption4)
         for (i in 0..3) {
@@ -82,19 +78,15 @@ class QuizFragment : Fragment() {
 
         handler = Handler()
         showQuizRunnable = Runnable {
-            vocaViewModel.getVocabularyCount()?.observe(viewLifecycleOwner, { integer ->
-                Log.d("HSK APP", integer.toString())
-                integer?.let {
-                    if (it > 4) {
-                        hideEmptyVocaLayout()
-                        showQuizLayout()
-                        showQuizWord()
-                    } else {
-                        hideQuizLayout()
-                        showEmptyVocaLayout(it)
-                    }
-                }
-            })
+            val vocaCount = newVocaViewModel.getVocabularyCount()
+            if (vocaCount > 4) {
+                hideEmptyVocaLayout()
+                showQuizLayout()
+                showQuizWord()
+            } else {
+                hideQuizLayout()
+                showEmptyVocaLayout(vocaCount)
+            }
         }
 
         tryShowQuizWord()
@@ -136,8 +128,8 @@ class QuizFragment : Fragment() {
     }
 
     fun showQuizWord() {
-        val answer = vocaViewModel.getRandomVocabulary().value
-        val optionsList = vocaViewModel.getRandomVocabularies(3, answer).toMutableList()
+        val answer = newVocaViewModel.getRandomVocabulary()
+        val optionsList = newVocaViewModel.getRandomVocabularies(3, answer).toMutableList()
         optionsList.add(answer)
         if (answer != null) {
             quizWord.text = answer.eng
@@ -178,7 +170,7 @@ class QuizFragment : Fragment() {
     }
 
     // shows whether the selection is correct
-    fun showVocaDialog(voca: Vocabulary?, isCorrect: Boolean) {
+    fun showVocaDialog(voca: RoomVocabulary?, isCorrect: Boolean) {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(if (isCorrect) "맞았습니다!!" else "틀렸습니다")
         builder.setMessage(String.format("%s: %s", voca!!.eng, formatString(voca.kor)))

@@ -2,8 +2,6 @@ package hsk.practice.myvoca
 
 import android.Manifest
 import android.content.Context
-import database.source.VocaRepository
-import database.source.local.VocaDatabase
 import hsk.practice.myvoca.ui.activity.MainActivity
 import java.io.BufferedWriter
 import java.io.File
@@ -16,6 +14,9 @@ import java.util.*
  * All methods are static.
  */
 object AppHelper {
+
+    const val LOG_TAG = "HSK APP"
+
     private var permissionsList: ArrayList<String?>? = null
 
     /**
@@ -91,7 +92,7 @@ object AppHelper {
      * @param context context of the application(mainly SplashActivity)
      */
     fun loadInstance(context: Context?) {
-        VocaDatabase.loadInstance(context)
-        VocaRepository.loadInstance()
+//        VocaDatabase.loadInstance(context)
+//        VocaRepository.loadInstance()
     }
 }

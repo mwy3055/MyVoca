@@ -39,6 +39,12 @@ class NewVocaViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
 
     fun getVocabularyCount(): Int = getAllVocabulary().size
 
+    fun getVocabulary(query: String) = vocaRepository.getVocabulary(query).toRoomVocabularyList()
+
+    fun insertVocabulary(vararg vocabularies: RoomVocabulary) {
+        vocaRepository.insertVocabulary(*vocabularies.toVocabularyArray())
+    }
+
     fun deleteVocabulary(vararg vocabularies: RoomVocabulary) {
         vocaRepository.deleteVocabulary(*vocabularies.toVocabularyArray())
     }
@@ -47,12 +53,12 @@ class NewVocaViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
         vocaRepository.updateVocabulary(*vocabularies.toVocabularyArray())
     }
 
-    fun getRandomVocabulary() = vocaRepository.getRandomVocabulary()
+    fun getRandomVocabulary() = vocaRepository.getRandomVocabulary()?.toRoomVocabulary()
 
     fun getRandomVocabularies(count: Int, notInclude: RoomVocabulary?): List<RoomVocabulary?> {
         val result = mutableSetOf<RoomVocabulary?>()
         while (result.size < count) {
-            val randomVoca = getRandomVocabulary()?.toRoomVocabulary()
+            val randomVoca = getRandomVocabulary()
             if (randomVoca != notInclude && randomVoca !in result) {
                 result.add(randomVoca)
             }

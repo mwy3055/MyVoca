@@ -4,13 +4,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
-import database.Vocabulary
-import hsk.practice.myvoca.VocaViewModel
 import hsk.practice.myvoca.databinding.FragmentHomeBinding
+import hsk.practice.myvoca.framework.VocaPersistenceDatabase
+import hsk.practice.myvoca.ui.NewVocaViewModel
+import hsk.practice.myvoca.ui.NewVocaViewModelFactory
 
 /**
  * First-shown fragment
@@ -31,38 +30,32 @@ class HomeFragment : Fragment() {
         get() = binding.homeVocaNumber
 
     private var viewModelProvider: ViewModelProvider? = null
-    private var homeViewModel: HomeViewModel? = null
-    private var vocaViewModel: VocaViewModel? = null
-    private var allVocabulary: LiveData<MutableList<Vocabulary?>?>? = null
+    private var newVocaViewModel: NewVocaViewModel? = null
+
+    //    private var allVocabulary: LiveData<MutableList<Vocabulary?>?>? = null
     private var showVocaWhenFragmentPause = true
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View {
         Log.d("HSK APP", "HomeFragment onCreateView(), " + java.lang.Boolean.toString(showVocaWhenFragmentPause))
-        viewModelProvider = ViewModelProvider(this)
-        homeViewModel = viewModelProvider!!.get(HomeViewModel::class.java)
-        vocaViewModel = viewModelProvider!!.get(VocaViewModel::class.java)
+
+        newVocaViewModel = ViewModelProvider(this, NewVocaViewModelFactory(VocaPersistenceDatabase(context))).get(NewVocaViewModel::class.java)
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        allVocabulary = vocaViewModel!!.getAllVocabulary()
-        allVocabulary?.observe(viewLifecycleOwner, Observer { vocabularies ->
-            if (vocabularies != null) {
-                if (vocabularies.isNotEmpty()) {
-                    showVocaNumber(vocabularies.size)
-                    tryShowRandomVocabulary()
-                }
+        newVocaViewModel!!.getAllVocabulary().let {
+            if (it.isNotEmpty()) {
+                showVocaNumber(it.size)
+                tryShowRandomVocabulary()
             }
-        })
+        }
+
         button.setOnClickListener { v ->
-            val isEmpty = vocaViewModel!!.isEmpty()
-            isEmpty.observe(viewLifecycleOwner, { aBoolean ->
-                if (aBoolean == true) {
-                    Snackbar.make(v, "버튼을 눌러 단어를 추가해 주세요.", Snackbar.LENGTH_LONG).show()
-                } else {
-                    showRandomVocabulary()
-                }
-            })
+            if (newVocaViewModel?.isEmpty() == false) {
+                Snackbar.make(v, "버튼을 눌러 단어를 추가해 주세요.", Snackbar.LENGTH_LONG).show()
+            } else {
+                showRandomVocabulary()
+            }
         }
         return binding.root
     }
@@ -89,30 +82,18 @@ class HomeFragment : Fragment() {
     }
 
     private fun tryShowRandomVocabulary() {
-        val isEmpty = vocaViewModel?.isEmpty()
-        isEmpty?.observeForever(object : Observer<Boolean?> {
-            override fun onChanged(aBoolean: Boolean?) {
-                if (showVocaWhenFragmentPause && aBoolean == false) {
-                    showRandomVocabulary()
-                    showVocaWhenFragmentPause = false
-                    button.visibility = View.VISIBLE
-                }
-                isEmpty.removeObserver(this)
-            }
-        })
+        if (showVocaWhenFragmentPause && newVocaViewModel?.isEmpty() == false) {
+            showRandomVocabulary()
+            showVocaWhenFragmentPause = false
+            button.visibility = View.VISIBLE
+        }
     }
 
     private fun showRandomVocabulary() {
-        val randomVocabulary = vocaViewModel?.getRandomVocabulary()
-        randomVocabulary?.observeForever(object : Observer<Vocabulary?> {
-            override fun onChanged(vocabulary: Vocabulary?) {
-                if (vocabulary != null) {
-                    binding.homeEng.text = vocabulary.eng
-                    binding.homeKor.text = vocabulary.kor
-                }
-                randomVocabulary.removeObserver(this)
-            }
-        })
+        newVocaViewModel?.getRandomVocabulary()?.let {
+            binding.homeEng.text = it.eng
+            binding.homeKor.text = it.kor
+        }
     }
 
     private fun showVocaNumber(number: Int) {
