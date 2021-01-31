@@ -1,18 +1,27 @@
 package com.hsk.data
 
 import com.hsk.domain.vocabulary.Vocabulary
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlin.coroutines.CoroutineContext
 
-class VocaRepository(private val vocaPersistence: VocaPersistence) {
+class VocaRepository(private val vocaPersistence: VocaPersistence) : CoroutineScope {
 
-    fun getAllVocabulary(): List<Vocabulary?>? {
+    private val job = Job()
+
+    override val coroutineContext: CoroutineContext
+        get() = job + Dispatchers.Default
+
+    suspend fun getAllVocabulary(): List<Vocabulary?>? {
         return vocaPersistence.getAllVocabulary()
     }
 
-    fun getVocabulary(query: String): List<Vocabulary?>? {
+    suspend fun getVocabulary(query: String): List<Vocabulary?>? {
         return vocaPersistence.getVocabulary(query)
     }
 
-    fun getRandomVocabulary(): Vocabulary? {
+    suspend fun getRandomVocabulary(): Vocabulary? {
         val vocabularyList = getAllVocabulary()
         return try {
             vocabularyList?.random()
@@ -21,15 +30,15 @@ class VocaRepository(private val vocaPersistence: VocaPersistence) {
         }
     }
 
-    fun insertVocabulary(vararg vocabularies: Vocabulary?) {
+    suspend fun insertVocabulary(vararg vocabularies: Vocabulary?) {
         vocaPersistence.insertVocabulary(*vocabularies)
     }
 
-    fun updateVocabulary(vararg vocabularies: Vocabulary?) {
+    suspend fun updateVocabulary(vararg vocabularies: Vocabulary?) {
         vocaPersistence.updateVocabulary(*vocabularies)
     }
 
-    fun deleteVocabulary(vararg vocabularies: Vocabulary?) {
+    suspend fun deleteVocabulary(vararg vocabularies: Vocabulary?) {
         vocaPersistence.deleteVocabulary(*vocabularies)
     }
 

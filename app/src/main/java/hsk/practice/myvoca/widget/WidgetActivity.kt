@@ -33,20 +33,18 @@ class WidgetActivity : AppCompatActivity() {
 
     private fun showWidget() {
         Log.d("HSK APP", "WidgetActivity showWidget()")
-        newVocaViewModel.getRandomVocabulary()?.let {
+        newVocaViewModel.getRandomVocabulary().observeForever {
             val widgetManager = AppWidgetManager.getInstance(this@WidgetActivity)
 
             val remoteView = RemoteViews(packageName, R.layout.widget_layout)
-            remoteView.setTextViewText(R.id.widget_eng, it.eng)
-            remoteView.setTextViewText(R.id.widget_kor, it.kor)
+            remoteView.setTextViewText(R.id.widget_eng, it?.eng)
+            remoteView.setTextViewText(R.id.widget_kor, it?.kor)
             widgetManager.updateAppWidget(widgetId, remoteView)
 
             val intent = Intent()
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
             setResult(RESULT_OK, intent)
             finish()
-        } ?: run {
-            Log.d("HSK APP", "Vocabulary on widget NULL")
         }
     }
 }

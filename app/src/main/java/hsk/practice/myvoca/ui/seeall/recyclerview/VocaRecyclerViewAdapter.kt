@@ -8,6 +8,7 @@ import android.view.ContextMenu.ContextMenuInfo
 import android.view.View.OnCreateContextMenuListener
 import android.view.View.OnLongClickListener
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import hsk.practice.myvoca.AppHelper
@@ -51,7 +52,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
     private var vocaClickListener: OnVocaClickListener? = null
     private var showVocaOnNotification: ShowVocaOnNotification? = null
 
-    private var currentVocabulary: MutableList<RoomVocabulary?>?
+    private var currentVocabulary: LiveData<MutableList<RoomVocabulary?>?>?
     private var newVocaViewModel: NewVocaViewModel
 
     private val selectedItems: SparseBooleanArray = SparseBooleanArray()
@@ -67,7 +68,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
     init {
         viewModelProvider = ViewModelProvider(activity)
         newVocaViewModel = ViewModelProvider(activity, NewVocaViewModelFactory(VocaPersistenceDatabase(activity))).get(NewVocaViewModel::class.java)
-        currentVocabulary = newVocaViewModel.getAllVocabulary().toMutableList()
+        currentVocabulary = newVocaViewModel.getAllVocabulary()
     }
 
     /* Notify adapter to show added item on screen immediately */
@@ -88,11 +89,11 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
 
     // Bind the content to the item
     override fun onBindViewHolder(holder: VocaViewHolder, position: Int) {
-        if (currentVocabulary == null) {
+        if (currentVocabulary?.value == null) {
             holder.setVocabulary(RoomVocabulary.nullVocabulary)
             holder.setVocaClickListener(vocaClickListener)
         } else {
-            val vocabulary = currentVocabulary?.get(position)
+            val vocabulary = currentVocabulary?.value?.get(position)
             holder.setVocabulary(vocabulary)
             holder.setVocaClickListener(vocaClickListener)
             holder.vocaBinding.deleteCheckBox.apply {
@@ -111,13 +112,13 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
     fun getCurrentVocabulary() = currentVocabulary
 
     // Methods for general adapter
-    override fun getItemCount() = currentVocabulary?.size ?: -1
+    override fun getItemCount() = currentVocabulary?.value?.size ?: -1
 
-    fun getItem(position: Int) = currentVocabulary?.get(position)
+    fun getItem(position: Int) = currentVocabulary?.value?.get(position)
 
     override fun getItemId(position: Int) = position.toLong()
 
-    fun getItemPosition(vocabulary: RoomVocabulary?) = currentVocabulary?.indexOf(vocabulary)
+    fun getItemPosition(vocabulary: RoomVocabulary?) = currentVocabulary?.value?.indexOf(vocabulary)
 
     // Getter/Setters of Listeners
     fun getVocaClickListener() = vocaClickListener
@@ -172,7 +173,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
     fun isDeleteMode() = deleteMode
 
     fun notifyItemsChanged() {
-        for (i in currentVocabulary?.indices!!) {
+        for (i in currentVocabulary?.value?.indices!!) {
             notifyItemChanged(i)
         }
     }
@@ -185,23 +186,25 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
     fun disableSearchMode() {
         if (searchMode) {
             searchMode = false
-            currentVocabulary = newVocaViewModel.getAllVocabulary().toMutableList()
+            currentVocabulary = newVocaViewModel.getAllVocabulary()
             sortItems(sortState)
             notifyDataSetChanged()
         }
     }
 
     fun searchVocabulary(query: String?) {
-        currentVocabulary = newVocaViewModel.getVocabulary("%$query%")?.toMutableList()
-        Log.d(AppHelper.LOG_TAG, "Searched $query: ${currentVocabulary?.size ?: -1}")
-        sortItems(sortState)
-        notifyDataSetChanged()
+        currentVocabulary = newVocaViewModel.getVocabulary("%$query%")
+        currentVocabulary?.observeForever {
+            Log.d(AppHelper.LOG_TAG, "Searched $query: ${it?.size ?: -1}")
+            sortItems(sortState)
+            notifyDataSetChanged()
+        }
     }
 
     // for remove and restore item with swiping
     fun removeItem(position: Int) {
-        val deletedVocabulary = currentVocabulary?.get(position)
-        currentVocabulary?.removeAt(position)
+        val deletedVocabulary = currentVocabulary?.value?.get(position)
+        currentVocabulary?.value?.removeAt(position)
         notifyItemRemoved(position)
         if (deletedVocabulary != null) {
             newVocaViewModel.deleteVocabulary(deletedVocabulary)
@@ -224,7 +227,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
     }
 
     fun restoreItem(vocabulary: RoomVocabulary?, position: Int) {
-        currentVocabulary?.add(position, vocabulary)
+        currentVocabulary?.value?.add(position, vocabulary)
         notifyItemInserted(position)
         if (vocabulary != null) {
             newVocaViewModel.insertVocabulary(vocabulary)
@@ -235,7 +238,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
     // state 0: sort alphabetically
     // state 1: sort by latest edited time
     fun sortItems(method: Int) {
-        currentVocabulary?.apply {
+        currentVocabulary?.value?.apply {
             sortState = method
             when (sortState) {
                 0 -> this.sortBy { it?.eng }
@@ -281,7 +284,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
         // long-click listener
         private val onMenuItemClickListener: MenuItem.OnMenuItemClickListener = MenuItem.OnMenuItemClickListener { item ->
             val position = adapterPosition
-            val vocabulary = currentVocabulary?.get(position)
+            val vocabulary = currentVocabulary?.value?.get(position)
             Log.d("HSK APP", position.toString())
             when (item.itemId) {
                 Constants.EDIT_CODE -> {

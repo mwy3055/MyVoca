@@ -6,14 +6,22 @@ import com.hsk.data.VocaPersistence
 import com.hsk.domain.vocabulary.Vocabulary
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.containsOnlyAlphabet
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
-class VocaPersistenceDatabase(context: Context?) : VocaPersistence {
+class VocaPersistenceDatabase(context: Context?) : VocaPersistence, CoroutineScope {
 
     private var databaseRoom: RoomVocaDatabase
     private val vocaDao: VocaDao
         get() = databaseRoom.vocaDao()!!
+
+    private val job = Job()
+
+    override val coroutineContext: CoroutineContext
+        get() = job + Dispatchers.Default
+
+    private val ioContext: CoroutineContext
+        get() = Dispatchers.IO
 
     private lateinit var allVocabulary: List<Vocabulary?>
 
@@ -23,46 +31,35 @@ class VocaPersistenceDatabase(context: Context?) : VocaPersistence {
         }
     }
 
-    override fun getAllVocabulary(): List<Vocabulary?> {
+    override suspend fun getAllVocabulary(): List<Vocabulary?> = coroutineScope {
         if (!::allVocabulary.isInitialized) {
-            allVocabulary = runBlocking {
-                // TODO: How to mix LiveData with coroutine
-                val list = vocaDao.loadAllVocabulary()?.toVocabularyList() ?: emptyList()
-                Log.d(AppHelper.LOG_TAG, "list empty? ${list.isEmpty()}")
-                delay(1000)
-                list
+            allVocabulary = withContext(ioContext) {
+                vocaDao.loadAllVocabulary()?.toVocabularyList() ?: emptyList()
             }
         }
         Log.d(AppHelper.LOG_TAG, "allVocabulary empty? ${allVocabulary.isEmpty()}")
-        return allVocabulary
+        allVocabulary
     }
 
-    override fun getVocabulary(query: String): List<Vocabulary?>? {
-        val resultList = runBlocking {
+    override suspend fun getVocabulary(query: String): List<Vocabulary?>? = coroutineScope {
+        withContext(ioContext) {
             if (query.containsOnlyAlphabet()) {
                 vocaDao.loadVocabularyByEng(query)?.toVocabularyList()
             } else {
                 vocaDao.loadVocabularyByKor(query)?.toVocabularyList()
             }
         }
-        return resultList
     }
 
-    override fun deleteVocabulary(vararg vocabularies: Vocabulary?) {
-        runBlocking {
-            vocaDao.deleteVocabulary(*vocabularies.toRoomVocabularyArray())
-        }
+    override suspend fun deleteVocabulary(vararg vocabularies: Vocabulary?) = coroutineScope {
+        vocaDao.deleteVocabulary(*vocabularies.toRoomVocabularyArray())
     }
 
-    override fun updateVocabulary(vararg vocabularies: Vocabulary?) {
-        runBlocking {
-            vocaDao.updateVocabulary(*vocabularies.toRoomVocabularyArray())
-        }
+    override suspend fun updateVocabulary(vararg vocabularies: Vocabulary?) = coroutineScope {
+        vocaDao.updateVocabulary(*vocabularies.toRoomVocabularyArray())
     }
 
-    override fun insertVocabulary(vararg vocabularies: Vocabulary?) {
-        runBlocking {
-            vocaDao.insertVocabulary(*vocabularies.toRoomVocabularyArray())
-        }
+    override suspend fun insertVocabulary(vararg vocabularies: Vocabulary?) = coroutineScope {
+        vocaDao.insertVocabulary(*vocabularies.toRoomVocabularyArray())
     }
 }

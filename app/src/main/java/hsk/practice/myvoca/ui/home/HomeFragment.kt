@@ -6,6 +6,7 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
+import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentHomeBinding
 import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.ui.NewVocaViewModel
@@ -43,18 +44,24 @@ class HomeFragment : Fragment() {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        newVocaViewModel!!.getAllVocabulary().let {
-            if (it.isNotEmpty()) {
-                showVocaNumber(it.size)
-                tryShowRandomVocabulary()
+        newVocaViewModel!!.getAllVocabulary()?.observe(viewLifecycleOwner) { allVocabulary ->
+            allVocabulary?.let {
+                if (it.isNotEmpty()) {
+                    showVocaNumber(it.size)
+                    tryShowRandomVocabulary()
+                } else {
+                    showNoVocaText()
+                }
             }
         }
 
         button.setOnClickListener { v ->
-            if (newVocaViewModel?.isEmpty() == false) {
-                Snackbar.make(v, "버튼을 눌러 단어를 추가해 주세요.", Snackbar.LENGTH_LONG).show()
-            } else {
-                showRandomVocabulary()
+            newVocaViewModel?.isEmpty()?.observe(viewLifecycleOwner) {
+                if (it) {
+                    showRandomVocabulary()
+                } else {
+                    Snackbar.make(v, "버튼을 눌러 단어를 추가해 주세요.", Snackbar.LENGTH_LONG).show()
+                }
             }
         }
         return binding.root
@@ -82,22 +89,33 @@ class HomeFragment : Fragment() {
     }
 
     private fun tryShowRandomVocabulary() {
-        if (showVocaWhenFragmentPause && newVocaViewModel?.isEmpty() == false) {
-            showRandomVocabulary()
-            showVocaWhenFragmentPause = false
-            button.visibility = View.VISIBLE
+        newVocaViewModel?.isEmpty()?.observe(viewLifecycleOwner) { isEmpty ->
+            if (showVocaWhenFragmentPause && !isEmpty) {
+                showRandomVocabulary()
+                showVocaWhenFragmentPause = false
+                button.visibility = View.VISIBLE
+            }
         }
     }
 
     private fun showRandomVocabulary() {
-        newVocaViewModel?.getRandomVocabulary()?.let {
-            binding.homeEng.text = it.eng
-            binding.homeKor.text = it.kor
+        newVocaViewModel?.getRandomVocabulary()?.observe(viewLifecycleOwner) {
+            binding.homeEng.text = it?.eng
+            binding.homeKor.text = it?.kor
         }
     }
 
     private fun showVocaNumber(number: Int) {
         vocaNumber.visibility = View.VISIBLE
-        vocaNumber.text = "${number}단어"
+        vocaNumber.text = getString(R.string.home_fragment_word_count, number)
+    }
+
+    private fun hideVocaNumber() {
+        vocaNumber.visibility = View.GONE
+    }
+
+    private fun showNoVocaText() {
+        hideVocaNumber()
+        vocaNumber.text = getString(R.string.home_fragment_home_kor)
     }
 }

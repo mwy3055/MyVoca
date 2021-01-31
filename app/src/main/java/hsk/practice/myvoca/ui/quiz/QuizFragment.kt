@@ -16,6 +16,7 @@ import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.ui.NewVocaViewModel
 import hsk.practice.myvoca.ui.NewVocaViewModelFactory
+import kotlin.random.Random
 
 /**
  * Shows word quiz to user.
@@ -61,15 +62,14 @@ class QuizFragment : Fragment() {
     lateinit var showQuizRunnable: Runnable
 
     override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?, savedInstanceState: Bundle?): View? {
+                              container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentQuizBinding.inflate(inflater, container, false)
 
         newVocaViewModel = ViewModelProvider(this, NewVocaViewModelFactory(VocaPersistenceDatabase(context))).get(NewVocaViewModel::class.java)
 
         quizOptionsList = mutableListOf(binding.quizOption1, binding.quizOption2, binding.quizOption3, binding.quizOption4)
-        for (i in 0..3) {
-            val option = quizOptionsList!![i]
-            option?.setOnClickListener { quizItemSelected(i) }
+        quizOptionsList?.forEachIndexed { index, option ->
+            option?.setOnClickListener { quizItemSelected(index) }
         }
 
         answerCount = PreferenceManager.getInt(context, PreferenceManager.QUIZ_CORRECT)
@@ -79,13 +79,16 @@ class QuizFragment : Fragment() {
         handler = Handler()
         showQuizRunnable = Runnable {
             val vocaCount = newVocaViewModel.getVocabularyCount()
-            if (vocaCount > 4) {
-                hideEmptyVocaLayout()
-                showQuizLayout()
-                showQuizWord()
-            } else {
-                hideQuizLayout()
-                showEmptyVocaLayout(vocaCount)
+            vocaCount?.observe(viewLifecycleOwner) { count ->
+                if (count > 4) {
+                    hideEmptyVocaLayout()
+                    showQuizLayout()
+                    showQuizWord()
+                } else {
+
+                    hideQuizLayout()
+                    showEmptyVocaLayout(count)
+                }
             }
         }
 
@@ -103,47 +106,61 @@ class QuizFragment : Fragment() {
         tryShowQuizWord()
     }
 
-    fun showEmptyVocaLayout(vocaCount: Int) {
+    private fun showEmptyVocaLayout(vocaCount: Int) {
         noVocaLayout.visibility = View.VISIBLE
         curVoca.text = getString(R.string.current_voca_count, vocaCount)
     }
 
-    fun hideEmptyVocaLayout() {
+    private fun hideEmptyVocaLayout() {
         noVocaLayout.visibility = View.GONE
         curVoca.visibility = View.GONE
     }
 
-    fun showQuizLayout() {
+    private fun showQuizLayout() {
         quizLayout.visibility = View.VISIBLE
         quizWord.visibility = View.VISIBLE
     }
 
-    fun hideQuizLayout() {
+    private fun hideQuizLayout() {
         quizLayout.visibility = View.GONE
         quizWord.visibility = View.GONE
     }
 
-    fun tryShowQuizWord() {
+    private fun tryShowQuizWord() {
         handler.postDelayed(showQuizRunnable, 50)
     }
 
     fun showQuizWord() {
-        val answer = newVocaViewModel.getRandomVocabulary()
-        val optionsList = newVocaViewModel.getRandomVocabularies(3, answer).toMutableList()
-        optionsList.add(answer)
-        if (answer != null) {
-            quizWord.text = answer.eng
-        }
+        newVocaViewModel.getRandomVocabularies(4).observe(viewLifecycleOwner) {
+            val answerIndex = Random.nextInt(0, 4)
+            val answer = it[answerIndex]
 
-        optionsList.shuffle()
-        for (i in 0..3) {
-            val option = optionsList[i]
-            if (answer == option) {
-                answerVoca = option
-                answerIndex = i
+            this.answerIndex = answerIndex
+            answerVoca = answer
+
+            quizWord.text = answer?.eng
+            it.forEachIndexed { index, optionVocabulary ->
+                quizOptionsList?.get(index)?.text = getString(R.string.quiz_option_format, index + 1, optionVocabulary?.kor)
             }
-            quizOptionsList?.get(i)?.text = getString(R.string.quiz_option_format, i + 1, formatString(option?.kor))
         }
+//        val answerLiveData = newVocaViewModel.getRandomVocabulary()
+//        answerLiveData.observe(viewLifecycleOwner) { answer ->
+//            val optionsList = newVocaViewModel.getRandomVocabularies(3, answer).toMutableList()
+//            optionsList.add(answer)
+//            if (answer != null) {
+//                quizWord.text = answer.eng
+//            }
+//
+//            optionsList.shuffle()
+//            for (i in 0..3) {
+//                val option = optionsList[i]
+//                if (answer == option) {
+//                    answerVoca = option
+//                    answerIndex = i
+//                }
+//                quizOptionsList?.get(i)?.text = getString(R.string.quiz_option_format, i + 1, formatString(option?.kor))
+//            }
+//        }
     }
 
     // replace new line character to the space

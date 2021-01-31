@@ -17,6 +17,10 @@ import hsk.practice.myvoca.R
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.framework.toRoomVocabulary
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.util.concurrent.Callable
 
 class VocaWidget : AppWidgetProvider() {
@@ -30,12 +34,20 @@ class VocaWidget : AppWidgetProvider() {
 
     private var vocaRepository: VocaRepository? = null
 
+    private val job = SupervisorJob()
+    val coroutineScope = CoroutineScope(Dispatchers.Main + job)
+
+    companion object {
+        val UPDATE_WIDGET: String = "action.updatewidget.update"
+    }
+
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent != null) {
             Log.d("HSK APP", "VocaWidget onReceive(): ${intent.action}")
         }
         init(context)
         super.onReceive(context, intent)
+
         if (intent?.action.equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE, ignoreCase = true)) {
             val widgetId = intent?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: 0
             val widgetIds: IntArray?
@@ -109,7 +121,7 @@ class VocaWidget : AppWidgetProvider() {
         super.onDeleted(context, appWidgetIds)
     }
 
-    private fun showRandomVocabulary(context: Context?, widgetIds: IntArray?) {
+    private fun showRandomVocabulary(context: Context?, widgetIds: IntArray?) = coroutineScope.launch {
         vocaRepository?.getRandomVocabulary()?.toRoomVocabulary()?.let {
             Log.d(AppHelper.LOG_TAG, "show: ${it.eng}")
 
@@ -135,7 +147,4 @@ class VocaWidget : AppWidgetProvider() {
         }
     }
 
-    companion object {
-        val UPDATE_WIDGET: String = "action.updatewidget.update"
-    }
 }
