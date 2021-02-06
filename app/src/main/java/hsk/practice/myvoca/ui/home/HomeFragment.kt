@@ -3,14 +3,17 @@ package hsk.practice.myvoca.ui.home
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.snackbar.Snackbar
+import androidx.lifecycle.lifecycleScope
+import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentHomeBinding
 import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.ui.NewVocaViewModel
 import hsk.practice.myvoca.ui.NewVocaViewModelFactory
+import kotlinx.coroutines.delay
 
 /**
  * First-shown fragment
@@ -30,45 +33,42 @@ class HomeFragment : Fragment() {
     val vocaNumber
         get() = binding.homeVocaNumber
 
-    private var viewModelProvider: ViewModelProvider? = null
-    private var newVocaViewModel: NewVocaViewModel? = null
+    private lateinit var viewModel: HomeViewModel
+
+    private lateinit var newVocaViewModel: NewVocaViewModel
 
     //    private var allVocabulary: LiveData<MutableList<Vocabulary?>?>? = null
     private var showVocaWhenFragmentPause = true
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View {
-        Log.d("HSK APP", "HomeFragment onCreateView(), " + java.lang.Boolean.toString(showVocaWhenFragmentPause))
+        Log.d("HSK APP", "HomeFragment onCreateView(), $showVocaWhenFragmentPause")
 
-        newVocaViewModel = ViewModelProvider(this, NewVocaViewModelFactory(VocaPersistenceDatabase(context))).get(NewVocaViewModel::class.java)
+        newVocaViewModel = ViewModelProvider(this, NewVocaViewModelFactory(VocaPersistenceDatabase.getInstance(requireContext()))).get(NewVocaViewModel::class.java)
+        viewModel = ViewModelProvider(this, HomeViewModelFactory(VocaPersistenceDatabase.getInstance(requireContext()))).get(HomeViewModel::class.java)
 
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
+        binding.homeViewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
 
-        newVocaViewModel!!.getAllVocabulary()?.observe(viewLifecycleOwner) { allVocabulary ->
-            allVocabulary?.let {
-                if (it.isNotEmpty()) {
-                    showVocaNumber(it.size)
-                    tryShowRandomVocabulary()
-                } else {
-                    showNoVocaText()
-                }
+        newVocaViewModel.getVocabularyCount().observe(viewLifecycleOwner) { count ->
+            Log.d(AppHelper.LOG_TAG, "get: $count")
+            if (count > 0) {
+                showVocaNumber(count)
+                showVocaButton()
+                viewModel.loadRandomVocabulary()
+            } else {
+                showNoVocaText()
+                hideVocaButton()
             }
         }
 
-        button.setOnClickListener { v ->
-            newVocaViewModel?.isEmpty()?.observe(viewLifecycleOwner) {
-                if (it) {
-                    showRandomVocabulary()
-                } else {
-                    Snackbar.make(v, "버튼을 눌러 단어를 추가해 주세요.", Snackbar.LENGTH_LONG).show()
-                }
-            }
-        }
         return binding.root
     }
 
     override fun onResume() {
         Log.d("HSK APP", "HomeFragment onResume()")
+        refreshVocaNumber()
         super.onResume()
     }
 
@@ -88,20 +88,32 @@ class HomeFragment : Fragment() {
         menu.clear()
     }
 
-    private fun tryShowRandomVocabulary() {
-        newVocaViewModel?.isEmpty()?.observe(viewLifecycleOwner) { isEmpty ->
-            if (showVocaWhenFragmentPause && !isEmpty) {
-                showRandomVocabulary()
-                showVocaWhenFragmentPause = false
-                button.visibility = View.VISIBLE
-            }
-        }
-    }
+//    private fun tryShowRandomVocabulary() {
+//        newVocaViewModel.isEmpty().observe(viewLifecycleOwner) { isEmpty ->
+//            if (showVocaWhenFragmentPause && !isEmpty) {
+//                showRandomVocabulary()
+//                showVocaWhenFragmentPause = false
+//                button.visibility = View.VISIBLE
+//            }
+//        }
+//    }
+//
+//    private fun showRandomVocabulary() {
+//        viewModel.loadRandomVocabulary()
+////        newVocaViewModel.getRandomVocabulary().observe(viewLifecycleOwner) {
+////            it?.let {
+////                binding.homeEng.text = it.eng
+////                binding.homeKor.text = it.kor
+////            } ?: run {
+////                Snackbar.make(button, "버튼을 눌러 단어를 추가해 주세요.", Snackbar.LENGTH_LONG).show()
+////            }
+////        }
+//    }
 
-    private fun showRandomVocabulary() {
-        newVocaViewModel?.getRandomVocabulary()?.observe(viewLifecycleOwner) {
-            binding.homeEng.text = it?.eng
-            binding.homeKor.text = it?.kor
+    private fun refreshVocaNumber() = lifecycleScope.launchWhenResumed {
+        delay(100)
+        newVocaViewModel.getVocabularyCount().observe(this@HomeFragment) {
+            showVocaNumber(it)
         }
     }
 
@@ -117,5 +129,13 @@ class HomeFragment : Fragment() {
     private fun showNoVocaText() {
         hideVocaNumber()
         vocaNumber.text = getString(R.string.home_fragment_home_kor)
+    }
+
+    private fun showVocaButton() {
+        binding.homeLoadNewVocabularyButton.visibility = View.VISIBLE
+    }
+
+    private fun hideVocaButton() {
+        binding.homeLoadNewVocabularyButton.visibility = View.GONE
     }
 }

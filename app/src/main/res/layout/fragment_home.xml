@@ -50,6 +50,7 @@
             android:layout_centerHorizontal="true"
             android:text="@string/home_fragment_load_button"
             android:visibility="gone"
+            android:onClick="@{() -> homeViewModel.loadRandomVocabulary()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
