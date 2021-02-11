@@ -23,7 +23,7 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getPermissions()
-        AppHelper.loadInstance(this)
+        AppHelper.loadInstance(application)
         // when database is loaded...
         startVocaProviderService()
         handler.post {
