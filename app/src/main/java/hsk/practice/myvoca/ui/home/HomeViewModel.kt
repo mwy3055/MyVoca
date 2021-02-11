@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
  * There is no fragment-dependent data in this application, so each ViewModel has nothing to do.
  * Just left for further use.
  */
-class HomeViewModel(val vocaPersistence: VocaPersistence) : ViewModel() {
+class HomeViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
 
     private val vocaRepository: VocaRepository = VocaRepository(vocaPersistence)
 
@@ -29,9 +29,8 @@ class HomeViewModel(val vocaPersistence: VocaPersistence) : ViewModel() {
         vocabulary.kor
     }
 
-    // TODO: fix this
-    val vocabularySize: LiveData<Int> = liveData {
-        emit(vocaRepository.getAllVocabulary()?.size ?: 0)
+    val vocabularySize: LiveData<Int> = Transformations.map(vocaRepository.getAllVocabulary().asLiveData(viewModelScope.coroutineContext)) {
+        it.size
     }
 
     fun loadRandomVocabulary() = viewModelScope.launch {
