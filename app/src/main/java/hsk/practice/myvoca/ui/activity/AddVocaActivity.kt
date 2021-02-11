@@ -6,6 +6,7 @@ import android.widget.*
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
@@ -32,11 +33,10 @@ class AddVocaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityAddVocaBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_add_voca)
 
         viewModelProvider = ViewModelProvider(this)
-        newVocaViewModel = ViewModelProvider(this, NewVocaViewModelFactory(VocaPersistenceDatabase(this))).get(NewVocaViewModel::class.java)
+        newVocaViewModel = ViewModelProvider(this, NewVocaViewModelFactory(VocaPersistenceDatabase.getInstance(this))).get(NewVocaViewModel::class.java)
         val toolbar = findViewById<Toolbar?>(R.id.toolbar_activity_new_voca)
         setSupportActionBar(toolbar)
 

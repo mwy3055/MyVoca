@@ -7,12 +7,11 @@ import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
+import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.navigation.NavigationView
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.ActivityMainBinding
@@ -42,13 +41,12 @@ class MainActivity : AppCompatActivity() {
         Log.d("HSK APP", "MainActivity onCreate()")
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        val toolbar = findViewById<Toolbar?>(R.id.toolbar)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        val toolbar = binding.appBarMain.coordinatorLayout.findViewById<Toolbar?>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         // button on the right bottom.
-        val fab = findViewById<FloatingActionButton?>(R.id.fab)
+        val fab = binding.appBarMain.fab
         fab.setOnClickListener {
             val intent = Intent(applicationContext, AddVocaActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -56,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         drawer = binding.drawerLayout
-        val navigationView = findViewById<NavigationView?>(R.id.nav_view)
+        val navigationView = binding.navView
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = AppBarConfiguration.Builder(
@@ -79,7 +77,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         Log.d("HSK APP", "MainActivity onDestroy()")
-        if (ShowNotificationService.Companion.isRunning()) {
+        if (ShowNotificationService.isRunning()) {
             stopService(Intent(applicationContext, ShowNotificationService::class.java))
         }
         super.onDestroy()
@@ -105,8 +103,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private var isRunning = false
-        fun isRunning(): Boolean {
-            return isRunning
-        }
+        fun isRunning() = isRunning
     }
 }
