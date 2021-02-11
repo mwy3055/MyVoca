@@ -2,7 +2,9 @@ package hsk.practice.myvoca
 
 import android.Manifest
 import android.content.Context
+import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.ui.activity.MainActivity
+import timber.log.Timber
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -91,8 +93,8 @@ object AppHelper {
      *
      * @param context context of the application(mainly SplashActivity)
      */
-    fun loadInstance(context: Context?) {
-//        VocaDatabase.loadInstance(context)
-//        VocaRepository.loadInstance()
+    fun loadInstance(context: Context) {
+        Timber.plant(Timber.DebugTree())
+        VocaPersistenceDatabase.getInstance(context)
     }
 }
