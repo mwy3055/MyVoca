@@ -132,7 +132,7 @@ class SeeAllFragment : Fragment(),
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        newVocaViewModel = ViewModelProvider(this, NewVocaViewModelFactory(VocaPersistenceDatabase(context))).get(NewVocaViewModel::class.java)
+        newVocaViewModel = ViewModelProvider(this, NewVocaViewModelFactory(VocaPersistenceDatabase.getInstance(requireContext()))).get(NewVocaViewModel::class.java)
         isFragmentShown = true
 
         _binding = FragmentSeeAllBinding.inflate(inflater, container, false)
