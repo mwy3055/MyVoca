@@ -1,9 +1,11 @@
 package hsk.practice.myvoca.framework
 
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 /**
  * DAO class creates actual SQL query.
+ * Room executes `suspend` methods in `Dispatchers.IO` by default.
  */
 @Dao
 interface VocaDao {
@@ -36,7 +38,7 @@ interface VocaDao {
      * @return all vocabulary
      */
     @Query("SELECT * FROM RoomVocabulary ORDER BY eng ASC")
-    suspend fun loadAllVocabulary(): List<RoomVocabulary?>?
+    fun loadAllVocabulary(): Flow<List<RoomVocabulary>>
 
     /**
      * Loads vocabularies that matches with the english word
