@@ -13,7 +13,7 @@ fun List<Vocabulary?>?.toRoomVocabularyList() = this?.map { it?.toRoomVocabulary
 
 fun List<Vocabulary?>?.toRoomVocabularyMutableList() = this?.toRoomVocabularyList()?.toMutableList()
 
-fun List<RoomVocabulary?>?.toVocabularyList() = this?.map { it.toVocabulary() }
+fun List<RoomVocabulary?>.toVocabularyList() = this.map { it.toVocabulary() }
 
 fun Array<out Vocabulary?>.toRoomVocabularyArray() = this.map { it?.toRoomVocabulary() }.toTypedArray()
 
