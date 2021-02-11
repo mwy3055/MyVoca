@@ -17,7 +17,12 @@ import java.io.Serializable
  * @memo: Memo for the word.
  */
 @Entity
-class RoomVocabulary(@kotlin.jvm.JvmField @PrimaryKey var eng: String, kor: String?, addedTime: Long, lastEditedTime: Long, memo: String?) : Serializable {
+data class RoomVocabulary(@kotlin.jvm.JvmField @PrimaryKey var eng: String,
+                          @kotlin.jvm.JvmField var kor: String?,
+                          @kotlin.jvm.JvmField @ColumnInfo(name = "add_time") var addedTime: Long,
+                          @kotlin.jvm.JvmField @ColumnInfo(name = "last_update") var lastEditedTime: Long,
+                          @kotlin.jvm.JvmField var memo: String?)
+    : Serializable {
 
     companion object {
         val nullVocabulary = RoomVocabulary(
@@ -28,23 +33,15 @@ class RoomVocabulary(@kotlin.jvm.JvmField @PrimaryKey var eng: String, kor: Stri
                 "")
     }
 
-    @kotlin.jvm.JvmField
-    var kor: String? = kor
+    override fun equals(other: Any?) = eng == (other as? RoomVocabulary)?.eng ?: false
 
-    @kotlin.jvm.JvmField
-    @ColumnInfo(name = "add_time")
-    var addedTime: Long = addedTime
-
-    @kotlin.jvm.JvmField
-    @ColumnInfo(name = "last_update")
-    var lastEditedTime: Long = lastEditedTime
-
-    @kotlin.jvm.JvmField
-    var memo: String? = memo
-
-    override fun equals(other: Any?): Boolean {
-        if (other == null) return false
-        return if (other is RoomVocabulary) eng.contentEquals(other.eng) else false
+    override fun hashCode(): Int {
+        var result = eng.hashCode()
+        result = 31 * result + (kor?.hashCode() ?: 0)
+        result = 31 * result + addedTime.hashCode()
+        result = 31 * result + lastEditedTime.hashCode()
+        result = 31 * result + (memo?.hashCode() ?: 0)
+        return result
     }
 
 }
