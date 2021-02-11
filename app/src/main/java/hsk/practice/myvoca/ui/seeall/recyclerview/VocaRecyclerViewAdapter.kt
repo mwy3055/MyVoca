@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.Constants
+import hsk.practice.myvoca.SingletonHolder
 import hsk.practice.myvoca.databinding.VocaViewBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.VocaPersistenceDatabase
@@ -32,6 +33,8 @@ import java.util.*
 class VocaRecyclerViewAdapter private constructor(private val activity: AppCompatActivity)
     : RecyclerView.Adapter<VocaViewHolder?>(), OnDeleteModeListener {
 
+    // TODO: Does adapter have to refer activity? Can this be acceptable?
+
     // Custom listener interfaces. Will be used in the ViewHolder below.
     interface OnVocaClickListener {
         fun onVocaClick(holder: VocaViewHolder?, view: View?, position: Int)
@@ -46,6 +49,10 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
         fun onDeleteModeEnabled()
         fun onDeleteModeDisabled()
     }
+
+    companion object : SingletonHolder<VocaRecyclerViewAdapter, AppCompatActivity>({ activity ->
+        VocaRecyclerViewAdapter(activity)
+    })
 
     private val viewModelProvider: ViewModelProvider?
 
@@ -65,10 +72,12 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
     private var handler: Handler? = null
     private val observeDelay = 400
 
+    private var sortState = 0
+
     init {
         viewModelProvider = ViewModelProvider(activity)
-        newVocaViewModel = ViewModelProvider(activity, NewVocaViewModelFactory(VocaPersistenceDatabase(activity))).get(NewVocaViewModel::class.java)
-        currentVocabulary = newVocaViewModel.getAllVocabulary()
+        newVocaViewModel = ViewModelProvider(activity, NewVocaViewModelFactory(VocaPersistenceDatabase.getInstance(activity))).get(NewVocaViewModel::class.java)
+        currentVocabulary = newVocaViewModel.allVocabulary
     }
 
     /* Notify adapter to show added item on screen immediately */
@@ -186,7 +195,7 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
     fun disableSearchMode() {
         if (searchMode) {
             searchMode = false
-            currentVocabulary = newVocaViewModel.getAllVocabulary()
+            currentVocabulary = newVocaViewModel.allVocabulary
             sortItems(sortState)
             notifyDataSetChanged()
         }
@@ -275,9 +284,9 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
                                onDeleteModeListener: OnDeleteModeListener?,
                                onVocabularyUpdateListener: OnVocabularyUpdateListener?) : RecyclerView.ViewHolder(vocaBinding.root), OnCreateContextMenuListener {
 
-        var vocaClickListener: OnVocaClickListener? = null
-        var onDeleteModeListener: OnDeleteModeListener?
-        var onVocabularyUpdateListener: OnVocabularyUpdateListener?
+        private var vocaClickListener: OnVocaClickListener? = null
+        private var onDeleteModeListener: OnDeleteModeListener?
+        private var onVocabularyUpdateListener: OnVocabularyUpdateListener?
         var viewForeground = vocaBinding.viewForeground
         var viewBackground = vocaBinding.viewBackground
 
@@ -349,17 +358,6 @@ class VocaRecyclerViewAdapter private constructor(private val activity: AppCompa
             this.onDeleteModeListener = onDeleteModeListener
             this.onVocabularyUpdateListener = onVocabularyUpdateListener
             vocaBinding.root.setOnCreateContextMenuListener(this)
-        }
-    }
-
-    companion object {
-        private var instance: VocaRecyclerViewAdapter? = null
-        private var sortState = 0
-        fun getInstance(activity: AppCompatActivity?): VocaRecyclerViewAdapter? {
-            if (instance == null) {
-                synchronized(VocaRecyclerViewAdapter::class.java) { instance = VocaRecyclerViewAdapter(activity!!) }
-            }
-            return instance
         }
     }
 }
