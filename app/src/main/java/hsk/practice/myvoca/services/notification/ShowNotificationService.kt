@@ -12,7 +12,7 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.hsk.data.VocaRepository
 import hsk.practice.myvoca.AppHelper
@@ -61,7 +61,7 @@ class ShowNotificationService : LifecycleService() {
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         receiver = ShowVocaNotificationReceiver()
 
-        vocaRepository = VocaRepository(VocaPersistenceDatabase(applicationContext))
+        vocaRepository = VocaRepository(VocaPersistenceDatabase.getInstance(applicationContext))
 
         val filter = IntentFilter()
         filter.addAction(SHOW_RANDOM_VOCA_ACTION_NAME)
@@ -93,8 +93,7 @@ class ShowNotificationService : LifecycleService() {
 //            }
 //        })
         lifecycleScope.launch {
-            val isEmpty = vocaRepository?.getAllVocabulary()?.isEmpty()
-            MutableLiveData(isEmpty).observeForever {
+            vocaRepository?.getAllVocabulary()?.asLiveData(lifecycleScope.coroutineContext)?.observeForever {
                 if (intent?.getSerializableExtra(SHOW_VOCA) != null) {
                     val vocabulary = intent.getSerializableExtra(SHOW_VOCA) as RoomVocabulary
                     showWordOnNotification(vocabulary)
@@ -109,9 +108,10 @@ class ShowNotificationService : LifecycleService() {
         isRunning = false
         Log.d("HSK APP", "ShowNotificationService onDestroy()")
         lifecycleScope.launch {
-            if (vocaRepository?.getAllVocabulary()?.isEmpty() == false) {
-                setAlarmTimer()
-            }
+//            if (vocaRepository?.getAllVocabulary()?.receive()?.isEmpty() == false) {
+//                setAlarmTimer()
+//            }
+            setAlarmTimer()
         }
         unregisterReceiver(receiver)
     }

@@ -68,7 +68,7 @@ class VocaWidget : AppWidgetProvider() {
         Log.d("HSK APP", "VocaWidget onEnabled()")
         super.onEnabled(context)
         init(context)
-        AppHelper.loadInstance(context)
+        AppHelper.loadInstance(context!!)
     }
 
     override fun onUpdate(context: Context?, appWidgetManager: AppWidgetManager?, appWidgetIds: IntArray?) {
@@ -101,7 +101,7 @@ class VocaWidget : AppWidgetProvider() {
             manager = AppWidgetManager.getInstance(context)
         }
         if (vocaRepository == null) {
-            vocaRepository = VocaRepository(VocaPersistenceDatabase(context!!))
+            vocaRepository = VocaRepository(VocaPersistenceDatabase.getInstance(context!!))
         }
     }
 
