@@ -6,23 +6,25 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import hsk.practice.myvoca.SingletonHolder
+import hsk.practice.myvoca.framework.RoomVocaDatabase.Companion.MIGRATION_1_2
+import hsk.practice.myvoca.framework.RoomVocaDatabase.Companion.vocaDatabaseName
 
 /**
  * Room database class. Exists at the bottom of the database abstraction.
  * Supports database migration, creation, etc.
+ * <b>
+ *
  * Implemented as Singleton because creating database object is very costly.
  */
 @Database(entities = [RoomVocabulary::class], version = 2)
 abstract class RoomVocaDatabase : RoomDatabase() {
     abstract fun vocaDao(): VocaDao?
 
-    companion object {
+    companion object : SingletonHolder<RoomVocaDatabase, Context>({ context ->
+        Room.databaseBuilder(context, RoomVocaDatabase::class.java, vocaDatabaseName).addMigrations(MIGRATION_1_2).build()
+    }) {
         private const val vocaDatabaseName = "Vocabulary"
-
-        @Synchronized
-        fun getInstance(context: Context?) = loadInstance(context)
-
-        private fun loadInstance(context: Context?) = Room.databaseBuilder(context!!, RoomVocaDatabase::class.java, vocaDatabaseName).addMigrations(MIGRATION_1_2).build()
 
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
