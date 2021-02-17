@@ -2,9 +2,9 @@ package hsk.practice.myvoca
 
 import android.Manifest
 import android.content.Context
-import database.source.VocaRepository
-import database.source.local.VocaDatabase
+import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.ui.activity.MainActivity
+import timber.log.Timber
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -16,6 +16,9 @@ import java.util.*
  * All methods are static.
  */
 object AppHelper {
+
+    const val LOG_TAG = "HSK APP"
+
     private var permissionsList: ArrayList<String?>? = null
 
     /**
@@ -64,7 +67,7 @@ object AppHelper {
      * @param timeInMillis Unix epoch timestamp to convert to string
      * @return Time string of the timestamp
      */
-    fun getTimeString(timeInMillis: Long): String? {
+    fun getTimeString(timeInMillis: Long): String {
         val cal = Calendar.getInstance()
         cal.timeInMillis = timeInMillis
         val year = cal[Calendar.YEAR]
@@ -90,26 +93,8 @@ object AppHelper {
      *
      * @param context context of the application(mainly SplashActivity)
      */
-    fun loadInstance(context: Context?) {
-        VocaDatabase.loadInstance(context)
-        VocaRepository.loadInstance()
-    }
-
-    /**
-     * Checks if the given string contains only alphabet
-     *
-     * @param str string to check
-     * @return true if string contains only alphabet, false otherwise
-     */
-    fun isStringOnlyAlphabet(str: String?): Boolean {
-        if (str == null || str == "") {
-            return false
-        }
-        for (c in str.toCharArray()) {
-            if (c !in 'a'..'z' && c !in 'A'..'Z' && c != '%') {
-                return false
-            }
-        }
-        return true
+    fun loadInstance(context: Context) {
+        Timber.plant(Timber.DebugTree())
+        VocaPersistenceDatabase.getInstance(context)
     }
 }
