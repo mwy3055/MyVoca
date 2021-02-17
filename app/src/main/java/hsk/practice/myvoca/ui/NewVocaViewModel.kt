@@ -4,13 +4,11 @@ import androidx.lifecycle.*
 import com.hsk.data.VocaPersistence
 import com.hsk.data.VocaRepository
 import hsk.practice.myvoca.framework.RoomVocabulary
-import hsk.practice.myvoca.framework.toRoomVocabulary
 import hsk.practice.myvoca.framework.toRoomVocabularyMutableList
 import hsk.practice.myvoca.framework.toVocabularyArray
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -26,15 +24,10 @@ class NewVocaViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
 
     private var vocaRepository: VocaRepository = VocaRepository(vocaPersistence)
 
-    private var allVocabulary: LiveData<MutableList<RoomVocabulary?>?>?=null
-    private var vocabularyCount: MutableLiveData<Int>?=null
+    val allVocabulary: LiveData<MutableList<RoomVocabulary?>?>
 
     init {
-        loadVocabulary()
-        allVocabulary?.observeForever {
-            vocabularyCount = MutableLiveData()
-            vocabularyCount!!.value = it?.size ?: 0
-        }
+        allVocabulary = loadVocabulary()
     }
 
     private val defaultContext: CoroutineContext
@@ -44,18 +37,15 @@ class NewVocaViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
         get() = viewModelScope.coroutineContext + Dispatchers.IO
 
     @Synchronized
-    private fun loadVocabulary(): LiveData<MutableList<RoomVocabulary?>?> = liveData {
-        emit(vocaRepository.getAllVocabulary().toRoomVocabularyMutableList())
+    private fun loadVocabulary() = Transformations.map(vocaRepository.getAllVocabulary().asLiveData(viewModelScope.coroutineContext)) {
+        Timber.d("allVocabulary assigned")
+        it.toRoomVocabularyMutableList()
     }
 
-    fun getAllVocabulary(): LiveData<MutableList<RoomVocabulary?>?>? {
-        if (allVocabulary?.value==null) {
-            allVocabulary = loadVocabulary()
-        }
-        return allVocabulary
+    fun getVocabularyCount(): LiveData<Int> = Transformations.map(allVocabulary) {
+        Timber.d("Size: ${it?.size}")
+        it?.size ?: 0
     }
-
-    fun getVocabularyCount(): LiveData<Int>? = vocabularyCount
 
     fun getVocabulary(query: String) = liveData {
         emit(vocaRepository.getVocabulary(query).toRoomVocabularyMutableList())
@@ -73,27 +63,12 @@ class NewVocaViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
         vocaRepository.updateVocabulary(*vocabularies.toVocabularyArray())
     }
 
-    fun getRandomVocabulary() = liveData {
-        emit(vocaRepository.getRandomVocabulary()?.toRoomVocabulary())
+    fun getRandomVocabulary(): LiveData<RoomVocabulary> = Transformations.map(allVocabulary) {
+        it?.random() ?: RoomVocabulary.nullVocabulary
     }
 
-    fun getRandomVocabularies(count: Int, notInclude: RoomVocabulary? = null) = liveData {
-        var result = mutableSetOf<RoomVocabulary?>()
-        while (result.size < count) {
-            val tempList = (1..10).map {
-                viewModelScope.async {
-                    getRandomVocabulary()
-                }
-            }.awaitAll().map {
-                it.value
-            }
-            result = (result + tempList).filter { it != notInclude }.toMutableSet()
-        }
-        emit(result.shuffled().subList(0, count))
-    }
-
-    fun isEmpty() = liveData {
-        emit(allVocabulary?.value?.isEmpty() ?: true)
+    fun isEmpty(): LiveData<Boolean> = Transformations.map(allVocabulary) {
+        it.isNullOrEmpty()
     }
 
 }
