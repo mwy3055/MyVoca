@@ -5,41 +5,62 @@ import com.hsk.data.VocaPersistence
 import com.hsk.domain.vocabulary.Vocabulary
 import hsk.practice.myvoca.SingletonHolder
 import hsk.practice.myvoca.containsOnlyAlphabet
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Vocabulary Persistence Room Database.
  * Implemented as singleton to keep the data persistence across the whole app.
  */
-class VocaPersistenceDatabase private constructor(context: Context) : VocaPersistence {
+class VocaPersistenceDatabase private constructor(context: Context) : VocaPersistence, CoroutineScope {
 
     companion object : SingletonHolder<VocaPersistenceDatabase, Context>(::VocaPersistenceDatabase)
+
+    private val job = Job()
+    override val coroutineContext: CoroutineContext
+        get() = job + Dispatchers.IO
 
     private var databaseRoom: RoomVocaDatabase
     private val vocaDao: VocaDao
         get() = databaseRoom.vocaDao()!!
 
-    private val allVocabularyChannel = Channel<List<Vocabulary?>>()
+    private val _allVocabulary = MutableStateFlow<List<Vocabulary?>>(emptyList())
 
-    private val allVocabulary: Flow<List<RoomVocabulary>>
-    private var isVocabularyLoading = false
+    private var allVocabularyCached: List<RoomVocabulary>? = null
 
     init {
         synchronized(this) {
             databaseRoom = RoomVocaDatabase.getInstance(context)
         }
-        allVocabulary = vocaDao.loadAllVocabulary()
+        loadAllVocabulary()
         Timber.d("Here")
     }
 
-    override fun getAllVocabulary() = allVocabulary.map { it.toVocabularyList() }
+    // TODO: Use StateFlow?
+    override fun getAllVocabulary(): StateFlow<List<Vocabulary?>> {
+        Timber.d("getAllVocabulary called!")
+        return _allVocabulary
+    }
 
 //    override suspend fun getAllVocabulary(): List<Vocabulary?> {
 //        return allVocabulary.getOrAwaitValue().toVocabularyList()
 //    }
+
+    private fun loadAllVocabulary() {
+        launch {
+            vocaDao.loadAllVocabulary().collect {
+                Timber.d("AllVocabulary loaded!")
+                _allVocabulary.value = it.toVocabularyList()
+            }
+        }
+    }
 
     override suspend fun getVocabulary(query: String): List<Vocabulary?>? {
         return if (query.containsOnlyAlphabet()) {
