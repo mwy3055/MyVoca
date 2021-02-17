@@ -4,9 +4,8 @@ import com.hsk.domain.vocabulary.Vocabulary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.take
 import kotlin.coroutines.CoroutineContext
 
@@ -17,7 +16,7 @@ class VocaRepository(private val vocaPersistence: VocaPersistence) : CoroutineSc
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.Default
 
-    fun getAllVocabulary(): Flow<List<Vocabulary?>> {
+    fun getAllVocabulary(): StateFlow<List<Vocabulary?>> {
         return vocaPersistence.getAllVocabulary()
     }
 
@@ -27,7 +26,7 @@ class VocaRepository(private val vocaPersistence: VocaPersistence) : CoroutineSc
 
     suspend fun getRandomVocabulary(): Vocabulary? {
         var resultVoca: Vocabulary? = null
-        getAllVocabulary().distinctUntilChanged().take(1).collect {
+        getAllVocabulary().take(1).collect {
             resultVoca = try {
                 it.shuffled().first()
             } catch (e: NoSuchElementException) {
