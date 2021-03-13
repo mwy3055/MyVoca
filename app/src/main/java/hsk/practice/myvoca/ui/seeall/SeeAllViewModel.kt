@@ -3,18 +3,116 @@ package hsk.practice.myvoca.ui.seeall
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.hsk.data.VocaPersistence
+import com.hsk.data.VocaRepository
+import com.hsk.domain.vocabulary.Vocabulary
+import hsk.practice.myvoca.framework.RoomVocabulary
+import hsk.practice.myvoca.framework.toRoomVocabularyList
+import hsk.practice.myvoca.framework.toRoomVocabularyMutableList
+import hsk.practice.myvoca.framework.toVocabulary
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * No use
  */
-class SeeAllViewModel : ViewModel() {
-    private val mText: MutableLiveData<String?>?
-    fun getText(): LiveData<String?>? {
-        return mText
-    }
+class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
+
+    private val vocaRepository = VocaRepository(vocaPersistence)
+
+    private val _allVocabulary = MutableLiveData<List<RoomVocabulary?>?>()
+    val allVocabulary: LiveData<List<RoomVocabulary?>?>
+        get() = _allVocabulary
+
+    private val _currentVocabulary = MutableLiveData<MutableList<RoomVocabulary?>?>()
+    val currentVocabulary: LiveData<MutableList<RoomVocabulary?>?>
+        get() = _currentVocabulary
+
+    var deleteMode = false
+    var searchMode = false
+    private var sortState = 0
 
     init {
-        mText = MutableLiveData()
-        //mText.setValue("dtd");
+        loadAllVocabulary()
     }
+
+    private fun loadAllVocabulary() = viewModelScope.launch(Dispatchers.IO) {
+        val allVocabularyFlow = vocaRepository.getAllVocabulary()
+        allVocabularyFlow.collectLatest {
+            _allVocabulary.postValue(it.toRoomVocabularyList())
+            Timber.d("AllVocabulary set: size ${it.size}")
+            if (!searchMode) {
+                _currentVocabulary.postValue(it.toRoomVocabularyMutableList())
+                Timber.d("CurrentVocabulary set: size ${it.size}")
+            }
+        }
+    }
+
+    fun enableSearchMode() {
+        searchMode = true
+    }
+
+    fun disableSearchMode() {
+        if (searchMode) {
+            searchMode = false
+            _currentVocabulary.value = allVocabulary.value?.toMutableList()
+            sortItems(sortState)
+        }
+    }
+
+    fun searchVocabulary(query: String) = viewModelScope.launch(Dispatchers.IO) {
+        val result = vocaRepository.getVocabulary(query) ?: return@launch
+        val sortedResult = sortItems(result, sortState)
+        Timber.d("Query $query result: ${sortedResult.size}")
+        _currentVocabulary.postValue(sortedResult.toRoomVocabularyMutableList())
+        sortItems(sortState)
+    }
+
+    fun deleteItem(position: Int) = viewModelScope.launch(Dispatchers.IO) {
+        val target = currentVocabulary.value?.get(position) ?: return@launch
+        _currentVocabulary.value?.removeAt(position)
+        vocaRepository.deleteVocabulary(target.toVocabulary())
+    }
+
+    fun deleteItems(targetIndices: List<Int>) = viewModelScope.launch(Dispatchers.IO) {
+        for (targetIndex in targetIndices.asReversed()) {
+            deleteItem(targetIndex)
+        }
+    }
+
+    fun restoreItem(target: RoomVocabulary, position: Int) = viewModelScope.launch(Dispatchers.IO) {
+        _currentVocabulary.value?.add(position, target) ?: return@launch
+        vocaRepository.insertVocabulary(target.toVocabulary())
+    }
+
+    // Sort items
+    // state 0: sort alphabetically
+    // state 1: sort by latest edited time
+    fun sortItems(method: Int) {
+        sortState = method
+        _currentVocabulary.value?.let { list ->
+            when (sortState) {
+                0 -> list.sortBy { it?.eng }
+                1 -> list.sortByDescending { it?.addedTime }
+                else -> {
+                    Timber.d("정렬할 수 없습니다: method $method")
+                }
+            }
+        }
+    }
+
+    fun sortItems(items: List<Vocabulary?>, method: Int): List<Vocabulary?> {
+        return when (sortState) {
+            0 -> items.sortedBy { it?.eng }
+            1 -> items.sortedByDescending { it?.addedTime }
+            else -> {
+                Timber.d("정렬할 수 없습니다: method $method")
+                items
+            }
+        }
+    }
+
 }
