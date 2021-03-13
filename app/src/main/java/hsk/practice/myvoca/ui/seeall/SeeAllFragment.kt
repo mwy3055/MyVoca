@@ -23,6 +23,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -40,6 +41,8 @@ import hsk.practice.myvoca.ui.activity.EditVocaActivity
 import hsk.practice.myvoca.ui.seeall.VocabularyTouchHelper.VocabularyTouchHelperListener
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * Most important fragment in this application!
@@ -167,11 +170,13 @@ class SeeAllFragment : Fragment(),
         showSpinner()
 
         // Loading vocabulary from the database is costly, so execute it asynchronously
-        val task = LoadAdapterTask()
-        handler.postDelayed({ task.execute() }, loadAdapterDelay.toLong())
+        lifecycleScope.launch(Dispatchers.IO) {
+            vocaRecyclerViewAdapter = VocaRecyclerViewAdapter.getInstance(newVocaViewModel)
+            setAdapter()
+        }
         vocaRecyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         vocaRecyclerView.addItemDecoration(DividerItemDecoration(vocaRecyclerView.context, LinearLayoutManager(parentActivity).orientation))
-        val callback: ItemTouchHelper.SimpleCallback = VocabularyTouchHelper(0, ItemTouchHelper.LEFT, this)
+        val callback = VocabularyTouchHelper(0, ItemTouchHelper.LEFT, this)
         ItemTouchHelper(callback).attachToRecyclerView(vocaRecyclerView)
 
         return binding.root
@@ -481,18 +486,18 @@ class SeeAllFragment : Fragment(),
      * AsyncTask which shows all vocabulary in the database.
      * Operate asynchronously to prevent the main thread from blocking for a long time.
      */
-    private inner class LoadAdapterTask : AsyncTask<Void?, Void?, Void?>() {
-        override fun doInBackground(vararg voids: Void?): Void? {
-            // TODO: 로딩화면 표시?
-            vocaRecyclerViewAdapter = VocaRecyclerViewAdapter.getInstance(parentActivity)
-            return null
-        }
-
-        override fun onPostExecute(aVoid: Void?) {
-            super.onPostExecute(aVoid)
-            setAdapter()
-        }
-    }
+//    private inner class LoadAdapterTask : AsyncTask<Void?, Void?, Void?>() {
+//        override fun doInBackground(vararg voids: Void?): Void? {
+//            // TODO: 로딩화면 표시?
+//            vocaRecyclerViewAdapter = VocaRecyclerViewAdapter.getInstance(parentActivity)
+//            return null
+//        }
+//
+//        override fun onPostExecute(aVoid: Void?) {
+//            super.onPostExecute(aVoid)
+//            setAdapter()
+//        }
+//    }
 
     companion object {
         private var sortState = 0
