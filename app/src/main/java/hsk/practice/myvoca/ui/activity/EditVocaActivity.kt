@@ -25,7 +25,6 @@ import java.util.*
  * Otherwise, activity just edits the database. See editVocabulary().
  */
 class EditVocaActivity : AppCompatActivity() {
-    private var position = 0
     private lateinit var vocabulary: RoomVocabulary
     private var exitCode = 0
 
@@ -36,17 +35,19 @@ class EditVocaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_voca)
-
-        position = intent.getIntExtra(Constants.POSITION, 0)
-        vocabulary = intent.getSerializableExtra(Constants.EDIT_VOCA) as RoomVocabulary
         newVocaViewModel = ViewModelProvider(this, NewVocaViewModelFactory(VocaPersistenceDatabase.getInstance(this))).get(NewVocaViewModel::class.java)
+        binding.lifecycleOwner = this
+
+        vocabulary = intent.getSerializableExtra(Constants.EDIT_VOCA) as RoomVocabulary
+        binding.target = vocabulary
+
         val toolbar = findViewById<Toolbar?>(R.id.toolbar_activity_edit_voca)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.displayOptions = ActionBar.DISPLAY_HOME_AS_UP or ActionBar.DISPLAY_SHOW_TITLE
 
         binding.editButtonOk.setOnClickListener {
-            if (!editVocabulary()) {
+            if (!updateVocabulary()) {
                 Toast.makeText(applicationContext, "단어를 입력해 주세요.", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
@@ -61,7 +62,7 @@ class EditVocaActivity : AppCompatActivity() {
     }
 
     // returns true if vocabulary is edited (or added) successfully, false otherwise
-    private fun editVocabulary(): Boolean {
+    private fun updateVocabulary(): Boolean {
         val eng = binding.editInputEng.text.toString()
         val kor = binding.editInputKor.text.toString()
         val memo = binding.editInputMemo.text.toString()
