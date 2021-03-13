@@ -33,8 +33,6 @@ class VocaPersistenceDatabase private constructor(context: Context) : VocaPersis
 
     private val _allVocabulary = MutableStateFlow<List<Vocabulary?>>(emptyList())
 
-    private var allVocabularyCached: List<RoomVocabulary>? = null
-
     init {
         synchronized(this) {
             databaseRoom = RoomVocaDatabase.getInstance(context)
@@ -43,7 +41,6 @@ class VocaPersistenceDatabase private constructor(context: Context) : VocaPersis
         Timber.d("Here")
     }
 
-    // TODO: Use StateFlow?
     override fun getAllVocabulary(): StateFlow<List<Vocabulary?>> {
         Timber.d("getAllVocabulary called!")
         return _allVocabulary
@@ -53,12 +50,10 @@ class VocaPersistenceDatabase private constructor(context: Context) : VocaPersis
 //        return allVocabulary.getOrAwaitValue().toVocabularyList()
 //    }
 
-    private fun loadAllVocabulary() {
-        launch {
-            vocaDao.loadAllVocabulary().collect {
-                Timber.d("AllVocabulary loaded!")
-                _allVocabulary.value = it.toVocabularyList()
-            }
+    private fun loadAllVocabulary() = launch {
+        vocaDao.loadAllVocabulary().collect {
+            Timber.d("AllVocabulary loaded!")
+            _allVocabulary.value = it.toVocabularyList()
         }
     }
 
