@@ -15,10 +15,10 @@ import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.SingletonHolder
 import hsk.practice.myvoca.databinding.VocaViewBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
-import hsk.practice.myvoca.ui.seeall.OnDeleteModeListener
-import hsk.practice.myvoca.ui.seeall.OnVocabularyUpdateListener
 import hsk.practice.myvoca.ui.seeall.SeeAllViewModel
-import hsk.practice.myvoca.ui.seeall.ShowVocaOnNotification
+import hsk.practice.myvoca.ui.seeall.listeners.OnDeleteModeListener
+import hsk.practice.myvoca.ui.seeall.listeners.OnVocabularyUpdateListener
+import hsk.practice.myvoca.ui.seeall.listeners.ShowVocaOnNotification
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.VocaViewHolder
 import java.util.*
 

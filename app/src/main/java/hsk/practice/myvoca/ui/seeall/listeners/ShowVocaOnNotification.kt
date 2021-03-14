@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.ui.seeall
+package hsk.practice.myvoca.ui.seeall.listeners
 
 import hsk.practice.myvoca.framework.RoomVocabulary
 

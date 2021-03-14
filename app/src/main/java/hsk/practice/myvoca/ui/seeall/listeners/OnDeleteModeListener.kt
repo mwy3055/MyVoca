@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.ui.seeall
+package hsk.practice.myvoca.ui.seeall.listeners
 
 /**
  * Custom listener which defines a behavior when the delete mode is enabled/disabled.
