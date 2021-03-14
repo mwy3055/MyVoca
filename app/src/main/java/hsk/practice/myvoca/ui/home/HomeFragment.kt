@@ -75,6 +75,7 @@ class HomeFragment : Fragment() {
 
     private fun showNoVocaText() {
         hideVocaNumber()
+        vocaNumber.visibility = View.VISIBLE
         vocaNumber.text = getString(R.string.home_fragment_home_kor)
     }
 
