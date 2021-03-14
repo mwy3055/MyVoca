@@ -11,22 +11,35 @@ import android.os.AsyncTask
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import database.Vocabulary
-import database.source.VocaRepository
+import com.hsk.data.VocaRepository
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.R
+import hsk.practice.myvoca.framework.RoomVocabulary
+import hsk.practice.myvoca.framework.VocaPersistenceDatabase
+import hsk.practice.myvoca.framework.toRoomVocabulary
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.util.concurrent.Callable
 
 class VocaWidget : AppWidgetProvider() {
 
-    private val repository: VocaRepository? = VocaRepository.getInstance()
     private var manager: AppWidgetManager? = null
     private var remoteView: RemoteViews? = null
-    private val showVocaTask: AsyncTask<Void?, Void?, LiveData<Vocabulary?>?>? = null
+    private val showVocaTask: AsyncTask<Void?, Void?, LiveData<RoomVocabulary?>?>? = null
     private val myTask: Callable<*>? = null
     private val receiver: UpdateWidgetReceiver? = null
     private val UPDATE_WIDGET_ID = 17
+
+    private var vocaRepository: VocaRepository? = null
+
+    private val job = SupervisorJob()
+    val coroutineScope = CoroutineScope(Dispatchers.Main + job)
+
+    companion object {
+        val UPDATE_WIDGET: String = "action.updatewidget.update"
+    }
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent != null) {
@@ -34,6 +47,7 @@ class VocaWidget : AppWidgetProvider() {
         }
         init(context)
         super.onReceive(context, intent)
+
         if (intent?.action.equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE, ignoreCase = true)) {
             val widgetId = intent?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: 0
             val widgetIds: IntArray?
@@ -54,7 +68,7 @@ class VocaWidget : AppWidgetProvider() {
         Log.d("HSK APP", "VocaWidget onEnabled()")
         super.onEnabled(context)
         init(context)
-        AppHelper.loadInstance(context)
+        AppHelper.loadInstance(context!!)
     }
 
     override fun onUpdate(context: Context?, appWidgetManager: AppWidgetManager?, appWidgetIds: IntArray?) {
@@ -86,6 +100,9 @@ class VocaWidget : AppWidgetProvider() {
         if (manager == null) {
             manager = AppWidgetManager.getInstance(context)
         }
+        if (vocaRepository == null) {
+            vocaRepository = VocaRepository(VocaPersistenceDatabase.getInstance(context!!))
+        }
     }
 
     private fun setPendingIntent(context: Context?, remoteViews: RemoteViews?, appWidgetIds: IntArray?, componentName: ComponentName?) {
@@ -104,28 +121,19 @@ class VocaWidget : AppWidgetProvider() {
         super.onDeleted(context, appWidgetIds)
     }
 
-    private fun showRandomVocabulary(context: Context?, widgetIds: IntArray?) {
-        val randomVocabulary = VocaRepository.getInstance()?.getRandomVocabulary()
-        randomVocabulary?.observeForever(object : Observer<Vocabulary?> {
-            override fun onChanged(vocabulary: Vocabulary?) {
-                if (vocabulary != null) {
-                    Log.d("HSK APP", "show: ${vocabulary.eng}")
-                }
-                val remoteView = RemoteViews(context?.packageName, R.layout.widget_layout)
-                remoteView.setTextViewText(R.id.widget_eng, vocabulary?.eng)
-                remoteView.setTextViewText(R.id.widget_kor, vocabulary?.kor)
-                val componentName = ComponentName(context!!, VocaWidget::class.java)
-                setPendingIntent(context, remoteView, widgetIds, componentName)
-                var temp = ""
-                if (widgetIds != null) {
-                    for (id in widgetIds) {
-                        temp += "$id "
-                    }
-                }
-                Log.d("HSK APP", "Widget ids in showRandomVoca(): $temp")
-                randomVocabulary.removeObserver(this)
-            }
-        })
+    private fun showRandomVocabulary(context: Context?, widgetIds: IntArray?) = coroutineScope.launch {
+        vocaRepository?.getRandomVocabulary()?.toRoomVocabulary()?.let {
+            Log.d(AppHelper.LOG_TAG, "show: ${it.eng}")
+
+            val remoteView = RemoteViews(context?.packageName, R.layout.widget_layout)
+            remoteView.setTextViewText(R.id.widget_eng, it.eng)
+            remoteView.setTextViewText(R.id.widget_kor, it.kor)
+            val componentName = ComponentName(context!!, VocaWidget::class.java)
+            setPendingIntent(context, remoteView, widgetIds, componentName)
+
+            val temp = widgetIds?.joinToString() ?: ""
+            Log.d("HSK APP", "Widget ids in showRandomVoca(): $temp")
+        }
     }
 
     inner class UpdateWidgetReceiver : BroadcastReceiver() {
@@ -139,7 +147,4 @@ class VocaWidget : AppWidgetProvider() {
         }
     }
 
-    companion object {
-        val UPDATE_WIDGET: String = "action.updatewidget.update"
-    }
 }

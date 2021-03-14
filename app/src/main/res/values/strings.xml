@@ -26,6 +26,7 @@
     <!-- for layout/fragment_home -->
     <string name="home_fragment_home_kor">단어를 추가해 주세요</string>
     <string name="home_fragment_load_button">다른 단어 보이기</string>
+    <string name="home_fragment_word_count">%d개</string>
 
     <!-- for layout/fragment_see_all -->
     <string name="see_all_fragment_number_word_text">단어 수</string>

@@ -6,12 +6,15 @@ import android.widget.*
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import database.Vocabulary
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
-import hsk.practice.myvoca.VocaViewModel
 import hsk.practice.myvoca.databinding.ActivityEditVocaBinding
+import hsk.practice.myvoca.framework.RoomVocabulary
+import hsk.practice.myvoca.framework.VocaPersistenceDatabase
+import hsk.practice.myvoca.ui.NewVocaViewModel
+import hsk.practice.myvoca.ui.NewVocaViewModelFactory
 import java.util.*
 
 /**
@@ -22,30 +25,29 @@ import java.util.*
  * Otherwise, activity just edits the database. See editVocabulary().
  */
 class EditVocaActivity : AppCompatActivity() {
-    private var position = 0
-    private lateinit var vocabulary: Vocabulary
+    private lateinit var vocabulary: RoomVocabulary
     private var exitCode = 0
 
     private lateinit var binding: ActivityEditVocaBinding
 
-    var vocaViewModel: VocaViewModel? = null
+    lateinit var newVocaViewModel: NewVocaViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityEditVocaBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_voca)
+        newVocaViewModel = ViewModelProvider(this, NewVocaViewModelFactory(VocaPersistenceDatabase.getInstance(this))).get(NewVocaViewModel::class.java)
+        binding.lifecycleOwner = this
 
-        val intent = intent
-        position = intent.getIntExtra(Constants.POSITION, 0)
-        vocabulary = intent.getSerializableExtra(Constants.EDIT_VOCA) as Vocabulary
-        vocaViewModel = ViewModelProvider(this).get(VocaViewModel::class.java)
+        vocabulary = intent.getSerializableExtra(Constants.EDIT_VOCA) as RoomVocabulary
+        binding.target = vocabulary
+
         val toolbar = findViewById<Toolbar?>(R.id.toolbar_activity_edit_voca)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.displayOptions = ActionBar.DISPLAY_HOME_AS_UP or ActionBar.DISPLAY_SHOW_TITLE
 
         binding.editButtonOk.setOnClickListener {
-            if (!editVocabulary()) {
+            if (!updateVocabulary()) {
                 Toast.makeText(applicationContext, "단어를 입력해 주세요.", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
@@ -60,20 +62,20 @@ class EditVocaActivity : AppCompatActivity() {
     }
 
     // returns true if vocabulary is edited (or added) successfully, false otherwise
-    private fun editVocabulary(): Boolean {
+    private fun updateVocabulary(): Boolean {
         val eng = binding.editInputEng.text.toString()
         val kor = binding.editInputKor.text.toString()
         val memo = binding.editInputMemo.text.toString()
-        val time = (Calendar.getInstance().timeInMillis / 1000).toInt()
+        val time = Calendar.getInstance().timeInMillis / 1000
         if (eng == "") {
             return false
         }
-        val newVocabulary = Vocabulary(eng, kor, vocabulary.addedTime, time, memo)
+        val newVocabulary = RoomVocabulary(eng, kor, vocabulary.addedTime, time, memo)
         if (vocabulary.eng == newVocabulary.eng) {
-            vocaViewModel?.editVocabulary(newVocabulary)
+            newVocaViewModel.updateVocabulary(newVocabulary)
         } else {
-            vocaViewModel?.deleteVocabulary(vocabulary)
-            vocaViewModel?.insertVocabulary(newVocabulary)
+            newVocaViewModel.deleteVocabulary(vocabulary)
+            newVocaViewModel.insertVocabulary(newVocabulary)
         }
         Toast.makeText(application, "수정 완료!", Toast.LENGTH_LONG).show()
         return true

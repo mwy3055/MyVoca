@@ -2,7 +2,7 @@
 <resources>
     <string-array name="sort_method">
         <item>단어</item>
-        <item>추가한 날짜</item>
+        <item>최신순</item>
     </string-array>
 
 </resources>

@@ -9,13 +9,11 @@ import androidx.lifecycle.ViewModel
  * That is, fragment doesn't manage the data directly. ViewModel does.
  */
 class GoBlogViewModel : ViewModel() {
-    private val mText: MutableLiveData<String?>?
-    fun getText(): LiveData<String?>? {
-        return mText
-    }
+    private val _goBlogText: MutableLiveData<String> = MutableLiveData()
+    val goBlogText: LiveData<String>
+        get() = _goBlogText
 
     init {
-        mText = MutableLiveData()
-        mText.value = "개발자 블로그로 이동합니다."
+        _goBlogText.value = "개발자 블로그로 이동합니다."
     }
 }
