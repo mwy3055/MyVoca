@@ -16,5 +16,5 @@ dependencies {
     kapt 'androidx.room:room-compiler:2.2.6'
     testImplementation 'androidx.room:room-testing:2.2.6'
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2-native-mt'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3-native-mt'
 }
