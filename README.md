@@ -3,7 +3,7 @@
 * Support Android 4.1+ (Ice Cream Sandwich)
 * Only Supports ENG to KOR. Other Languages are not supported.
 
-![MAD score preview](https://blog.kakaocdn.net/dn/bvvRte/btqVAICQpBu/DvKZZfUrtwM4ERUo8IMXv1/img.png)
+![MAD score preview](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fq6gig%2FbtqZ6jMiDkY%2FjgoAUfjw7Y1TTquxsYRXnk%2Fimg.png)
 
 # Features
 * Add, edit and delete vocabulary
@@ -15,6 +15,6 @@
 * Visit a blog of the developer!
 
 # MAD scorecard
-![MAD scorecard Kotlin](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FAfIcQ%2FbtqVAIpjWEC%2Fg7G2n1oO4AdFhvOgMMvvI0%2Fimg.png)
-![MAD scorecard Jetpack](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FbcdZ8z%2FbtqVyVvWc0D%2FIMFXTjrQ9NAzo0TYAapNU1%2Fimg.png)
-![MAD scorecard android studio](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FJJ1qy%2FbtqVufVWmxU%2FE0Mk2WDTt51IKo7mCDj4QK%2Fimg.png)
+![MAD scorecard Kotlin](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fdfcfz4%2FbtqZ1IzzDYK%2FkmUPA8SBHawkLDLqNBCG1k%2Fimg.png)
+![MAD scorecard Jetpack](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2F1i01i%2FbtqZ6jZQeNU%2Fwpr9HlpanbkL4bUnioYNNk%2Fimg.png)
+![MAD scorecard android studio](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FSnanj%2FbtqZ6j6DrOA%2Fi8c0E38wmXStB6fY5xVxrk%2Fimg.png)
