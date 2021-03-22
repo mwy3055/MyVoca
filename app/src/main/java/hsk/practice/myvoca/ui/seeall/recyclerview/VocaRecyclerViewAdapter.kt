@@ -9,7 +9,6 @@ import android.view.ContextMenu.ContextMenuInfo
 import android.view.View.OnCreateContextMenuListener
 import android.view.View.OnLongClickListener
 import androidx.core.util.keyIterator
-import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -50,9 +49,6 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
         VocaRecyclerViewAdapter(viewModel)
     })
 
-    val currentVocabulary: LiveData<MutableList<RoomVocabulary?>?>
-        get() = viewModel.currentVocabulary
-
     val deleteMode: Boolean
         get() = viewModel.deleteMode
     private val searchMode: Boolean
@@ -75,8 +71,7 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
 
     // Bind the content to the item
     override fun onBindViewHolder(holder: VocaViewHolder, position: Int) {
-        val vocabulary = currentVocabulary.value?.get(position)
-                ?: RoomVocabulary.nullVocabulary
+        val vocabulary = getItem(position) ?: RoomVocabulary.nullVocabulary
         holder.bind(vocabulary, position)
     }
 
@@ -127,7 +122,7 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
     }
 
     fun notifyItemsChanged() {
-        for (i in currentVocabulary.value?.indices!!) {
+        for (i in 0 until itemCount) {
             notifyItemChanged(i)
         }
     }

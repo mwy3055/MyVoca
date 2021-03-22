@@ -244,7 +244,7 @@ class SeeAllFragment : Fragment(),
      */
     private fun searchVocabulary(query: String) {
         vocaRecyclerViewAdapter?.searchVocabulary(query)
-        val searchResult = vocaRecyclerViewAdapter?.currentVocabulary
+//        val searchResult = vocaRecyclerViewAdapter?.currentVocabulary
 //        if (isSearchMode) searchResult?.observe(viewLifecycleOwner) { vocaNumberText.text = it?.size.toString() }
     }
 
