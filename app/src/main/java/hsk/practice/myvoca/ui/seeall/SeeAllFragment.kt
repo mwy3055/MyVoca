@@ -96,8 +96,6 @@ class SeeAllFragment : Fragment(),
     private var isSearchMode = false
     private var vocaRecyclerViewAdapter: VocaRecyclerViewAdapter? = null
 
-    private lateinit var updateWordSizeRunnable: Runnable
-
     private var isFragmentShown = false
 
     private val seeAllLayout
@@ -175,7 +173,7 @@ class SeeAllFragment : Fragment(),
 
         seeAllViewModel.currentVocabulary.observe(viewLifecycleOwner) {
             it?.let { vocaRecyclerViewAdapter?.submitList(it) }
-            vocaNumberText.text = (it?.size ?: 0).toString()
+//            vocaNumberText.text = (it?.size ?: 0).toString()
             vocaRecyclerViewAdapter?.notifyDataSetChanged()
         }
         return binding.root
@@ -220,7 +218,7 @@ class SeeAllFragment : Fragment(),
                 if (searchMenuItem.isActionViewExpanded) {
                     animateSearchToolbar(1, false, false)
                     vocaRecyclerViewAdapter?.disableSearchMode()
-                    vocaNumberText.text = vocaRecyclerViewAdapter?.itemCount?.toString()
+//                    vocaNumberText.text = vocaRecyclerViewAdapter?.itemCount?.toString()
                 }
                 return true
             }
@@ -247,7 +245,7 @@ class SeeAllFragment : Fragment(),
     private fun searchVocabulary(query: String) {
         vocaRecyclerViewAdapter?.searchVocabulary(query)
         val searchResult = vocaRecyclerViewAdapter?.currentVocabulary
-        if (isSearchMode) searchResult?.observe(viewLifecycleOwner) { vocaNumberText.text = it?.size.toString() }
+//        if (isSearchMode) searchResult?.observe(viewLifecycleOwner) { vocaNumberText.text = it?.size.toString() }
     }
 
     /**
