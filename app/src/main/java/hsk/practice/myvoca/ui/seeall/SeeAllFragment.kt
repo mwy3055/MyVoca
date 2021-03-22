@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.*
 import android.content.res.Resources
-import android.graphics.Color
 import android.os.*
 import android.util.Log
 import android.view.*
@@ -138,6 +137,8 @@ class SeeAllFragment : Fragment(),
 
         isFragmentShown = true
         _binding = FragmentSeeAllBinding.inflate(inflater, container, false)
+        binding.viewModel = seeAllViewModel
+        binding.lifecycleOwner = viewLifecycleOwner
 
         toolbar = parentActivity.findViewById(R.id.toolbar)
         drawer = parentActivity.findViewById(R.id.drawer_layout)
@@ -173,6 +174,7 @@ class SeeAllFragment : Fragment(),
         ItemTouchHelper(callback).attachToRecyclerView(vocaRecyclerView)
 
         seeAllViewModel.currentVocabulary.observe(viewLifecycleOwner) {
+            it?.let { vocaRecyclerViewAdapter?.submitList(it) }
             vocaNumberText.text = (it?.size ?: 0).toString()
             vocaRecyclerViewAdapter?.notifyDataSetChanged()
         }
@@ -352,18 +354,7 @@ class SeeAllFragment : Fragment(),
      */
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int, position: Int) {
         if (viewHolder is VocaViewHolder) {
-            val deletedVocabulary = vocaRecyclerViewAdapter?.getItem(position) as RoomVocabulary
-            val eng = deletedVocabulary.eng
-            Log.d("HSK APP", "pos: $position")
-            vocaRecyclerViewAdapter!!.removeItem(position)
-            vocaNumberText.text = vocaRecyclerViewAdapter!!.itemCount.toString()
-            val snackBar = Snackbar.make(seeAllLayout, eng + "이(가) 삭제되었습니다.", Snackbar.LENGTH_LONG)
-            snackBar.setAction("실행 취소") {
-                vocaRecyclerViewAdapter!!.restoreItem(deletedVocabulary, position)
-                vocaNumberText.text = vocaRecyclerViewAdapter!!.itemCount.toString()
-            }
-            snackBar.setActionTextColor(Color.YELLOW)
-            snackBar.show()
+            vocaRecyclerViewAdapter?.showDeleteSnackbar(requireView(), position)
         }
     }
 

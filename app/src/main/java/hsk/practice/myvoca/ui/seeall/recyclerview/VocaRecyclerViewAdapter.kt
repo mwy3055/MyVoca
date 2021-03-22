@@ -1,5 +1,6 @@
 package hsk.practice.myvoca.ui.seeall.recyclerview
 
+import android.graphics.Color
 import android.os.*
 import android.util.Log
 import android.util.SparseBooleanArray
@@ -9,7 +10,10 @@ import android.view.View.OnCreateContextMenuListener
 import android.view.View.OnLongClickListener
 import androidx.core.util.keyIterator
 import androidx.lifecycle.LiveData
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.SingletonHolder
@@ -29,7 +33,7 @@ import java.util.*
  * For further information, Please refer the comments above some methods.
  */
 class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel)
-    : RecyclerView.Adapter<VocaViewHolder?>(), OnDeleteModeListener {
+    : ListAdapter<RoomVocabulary, VocaViewHolder>(RoomVocabularyDiffCallback()), OnDeleteModeListener {
 
     // Custom listener interfaces. Will be used in the ViewHolder below.
     interface OnVocaClickListener {
@@ -75,15 +79,6 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
                 ?: RoomVocabulary.nullVocabulary
         holder.bind(vocabulary, position)
     }
-
-    // Methods for general adapter
-    override fun getItemCount() = currentVocabulary.value?.size ?: 0
-
-    fun getItem(position: Int) = currentVocabulary.value?.get(position)
-
-    override fun getItemId(position: Int) = position.toLong()
-
-    fun getItemPosition(vocabulary: RoomVocabulary?) = currentVocabulary.value?.indexOf(vocabulary)
 
     // Getter/Setters of Listeners
     fun getVocaClickListener() = vocaClickListener
@@ -149,7 +144,6 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
 //            currentVocabulary = viewModel.allVocabulary
 //            sortItems(sortState)
             viewModel.disableSearchMode()
-            notifyDataSetChanged()
         }
     }
 
@@ -161,7 +155,6 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
 //            notifyDataSetChanged()
 //        }
         viewModel.searchVocabulary("%$query%")
-        notifyDataSetChanged()
     }
 
     /**
@@ -172,7 +165,6 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
 //        val deletedVocabulary = currentVocabulary?.value?.get(position)
 //        currentVocabulary?.value?.removeAt(position)
         viewModel.deleteItem(position)
-        notifyItemRemoved(position)
 //        if (deletedVocabulary != null) {
 //            viewModel.deleteVocabulary(deletedVocabulary)
 //        }
@@ -196,7 +188,6 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
     fun restoreItem(vocabulary: RoomVocabulary, position: Int) {
 //        currentVocabulary?.value?.add(position, vocabulary)
         viewModel.restoreItem(vocabulary, position)
-        notifyItemInserted(position)
 //        if (vocabulary != null) {
 //            viewModel.insertVocabulary(vocabulary)
 //        }
@@ -204,7 +195,19 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
 
     fun sortItems(method: Int) {
         viewModel.sortItems(method)
-        notifyDataSetChanged()
+    }
+
+    fun showDeleteSnackbar(view: View, position: Int) {
+        val deletedVocabulary = getItem(position)
+        val eng = deletedVocabulary.eng
+        Log.d("HSK APP", "pos: $position")
+        removeItem(position)
+        val snackBar = Snackbar.make(view, eng + "이(가) 삭제되었습니다.", Snackbar.LENGTH_LONG)
+        snackBar.setAction("실행 취소") {
+            restoreItem(deletedVocabulary, position)
+        }
+        snackBar.setActionTextColor(Color.YELLOW)
+        snackBar.show()
     }
 
     // See SeeAllFragment.onDeleteModeEnabled() Method
@@ -280,23 +283,6 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
             if (vocabulary != RoomVocabulary.nullVocabulary) {
                 setDeleteCheckBox(position)
             }
-//            if (currentVocabulary?.value == null) {
-//                setVocabulary(RoomVocabulary.nullVocabulary)
-//                setVocaClickListener(vocaClickListener)
-//            } else {
-//                val vocabulary = currentVocabulary.value?.get(position)
-//                setVocabulary(vocabulary)
-//                setVocaClickListener(vocaClickListener)
-//                vocaBinding.deleteCheckBox.apply {
-//                    if (deleteMode) {
-//                        visibility = View.VISIBLE
-//                        isChecked = selectedItems.get(position)
-//                    } else {
-//                        visibility = View.GONE
-//                        isChecked = false
-//                    }
-//                }
-//            }
         }
 
         private fun setVocabulary(vocabulary: RoomVocabulary?) {
@@ -342,5 +328,15 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
             this.onVocabularyUpdateListener = onVocabularyUpdateListener
             vocaBinding.root.setOnCreateContextMenuListener(this)
         }
+    }
+}
+
+class RoomVocabularyDiffCallback : DiffUtil.ItemCallback<RoomVocabulary>() {
+    override fun areContentsTheSame(oldItem: RoomVocabulary, newItem: RoomVocabulary): Boolean {
+        return oldItem == newItem
+    }
+
+    override fun areItemsTheSame(oldItem: RoomVocabulary, newItem: RoomVocabulary): Boolean {
+        return oldItem.eng == newItem.eng
     }
 }
