@@ -87,7 +87,6 @@ class SeeAllFragment : Fragment(),
         get() = _binding!!
 
     private lateinit var parentActivity: AppCompatActivity
-    private lateinit var viewModelProvider: ViewModelProvider
     private lateinit var seeAllViewModel: SeeAllViewModel
 
     private lateinit var toolbar: Toolbar
@@ -95,8 +94,6 @@ class SeeAllFragment : Fragment(),
 
     private var isSearchMode = false
     private var vocaRecyclerViewAdapter: VocaRecyclerViewAdapter? = null
-
-    private var isFragmentShown = false
 
     private val seeAllLayout
         get() = binding.layoutSeeAll
@@ -109,9 +106,6 @@ class SeeAllFragment : Fragment(),
 
     private val deleteCancelButton
         get() = binding.addButtonCancel
-
-    private val vocaNumberText
-        get() = binding.textVocaNumber
 
     private val sortSpinner
         get() = binding.spinnerSort
@@ -130,10 +124,15 @@ class SeeAllFragment : Fragment(),
     }
 
     override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        seeAllViewModel = ViewModelProvider(this, VocaViewModelFactory(VocaPersistenceDatabase.getInstance(requireContext()))).get(SeeAllViewModel::class.java)
+                              container: ViewGroup?, savedInstanceState: Bundle?): View {
+//        isFragmentShown = true
 
-        isFragmentShown = true
+        seeAllViewModel = ViewModelProvider(this, VocaViewModelFactory(VocaPersistenceDatabase.getInstance(requireContext()))).get(SeeAllViewModel::class.java)
+        seeAllViewModel.currentVocabulary.observe(viewLifecycleOwner) {
+            it?.let { vocaRecyclerViewAdapter?.submitList(it) }
+            vocaRecyclerViewAdapter?.notifyDataSetChanged()
+        }
+
         _binding = FragmentSeeAllBinding.inflate(inflater, container, false)
         binding.viewModel = seeAllViewModel
         binding.lifecycleOwner = viewLifecycleOwner
@@ -143,7 +142,7 @@ class SeeAllFragment : Fragment(),
         setHasOptionsMenu(true)
 
         // Delete one or many items (with checkbox)
-        deleteVocabularyButton.setOnClickListener(View.OnClickListener {
+        deleteVocabularyButton.setOnClickListener {
             val selectedItems = vocaRecyclerViewAdapter?.getSelectedItems()
             val builder = AlertDialog.Builder(parentActivity)
             builder.setTitle("삭제")
@@ -155,38 +154,24 @@ class SeeAllFragment : Fragment(),
             builder.setNegativeButton("취소", DialogInterface.OnClickListener { _, _ -> return@OnClickListener })
             val dialog = builder.create()
             dialog.show()
-        })
+        }
         deleteCancelButton.setOnClickListener { vocaRecyclerViewAdapter?.disableDeleteMode() }
 
         showSpinner()
 
         // Load adapter asynchronously
         lifecycleScope.launch(Dispatchers.IO) {
-            vocaRecyclerViewAdapter = VocaRecyclerViewAdapter.getInstance(seeAllViewModel)
-            launch(Dispatchers.Main) { setAdapter() }
+            setAdapter()
         }
 
-        vocaRecyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        vocaRecyclerView.addItemDecoration(DividerItemDecoration(vocaRecyclerView.context, LinearLayoutManager(parentActivity).orientation))
-        val callback = VocabularyTouchHelper(0, ItemTouchHelper.LEFT, this)
-        ItemTouchHelper(callback).attachToRecyclerView(vocaRecyclerView)
+        vocaRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+            addItemDecoration(DividerItemDecoration(context, LinearLayoutManager(parentActivity).orientation))
 
-        seeAllViewModel.currentVocabulary.observe(viewLifecycleOwner) {
-            it?.let { vocaRecyclerViewAdapter?.submitList(it) }
-//            vocaNumberText.text = (it?.size ?: 0).toString()
-            vocaRecyclerViewAdapter?.notifyDataSetChanged()
+            val callback = VocabularyTouchHelper(0, ItemTouchHelper.LEFT, this@SeeAllFragment)
+            ItemTouchHelper(callback).attachToRecyclerView(this)
         }
         return binding.root
-    }
-
-    override fun onResume() {
-        isFragmentShown = true
-        super.onResume()
-    }
-
-    override fun onPause() {
-        isFragmentShown = false
-        super.onPause()
     }
 
     override fun onDestroyView() {
@@ -208,7 +193,7 @@ class SeeAllFragment : Fragment(),
         searchMenuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
                 // Called when SearchView is expanding
-                animateSearchToolbar(1, true, true)
+                animateSearchToolbar(1, containsOverflow = true, show = true)
                 vocaRecyclerViewAdapter?.enableSearchMode()
                 return true
             }
@@ -216,9 +201,8 @@ class SeeAllFragment : Fragment(),
             override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
                 // Called when SearchView is collapsing
                 if (searchMenuItem.isActionViewExpanded) {
-                    animateSearchToolbar(1, false, false)
+                    animateSearchToolbar(1, containsOverflow = true, show = false)
                     vocaRecyclerViewAdapter?.disableSearchMode()
-//                    vocaNumberText.text = vocaRecyclerViewAdapter?.itemCount?.toString()
                 }
                 return true
             }
@@ -244,8 +228,6 @@ class SeeAllFragment : Fragment(),
      */
     private fun searchVocabulary(query: String) {
         vocaRecyclerViewAdapter?.searchVocabulary(query)
-//        val searchResult = vocaRecyclerViewAdapter?.currentVocabulary
-//        if (isSearchMode) searchResult?.observe(viewLifecycleOwner) { vocaNumberText.text = it?.size.toString() }
     }
 
     /**
@@ -332,7 +314,8 @@ class SeeAllFragment : Fragment(),
         view.isFocusableInTouchMode = true
         view.requestFocus()
         view.setOnKeyListener { _, keyCode, _ ->
-            if (keyCode == KeyEvent.KEYCODE_BACK && vocaRecyclerViewAdapter?.deleteMode == true &&
+            if (keyCode == KeyEvent.KEYCODE_BACK &&
+                    seeAllViewModel.deleteMode &&
                     !drawer.isDrawerOpen(GravityCompat.START)) {
                 vocaRecyclerViewAdapter?.disableDeleteMode()
                 true
@@ -431,50 +414,24 @@ class SeeAllFragment : Fragment(),
      * Show adapter when loaded
      */
     private fun setAdapter() {
-        vocaRecyclerViewAdapter?.apply {
-            setOnEditVocabularyListener(this@SeeAllFragment)
-            setOnDeleteModeListener(this@SeeAllFragment)
-            setShowVocaOnNotificationListener(this@SeeAllFragment)
-            setVocaClickListener(object : OnVocaClickListener {
-                override fun onVocaClick(holder: VocaViewHolder?, view: View?, position: Int) {
-                    Log.d("HSK APP", "$position clicked.")
-                    if (deleteMode) {
-                        switchSelectedState(position)
-                    } else {
-                        // do nothing
+        vocaRecyclerViewAdapter = VocaRecyclerViewAdapter(seeAllViewModel,
+                onVocabularyUpdateListener = this,
+                onDeleteModeListener = this,
+                showVocaOnNotification = this,
+                vocaClickListener = object : OnVocaClickListener {
+                    override fun onVocaClick(holder: VocaViewHolder?, view: View?, position: Int) {
+                        Log.d("HSK APP", "$position clicked.")
+                        if (seeAllViewModel.deleteMode) {
+                            vocaRecyclerViewAdapter!!.switchSelectedState(position)
+                        }
                     }
-                }
 
-                override fun onVocaLongClick(holder: VocaViewHolder?, view: View?, position: Int): Boolean {
-                    return false
-                }
-            })
-
-//            getCurrentVocabulary()?.observeForever {
-//                Log.d("HSK APP", "setAdapter() -> onChanged()")
-//                showVocaSize()
-//                observe()
-//            }
-            vocaRecyclerView.adapter = this
-        }
+                    override fun onVocaLongClick(holder: VocaViewHolder?, view: View?, position: Int): Boolean {
+                        return false
+                    }
+                })
+        vocaRecyclerView.adapter = vocaRecyclerViewAdapter
     }
-
-    /**
-     * AsyncTask which shows all vocabulary in the database.
-     * Operate asynchronously to prevent the main thread from blocking for a long time.
-     */
-//    private inner class LoadAdapterTask : AsyncTask<Void?, Void?, Void?>() {
-//        override fun doInBackground(vararg voids: Void?): Void? {
-//            // TODO: 로딩화면 표시?
-//            vocaRecyclerViewAdapter = VocaRecyclerViewAdapter.getInstance(parentActivity)
-//            return null
-//        }
-//
-//        override fun onPostExecute(aVoid: Void?) {
-//            super.onPostExecute(aVoid)
-//            setAdapter()
-//        }
-//    }
 
     companion object {
         private var sortState = 0

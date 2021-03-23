@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.Constants
-import hsk.practice.myvoca.SingletonHolder
 import hsk.practice.myvoca.databinding.VocaViewBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.ui.seeall.SeeAllViewModel
@@ -31,7 +30,11 @@ import java.util.*
  *
  * For further information, Please refer the comments above some methods.
  */
-class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel)
+class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
+                              val vocaClickListener: OnVocaClickListener? = null,
+                              val showVocaOnNotification: ShowVocaOnNotification? = null,
+                              val onDeleteModeListener: OnSelectModeListener? = null,
+                              val onVocabularyUpdateListener: OnVocabularyUpdateListener? = null)
     : ListAdapter<RoomVocabulary, VocaViewHolder>(RoomVocabularyDiffCallback()), OnDeleteModeListener {
 
     // Custom listener interfaces. Will be used in the ViewHolder below.
@@ -45,27 +48,18 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
         fun onDeleteModeDisabled()
     }
 
-    companion object : SingletonHolder<VocaRecyclerViewAdapter, SeeAllViewModel>({ viewModel ->
-        VocaRecyclerViewAdapter(viewModel)
-    })
-
     val deleteMode: Boolean
         get() = viewModel.deleteMode
     private val searchMode: Boolean
         get() = viewModel.searchMode
-
-    private var vocaClickListener: OnVocaClickListener? = null
-    private var showVocaOnNotification: ShowVocaOnNotification? = null
-    private var onDeleteModeListener: OnSelectModeListener? = null
-    private var onVocabularyUpdateListener: OnVocabularyUpdateListener? = null
 
     private val selectedItems: SparseBooleanArray = SparseBooleanArray()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VocaViewHolder {
         val vocaBinding = VocaViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
-        val holder = VocaViewHolder(vocaBinding, this, onVocabularyUpdateListener)
-        holder.setVocaClickListener(vocaClickListener)
+        // TODO: replace to companion object method VocaViewHolder.from(...)
+        val holder = VocaViewHolder(vocaBinding, this, onVocabularyUpdateListener, vocaClickListener)
         return holder
     }
 
@@ -73,25 +67,6 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
     override fun onBindViewHolder(holder: VocaViewHolder, position: Int) {
         val vocabulary = getItem(position) ?: RoomVocabulary.nullVocabulary
         holder.bind(vocabulary, position)
-    }
-
-    // Getter/Setters of Listeners
-    fun getVocaClickListener() = vocaClickListener
-
-    fun setOnDeleteModeListener(listener: OnSelectModeListener?) {
-        onDeleteModeListener = listener
-    }
-
-    fun setVocaClickListener(vocaClickListener: OnVocaClickListener?) {
-        this.vocaClickListener = vocaClickListener
-    }
-
-    fun setOnEditVocabularyListener(updateListener: OnVocabularyUpdateListener?) {
-        onVocabularyUpdateListener = updateListener
-    }
-
-    fun setShowVocaOnNotificationListener(notificationListener: ShowVocaOnNotification?) {
-        showVocaOnNotification = notificationListener
     }
 
     // Methods for managing select state
@@ -129,26 +104,16 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
 
     /* for search mode */
     fun enableSearchMode() {
-//        searchMode = true
         viewModel.enableSearchMode()
     }
 
     fun disableSearchMode() {
         if (searchMode) {
-//            searchMode = false
-//            currentVocabulary = viewModel.allVocabulary
-//            sortItems(sortState)
             viewModel.disableSearchMode()
         }
     }
 
     fun searchVocabulary(query: String) {
-//        currentVocabulary = viewModel.getVocabulary("%$query%")
-//        currentVocabulary?.observeForever {
-//            Log.d(AppHelper.LOG_TAG, "Searched $query: ${it?.size ?: -1}")
-//            sortItems(sortState)
-//            notifyDataSetChanged()
-//        }
         viewModel.searchVocabulary("%$query%")
     }
 
@@ -157,35 +122,17 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
      * @param position position whose item to remove
      */
     fun removeItem(position: Int) {
-//        val deletedVocabulary = currentVocabulary?.value?.get(position)
-//        currentVocabulary?.value?.removeAt(position)
         viewModel.deleteItem(position)
-//        if (deletedVocabulary != null) {
-//            viewModel.deleteVocabulary(deletedVocabulary)
-//        }
     }
 
     fun deleteVocabularies() {
         val selectedItems = getSelectedItems()
         viewModel.deleteItems(selectedItems)
-//        val selected = getSelectedItems()
-//        // reverse iteration
-//        val iterator: MutableListIterator<*> = selected.listIterator(selected.size)
-//        while (iterator.hasPrevious()) {
-//            val vocabulary = getItem(iterator.previous() as Int)
-//            if (vocabulary != null) {
-//                viewModel.deleteVocabulary(vocabulary)
-//            }
-//        }
         disableDeleteMode()
     }
 
     fun restoreItem(vocabulary: RoomVocabulary, position: Int) {
-//        currentVocabulary?.value?.add(position, vocabulary)
         viewModel.restoreItem(vocabulary, position)
-//        if (vocabulary != null) {
-//            viewModel.insertVocabulary(vocabulary)
-//        }
     }
 
     fun sortItems(method: Int) {
@@ -224,12 +171,14 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
     /**
      * ViewHolder for vocabulary object.
      * Manages the content of the item and action when the item is clicked or long-clicked.
+     *
+     * TODO: convert to pure class, not a inner class
      */
     inner class VocaViewHolder(private val vocaBinding: VocaViewBinding,
-                               onDeleteModeListener: OnDeleteModeListener?,
-                               onVocabularyUpdateListener: OnVocabularyUpdateListener?) : RecyclerView.ViewHolder(vocaBinding.root), OnCreateContextMenuListener {
+                                                   onDeleteModeListener: OnDeleteModeListener?,
+                                                   onVocabularyUpdateListener: OnVocabularyUpdateListener?,
+                                                   vocaClickListener: OnVocaClickListener? = null) : RecyclerView.ViewHolder(vocaBinding.root), OnCreateContextMenuListener {
 
-        private var vocaClickListener: OnVocaClickListener? = null
         private var onDeleteModeListener: OnDeleteModeListener?
         private var onVocabularyUpdateListener: OnVocabularyUpdateListener?
         var viewForeground = vocaBinding.viewForeground
@@ -274,7 +223,7 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
 
         fun bind(vocabulary: RoomVocabulary, position: Int) {
             setVocabulary(vocabulary)
-            setVocaClickListener(vocaClickListener)
+//            this@VocaRecyclerViewAdapter.vocaClickListener = vocaClickListener
             if (vocabulary != RoomVocabulary.nullVocabulary) {
                 setDeleteCheckBox(position)
             }
@@ -286,11 +235,6 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
                 vocaBinding.vocaKor.text = kor
                 vocaBinding.lastEditTime.text = AppHelper.getTimeString(lastEditedTime.toLong() * 1000)
             }
-        }
-
-        @JvmName("setVocaClickListener1")
-        fun setVocaClickListener(vocaClickListener: OnVocaClickListener?) {
-            this.vocaClickListener = vocaClickListener
         }
 
         private fun setDeleteCheckBox(position: Int) {
@@ -309,13 +253,13 @@ class VocaRecyclerViewAdapter private constructor(val viewModel: SeeAllViewModel
             vocaBinding.root.setOnClickListener { v ->
                 if (vocaClickListener != null) {
                     val position = adapterPosition
-                    vocaClickListener!!.onVocaClick(this@VocaViewHolder, v, position)
+                    vocaClickListener.onVocaClick(this@VocaViewHolder, v, position)
                 }
             }
             vocaBinding.root.setOnLongClickListener(OnLongClickListener { v ->
                 if (vocaClickListener != null) {
                     val position = adapterPosition
-                    return@OnLongClickListener vocaClickListener!!.onVocaLongClick(this@VocaViewHolder, v, position)
+                    return@OnLongClickListener vocaClickListener.onVocaLongClick(this@VocaViewHolder, v, position)
                 }
                 false
             })
