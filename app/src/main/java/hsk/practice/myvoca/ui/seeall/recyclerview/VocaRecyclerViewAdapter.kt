@@ -13,12 +13,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import hsk.practice.myvoca.AppHelper
-import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.databinding.VocaViewBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.ui.seeall.SeeAllViewModel
 import hsk.practice.myvoca.ui.seeall.listeners.OnDeleteModeListener
-import hsk.practice.myvoca.ui.seeall.listeners.OnVocabularyUpdateListener
 import hsk.practice.myvoca.ui.seeall.listeners.ShowVocaOnNotification
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.VocaViewHolder
 import java.util.*
@@ -31,8 +29,7 @@ import java.util.*
  */
 class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
                               val showVocaOnNotification: ShowVocaOnNotification? = null,
-                              val onDeleteModeListener: OnSelectModeListener? = null,
-                              val onVocabularyUpdateListener: OnVocabularyUpdateListener? = null)
+                              val onDeleteModeListener: OnSelectModeListener? = null,)
     : ListAdapter<RoomVocabulary, VocaViewHolder>(RoomVocabularyDiffCallback()), OnDeleteModeListener {
 
     interface OnSelectModeListener {
@@ -51,7 +48,7 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
         val vocaBinding = VocaViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
         // TODO: replace to companion object method VocaViewHolder.from(...)
-        val holder = VocaViewHolder(vocaBinding, this, onVocabularyUpdateListener)
+        val holder = VocaViewHolder(vocaBinding, this)
         return holder
     }
 
@@ -164,15 +161,16 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
     /**
      * ViewHolder for vocabulary object.
      * Manages the content of the item and action when the item is clicked or long-clicked.
-     *
-     * TODO: convert to pure class, not a inner class
      */
     inner class VocaViewHolder(private val vocaBinding: VocaViewBinding,
-                               onDeleteModeListener: OnDeleteModeListener?,
-                               onVocabularyUpdateListener: OnVocabularyUpdateListener?) : RecyclerView.ViewHolder(vocaBinding.root), OnCreateContextMenuListener {
+                               onDeleteModeListener: OnDeleteModeListener?,)
+        : RecyclerView.ViewHolder(vocaBinding.root), OnCreateContextMenuListener {
+
+        private val EDIT_CODE = 100
+        private val DELETE_CODE = 101
+        private val SHOW_ON_NOTIFICATION_CODE = 102
 
         private var onDeleteModeListener: OnDeleteModeListener?
-        private var onVocabularyUpdateListener: OnVocabularyUpdateListener?
         var viewForeground = vocaBinding.viewForeground
         var viewBackground = vocaBinding.viewBackground
 
@@ -183,15 +181,16 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
                     ?: return@OnMenuItemClickListener true
             Log.d("HSK APP", position.toString())
             when (item.itemId) {
-                Constants.EDIT_CODE -> {
-                    onVocabularyUpdateListener?.updateVocabulary(position)
+                EDIT_CODE -> {
+//                    onVocabularyUpdateListener?.updateVocabulary(position)
+                    viewModel.onVocabularyUpdate(position)
                 }
-                Constants.DELETE_CODE -> {
+                DELETE_CODE -> {
                     val adapter = this@VocaRecyclerViewAdapter
                     adapter.enableDeleteMode()
                     adapter.switchSelectedState(position)
                 }
-                Constants.SHOW_ON_NOTIFICATION_CODE -> {
+                SHOW_ON_NOTIFICATION_CODE -> {
                     // TODO: show selected vocabulary on notification
                     showVocaOnNotification?.showVocabularyOnNotification(vocabulary)
                 }
@@ -201,13 +200,12 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
 
         // Create drop-down menu when item is long-clicked
         override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenuInfo?) {
-            val adapter = this@VocaRecyclerViewAdapter
-            if (adapter.deleteMode) {
+            if (viewModel.deleteMode) {
                 return
             }
-            val edit = menu?.add(Menu.NONE, Constants.EDIT_CODE, 1, "수정")
-            val delete = menu?.add(Menu.NONE, Constants.DELETE_CODE, 2, "삭제")
-            //            MenuItem showOnNotification = menu.add(Menu.NONE, Constants.SHOW_ON_NOTIFICATION_CODE, 3, "알림에 보이기");
+            val edit = menu?.add(Menu.NONE, EDIT_CODE, 1, "수정")
+            val delete = menu?.add(Menu.NONE, DELETE_CODE, 2, "삭제")
+            //            MenuItem showOnNotification = menu.add(Menu.NONE, SHOW_ON_NOTIFICATION_CODE, 3, "알림에 보이기");
             edit?.setOnMenuItemClickListener(onMenuItemClickListener)
             delete?.setOnMenuItemClickListener(onMenuItemClickListener)
             //            showOnNotification.setOnMenuItemClickListener(onMenuItemClickListener);
@@ -225,7 +223,7 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
             vocabulary?.apply {
                 vocaBinding.vocaEng.text = eng
                 vocaBinding.vocaKor.text = kor
-                vocaBinding.lastEditTime.text = AppHelper.getTimeString(lastEditedTime.toLong() * 1000)
+                vocaBinding.lastEditTime.text = AppHelper.getTimeString(lastEditedTime * 1000)
             }
         }
 
@@ -246,7 +244,6 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
                 switchSelectedState(adapterPosition)
             }
             this.onDeleteModeListener = onDeleteModeListener
-            this.onVocabularyUpdateListener = onVocabularyUpdateListener
             vocaBinding.root.setOnCreateContextMenuListener(this)
         }
     }

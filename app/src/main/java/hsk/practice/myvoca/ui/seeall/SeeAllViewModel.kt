@@ -115,4 +115,20 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
         }
     }
 
+    /**
+     * LiveData object for delivering event.
+     * Fired when vocabulary is updated in the RecyclerView.
+     */
+    private val _eventVocabularyUpdated = MutableLiveData<Int?>()
+    val eventVocabularyUpdated: LiveData<Int?>
+        get() = _eventVocabularyUpdated
+
+    fun onVocabularyUpdate(position: Int) {
+        _eventVocabularyUpdated.value = position
+    }
+
+    fun onVocabularyUpdateComplete() {
+        _eventVocabularyUpdated.value = null
+    }
+
 }

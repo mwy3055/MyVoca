@@ -37,7 +37,6 @@ import hsk.practice.myvoca.services.notification.ShowNotificationService
 import hsk.practice.myvoca.ui.VocaViewModelFactory
 import hsk.practice.myvoca.ui.activity.EditVocaActivity
 import hsk.practice.myvoca.ui.seeall.VocabularyTouchHelper.VocabularyTouchHelperListener
-import hsk.practice.myvoca.ui.seeall.listeners.OnVocabularyUpdateListener
 import hsk.practice.myvoca.ui.seeall.listeners.ShowVocaOnNotification
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.*
@@ -78,8 +77,7 @@ import timber.log.Timber
  * 2. Sort vocabularies by latest edited time.
  */
 class SeeAllFragment : Fragment(),
-        OnSelectModeListener, VocabularyTouchHelperListener,
-        OnVocabularyUpdateListener, ShowVocaOnNotification {
+        OnSelectModeListener, VocabularyTouchHelperListener, ShowVocaOnNotification {
 
     private var _binding: FragmentSeeAllBinding? = null
 
@@ -170,6 +168,18 @@ class SeeAllFragment : Fragment(),
 
             val callback = VocabularyTouchHelper(0, ItemTouchHelper.LEFT, this@SeeAllFragment)
             ItemTouchHelper(callback).attachToRecyclerView(this)
+        }
+
+        seeAllViewModel.eventVocabularyUpdated.observe(viewLifecycleOwner) { position ->
+            position?.let {
+                val target = seeAllViewModel.currentVocabulary.value?.get(position)
+                Timber.d("Update: $target")
+                val intent = Intent(parentActivity.applicationContext, EditVocaActivity::class.java)
+                intent.putExtra(Constants.POSITION, position)
+                intent.putExtra(Constants.EDIT_VOCA, target)
+                startActivityForResult(intent, Constants.CALL_EDIT_VOCA_ACTIVITY)
+                seeAllViewModel.onVocabularyUpdateComplete()
+            }
         }
         return binding.root
     }
@@ -376,19 +386,6 @@ class SeeAllFragment : Fragment(),
     }
 
     /**
-     * Call EditVocaActivity to edit the vocabulary.
-     * @param position position of the item in the adapter.
-     */
-    override fun updateVocabulary(position: Int) {
-        val target = seeAllViewModel.currentVocabulary.value?.get(position)
-        Timber.d("Update: $target")
-        val intent = Intent(parentActivity.applicationContext, EditVocaActivity::class.java)
-        intent.putExtra(Constants.POSITION, position)
-        intent.putExtra(Constants.EDIT_VOCA, target)
-        startActivityForResult(intent, Constants.CALL_EDIT_VOCA_ACTIVITY)
-    }
-
-    /**
      * Show a vocabulary at the notification.
      * @param target vocabulary to show at the notification
      */
@@ -416,8 +413,7 @@ class SeeAllFragment : Fragment(),
     private fun setAdapter() {
         vocaRecyclerViewAdapter = VocaRecyclerViewAdapter(seeAllViewModel,
                 showVocaOnNotification = this,
-                onDeleteModeListener = this,
-                onVocabularyUpdateListener = this)
+                onDeleteModeListener = this)
         vocaRecyclerView.adapter = vocaRecyclerViewAdapter
     }
 
