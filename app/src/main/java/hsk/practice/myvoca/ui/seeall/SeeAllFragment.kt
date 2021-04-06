@@ -415,21 +415,9 @@ class SeeAllFragment : Fragment(),
      */
     private fun setAdapter() {
         vocaRecyclerViewAdapter = VocaRecyclerViewAdapter(seeAllViewModel,
-                onVocabularyUpdateListener = this,
-                onDeleteModeListener = this,
                 showVocaOnNotification = this,
-                vocaClickListener = object : OnVocaClickListener {
-                    override fun onVocaClick(holder: VocaViewHolder?, view: View?, position: Int) {
-                        Log.d("HSK APP", "$position clicked.")
-                        if (seeAllViewModel.deleteMode) {
-                            vocaRecyclerViewAdapter!!.switchSelectedState(position)
-                        }
-                    }
-
-                    override fun onVocaLongClick(holder: VocaViewHolder?, view: View?, position: Int): Boolean {
-                        return false
-                    }
-                })
+                onDeleteModeListener = this,
+                onVocabularyUpdateListener = this)
         vocaRecyclerView.adapter = vocaRecyclerViewAdapter
     }
 

@@ -7,7 +7,6 @@ import android.util.SparseBooleanArray
 import android.view.*
 import android.view.ContextMenu.ContextMenuInfo
 import android.view.View.OnCreateContextMenuListener
-import android.view.View.OnLongClickListener
 import androidx.core.util.keyIterator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -31,17 +30,10 @@ import java.util.*
  * For further information, Please refer the comments above some methods.
  */
 class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
-                              val vocaClickListener: OnVocaClickListener? = null,
                               val showVocaOnNotification: ShowVocaOnNotification? = null,
                               val onDeleteModeListener: OnSelectModeListener? = null,
                               val onVocabularyUpdateListener: OnVocabularyUpdateListener? = null)
     : ListAdapter<RoomVocabulary, VocaViewHolder>(RoomVocabularyDiffCallback()), OnDeleteModeListener {
-
-    // Custom listener interfaces. Will be used in the ViewHolder below.
-    interface OnVocaClickListener {
-        fun onVocaClick(holder: VocaViewHolder?, view: View?, position: Int)
-        fun onVocaLongClick(holder: VocaViewHolder?, view: View?, position: Int): Boolean
-    }
 
     interface OnSelectModeListener {
         fun onDeleteModeEnabled()
@@ -59,7 +51,7 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
         val vocaBinding = VocaViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
         // TODO: replace to companion object method VocaViewHolder.from(...)
-        val holder = VocaViewHolder(vocaBinding, this, onVocabularyUpdateListener, vocaClickListener)
+        val holder = VocaViewHolder(vocaBinding, this, onVocabularyUpdateListener)
         return holder
     }
 
@@ -73,6 +65,7 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
     fun isSelected(position: Int) = getSelectedItems().contains(position)
 
     fun switchSelectedState(position: Int) {
+        if (!viewModel.deleteMode) return
         if (selectedItems.get(position)) {
             selectedItems.delete(position)
         } else {
@@ -175,9 +168,8 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
      * TODO: convert to pure class, not a inner class
      */
     inner class VocaViewHolder(private val vocaBinding: VocaViewBinding,
-                                                   onDeleteModeListener: OnDeleteModeListener?,
-                                                   onVocabularyUpdateListener: OnVocabularyUpdateListener?,
-                                                   vocaClickListener: OnVocaClickListener? = null) : RecyclerView.ViewHolder(vocaBinding.root), OnCreateContextMenuListener {
+                               onDeleteModeListener: OnDeleteModeListener?,
+                               onVocabularyUpdateListener: OnVocabularyUpdateListener?) : RecyclerView.ViewHolder(vocaBinding.root), OnCreateContextMenuListener {
 
         private var onDeleteModeListener: OnDeleteModeListener?
         private var onVocabularyUpdateListener: OnVocabularyUpdateListener?
@@ -250,19 +242,9 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
         }
 
         init {
-            vocaBinding.root.setOnClickListener { v ->
-                if (vocaClickListener != null) {
-                    val position = adapterPosition
-                    vocaClickListener.onVocaClick(this@VocaViewHolder, v, position)
-                }
+            vocaBinding.root.setOnClickListener {
+                switchSelectedState(adapterPosition)
             }
-            vocaBinding.root.setOnLongClickListener(OnLongClickListener { v ->
-                if (vocaClickListener != null) {
-                    val position = adapterPosition
-                    return@OnLongClickListener vocaClickListener.onVocaLongClick(this@VocaViewHolder, v, position)
-                }
-                false
-            })
             this.onDeleteModeListener = onDeleteModeListener
             this.onVocabularyUpdateListener = onVocabularyUpdateListener
             vocaBinding.root.setOnCreateContextMenuListener(this)
