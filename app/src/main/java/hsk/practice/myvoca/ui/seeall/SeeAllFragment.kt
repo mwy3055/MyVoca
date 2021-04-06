@@ -425,8 +425,7 @@ class SeeAllFragment : Fragment(),
      */
     private fun setAdapter() {
         vocaRecyclerViewAdapter = VocaRecyclerViewAdapter(seeAllViewModel,
-                showVocaOnNotification = this,
-                onDeleteModeListener = this)
+                showVocaOnNotification = this)
         vocaRecyclerView.adapter = vocaRecyclerViewAdapter
     }
 

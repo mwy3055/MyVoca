@@ -27,8 +27,7 @@ import java.util.*
  * For further information, Please refer the comments above some methods.
  */
 class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
-                              val showVocaOnNotification: ShowVocaOnNotification? = null,
-                              val onDeleteModeListener: OnSelectModeListener? = null,)
+                              val showVocaOnNotification: ShowVocaOnNotification? = null)
     : ListAdapter<RoomVocabulary, VocaViewHolder>(RoomVocabularyDiffCallback()) {
 
     interface OnSelectModeListener {
@@ -61,7 +60,7 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
     fun isSelected(position: Int) = getSelectedItems().contains(position)
 
     fun switchSelectedState(position: Int) {
-        if (!viewModel.deleteMode) return
+        if (!deleteMode) return
         if (selectedItems.get(position)) {
             selectedItems.delete(position)
         } else {
@@ -167,7 +166,6 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
                 }
                 DELETE_CODE -> {
                     val adapter = this@VocaRecyclerViewAdapter
-//                    adapter.enableDeleteMode()
                     viewModel.onDeleteModeChange(true)
                     adapter.switchSelectedState(position)
                 }
