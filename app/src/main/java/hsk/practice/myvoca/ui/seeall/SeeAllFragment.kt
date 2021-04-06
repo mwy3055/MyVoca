@@ -148,12 +148,15 @@ class SeeAllFragment : Fragment(),
                 builder.setMessage("${selectedItems.size}개의 단어를 삭제합니다.")
             }
             builder.setIcon(android.R.drawable.ic_dialog_alert)
-            builder.setPositiveButton("확인") { _, _ -> vocaRecyclerViewAdapter?.deleteVocabularies() }
-            builder.setNegativeButton("취소", DialogInterface.OnClickListener { _, _ -> return@OnClickListener })
+            builder.setPositiveButton("확인") { _, _ ->
+                vocaRecyclerViewAdapter?.deleteVocabularies()
+                seeAllViewModel.onDeleteModeChange(false)
+            }
+            builder.setNegativeButton("취소") { _, _ -> }
             val dialog = builder.create()
             dialog.show()
         }
-        deleteCancelButton.setOnClickListener { vocaRecyclerViewAdapter?.disableDeleteMode() }
+        deleteCancelButton.setOnClickListener { seeAllViewModel.onDeleteModeChange(false) }
 
         showSpinner()
 
@@ -170,6 +173,7 @@ class SeeAllFragment : Fragment(),
             ItemTouchHelper(callback).attachToRecyclerView(this)
         }
 
+        // what to do when update request is given
         seeAllViewModel.eventVocabularyUpdated.observe(viewLifecycleOwner) { position ->
             position?.let {
                 val target = seeAllViewModel.currentVocabulary.value?.get(position)
@@ -179,6 +183,20 @@ class SeeAllFragment : Fragment(),
                 intent.putExtra(Constants.EDIT_VOCA, target)
                 startActivityForResult(intent, Constants.CALL_EDIT_VOCA_ACTIVITY)
                 seeAllViewModel.onVocabularyUpdateComplete()
+            }
+        }
+        // what to do when delete mode is changed at the adapter
+        seeAllViewModel.eventDeleteModeChanged.observe(viewLifecycleOwner) { mode ->
+            Timber.d("Delete mode: $mode")
+            mode?.let {
+                if (mode) {
+                    deleteLayout.visibility = View.VISIBLE
+                    vocaRecyclerViewAdapter?.notifyItemsChanged()
+                } else {
+                    deleteLayout.visibility = View.GONE
+                    vocaRecyclerViewAdapter?.clearSelectedState()
+                }
+                seeAllViewModel.onDeleteModeUpdateComplete()
             }
         }
         return binding.root

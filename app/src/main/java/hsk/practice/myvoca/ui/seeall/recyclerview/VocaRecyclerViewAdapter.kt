@@ -144,18 +144,18 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
 
     // See SeeAllFragment.onDeleteModeEnabled() Method
     override fun enableDeleteMode() {
-        Log.d("HSK APP", "DELETE MODE ENABLED")
-        viewModel.deleteMode = true
-        notifyItemsChanged()
-        onDeleteModeListener?.onDeleteModeEnabled()
+//        Log.d("HSK APP", "DELETE MODE ENABLED")
+//        viewModel.deleteMode = true
+//        notifyItemsChanged()
+//        onDeleteModeListener?.onDeleteModeEnabled()
     }
 
     // See SeeAllFragment.onDeleteModeDisabled() Method
     override fun disableDeleteMode() {
-        Log.d("HSK APP", "DELETE MODE DISABLED")
-        viewModel.deleteMode = false
-        notifyItemsChanged()
-        onDeleteModeListener?.onDeleteModeDisabled()
+//        Log.d("HSK APP", "DELETE MODE DISABLED")
+//        viewModel.deleteMode = false
+//        notifyItemsChanged()
+//        onDeleteModeListener?.onDeleteModeDisabled()
     }
 
     /**
@@ -187,7 +187,8 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
                 }
                 DELETE_CODE -> {
                     val adapter = this@VocaRecyclerViewAdapter
-                    adapter.enableDeleteMode()
+//                    adapter.enableDeleteMode()
+                    viewModel.onDeleteModeChange(true)
                     adapter.switchSelectedState(position)
                 }
                 SHOW_ON_NOTIFICATION_CODE -> {

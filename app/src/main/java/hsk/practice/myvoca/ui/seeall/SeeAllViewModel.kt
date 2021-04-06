@@ -31,6 +31,7 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
     val currentVocabulary: LiveData<MutableList<RoomVocabulary?>?>
         get() = _currentVocabulary
 
+    // TODO: change to LiveData?
     var deleteMode = false
     var searchMode = false
     private var sortState = 0
@@ -129,6 +130,23 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
 
     fun onVocabularyUpdateComplete() {
         _eventVocabularyUpdated.value = null
+    }
+
+    /**
+     * LiveData object for delivering event.
+     * Fired when delete mode is changed at the RecyclerView.
+     */
+    private val _eventDeleteModeChanged = MutableLiveData<Boolean?>()
+    val eventDeleteModeChanged: LiveData<Boolean?>
+        get() = _eventDeleteModeChanged
+
+    fun onDeleteModeChange(mode: Boolean) {
+        _eventDeleteModeChanged.value = mode
+        deleteMode = mode
+    }
+
+    fun onDeleteModeUpdateComplete() {
+        _eventDeleteModeChanged.value = null
     }
 
 }
