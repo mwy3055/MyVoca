@@ -342,14 +342,9 @@ class SeeAllFragment : Fragment(),
         view.isFocusableInTouchMode = true
         view.requestFocus()
         view.setOnKeyListener { _, keyCode, _ ->
-            if (keyCode == KeyEvent.KEYCODE_BACK &&
+            keyCode == KeyEvent.KEYCODE_BACK &&
                     seeAllViewModel.deleteMode &&
-                    !drawer.isDrawerOpen(GravityCompat.START)) {
-                vocaRecyclerViewAdapter?.disableDeleteMode()
-                true
-            } else {
-                false
-            }
+                    !drawer.isDrawerOpen(GravityCompat.START)
         }
     }
 

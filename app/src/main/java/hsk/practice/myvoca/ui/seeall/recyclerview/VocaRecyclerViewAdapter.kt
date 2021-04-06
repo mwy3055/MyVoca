@@ -16,7 +16,6 @@ import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.databinding.VocaViewBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.ui.seeall.SeeAllViewModel
-import hsk.practice.myvoca.ui.seeall.listeners.OnDeleteModeListener
 import hsk.practice.myvoca.ui.seeall.listeners.ShowVocaOnNotification
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.VocaViewHolder
 import java.util.*
@@ -30,7 +29,7 @@ import java.util.*
 class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
                               val showVocaOnNotification: ShowVocaOnNotification? = null,
                               val onDeleteModeListener: OnSelectModeListener? = null,)
-    : ListAdapter<RoomVocabulary, VocaViewHolder>(RoomVocabularyDiffCallback()), OnDeleteModeListener {
+    : ListAdapter<RoomVocabulary, VocaViewHolder>(RoomVocabularyDiffCallback()) {
 
     interface OnSelectModeListener {
         fun onDeleteModeEnabled()
@@ -48,7 +47,7 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
         val vocaBinding = VocaViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
         // TODO: replace to companion object method VocaViewHolder.from(...)
-        val holder = VocaViewHolder(vocaBinding, this)
+        val holder = VocaViewHolder(vocaBinding)
         return holder
     }
 
@@ -118,7 +117,6 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
     fun deleteVocabularies() {
         val selectedItems = getSelectedItems()
         viewModel.deleteItems(selectedItems)
-        disableDeleteMode()
     }
 
     fun restoreItem(vocabulary: RoomVocabulary, position: Int) {
@@ -142,35 +140,17 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
         snackBar.show()
     }
 
-    // See SeeAllFragment.onDeleteModeEnabled() Method
-    override fun enableDeleteMode() {
-//        Log.d("HSK APP", "DELETE MODE ENABLED")
-//        viewModel.deleteMode = true
-//        notifyItemsChanged()
-//        onDeleteModeListener?.onDeleteModeEnabled()
-    }
-
-    // See SeeAllFragment.onDeleteModeDisabled() Method
-    override fun disableDeleteMode() {
-//        Log.d("HSK APP", "DELETE MODE DISABLED")
-//        viewModel.deleteMode = false
-//        notifyItemsChanged()
-//        onDeleteModeListener?.onDeleteModeDisabled()
-    }
-
     /**
      * ViewHolder for vocabulary object.
      * Manages the content of the item and action when the item is clicked or long-clicked.
      */
-    inner class VocaViewHolder(private val vocaBinding: VocaViewBinding,
-                               onDeleteModeListener: OnDeleteModeListener?,)
+    inner class VocaViewHolder(private val vocaBinding: VocaViewBinding)
         : RecyclerView.ViewHolder(vocaBinding.root), OnCreateContextMenuListener {
 
         private val EDIT_CODE = 100
         private val DELETE_CODE = 101
         private val SHOW_ON_NOTIFICATION_CODE = 102
 
-        private var onDeleteModeListener: OnDeleteModeListener?
         var viewForeground = vocaBinding.viewForeground
         var viewBackground = vocaBinding.viewBackground
 
@@ -244,7 +224,6 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
             vocaBinding.root.setOnClickListener {
                 switchSelectedState(adapterPosition)
             }
-            this.onDeleteModeListener = onDeleteModeListener
             vocaBinding.root.setOnCreateContextMenuListener(this)
         }
     }
