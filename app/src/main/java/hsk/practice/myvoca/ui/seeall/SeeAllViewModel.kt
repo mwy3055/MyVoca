@@ -94,10 +94,10 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
     // state 1: sort by latest edited time
     fun sortItems(method: Int) {
         sortState = method
-        _currentVocabulary.value?.let { list ->
+        _currentVocabulary.value = _currentVocabulary.value?.apply {
             when (sortState) {
-                0 -> list.sortBy { it?.eng }
-                1 -> list.sortByDescending { it?.addedTime }
+                0 -> this.sortBy { it?.eng }
+                1 -> this.sortByDescending { it?.addedTime }
                 else -> {
                     Timber.d("정렬할 수 없습니다: method $method")
                 }

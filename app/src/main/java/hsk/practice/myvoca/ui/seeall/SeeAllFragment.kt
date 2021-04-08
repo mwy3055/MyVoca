@@ -74,8 +74,7 @@ import timber.log.Timber
  * 1. Sort vocabularies in an alphabetic order of the field 'eng'. This is the default sorting method.
  * 2. Sort vocabularies by latest edited time.
  */
-class SeeAllFragment : Fragment(),
-        OnSelectModeListener, VocabularyTouchHelperListener {
+class SeeAllFragment : Fragment(),        VocabularyTouchHelperListener {
 
     private var _binding: FragmentSeeAllBinding? = null
 
@@ -123,6 +122,7 @@ class SeeAllFragment : Fragment(),
                               container: ViewGroup?, savedInstanceState: Bundle?): View {
         seeAllViewModel = ViewModelProvider(this, VocaViewModelFactory(VocaPersistenceDatabase.getInstance(requireContext()))).get(SeeAllViewModel::class.java)
         seeAllViewModel.currentVocabulary.observe(viewLifecycleOwner) {
+            Timber.d("Current vocabulary changed!")
             it?.let { vocaRecyclerViewAdapter?.submitList(it) }
             vocaRecyclerViewAdapter?.notifyDataSetChanged()
         }
@@ -395,16 +395,6 @@ class SeeAllFragment : Fragment(),
         sortSpinner.prompt = "정렬 방법"
         sortSpinner.setSelection(sortState)
         sortSpinner.gravity = Gravity.CENTER
-    }
-
-    // Implements interfaces
-    override fun onDeleteModeEnabled() {
-        deleteLayout.visibility = View.VISIBLE
-    }
-
-    override fun onDeleteModeDisabled() {
-        vocaRecyclerViewAdapter?.clearSelectedState()
-        deleteLayout.visibility = View.GONE
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
