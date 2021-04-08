@@ -31,6 +31,7 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
     val currentVocabulary: LiveData<MutableList<RoomVocabulary?>?>
         get() = _currentVocabulary
 
+    // TODO: change to LiveData?
     var deleteMode = false
     var searchMode = false
     private var sortState = 0
@@ -73,7 +74,6 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
 
     fun deleteItem(position: Int) = viewModelScope.launch(Dispatchers.IO) {
         val target = currentVocabulary.value?.get(position) ?: return@launch
-        _currentVocabulary.value?.removeAt(position)
         vocaRepository.deleteVocabulary(target.toVocabulary())
     }
 
@@ -84,7 +84,6 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
     }
 
     fun restoreItem(target: RoomVocabulary, position: Int) = viewModelScope.launch(Dispatchers.IO) {
-        _currentVocabulary.value?.add(position, target) ?: return@launch
         vocaRepository.insertVocabulary(target.toVocabulary())
     }
 
@@ -93,10 +92,10 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
     // state 1: sort by latest edited time
     fun sortItems(method: Int) {
         sortState = method
-        _currentVocabulary.value?.let { list ->
+        _currentVocabulary.value = _currentVocabulary.value?.apply {
             when (sortState) {
-                0 -> list.sortBy { it?.eng }
-                1 -> list.sortByDescending { it?.addedTime }
+                0 -> this.sortBy { it?.eng }
+                1 -> this.sortByDescending { it?.addedTime }
                 else -> {
                     Timber.d("정렬할 수 없습니다: method $method")
                 }
@@ -113,6 +112,55 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
                 items
             }
         }
+    }
+
+    /**
+     * LiveData object for delivering event.
+     * Fired when vocabulary is updated in the RecyclerView.
+     */
+    private val _eventVocabularyUpdated = MutableLiveData<Int?>()
+    val eventVocabularyUpdated: LiveData<Int?>
+        get() = _eventVocabularyUpdated
+
+    fun onVocabularyUpdate(position: Int) {
+        _eventVocabularyUpdated.value = position
+    }
+
+    fun onVocabularyUpdateComplete() {
+        _eventVocabularyUpdated.value = null
+    }
+
+    /**
+     * LiveData object for delivering event.
+     * Fired when delete mode is changed at the RecyclerView.
+     */
+    private val _eventDeleteModeChanged = MutableLiveData<Boolean?>()
+    val eventDeleteModeChanged: LiveData<Boolean?>
+        get() = _eventDeleteModeChanged
+
+    fun onDeleteModeChange(mode: Boolean) {
+        _eventDeleteModeChanged.value = mode
+        deleteMode = mode
+    }
+
+    fun onDeleteModeUpdateComplete() {
+        _eventDeleteModeChanged.value = null
+    }
+
+    /**
+     * LiveData object for delivering event.
+     * Fired when user wants to show a vocabulary in the notification.
+     */
+    private val _eventShowVocabulary = MutableLiveData<RoomVocabulary?>()
+    val eventShowVocabulary: LiveData<RoomVocabulary?>
+        get() = _eventShowVocabulary
+
+    fun onShowVocabulary(vocabulary: RoomVocabulary) {
+        _eventShowVocabulary.value = vocabulary
+    }
+
+    fun onShowVocabularyComplete() {
+        _eventShowVocabulary.value = null
     }
 
 }

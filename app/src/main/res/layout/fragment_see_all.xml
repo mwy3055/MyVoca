@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="hsk.practice.myvoca.ui.seeall.SeeAllViewModel" />
+
+    </data>
 
     <LinearLayout
         android:id="@+id/layout_see_all"
@@ -39,7 +48,8 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/maplestory_light"
                         android:text="@string/see_all_fragment_number_word"
-                        android:textSize="28sp" />
+                        android:textSize="28sp"
+                        app:vocaNumber="@{viewModel.currentVocabulary}" />
 
                     <TextView
                         android:layout_width="wrap_content"
