@@ -1,6 +1,5 @@
 package hsk.practice.myvoca.ui.seeall.recyclerview
 
-import android.graphics.Color
 import android.os.*
 import android.util.Log
 import android.util.SparseBooleanArray
@@ -11,7 +10,6 @@ import androidx.core.util.keyIterator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.databinding.VocaViewBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
@@ -98,38 +96,13 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel)
         viewModel.searchVocabulary("%$query%")
     }
 
-    /**
-     * Swipe to remove one item.
-     * @param position position whose item to remove
-     */
-    fun removeItem(position: Int) {
-        viewModel.deleteItem(position)
-    }
-
     fun deleteVocabularies() {
         val selectedItems = getSelectedItems()
         viewModel.deleteItems(selectedItems)
     }
 
-    fun restoreItem(vocabulary: RoomVocabulary, position: Int) {
-        viewModel.restoreItem(vocabulary, position)
-    }
-
     fun sortItems(method: Int) {
         viewModel.sortItems(method)
-    }
-
-    fun showDeleteSnackbar(view: View, position: Int) {
-        val deletedVocabulary = getItem(position)
-        val eng = deletedVocabulary.eng
-        Log.d("HSK APP", "pos: $position")
-        removeItem(position)
-        val snackBar = Snackbar.make(view, eng + "이(가) 삭제되었습니다.", Snackbar.LENGTH_LONG)
-        snackBar.setAction("실행 취소") {
-            restoreItem(deletedVocabulary, position)
-        }
-        snackBar.setActionTextColor(Color.YELLOW)
-        snackBar.show()
     }
 
     /**

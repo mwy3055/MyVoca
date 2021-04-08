@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.*
 import android.content.res.Resources
+import android.graphics.Color
 import android.os.*
 import android.util.Log
 import android.view.*
@@ -74,7 +75,7 @@ import timber.log.Timber
  * 1. Sort vocabularies in an alphabetic order of the field 'eng'. This is the default sorting method.
  * 2. Sort vocabularies by latest edited time.
  */
-class SeeAllFragment : Fragment(),        VocabularyTouchHelperListener {
+class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
 
     private var _binding: FragmentSeeAllBinding? = null
 
@@ -367,8 +368,30 @@ class SeeAllFragment : Fragment(),        VocabularyTouchHelperListener {
      */
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int, position: Int) {
         if (viewHolder is VocaViewHolder) {
-            vocaRecyclerViewAdapter?.showDeleteSnackbar(requireView(), position)
+            onVocabularySwiped(position)
         }
+    }
+
+    /**
+     * Invoked when vocabulary item is swiped. Delete vocabulary and show snack bar to notify the user.
+     * Executed with coroutine to enhance the UI performance, but seems less effective..
+     *
+     *
+     * TODO: Enhance the UI performance of the RecyclerView
+     * @param position position of the item to remove
+     */
+    private fun onVocabularySwiped(position: Int) = lifecycleScope.launch(Dispatchers.IO) {
+        val deletedVocabulary = seeAllViewModel.currentVocabulary.value?.get(position)
+                ?: return@launch
+        val eng = deletedVocabulary.eng
+        Log.d("HSK APP", "pos: $position")
+        seeAllViewModel.deleteItem(position)
+        val snackBar = Snackbar.make(requireView(), "${eng}이(가) 삭제되었습니다.", Snackbar.LENGTH_LONG)
+        snackBar.setAction("실행 취소") {
+            seeAllViewModel.restoreItem(deletedVocabulary, position)
+        }
+        snackBar.setActionTextColor(Color.YELLOW)
+        snackBar.show()
     }
 
     /**
