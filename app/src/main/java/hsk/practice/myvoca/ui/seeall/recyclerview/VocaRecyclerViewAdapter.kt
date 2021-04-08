@@ -16,7 +16,6 @@ import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.databinding.VocaViewBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.ui.seeall.SeeAllViewModel
-import hsk.practice.myvoca.ui.seeall.listeners.ShowVocaOnNotification
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.VocaViewHolder
 import java.util.*
 
@@ -26,8 +25,7 @@ import java.util.*
  *
  * For further information, Please refer the comments above some methods.
  */
-class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
-                              val showVocaOnNotification: ShowVocaOnNotification? = null)
+class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel)
     : ListAdapter<RoomVocabulary, VocaViewHolder>(RoomVocabularyDiffCallback()) {
 
     interface OnSelectModeListener {
@@ -171,7 +169,7 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel,
                 }
                 SHOW_ON_NOTIFICATION_CODE -> {
                     // TODO: show selected vocabulary on notification
-                    showVocaOnNotification?.showVocabularyOnNotification(vocabulary)
+                    viewModel.onShowVocabulary(vocabulary)
                 }
             }
             true

@@ -31,13 +31,11 @@ import com.google.android.material.snackbar.Snackbar
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentSeeAllBinding
-import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.services.notification.ShowNotificationService
 import hsk.practice.myvoca.ui.VocaViewModelFactory
 import hsk.practice.myvoca.ui.activity.EditVocaActivity
 import hsk.practice.myvoca.ui.seeall.VocabularyTouchHelper.VocabularyTouchHelperListener
-import hsk.practice.myvoca.ui.seeall.listeners.ShowVocaOnNotification
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.*
 import kotlinx.coroutines.Dispatchers
@@ -77,7 +75,7 @@ import timber.log.Timber
  * 2. Sort vocabularies by latest edited time.
  */
 class SeeAllFragment : Fragment(),
-        OnSelectModeListener, VocabularyTouchHelperListener, ShowVocaOnNotification {
+        OnSelectModeListener, VocabularyTouchHelperListener {
 
     private var _binding: FragmentSeeAllBinding? = null
 
@@ -123,8 +121,6 @@ class SeeAllFragment : Fragment(),
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View {
-//        isFragmentShown = true
-
         seeAllViewModel = ViewModelProvider(this, VocaViewModelFactory(VocaPersistenceDatabase.getInstance(requireContext()))).get(SeeAllViewModel::class.java)
         seeAllViewModel.currentVocabulary.observe(viewLifecycleOwner) {
             it?.let { vocaRecyclerViewAdapter?.submitList(it) }
@@ -139,25 +135,7 @@ class SeeAllFragment : Fragment(),
         drawer = parentActivity.findViewById(R.id.drawer_layout)
         setHasOptionsMenu(true)
 
-        // Delete one or many items (with checkbox)
-        deleteVocabularyButton.setOnClickListener {
-            val selectedItems = vocaRecyclerViewAdapter?.getSelectedItems()
-            val builder = AlertDialog.Builder(parentActivity)
-            builder.setTitle("삭제")
-            if (selectedItems != null) {
-                builder.setMessage("${selectedItems.size}개의 단어를 삭제합니다.")
-            }
-            builder.setIcon(android.R.drawable.ic_dialog_alert)
-            builder.setPositiveButton("확인") { _, _ ->
-                vocaRecyclerViewAdapter?.deleteVocabularies()
-                seeAllViewModel.onDeleteModeChange(false)
-            }
-            builder.setNegativeButton("취소") { _, _ -> }
-            val dialog = builder.create()
-            dialog.show()
-        }
-        deleteCancelButton.setOnClickListener { seeAllViewModel.onDeleteModeChange(false) }
-
+        setDeleteButtonListener()
         showSpinner()
 
         // Load adapter asynchronously
@@ -197,6 +175,15 @@ class SeeAllFragment : Fragment(),
                     vocaRecyclerViewAdapter?.clearSelectedState()
                 }
                 seeAllViewModel.onDeleteModeUpdateComplete()
+            }
+        }
+        // what to do when a user wants to show a vocabulary in the notification
+        seeAllViewModel.eventShowVocabulary.observe(viewLifecycleOwner) { vocabulary ->
+            vocabulary?.let {
+                val intent = Intent(context, ShowNotificationService::class.java)
+                intent.putExtra(ShowNotificationService.SHOW_VOCA, it)
+                parentActivity.startService(intent)
+                Snackbar.make(seeAllLayout, "알림에 보임: ${it.eng}", Snackbar.LENGTH_LONG).show()
             }
         }
         return binding.root
@@ -247,6 +234,27 @@ class SeeAllFragment : Fragment(),
                 return false
             }
         })
+    }
+
+    private fun setDeleteButtonListener() {
+        // Delete one or many items (with checkbox)
+        deleteVocabularyButton.setOnClickListener {
+            val selectedItems = vocaRecyclerViewAdapter?.getSelectedItems()
+            val builder = AlertDialog.Builder(parentActivity)
+            builder.setTitle("삭제")
+            if (selectedItems != null) {
+                builder.setMessage("${selectedItems.size}개의 단어를 삭제합니다.")
+            }
+            builder.setIcon(android.R.drawable.ic_dialog_alert)
+            builder.setPositiveButton("확인") { _, _ ->
+                vocaRecyclerViewAdapter?.deleteVocabularies()
+                seeAllViewModel.onDeleteModeChange(false)
+            }
+            builder.setNegativeButton("취소") { _, _ -> }
+            val dialog = builder.create()
+            dialog.show()
+        }
+        deleteCancelButton.setOnClickListener { seeAllViewModel.onDeleteModeChange(false) }
     }
 
     /**
@@ -398,17 +406,6 @@ class SeeAllFragment : Fragment(),
         deleteLayout.visibility = View.GONE
     }
 
-    /**
-     * Show a vocabulary at the notification.
-     * @param target vocabulary to show at the notification
-     */
-    override fun showVocabularyOnNotification(target: RoomVocabulary) {
-        val intent = Intent(context, ShowNotificationService::class.java)
-        intent.putExtra(ShowNotificationService.SHOW_VOCA, target)
-        parentActivity.startService(intent)
-        Snackbar.make(seeAllLayout, "알림에 보임: ${target.eng}", Snackbar.LENGTH_LONG).show()
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Log.d("HSK APP", "requestCode = $requestCode, resultCode = $resultCode")
         if (requestCode == Constants.CALL_EDIT_VOCA_ACTIVITY && resultCode == Constants.EDIT_NEW_VOCA_OK) {
@@ -424,8 +421,7 @@ class SeeAllFragment : Fragment(),
      * Show adapter when loaded
      */
     private fun setAdapter() {
-        vocaRecyclerViewAdapter = VocaRecyclerViewAdapter(seeAllViewModel,
-                showVocaOnNotification = this)
+        vocaRecyclerViewAdapter = VocaRecyclerViewAdapter(seeAllViewModel)
         vocaRecyclerView.adapter = vocaRecyclerViewAdapter
     }
 

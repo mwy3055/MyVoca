@@ -149,4 +149,20 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
         _eventDeleteModeChanged.value = null
     }
 
+    /**
+     * LiveData object for delivering event.
+     * Fired when user wants to show a vocabulary in the notification.
+     */
+    private val _eventShowVocabulary = MutableLiveData<RoomVocabulary?>()
+    val eventShowVocabulary: LiveData<RoomVocabulary?>
+        get() = _eventShowVocabulary
+
+    fun onShowVocabulary(vocabulary: RoomVocabulary) {
+        _eventShowVocabulary.value = vocabulary
+    }
+
+    fun onShowVocabularyComplete() {
+        _eventShowVocabulary.value = null
+    }
+
 }
