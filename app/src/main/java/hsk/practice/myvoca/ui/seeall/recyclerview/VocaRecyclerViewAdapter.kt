@@ -28,11 +28,6 @@ import java.util.*
 class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel)
     : ListAdapter<RoomVocabulary, VocaViewHolder>(RoomVocabularyDiffCallback()) {
 
-    interface OnSelectModeListener {
-        fun onDeleteModeEnabled()
-        fun onDeleteModeDisabled()
-    }
-
     val deleteMode: Boolean
         get() = viewModel.deleteMode
     private val searchMode: Boolean
