@@ -184,6 +184,7 @@ class SeeAllFragment : Fragment(),
                 intent.putExtra(ShowNotificationService.SHOW_VOCA, it)
                 parentActivity.startService(intent)
                 Snackbar.make(seeAllLayout, "알림에 보임: ${it.eng}", Snackbar.LENGTH_LONG).show()
+                seeAllViewModel.onShowVocabularyComplete()
             }
         }
         return binding.root
