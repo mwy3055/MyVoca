@@ -74,7 +74,6 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
 
     fun deleteItem(position: Int) = viewModelScope.launch(Dispatchers.IO) {
         val target = currentVocabulary.value?.get(position) ?: return@launch
-        _currentVocabulary.value?.removeAt(position)
         vocaRepository.deleteVocabulary(target.toVocabulary())
     }
 
@@ -85,7 +84,6 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
     }
 
     fun restoreItem(target: RoomVocabulary, position: Int) = viewModelScope.launch(Dispatchers.IO) {
-        _currentVocabulary.value?.add(position, target) ?: return@launch
         vocaRepository.insertVocabulary(target.toVocabulary())
     }
 

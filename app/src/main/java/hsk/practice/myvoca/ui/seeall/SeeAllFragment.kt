@@ -125,7 +125,6 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         seeAllViewModel.currentVocabulary.observe(viewLifecycleOwner) {
             Timber.d("Current vocabulary changed!")
             it?.let { vocaRecyclerViewAdapter?.submitList(it) }
-            vocaRecyclerViewAdapter?.notifyDataSetChanged()
         }
 
         _binding = FragmentSeeAllBinding.inflate(inflater, container, false)
