@@ -6,7 +6,6 @@ import android.content.*
 import android.content.res.Resources
 import android.graphics.Color
 import android.os.*
-import android.util.Log
 import android.view.*
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
@@ -29,6 +28,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.orhanobut.logger.Logger
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentSeeAllBinding
@@ -41,7 +41,6 @@ import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 /**
  * Most important fragment in this application!
@@ -123,7 +122,6 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
                               container: ViewGroup?, savedInstanceState: Bundle?): View {
         seeAllViewModel = ViewModelProvider(this, VocaViewModelFactory(VocaPersistenceDatabase.getInstance(requireContext()))).get(SeeAllViewModel::class.java)
         seeAllViewModel.currentVocabulary.observe(viewLifecycleOwner) {
-            Timber.d("Current vocabulary changed!")
             it?.let { vocaRecyclerViewAdapter?.submitList(it) }
         }
 
@@ -155,7 +153,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         seeAllViewModel.eventVocabularyUpdated.observe(viewLifecycleOwner) { position ->
             position?.let {
                 val target = seeAllViewModel.currentVocabulary.value?.get(position)
-                Timber.d("Update: $target")
+                Logger.d("Update: $target")
                 val intent = Intent(parentActivity.applicationContext, EditVocaActivity::class.java)
                 intent.putExtra(Constants.POSITION, position)
                 intent.putExtra(Constants.EDIT_VOCA, target)
@@ -165,7 +163,6 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         }
         // what to do when delete mode is changed at the adapter
         seeAllViewModel.eventDeleteModeChanged.observe(viewLifecycleOwner) { mode ->
-            Timber.d("Delete mode: $mode")
             mode?.let {
                 if (mode) {
                     deleteLayout.visibility = View.VISIBLE
@@ -204,7 +201,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
      */
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.main, menu)
-        Log.d("HSK APP", "onCreateOptionsMenu() in SeeAllFragment")
+        Logger.d("onCreateOptionsMenu() in SeeAllFragment")
         searchMenuItem = menu.findItem(R.id.action_search)
         searchMenuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
@@ -383,11 +380,11 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         val deletedVocabulary = seeAllViewModel.currentVocabulary.value?.get(position)
                 ?: return@launch
         val eng = deletedVocabulary.eng
-        Log.d("HSK APP", "pos: $position")
+        Logger.d("pos: $position")
         seeAllViewModel.deleteItem(position)
         val snackBar = Snackbar.make(requireView(), "${eng}이(가) 삭제되었습니다.", Snackbar.LENGTH_LONG)
         snackBar.setAction("실행 취소") {
-            seeAllViewModel.restoreItem(deletedVocabulary, position)
+            seeAllViewModel.restoreItem(deletedVocabulary)
         }
         snackBar.setActionTextColor(Color.YELLOW)
         snackBar.show()
@@ -420,7 +417,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.d("HSK APP", "requestCode = $requestCode, resultCode = $resultCode")
+        Logger.d("requestCode = $requestCode, resultCode = $resultCode")
         if (requestCode == Constants.CALL_EDIT_VOCA_ACTIVITY && resultCode == Constants.EDIT_NEW_VOCA_OK) {
             vocaRecyclerViewAdapter?.notifyItemsChanged()
         } else if (requestCode == Constants.CALL_ADD_VOCA_ACTIVITY && resultCode == Constants.ADD_NEW_VOCA_OK) {

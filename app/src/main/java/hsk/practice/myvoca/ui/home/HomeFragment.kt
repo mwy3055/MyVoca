@@ -9,7 +9,6 @@ import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentHomeBinding
 import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.ui.VocaViewModelFactory
-import timber.log.Timber
 
 /**
  * First-shown fragment
@@ -40,7 +39,6 @@ class HomeFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.vocabularySize.observe(viewLifecycleOwner) { count ->
-            Timber.d("get: $count")
             if (count > 0) {
                 showVocaNumber(count)
                 showVocaButton()

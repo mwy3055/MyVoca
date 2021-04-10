@@ -9,12 +9,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.hsk.data.VocaRepository
+import com.orhanobut.logger.Logger
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.framework.RoomVocabulary
@@ -54,7 +54,7 @@ class ShowNotificationService : LifecycleService() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("HSK APP", "ShowNotificationService onCreate()")
+        Logger.d("ShowNotificationService onCreate()")
         AppHelper.loadInstance(applicationContext)
 
 //        vocaViewModel = VocaViewModel()
@@ -71,7 +71,7 @@ class ShowNotificationService : LifecycleService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("HSK APP", "ShowNotificationService onStartCommand()")
+        Logger.d("ShowNotificationService onStartCommand()")
         AppHelper.loadInstance(applicationContext)
         isRunning = true
 //        val isEmpty = newVocaViewModel?.isEmpty()
@@ -106,7 +106,7 @@ class ShowNotificationService : LifecycleService() {
     override fun onDestroy() {
         super.onDestroy()
         isRunning = false
-        Log.d("HSK APP", "ShowNotificationService onDestroy()")
+        Logger.d("ShowNotificationService onDestroy()")
         lifecycleScope.launch {
 //            if (vocaRepository?.getAllVocabulary()?.receive()?.isEmpty() == false) {
 //                setAlarmTimer()
@@ -169,14 +169,14 @@ class ShowNotificationService : LifecycleService() {
 
     inner class ShowVocaNotificationReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d("HSK APP", "NotificationReceiver onReceive()")
+            Logger.d("NotificationReceiver onReceive()")
             if (intent?.action.equals(SHOW_RANDOM_VOCA_ACTION_NAME, ignoreCase = true)) {
                 // TODO: wait until vocaViewModel is not null
-                Log.d("HSK APP", "Show voca on notification")
+                Logger.d("Show voca on notification")
                 showRandomWordOnNotification()
             } else if (intent?.action.equals(START_APP_ACTION_NAME, ignoreCase = true)
                     && !AppHelper.isForeground()) {
-                Log.d("HSK APP", "Start app")
+                Logger.d("Start app")
                 val startAppIntent = Intent(applicationContext, SplashActivity::class.java)
                 startAppIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 startActivity(startAppIntent)

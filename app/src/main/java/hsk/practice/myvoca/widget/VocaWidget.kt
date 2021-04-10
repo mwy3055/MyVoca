@@ -12,6 +12,7 @@ import android.util.Log
 import android.widget.RemoteViews
 import androidx.lifecycle.LiveData
 import com.hsk.data.VocaRepository
+import com.orhanobut.logger.Logger
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.framework.RoomVocabulary
@@ -43,19 +44,16 @@ class VocaWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent != null) {
-            Log.d("HSK APP", "VocaWidget onReceive(): ${intent.action}")
+            Logger.d("VocaWidget onReceive(): ${intent.action}")
         }
         init(context)
         super.onReceive(context, intent)
 
         if (intent?.action.equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE, ignoreCase = true)) {
             val widgetId = intent?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1) ?: 0
-            val widgetIds: IntArray?
-            widgetIds = if (widgetId != -1) {
-                Log.d("HSK APP", "Widget here")
+            val widgetIds: IntArray? = if (widgetId != -1) {
                 intArrayOf(widgetId)
             } else {
-                Log.d("HSK APP", "Widget here 2")
                 val componentName = ComponentName(context!!, VocaWidget::class.java)
                 manager?.getAppWidgetIds(componentName)
             }
@@ -65,14 +63,14 @@ class VocaWidget : AppWidgetProvider() {
     }
 
     override fun onEnabled(context: Context?) {
-        Log.d("HSK APP", "VocaWidget onEnabled()")
+        Logger.d("VocaWidget onEnabled()")
         super.onEnabled(context)
         init(context)
         AppHelper.loadInstance(context!!)
     }
 
     override fun onUpdate(context: Context?, appWidgetManager: AppWidgetManager?, appWidgetIds: IntArray?) {
-        Log.d("HSK APP", "VocaWidget onUpdate()")
+        Logger.d("VocaWidget onUpdate()")
         AppHelper.loadInstance(context!!.applicationContext)
         var temp = ""
         if (appWidgetIds != null) {
@@ -80,7 +78,7 @@ class VocaWidget : AppWidgetProvider() {
                 temp += "$id "
             }
         }
-        Log.d("HSK APP", "Widget ids in onUpdate(): $temp")
+        Logger.d("Widget ids in onUpdate(): $temp")
         val componentName = ComponentName(context, VocaWidget::class.java)
         val remoteViews = RemoteViews(context.packageName, R.layout.widget_layout)
         setPendingIntent(context, remoteViews, appWidgetIds, componentName)
@@ -117,7 +115,7 @@ class VocaWidget : AppWidgetProvider() {
     }
 
     override fun onDeleted(context: Context?, appWidgetIds: IntArray?) {
-        Log.d("HSK APP", "Widget onDeleted()")
+        Logger.d("Widget onDeleted()")
         super.onDeleted(context, appWidgetIds)
     }
 
@@ -132,13 +130,13 @@ class VocaWidget : AppWidgetProvider() {
             setPendingIntent(context, remoteView, widgetIds, componentName)
 
             val temp = widgetIds?.joinToString() ?: ""
-            Log.d("HSK APP", "Widget ids in showRandomVoca(): $temp")
+            Logger.d("Widget ids in showRandomVoca(): $temp")
         }
     }
 
     inner class UpdateWidgetReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Log.d("HSK APP", "WidgetReceiver onReceive()")
+            Logger.d("WidgetReceiver onReceive()")
             if (intent?.action.equals(UPDATE_WIDGET, ignoreCase = true)) {
                 val widgetName = ComponentName(context!!.packageName, VocaWidget::class.java.name)
                 val widgetId = manager?.getAppWidgetIds(widgetName)

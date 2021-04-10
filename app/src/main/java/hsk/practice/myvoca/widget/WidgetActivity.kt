@@ -3,10 +3,10 @@ package hsk.practice.myvoca.widget
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
+import com.orhanobut.logger.Logger
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.ActivityWidgetSettingBinding
@@ -32,7 +32,7 @@ class WidgetActivity : AppCompatActivity() {
     }
 
     private fun showWidget() {
-        Log.d("HSK APP", "WidgetActivity showWidget()")
+        Logger.d("WidgetActivity showWidget()")
         newVocaViewModel.getRandomVocabulary().observeForever {
             val widgetManager = AppWidgetManager.getInstance(this@WidgetActivity)
 

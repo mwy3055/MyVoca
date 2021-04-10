@@ -1,7 +1,6 @@
 package hsk.practice.myvoca.ui.seeall.recyclerview
 
 import android.os.*
-import android.util.Log
 import android.util.SparseBooleanArray
 import android.view.*
 import android.view.ContextMenu.ContextMenuInfo
@@ -124,7 +123,6 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel)
             val position = adapterPosition
             val vocabulary = viewModel.currentVocabulary.value?.get(position)
                     ?: return@OnMenuItemClickListener true
-            Log.d("HSK APP", position.toString())
             when (item.itemId) {
                 EDIT_CODE -> {
 //                    onVocabularyUpdateListener?.updateVocabulary(position)

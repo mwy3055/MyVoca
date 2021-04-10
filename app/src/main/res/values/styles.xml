@@ -65,7 +65,7 @@
     <style name="QuizOptionStyle">
         <item name="android:textSize">25sp</item>
         <item name="android:gravity">center</item>
-<!--        <item name="android:autoSizeTextType">uniform</item>-->
+        <!--        <item name="android:autoSizeTextType">uniform</item>-->
         <item name="fontFamily">@font/maplestory_light</item>
     </style>
 

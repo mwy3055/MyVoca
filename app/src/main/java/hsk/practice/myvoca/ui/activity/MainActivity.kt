@@ -2,7 +2,6 @@ package hsk.practice.myvoca.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -12,6 +11,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
+import com.orhanobut.logger.Logger
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.ActivityMainBinding
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("HSK APP", "MainActivity onCreate()")
+        Logger.d("MainActivity onCreate()")
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        Log.d("HSK APP", "MainActivity onDestroy()")
+        Logger.d("MainActivity onDestroy()")
         if (ShowNotificationService.isRunning()) {
             stopService(Intent(applicationContext, ShowNotificationService::class.java))
         }
