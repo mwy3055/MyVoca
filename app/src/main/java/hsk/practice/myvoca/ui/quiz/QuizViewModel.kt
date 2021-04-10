@@ -4,13 +4,13 @@ import android.content.Context
 import androidx.lifecycle.*
 import com.hsk.data.VocaPersistence
 import com.hsk.data.VocaRepository
+import com.orhanobut.logger.Logger
 import hsk.practice.myvoca.PreferenceManager
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.toRoomVocabularyList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 /**
  * ViewModel for QuizFragment.
@@ -33,7 +33,6 @@ class QuizViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
     private fun loadAllVocabulary() = viewModelScope.launch {
         val allVocabularyFlow = vocaRepository.getAllVocabulary()
         _allVocabulary.value = allVocabularyFlow.value.toRoomVocabularyList()
-        Timber.d("Value set! ${_allVocabulary.value?.size}")
         allVocabularyFlow.collect {
             _allVocabulary.value = it.toRoomVocabularyList()
         }
@@ -44,14 +43,12 @@ class QuizViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
      * For observe only. Observers should not execute any code.
      */
     val quizAvailable: LiveData<Boolean> = Transformations.map(allVocabulary) {
-        Timber.d("Quiz initialized.. ${it == null}")
+        Logger.d("Quiz initialized.. ${it == null}")
         val result = if (it != null) it.size >= 4 else false
         val loadResult = viewModelScope.async {
             if (result) {
-                Timber.d("Prepare quiz")
                 prepareQuiz(it!!)
             } else {
-                Timber.d("Clear quiz")
                 clearQuiz()
             }
         }

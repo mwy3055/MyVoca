@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.hsk.data.VocaPersistence
 import com.hsk.data.VocaRepository
 import com.hsk.domain.vocabulary.Vocabulary
+import com.orhanobut.logger.Logger
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.toRoomVocabularyList
 import hsk.practice.myvoca.framework.toRoomVocabularyMutableList
@@ -14,11 +15,7 @@ import hsk.practice.myvoca.framework.toVocabulary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
-/**
- * No use
- */
 class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
 
     private val vocaRepository = VocaRepository(vocaPersistence)
@@ -44,10 +41,8 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
         val allVocabularyFlow = vocaRepository.getAllVocabulary()
         allVocabularyFlow.collectLatest {
             _allVocabulary.postValue(it.toRoomVocabularyList())
-            Timber.d("AllVocabulary set: size ${it.size}")
             if (!searchMode) {
                 _currentVocabulary.postValue(it.toRoomVocabularyMutableList())
-                Timber.d("CurrentVocabulary set: size ${it.size}")
             }
         }
     }
@@ -67,7 +62,6 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
     fun searchVocabulary(query: String) = viewModelScope.launch(Dispatchers.IO) {
         val result = vocaRepository.getVocabulary(query) ?: return@launch
         val sortedResult = sortItems(result, sortState)
-        Timber.d("Query $query result: ${sortedResult.size}")
         _currentVocabulary.postValue(sortedResult.toRoomVocabularyMutableList())
         sortItems(sortState)
     }
@@ -83,7 +77,7 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
         }
     }
 
-    fun restoreItem(target: RoomVocabulary, position: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun restoreItem(target: RoomVocabulary) = viewModelScope.launch(Dispatchers.IO) {
         vocaRepository.insertVocabulary(target.toVocabulary())
     }
 
@@ -97,7 +91,7 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
                 0 -> this.sortBy { it?.eng }
                 1 -> this.sortByDescending { it?.addedTime }
                 else -> {
-                    Timber.d("정렬할 수 없습니다: method $method")
+                    Logger.d("정렬할 수 없습니다: method $method")
                 }
             }
         }
@@ -108,7 +102,7 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
             0 -> items.sortedBy { it?.eng }
             1 -> items.sortedByDescending { it?.addedTime }
             else -> {
-                Timber.d("정렬할 수 없습니다: method $method")
+                Logger.d("정렬할 수 없습니다: method $method")
                 items
             }
         }

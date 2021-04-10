@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.orhanobut.logger.Logger
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentQuizBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
@@ -16,7 +17,6 @@ import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.ui.VocaViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 /**
  * Shows word quiz to user.
@@ -55,7 +55,7 @@ class QuizFragment : Fragment() {
         // Do not execute any code while observing quizAvailable
         quizViewModel.quizAvailable.observe(viewLifecycleOwner) { }
         quizViewModel.quizLoadCompleteEvent.observe(viewLifecycleOwner) { loadResult ->
-            Timber.d("Quiz load status: $loadResult")
+            Logger.d("Quiz load status: $loadResult")
             loadResult?.let {
                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
                     if (it) showQuiz(quizViewModel.answerVoca.value!!, quizViewModel.quizVocabulary.value!!) else hideQuiz()
@@ -113,13 +113,13 @@ class QuizFragment : Fragment() {
         hideEmptyVoca()
         showQuizLayout()
         with(binding) {
-            Timber.d("Quiz word: ${answerVoca.eng}")
+            Logger.d("Quiz word: ${answerVoca.eng}")
             quizWord.text = answerVoca.eng
-            Timber.d("Quiz Vocabulary content: $quizVocabulary")
+            Logger.d("Quiz Vocabulary content: $quizVocabulary")
             quizVocabulary.forEachIndexed { index, vocabulary ->
                 quizOptionsList[index].text = getString(R.string.quiz_option_format, index + 1, vocabulary.kor)
             }
-            Timber.d("Quiz layout visibility: ${quizLayout.visibility == View.VISIBLE}")
+            Logger.d("Quiz layout visibility: ${quizLayout.visibility == View.VISIBLE}")
         }
     }
 

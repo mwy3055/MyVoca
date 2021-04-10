@@ -39,6 +39,6 @@
         android:id="@+id/nav_go_blog"
         android:name="hsk.practice.myvoca.ui.goblog.GoBlogFragment"
         android:label="개발자 블로그"
-        tools:layout="@layout/fragment_go_blog"/>
+        tools:layout="@layout/fragment_go_blog" />
 
 </navigation>

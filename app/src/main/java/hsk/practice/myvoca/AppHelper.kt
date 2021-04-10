@@ -2,9 +2,10 @@ package hsk.practice.myvoca
 
 import android.Manifest
 import android.content.Context
+import com.orhanobut.logger.AndroidLogAdapter
+import com.orhanobut.logger.Logger
 import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.ui.activity.MainActivity
-import timber.log.Timber
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
@@ -94,7 +95,11 @@ object AppHelper {
      * @param context context of the application(mainly SplashActivity)
      */
     fun loadInstance(context: Context) {
-        Timber.plant(Timber.DebugTree())
+        loadLogger()
         VocaPersistenceDatabase.getInstance(context)
+    }
+
+    private fun loadLogger() {
+        Logger.addLogAdapter(AndroidLogAdapter())
     }
 }
