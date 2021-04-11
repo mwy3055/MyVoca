@@ -3,6 +3,7 @@ package hsk.practice.myvoca.framework
 import android.content.Context
 import com.hsk.data.VocaPersistence
 import com.hsk.domain.vocabulary.Vocabulary
+import com.orhanobut.logger.Logger
 import hsk.practice.myvoca.SingletonHolder
 import hsk.practice.myvoca.containsOnlyAlphabet
 import kotlinx.coroutines.CoroutineScope
@@ -12,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -38,11 +38,9 @@ class VocaPersistenceDatabase private constructor(context: Context) : VocaPersis
             databaseRoom = RoomVocaDatabase.getInstance(context)
         }
         loadAllVocabulary()
-        Timber.d("Here")
     }
 
     override fun getAllVocabulary(): StateFlow<List<Vocabulary?>> {
-        Timber.d("getAllVocabulary called!")
         return _allVocabulary
     }
 
@@ -52,7 +50,7 @@ class VocaPersistenceDatabase private constructor(context: Context) : VocaPersis
 
     private fun loadAllVocabulary() = launch {
         vocaDao.loadAllVocabulary().collect {
-            Timber.d("AllVocabulary loaded!")
+            Logger.d("AllVocabulary loaded!")
             _allVocabulary.value = it.toVocabularyList()
         }
     }

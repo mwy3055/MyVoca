@@ -4,11 +4,6 @@ package hsk.practice.myvoca
  * Constant values which is used at the whole application.
  */
 object Constants {
-    /* Used at VocaRecyclerViewAdapter */
-    const val EDIT_CODE = 100
-    const val DELETE_CODE = 101
-    const val SHOW_ON_NOTIFICATION_CODE = 102
-
     /* Used for SeeAllFragment <-> EditVocaActivity */
     const val CALL_EDIT_VOCA_ACTIVITY = 10
     const val EDIT_VOCA: String = "VOCABULARY"

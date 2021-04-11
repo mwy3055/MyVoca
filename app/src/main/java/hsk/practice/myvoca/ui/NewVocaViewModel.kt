@@ -3,12 +3,12 @@ package hsk.practice.myvoca.ui
 import androidx.lifecycle.*
 import com.hsk.data.VocaPersistence
 import com.hsk.data.VocaRepository
+import com.orhanobut.logger.Logger
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.toRoomVocabularyMutableList
 import hsk.practice.myvoca.framework.toVocabularyArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -38,12 +38,12 @@ class NewVocaViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
 
     @Synchronized
     private fun loadVocabulary() = Transformations.map(vocaRepository.getAllVocabulary().asLiveData(viewModelScope.coroutineContext)) {
-        Timber.d("allVocabulary assigned")
+        Logger.d("allVocabulary assigned")
         it.toRoomVocabularyMutableList()
     }
 
     fun getVocabularyCount(): LiveData<Int> = Transformations.map(allVocabulary) {
-        Timber.d("Size: ${it?.size}")
+        Logger.d("Size: ${it?.size}")
         it?.size ?: 0
     }
 
