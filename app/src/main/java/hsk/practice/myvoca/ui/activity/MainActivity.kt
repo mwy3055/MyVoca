@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         mAppBarConfiguration = AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_see_all, R.id.nav_quiz,
-                R.id.nav_tools, R.id.nav_share, R.id.nav_go_blog)
+                R.id.nav_tools, R.id.nav_share, R.id.nav_go_github)
                 .setDrawerLayout(drawer)
                 .build()
         val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
