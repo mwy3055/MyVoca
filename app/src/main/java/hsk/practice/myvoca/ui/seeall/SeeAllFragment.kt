@@ -138,7 +138,8 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
 
         // Load adapter asynchronously
         lifecycleScope.launch(Dispatchers.IO) {
-            setAdapter()
+            vocaRecyclerViewAdapter = VocaRecyclerViewAdapter(seeAllViewModel)
+            vocaRecyclerView.adapter = vocaRecyclerViewAdapter
         }
 
         vocaRecyclerView.apply {
@@ -149,8 +150,14 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
             ItemTouchHelper(callback).attachToRecyclerView(this)
         }
 
+        // what to do when sort method is changed
+        seeAllViewModel.sortState.observe(viewLifecycleOwner) { method ->
+            method?.let {
+                vocaRecyclerViewAdapter?.notifyDataSetChanged()
+            }
+        }
         // what to do when update request is given
-        seeAllViewModel.eventVocabularyUpdated.observe(viewLifecycleOwner) { position ->
+        seeAllViewModel.eventVocabularyUpdateRequest.observe(viewLifecycleOwner) { position ->
             position?.let {
                 val target = seeAllViewModel.currentVocabulary.value?.get(position)
                 Logger.d("Update: $target")
@@ -399,20 +406,15 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         sortSpinner.adapter = sortAdapter
         sortSpinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (sortState == position) {
-                    return
-                }
-                sortState = position
-                vocaRecyclerViewAdapter?.sortItems(sortState)
+                seeAllViewModel.setSortState(position)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                sortState = 0
-                vocaRecyclerViewAdapter?.sortItems(sortState)
+                seeAllViewModel.setSortState(0)
             }
         }
         sortSpinner.prompt = "정렬 방법"
-        sortSpinner.setSelection(sortState)
+        sortSpinner.setSelection(0)
         sortSpinner.gravity = Gravity.CENTER
     }
 
@@ -427,17 +429,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         }
     }
 
-    /**
-     * Show adapter when loaded
-     */
-    private fun setAdapter() {
-        vocaRecyclerViewAdapter = VocaRecyclerViewAdapter(seeAllViewModel)
-        vocaRecyclerView.adapter = vocaRecyclerViewAdapter
-    }
-
     companion object {
-        private var sortState = 0
-
         /**
          * Finds color of the current theme.
          *
