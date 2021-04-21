@@ -101,7 +101,7 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel)
     }
 
     fun sortItems(method: Int) {
-        viewModel.sortItems(method)
+        viewModel.setSortState(method)
     }
 
     /**
@@ -120,7 +120,8 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel)
 
         // long-click listener
         private val onMenuItemClickListener: MenuItem.OnMenuItemClickListener = MenuItem.OnMenuItemClickListener { item ->
-            val position = adapterPosition
+            val position = layoutPosition
+            // val position = adapterPosition
             val vocabulary = viewModel.currentVocabulary.value?.get(position)
                     ?: return@OnMenuItemClickListener true
             when (item.itemId) {
