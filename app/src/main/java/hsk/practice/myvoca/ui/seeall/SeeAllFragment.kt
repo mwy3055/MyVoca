@@ -36,9 +36,10 @@ import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.services.notification.ShowNotificationService
 import hsk.practice.myvoca.ui.VocaViewModelFactory
 import hsk.practice.myvoca.ui.activity.EditVocaActivity
-import hsk.practice.myvoca.ui.seeall.VocabularyTouchHelper.VocabularyTouchHelperListener
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.*
+import hsk.practice.myvoca.ui.seeall.recyclerview.VocabularyTouchHelper
+import hsk.practice.myvoca.ui.seeall.recyclerview.VocabularyTouchHelper.VocabularyTouchHelperListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -146,7 +147,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             addItemDecoration(DividerItemDecoration(context, LinearLayoutManager(parentActivity).orientation))
 
-            val callback = VocabularyTouchHelper(0, ItemTouchHelper.LEFT, this@SeeAllFragment)
+            val callback = VocabularyTouchHelper(0, ItemTouchHelper.LEFT, seeAllViewModel.deleteMode, this@SeeAllFragment)
             ItemTouchHelper(callback).attachToRecyclerView(this)
         }
 
@@ -356,7 +357,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         view.requestFocus()
         view.setOnKeyListener { _, keyCode, _ ->
             keyCode == KeyEvent.KEYCODE_BACK &&
-                    seeAllViewModel.deleteMode &&
+                    seeAllViewModel.deleteMode.value == true &&
                     !drawer.isDrawerOpen(GravityCompat.START)
         }
     }
@@ -370,7 +371,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
      * @param position position of the item in the RecyclerView
      */
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int, position: Int) {
-        if (viewHolder is VocaViewHolder) {
+        if (viewHolder is VocaViewHolder && seeAllViewModel.deleteMode.value == false) {
             onVocabularySwiped(position)
         }
     }
@@ -379,8 +380,6 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
      * Invoked when vocabulary item is swiped. Delete vocabulary and show snack bar to notify the user.
      * Executed with coroutine to enhance the UI performance, but seems less effective..
      *
-     *
-     * TODO: Enhance the UI performance of the RecyclerView
      * @param position position of the item to remove
      */
     private fun onVocabularySwiped(position: Int) = lifecycleScope.launch(Dispatchers.IO) {

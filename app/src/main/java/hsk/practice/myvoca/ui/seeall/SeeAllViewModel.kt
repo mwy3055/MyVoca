@@ -29,7 +29,10 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
         get() = _currentVocabulary
 
     // TODO: change to LiveData?
-    var deleteMode = false
+    private val _deleteMode = MutableLiveData(false)
+    val deleteMode: LiveData<Boolean>
+        get() = _deleteMode
+
     var searchMode = false
 
 
@@ -149,7 +152,7 @@ class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
 
     fun onDeleteModeChange(mode: Boolean) {
         _eventDeleteModeChanged.value = mode
-        deleteMode = mode
+        _deleteMode.value = mode
     }
 
     fun onDeleteModeUpdateComplete() {
