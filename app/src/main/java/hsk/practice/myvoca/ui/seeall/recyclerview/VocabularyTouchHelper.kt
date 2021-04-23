@@ -23,7 +23,7 @@ class VocabularyTouchHelper(dragDirs: Int, swipeDirs: Int, private val deleteMod
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         if (deleteMode.value == false) {
-            listener?.onSwiped(viewHolder, direction, viewHolder.adapterPosition)
+            listener?.onSwiped(viewHolder, direction, viewHolder.absoluteAdapterPosition)
         }
     }
 
