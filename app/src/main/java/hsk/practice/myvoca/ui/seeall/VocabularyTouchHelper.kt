@@ -31,7 +31,7 @@ class VocabularyTouchHelper(dragDirs: Int, swipeDirs: Int, private val listener:
     }
 
     override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
-        val foregroundView: View? = (viewHolder as VocaViewHolder).viewForeground
+        val foregroundView: View = (viewHolder as VocaViewHolder).viewForeground
         getDefaultUIUtil().onDraw(c, recyclerView, foregroundView, dX, dY, actionState, isCurrentlyActive)
     }
 
@@ -41,7 +41,7 @@ class VocabularyTouchHelper(dragDirs: Int, swipeDirs: Int, private val listener:
     }
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
-        val foregroundView: View? = (viewHolder as VocaViewHolder).viewForeground
+        val foregroundView: View = (viewHolder as VocaViewHolder).viewForeground
         getDefaultUIUtil().clearView(foregroundView)
     }
 
