@@ -14,7 +14,7 @@ import hsk.practice.myvoca.databinding.ActivityAddVocaBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.ui.NewVocaViewModel
-import hsk.practice.myvoca.ui.NewVocaViewModelFactory
+import hsk.practice.myvoca.ui.VocaViewModelFactory
 import java.util.*
 
 /**
@@ -36,7 +36,7 @@ class AddVocaActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_voca)
 
         viewModelProvider = ViewModelProvider(this)
-        newVocaViewModel = ViewModelProvider(this, NewVocaViewModelFactory(VocaPersistenceDatabase.getInstance(this))).get(NewVocaViewModel::class.java)
+        newVocaViewModel = ViewModelProvider(this, VocaViewModelFactory(VocaPersistenceDatabase.getInstance(this))).get(NewVocaViewModel::class.java)
         val toolbar = findViewById<Toolbar?>(R.id.toolbar_activity_new_voca)
         setSupportActionBar(toolbar)
 

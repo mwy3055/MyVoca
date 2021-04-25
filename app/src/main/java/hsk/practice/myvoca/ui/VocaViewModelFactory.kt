@@ -11,7 +11,8 @@ import java.lang.reflect.InvocationTargetException
 class VocaViewModelFactory(private val vocaPersistence: VocaPersistence) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         try {
-            return if (modelClass.isAssignableFrom(HomeViewModel::class.java)
+            return if (modelClass.isAssignableFrom(NewVocaViewModel::class.java)
+                    || modelClass.isAssignableFrom(HomeViewModel::class.java)
                     || modelClass.isAssignableFrom(QuizViewModel::class.java)
                     || modelClass.isAssignableFrom(SeeAllViewModel::class.java)) {
                 modelClass.getConstructor(VocaPersistence::class.java).newInstance(vocaPersistence)

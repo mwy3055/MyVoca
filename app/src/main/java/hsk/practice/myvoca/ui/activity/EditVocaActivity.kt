@@ -14,7 +14,7 @@ import hsk.practice.myvoca.databinding.ActivityEditVocaBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.ui.NewVocaViewModel
-import hsk.practice.myvoca.ui.NewVocaViewModelFactory
+import hsk.practice.myvoca.ui.VocaViewModelFactory
 import java.util.*
 
 /**
@@ -35,7 +35,7 @@ class EditVocaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_voca)
-        newVocaViewModel = ViewModelProvider(this, NewVocaViewModelFactory(VocaPersistenceDatabase.getInstance(this))).get(NewVocaViewModel::class.java)
+        newVocaViewModel = ViewModelProvider(this, VocaViewModelFactory(VocaPersistenceDatabase.getInstance(this))).get(NewVocaViewModel::class.java)
         binding.lifecycleOwner = this
 
         vocabulary = intent.getSerializableExtra(Constants.EDIT_VOCA) as RoomVocabulary
