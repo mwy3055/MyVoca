@@ -12,7 +12,7 @@ android {
         targetSdkVersion 30
         versionCode 4
         versionName '1.12.3'
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        testInstrumentationRunner 'hsk.practice.myvoca.CustomTestRunner'
         signingConfig signingConfigs.debug
         javaCompileOptions {
             annotationProcessorOptions {
@@ -73,8 +73,14 @@ dependencies {
 
     implementation 'com.orhanobut:logger:2.2.0'
 
+    // Hilt dependency
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
+
+    // Hilt testing dependency
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
+    // Make Hilt generate code in the androidTest folder
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"
 
     implementation project(':data')
     implementation project(':domain')
