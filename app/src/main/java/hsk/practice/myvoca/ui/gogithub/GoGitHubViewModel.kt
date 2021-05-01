@@ -3,8 +3,11 @@ package hsk.practice.myvoca.ui.gogithub
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class GoGitHubViewModel : ViewModel() {
+@HiltViewModel
+class GoGitHubViewModel @Inject constructor() : ViewModel() {
     private val _goBlogText: MutableLiveData<String> = MutableLiveData()
     val goBlogText: LiveData<String>
         get() = _goBlogText

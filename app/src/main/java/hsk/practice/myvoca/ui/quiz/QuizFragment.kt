@@ -7,14 +7,13 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.orhanobut.logger.Logger
+import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentQuizBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
-import hsk.practice.myvoca.framework.VocaPersistenceDatabase
-import hsk.practice.myvoca.ui.VocaViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -28,13 +27,14 @@ import kotlinx.coroutines.launch
  *
  * Numbers of correct and wrong answers are stored in the SharedPreferences and updated in real time.
  */
+@AndroidEntryPoint
 class QuizFragment : Fragment() {
 
     private var _binding: FragmentQuizBinding? = null
     private val binding
         get() = _binding!!
 
-    private lateinit var quizViewModel: QuizViewModel
+    private val quizViewModel: QuizViewModel by viewModels()
 
     private lateinit var quizOptionsList: MutableList<TextView>
 
@@ -42,7 +42,6 @@ class QuizFragment : Fragment() {
                               container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentQuizBinding.inflate(inflater, container, false)
 
-        quizViewModel = ViewModelProvider(this, VocaViewModelFactory(VocaPersistenceDatabase.getInstance(requireContext()))).get(QuizViewModel::class.java)
         binding.lifecycleOwner = viewLifecycleOwner
 
         quizOptionsList = mutableListOf(binding.quizOption1, binding.quizOption2, binding.quizOption3, binding.quizOption4)

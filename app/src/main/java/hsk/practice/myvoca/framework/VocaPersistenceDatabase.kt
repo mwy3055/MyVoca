@@ -4,7 +4,11 @@ import android.content.Context
 import com.hsk.data.VocaPersistence
 import com.hsk.domain.vocabulary.Vocabulary
 import com.orhanobut.logger.Logger
-import hsk.practice.myvoca.SingletonHolder
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import hsk.practice.myvoca.containsOnlyAlphabet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,29 +17,41 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
 /**
  * Vocabulary Persistence Room Database.
  * Implemented as singleton to keep the data persistence across the whole app.
  */
-class VocaPersistenceDatabase private constructor(context: Context) : VocaPersistence, CoroutineScope {
+@Singleton
+class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: Context) : VocaPersistence, CoroutineScope {
 
-    companion object : SingletonHolder<VocaPersistenceDatabase, Context>(::VocaPersistenceDatabase)
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface VocaPersistenceDatabaseEntryPoint {
+        fun vocaDao(): VocaDao
+    }
 
     private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.IO
 
-    private var databaseRoom: RoomVocaDatabase
-    private val vocaDao: VocaDao
-        get() = databaseRoom.vocaDao()!!
+//    @Inject
+//    lateinit var databaseRoom: RoomVocaDatabase
+
+    private var vocaDao: VocaDao
 
     private val _allVocabulary = MutableStateFlow<List<Vocabulary?>>(emptyList())
 
     init {
+//        synchronized(this) {
+//            databaseRoom = RoomVocaDatabase.getInstance(context)
+//        }
         synchronized(this) {
-            databaseRoom = RoomVocaDatabase.getInstance(context)
+           val hiltEntryPoint = EntryPointAccessors.fromApplication(context, VocaPersistenceDatabaseEntryPoint::class.java)
+           vocaDao = hiltEntryPoint.vocaDao()
         }
         loadAllVocabulary()
     }

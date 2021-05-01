@@ -1,10 +1,8 @@
 package hsk.practice.myvoca
 
 import android.Manifest
-import android.content.Context
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
-import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.ui.activity.MainActivity
 import java.io.BufferedWriter
 import java.io.File
@@ -94,9 +92,8 @@ object AppHelper {
      *
      * @param context context of the application(mainly SplashActivity)
      */
-    fun loadInstance(context: Context) {
+    fun loadInstance() {
         loadLogger()
-        VocaPersistenceDatabase.getInstance(context)
     }
 
     private fun loadLogger() {
