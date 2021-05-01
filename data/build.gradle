@@ -5,16 +5,12 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_7
-    targetCompatibility = JavaVersion.VERSION_1_7
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-
-    implementation 'androidx.room:room-runtime:2.2.6'
-    kapt 'androidx.room:room-compiler:2.2.6'
-    testImplementation 'androidx.room:room-testing:2.2.6'
 
     def coroutines_version = '1.4.3-native-mt'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
