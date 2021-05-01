@@ -1,14 +1,13 @@
 package hsk.practice.myvoca.ui
 
 import androidx.lifecycle.*
-import com.hsk.data.VocaPersistence
 import com.hsk.data.VocaRepository
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.toRoomVocabularyMutableList
 import hsk.practice.myvoca.framework.toVocabularyArray
-import hsk.practice.myvoca.module.RoomVocaPersistence
+import hsk.practice.myvoca.module.RoomVocaRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,9 +21,7 @@ import javax.inject.Inject
  * UI classes should observe the LiveData and define what to do when the operation is actually finished.
  */
 @HiltViewModel
-class NewVocaViewModel @Inject constructor(@RoomVocaPersistence vocaPersistence: VocaPersistence) : ViewModel() {
-
-    private var vocaRepository: VocaRepository = VocaRepository(vocaPersistence)
+class NewVocaViewModel @Inject constructor(@RoomVocaRepository private val vocaRepository: VocaRepository) : ViewModel() {
 
     val allVocabulary: LiveData<MutableList<RoomVocabulary?>?>
 
