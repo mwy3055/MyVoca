@@ -3,18 +3,17 @@ package hsk.practice.myvoca.ui.activity
 import android.os.Bundle
 import android.view.*
 import android.widget.*
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
+import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.ActivityEditVocaBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
-import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.ui.NewVocaViewModel
-import hsk.practice.myvoca.ui.VocaViewModelFactory
 import java.util.*
 
 /**
@@ -24,18 +23,19 @@ import java.util.*
  * If the field 'eng' is edited, activity erases the previous word and add the new word.
  * Otherwise, activity just edits the database. See editVocabulary().
  */
+@AndroidEntryPoint
 class EditVocaActivity : AppCompatActivity() {
     private lateinit var vocabulary: RoomVocabulary
     private var exitCode = 0
 
     private lateinit var binding: ActivityEditVocaBinding
 
-    lateinit var newVocaViewModel: NewVocaViewModel
+    private val newVocaViewModel: NewVocaViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_voca)
-        newVocaViewModel = ViewModelProvider(this, VocaViewModelFactory(VocaPersistenceDatabase.getInstance(this))).get(NewVocaViewModel::class.java)
         binding.lifecycleOwner = this
 
         vocabulary = intent.getSerializableExtra(Constants.EDIT_VOCA) as RoomVocabulary

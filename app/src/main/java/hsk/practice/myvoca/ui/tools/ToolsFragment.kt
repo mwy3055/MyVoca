@@ -6,11 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.databinding.FragmentToolsBinding
 
 /**
  * Created by Android Studio. Left for further use.
  */
+@AndroidEntryPoint
 class ToolsFragment : Fragment() {
     private var _binding: FragmentToolsBinding? = null
 

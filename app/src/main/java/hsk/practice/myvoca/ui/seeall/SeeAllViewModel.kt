@@ -29,13 +29,11 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
     val currentVocabulary: LiveData<MutableList<RoomVocabulary?>?>
         get() = _currentVocabulary
 
-    // TODO: change to LiveData?
     private val _deleteMode = MutableLiveData(false)
     val deleteMode: LiveData<Boolean>
         get() = _deleteMode
 
     var searchMode = false
-
 
     // state 0: sort alphabetically
     // state 1: sort by latest edited time

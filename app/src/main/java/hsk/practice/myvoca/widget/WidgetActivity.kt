@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
 import android.widget.*
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
 import com.orhanobut.logger.Logger
@@ -15,7 +16,7 @@ import hsk.practice.myvoca.ui.NewVocaViewModel
 class WidgetActivity : AppCompatActivity() {
     private lateinit var binding: ActivityWidgetSettingBinding
 
-    private lateinit var newVocaViewModel: NewVocaViewModel
+    private val newVocaViewModel: NewVocaViewModel by viewModels()
     private var widgetId = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +26,6 @@ class WidgetActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         AppHelper.loadInstance(this)
-        newVocaViewModel = ViewModelProvider(this).get(NewVocaViewModel::class.java)
         widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
 
         showWidget()

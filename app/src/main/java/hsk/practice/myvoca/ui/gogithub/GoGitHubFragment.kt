@@ -8,12 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.databinding.FragmentGoGithubBinding
 
 /**
  * Just for fun.
  * Maybe some features can be added here...
  */
+@AndroidEntryPoint
 class GoGitHubFragment : Fragment() {
 
     private var _binding: FragmentGoGithubBinding? = null

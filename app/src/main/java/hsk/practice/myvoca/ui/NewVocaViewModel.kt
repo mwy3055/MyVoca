@@ -4,12 +4,13 @@ import androidx.lifecycle.*
 import com.hsk.data.VocaPersistence
 import com.hsk.data.VocaRepository
 import com.orhanobut.logger.Logger
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.toRoomVocabularyMutableList
 import hsk.practice.myvoca.framework.toVocabularyArray
-import kotlinx.coroutines.Dispatchers
+import hsk.practice.myvoca.module.RoomVocaPersistence
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
+import javax.inject.Inject
 
 /**
  * VocaViewModel is at the top of the database abstraction.
@@ -20,7 +21,8 @@ import kotlin.coroutines.CoroutineContext
  * Methods return the LiveData immediately when the method is called. Actual result will be filled into LiveData later.
  * UI classes should observe the LiveData and define what to do when the operation is actually finished.
  */
-class NewVocaViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
+@HiltViewModel
+class NewVocaViewModel @Inject constructor(@RoomVocaPersistence vocaPersistence: VocaPersistence) : ViewModel() {
 
     private var vocaRepository: VocaRepository = VocaRepository(vocaPersistence)
 
@@ -29,12 +31,6 @@ class NewVocaViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
     init {
         allVocabulary = loadVocabulary()
     }
-
-    private val defaultContext: CoroutineContext
-        get() = viewModelScope.coroutineContext + Dispatchers.Default
-
-    private val ioContext: CoroutineContext
-        get() = viewModelScope.coroutineContext + Dispatchers.IO
 
     @Synchronized
     private fun loadVocabulary() = Transformations.map(vocaRepository.getAllVocabulary().asLiveData(viewModelScope.coroutineContext)) {
