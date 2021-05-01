@@ -15,20 +15,26 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.hsk.data.VocaRepository
 import com.orhanobut.logger.Logger
+import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.framework.RoomVocabulary
-import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.framework.toRoomVocabulary
+import hsk.practice.myvoca.module.RoomVocaRepository
 import hsk.practice.myvoca.ui.activity.SplashActivity
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ShowNotificationService : LifecycleService() {
     private var receiver: ShowVocaNotificationReceiver? = null
     private var notificationManager: NotificationManager? = null
 
-    private var vocaRepository: VocaRepository? = null
+    //    private var vocaRepository: VocaRepository? = null
+    @RoomVocaRepository
+    @Inject
+    lateinit var vocaRepository: VocaRepository
 
     private val VOCA_NOTIFICATION_CHANNEL_ID: String = "VOCA_NOTIFICATION"
     private val VOCA_NOTIFICATION_CHANNEL_NAME: String = "단어 보이기"
@@ -55,13 +61,13 @@ class ShowNotificationService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         Logger.d("ShowNotificationService onCreate()")
-        AppHelper.loadInstance(applicationContext)
+        AppHelper.loadInstance()
 
 //        vocaViewModel = VocaViewModel()
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         receiver = ShowVocaNotificationReceiver()
 
-        vocaRepository = VocaRepository(VocaPersistenceDatabase.getInstance(applicationContext))
+//        vocaRepository = VocaRepository(VocaPersistenceDatabase.getInstance(applicationContext))
 
         val filter = IntentFilter()
         filter.addAction(SHOW_RANDOM_VOCA_ACTION_NAME)
@@ -72,7 +78,7 @@ class ShowNotificationService : LifecycleService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Logger.d("ShowNotificationService onStartCommand()")
-        AppHelper.loadInstance(applicationContext)
+        AppHelper.loadInstance()
         isRunning = true
 //        val isEmpty = newVocaViewModel?.isEmpty()
 //        isEmpty?.observeForever(object : Observer<Boolean?> {

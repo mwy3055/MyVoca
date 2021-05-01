@@ -8,11 +8,11 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
-import android.util.Log
 import android.widget.RemoteViews
 import androidx.lifecycle.LiveData
 import com.hsk.data.VocaRepository
 import com.orhanobut.logger.Logger
+import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.framework.RoomVocabulary
@@ -24,6 +24,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.util.concurrent.Callable
 
+@AndroidEntryPoint
 class VocaWidget : AppWidgetProvider() {
 
     private var manager: AppWidgetManager? = null
@@ -66,12 +67,12 @@ class VocaWidget : AppWidgetProvider() {
         Logger.d("VocaWidget onEnabled()")
         super.onEnabled(context)
         init(context)
-        AppHelper.loadInstance(context!!)
+        AppHelper.loadInstance()
     }
 
     override fun onUpdate(context: Context?, appWidgetManager: AppWidgetManager?, appWidgetIds: IntArray?) {
         Logger.d("VocaWidget onUpdate()")
-        AppHelper.loadInstance(context!!.applicationContext)
+        AppHelper.loadInstance()
         var temp = ""
         if (appWidgetIds != null) {
             for (id in appWidgetIds) {
@@ -79,16 +80,9 @@ class VocaWidget : AppWidgetProvider() {
             }
         }
         Logger.d("Widget ids in onUpdate(): $temp")
-        val componentName = ComponentName(context, VocaWidget::class.java)
+        val componentName = ComponentName(context!!, VocaWidget::class.java)
         val remoteViews = RemoteViews(context.packageName, R.layout.widget_layout)
         setPendingIntent(context, remoteViews, appWidgetIds, componentName)
-        /*   Intent intent = new Intent(context, VocaWidget.class);
-        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[0]);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context,5, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        remoteViews.setOnClickPendingIntent(R.id.widget_voca_button, pendingIntent);
-
-        appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);*/
     }
 
     private fun init(context: Context?) {
@@ -99,7 +93,7 @@ class VocaWidget : AppWidgetProvider() {
             manager = AppWidgetManager.getInstance(context)
         }
         if (vocaRepository == null) {
-            vocaRepository = VocaRepository(VocaPersistenceDatabase.getInstance(context!!))
+            vocaRepository = VocaRepository(VocaPersistenceDatabase(context?.applicationContext!!))
         }
     }
 
@@ -121,16 +115,13 @@ class VocaWidget : AppWidgetProvider() {
 
     private fun showRandomVocabulary(context: Context?, widgetIds: IntArray?) = coroutineScope.launch {
         vocaRepository?.getRandomVocabulary()?.toRoomVocabulary()?.let {
-            Log.d(AppHelper.LOG_TAG, "show: ${it.eng}")
+            Logger.d("show: $it")
 
             val remoteView = RemoteViews(context?.packageName, R.layout.widget_layout)
             remoteView.setTextViewText(R.id.widget_eng, it.eng)
             remoteView.setTextViewText(R.id.widget_kor, it.kor)
             val componentName = ComponentName(context!!, VocaWidget::class.java)
             setPendingIntent(context, remoteView, widgetIds, componentName)
-
-            val temp = widgetIds?.joinToString() ?: ""
-            Logger.d("Widget ids in showRandomVoca(): $temp")
         }
     }
 
