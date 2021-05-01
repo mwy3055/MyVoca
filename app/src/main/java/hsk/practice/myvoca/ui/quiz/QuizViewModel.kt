@@ -2,15 +2,17 @@ package hsk.practice.myvoca.ui.quiz
 
 import android.content.Context
 import androidx.lifecycle.*
-import com.hsk.data.VocaPersistence
 import com.hsk.data.VocaRepository
 import com.orhanobut.logger.Logger
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hsk.practice.myvoca.PreferenceManager
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.toRoomVocabularyList
+import hsk.practice.myvoca.module.RoomVocaRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * ViewModel for QuizFragment.
@@ -18,9 +20,8 @@ import kotlinx.coroutines.launch
  *
  * Among many LiveData related to quiz, QuizFragment should only observe quizVocabulary.
  */
-class QuizViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
-
-    private val vocaRepository = VocaRepository(vocaPersistence)
+@HiltViewModel
+class QuizViewModel @Inject constructor(@RoomVocaRepository private val vocaRepository: VocaRepository) : ViewModel() {
 
     private val _allVocabulary = MutableLiveData<List<RoomVocabulary?>?>()
     private val allVocabulary: LiveData<List<RoomVocabulary?>?>

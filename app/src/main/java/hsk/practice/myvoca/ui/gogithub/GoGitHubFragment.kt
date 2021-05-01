@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import hsk.practice.myvoca.databinding.FragmentGoGithubBinding
 
 /**
@@ -17,14 +17,12 @@ import hsk.practice.myvoca.databinding.FragmentGoGithubBinding
 class GoGitHubFragment : Fragment() {
 
     private var _binding: FragmentGoGithubBinding? = null
-    private lateinit var goGitHubViewModel: GoGitHubViewModel
+    private val goGitHubViewModel: GoGitHubViewModel by viewModels()
 
     private val binding get() = _binding!!
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View {
-        goGitHubViewModel = ViewModelProvider(this).get(GoGitHubViewModel::class.java)
-
         _binding = FragmentGoGithubBinding.inflate(inflater, container, false)
         binding.goGitHubViewModel = goGitHubViewModel
         binding.lifecycleOwner = viewLifecycleOwner

@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import hsk.practice.myvoca.databinding.FragmentShareBinding
 
 /**
@@ -17,14 +17,11 @@ class ShareFragment : Fragment() {
     private val binding
         get() = _binding!!
 
+    private val shareViewModel: ShareViewModel by viewModels()
 
-    private lateinit var viewModelProvider: ViewModelProvider
-    private lateinit var shareViewModel: ShareViewModel
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentShareBinding.inflate(inflater, container, false)
-        viewModelProvider = ViewModelProvider(this)
-        shareViewModel = viewModelProvider.get(ShareViewModel::class.java)
 
         val textView = binding.textShare
         shareViewModel.getText()?.observe(viewLifecycleOwner, { s -> textView.text = s })

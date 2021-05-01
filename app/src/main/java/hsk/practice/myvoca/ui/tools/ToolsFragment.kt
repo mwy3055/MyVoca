@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import hsk.practice.myvoca.databinding.FragmentToolsBinding
 
 /**
@@ -17,14 +17,11 @@ class ToolsFragment : Fragment() {
     private val binding
         get() = _binding!!
 
-    private lateinit var viewModelProvider: ViewModelProvider
-    private lateinit var toolsViewModel: ToolsViewModel
+    private val toolsViewModel: ToolsViewModel by viewModels()
+
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentToolsBinding.inflate(inflater, container, false)
-
-        viewModelProvider = ViewModelProvider(this)
-        toolsViewModel = viewModelProvider.get(ToolsViewModel::class.java)
 
         val textView = binding.textTools
         toolsViewModel.getText()?.observe(viewLifecycleOwner, { s -> textView.text = s })

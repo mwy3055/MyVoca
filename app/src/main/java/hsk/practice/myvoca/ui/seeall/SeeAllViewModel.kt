@@ -4,21 +4,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hsk.data.VocaPersistence
 import com.hsk.data.VocaRepository
 import com.hsk.domain.vocabulary.Vocabulary
 import com.orhanobut.logger.Logger
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.toRoomVocabularyList
 import hsk.practice.myvoca.framework.toRoomVocabularyMutableList
 import hsk.practice.myvoca.framework.toVocabulary
+import hsk.practice.myvoca.module.RoomVocaRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SeeAllViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
-
-    private val vocaRepository = VocaRepository(vocaPersistence)
+@HiltViewModel
+class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRepository: VocaRepository) : ViewModel() {
 
     private val _allVocabulary = MutableLiveData<List<RoomVocabulary?>?>()
     val allVocabulary: LiveData<List<RoomVocabulary?>?>

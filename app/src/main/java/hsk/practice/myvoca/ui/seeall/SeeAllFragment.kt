@@ -21,7 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -32,9 +32,7 @@ import com.orhanobut.logger.Logger
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentSeeAllBinding
-import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.services.notification.ShowNotificationService
-import hsk.practice.myvoca.ui.VocaViewModelFactory
 import hsk.practice.myvoca.ui.activity.EditVocaActivity
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.*
@@ -83,7 +81,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         get() = _binding!!
 
     private lateinit var parentActivity: AppCompatActivity
-    private lateinit var seeAllViewModel: SeeAllViewModel
+    private val seeAllViewModel: SeeAllViewModel by viewModels()
 
     private lateinit var toolbar: Toolbar
     private lateinit var drawer: DrawerLayout
@@ -121,7 +119,6 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View {
-        seeAllViewModel = ViewModelProvider(this, VocaViewModelFactory(VocaPersistenceDatabase.getInstance(requireContext()))).get(SeeAllViewModel::class.java)
         seeAllViewModel.currentVocabulary.observe(viewLifecycleOwner) {
             it?.let { vocaRecyclerViewAdapter?.submitList(it) }
         }
