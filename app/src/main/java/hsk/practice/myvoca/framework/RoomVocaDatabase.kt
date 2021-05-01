@@ -1,14 +1,9 @@
 package hsk.practice.myvoca.framework
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import hsk.practice.myvoca.SingletonHolder
-import hsk.practice.myvoca.framework.RoomVocaDatabase.Companion.MIGRATION_1_2
-import hsk.practice.myvoca.framework.RoomVocaDatabase.Companion.vocaDatabaseName
 
 /**
  * Room database class. Exists at the bottom of the database abstraction.
@@ -21,12 +16,10 @@ import hsk.practice.myvoca.framework.RoomVocaDatabase.Companion.vocaDatabaseName
 abstract class RoomVocaDatabase : RoomDatabase() {
     abstract fun vocaDao(): VocaDao?
 
-    companion object : SingletonHolder<RoomVocaDatabase, Context>({ context ->
-        Room.databaseBuilder(context, RoomVocaDatabase::class.java, vocaDatabaseName).addMigrations(MIGRATION_1_2).build()
-    }) {
-        private const val vocaDatabaseName = "Vocabulary"
+    companion object {
+        const val vocaDatabaseName = "Vocabulary"
 
-        private val MIGRATION_1_2 = object : Migration(1, 2) {
+        val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE Vocabulary_new " +
                         "(eng TEXT PRIMARY KEY NOT NULL," +
@@ -40,6 +33,8 @@ abstract class RoomVocaDatabase : RoomDatabase() {
                 database.execSQL("ALTER TABLE Vocabulary_new RENAME TO Vocabulary")
             }
         }
+
+        val migrations = arrayOf(MIGRATION_1_2)
 
     }
 }
