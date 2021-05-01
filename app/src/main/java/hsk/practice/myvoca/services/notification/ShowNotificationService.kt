@@ -99,7 +99,7 @@ class ShowNotificationService : LifecycleService() {
 //            }
 //        })
         lifecycleScope.launch {
-            vocaRepository?.getAllVocabulary()?.asLiveData(lifecycleScope.coroutineContext)?.observeForever {
+            vocaRepository.getAllVocabulary().asLiveData(lifecycleScope.coroutineContext).observeForever {
                 if (intent?.getSerializableExtra(SHOW_VOCA) != null) {
                     val vocabulary = intent.getSerializableExtra(SHOW_VOCA) as RoomVocabulary
                     showWordOnNotification(vocabulary)
@@ -163,7 +163,7 @@ class ShowNotificationService : LifecycleService() {
     }
 
     private fun showRandomWordOnNotification() = lifecycleScope.launch {
-        val vocabulary = vocaRepository?.getRandomVocabulary()?.toRoomVocabulary()
+        val vocabulary = vocaRepository.getRandomVocabulary()?.toRoomVocabulary()
         showWordOnNotification(vocabulary)
     }
 
