@@ -4,17 +4,17 @@ import android.os.Bundle
 import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentHomeBinding
-import hsk.practice.myvoca.framework.VocaPersistenceDatabase
-import hsk.practice.myvoca.ui.VocaViewModelFactory
 
 /**
  * First-shown fragment
  * Shows a random word. Press the button to change the word.
  * If there is no word in the database, notification text will be shown instead.
  */
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
@@ -28,11 +28,10 @@ class HomeFragment : Fragment() {
     private val vocaNumber
         get() = binding.homeVocaNumber
 
-    private lateinit var viewModel: HomeViewModel
+    private val viewModel: HomeViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View {
-        viewModel = ViewModelProvider(this, VocaViewModelFactory(VocaPersistenceDatabase.getInstance(requireContext()))).get(HomeViewModel::class.java)
 
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         binding.homeViewModel = viewModel
