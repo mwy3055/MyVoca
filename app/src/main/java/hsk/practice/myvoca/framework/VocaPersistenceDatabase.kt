@@ -14,12 +14,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
 /**
  * Vocabulary Persistence Room Database.
  * Implemented as singleton to keep the data persistence across the whole app.
  */
+@Singleton
 class VocaPersistenceDatabase @Inject constructor(context: Context) : VocaPersistence, CoroutineScope {
 
     companion object : SingletonHolder<VocaPersistenceDatabase, Context>(::VocaPersistenceDatabase)
