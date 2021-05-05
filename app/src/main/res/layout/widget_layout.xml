@@ -1,44 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/view_foreground"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
     <LinearLayout
-        android:id="@+id/view_foreground"
-        android:layout_width="match_parent"
+        android:id="@+id/widget_layout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="10dp">
 
-        <LinearLayout
-            android:id="@+id/widget_layout"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/widget_eng"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:padding="10dp">
+            android:fontFamily="sans-serif"
+            android:text="@string/word_english"
+            android:textColor="?android:attr/textColorPrimaryInverse"
+            android:textSize="15sp" />
 
-            <TextView
-                android:id="@+id/widget_eng"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:text="word"
-                android:textColor="?android:attr/textColorPrimaryInverse"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/widget_kor"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-light"
-                android:text="단어"
-                android:textColor="?android:attr/textColorPrimaryInverse"
-                android:textSize="13sp" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/widget_voca_button"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/widget_kor"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/widget_layout_show_voca" />
+            android:fontFamily="sans-serif-light"
+            android:text="@string/word_korean"
+            android:textColor="?android:attr/textColorPrimaryInverse"
+            android:textSize="13sp" />
     </LinearLayout>
-</layout>
+
+    <Button
+        android:id="@+id/widget_voca_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="@string/widget_layout_show_voca" />
+</LinearLayout>
