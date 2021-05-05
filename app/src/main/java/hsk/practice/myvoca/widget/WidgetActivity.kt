@@ -3,22 +3,24 @@ package hsk.practice.myvoca.widget
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
-import android.widget.RemoteViews
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.hsk.data.VocaRepository
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.AndroidEntryPoint
-import hsk.practice.myvoca.AppHelper
-import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.ActivityWidgetSettingBinding
-import hsk.practice.myvoca.ui.NewVocaViewModel
+import hsk.practice.myvoca.framework.toRoomVocabulary
+import hsk.practice.myvoca.module.RoomVocaRepository
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class WidgetActivity : AppCompatActivity() {
     private lateinit var binding: ActivityWidgetSettingBinding
 
-    private val newVocaViewModel: NewVocaViewModel by viewModels()
-    private var widgetId = 0
+    @RoomVocaRepository
+    @Inject
+    lateinit var vocaRepository: VocaRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,26 +28,32 @@ class WidgetActivity : AppCompatActivity() {
         binding = ActivityWidgetSettingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        AppHelper.loadInstance()
-        widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
-
-        showWidget()
+        val widgetId = intent.getIntExtra(
+            AppWidgetManager.EXTRA_APPWIDGET_ID,
+            AppWidgetManager.INVALID_APPWIDGET_ID
+        )
+        showWidget(widgetId)
     }
 
-    private fun showWidget() {
+    /**
+     * Widget configuration Activity가 정의되었으므로,
+     * 위젯을 생성한 후 최초의 업데이트는 여기에서 수행해야 한다.
+     */
+    private fun showWidget(widgetId: Int) = lifecycleScope.launch {
         Logger.d("WidgetActivity showWidget()")
-        newVocaViewModel.getRandomVocabulary().observeForever {
-            val widgetManager = AppWidgetManager.getInstance(this)
+        val context = this@WidgetActivity
+        val widgetManager = AppWidgetManager.getInstance(context)
 
-            val remoteView = RemoteViews(packageName, R.layout.widget_layout)
-            remoteView.setTextViewText(R.id.widget_eng, it?.eng)
-            remoteView.setTextViewText(R.id.widget_kor, it?.kor)
-            widgetManager.updateAppWidget(widgetId, remoteView)
+        val vocabulary = vocaRepository.getRandomVocabulary()?.toRoomVocabulary() ?: return@launch
+        VocaWidgetProvider.remoteViewWithVocabulary(context, widgetId, vocabulary)
+            .also { remoteViews ->
+                widgetManager.updateAppWidget(widgetId, remoteViews)
+            }
 
-            val intent = Intent()
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-            setResult(RESULT_OK, intent)
-            finish()
+        val result = Intent().apply {
+            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
         }
+        setResult(RESULT_OK, result)
+        finish()
     }
 }
