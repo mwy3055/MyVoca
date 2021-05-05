@@ -69,7 +69,7 @@
             android:resource="@array/preloaded_fonts" />
 
         <receiver
-            android:name=".widget.VocaWidget"
+            android:name=".widget.VocaWidgetProvider"
             android:label="단어 위젯">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
