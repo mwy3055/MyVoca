@@ -79,4 +79,6 @@
     <!-- for layout/widget_layout -->
     <string name="widget_layout_show_voca">다른 단어</string>
     <string name="zero">0</string>
+    <string name="word_english">word</string>
+    <string name="word_korean">단어</string>
 </resources>

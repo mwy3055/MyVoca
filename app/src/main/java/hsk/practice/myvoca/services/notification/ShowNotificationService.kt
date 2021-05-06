@@ -61,7 +61,7 @@ class ShowNotificationService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         Logger.d("ShowNotificationService onCreate()")
-        AppHelper.loadInstance()
+//        AppHelper.loadInstance()
 
 //        vocaViewModel = VocaViewModel()
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -78,7 +78,7 @@ class ShowNotificationService : LifecycleService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Logger.d("ShowNotificationService onStartCommand()")
-        AppHelper.loadInstance()
+//        AppHelper.loadInstance()
         isRunning = true
 //        val isEmpty = newVocaViewModel?.isEmpty()
 //        isEmpty?.observeForever(object : Observer<Boolean?> {

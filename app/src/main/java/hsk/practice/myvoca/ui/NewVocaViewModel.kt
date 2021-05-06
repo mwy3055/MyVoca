@@ -21,16 +21,12 @@ import javax.inject.Inject
  * UI classes should observe the LiveData and define what to do when the operation is actually finished.
  */
 @HiltViewModel
-class NewVocaViewModel @Inject constructor(@RoomVocaRepository private val vocaRepository: VocaRepository) : ViewModel() {
+class NewVocaViewModel @Inject constructor(@RoomVocaRepository private val vocaRepository: VocaRepository) :
+    ViewModel() {
 
-    val allVocabulary: LiveData<MutableList<RoomVocabulary?>?>
-
-    init {
-        allVocabulary = loadVocabulary()
-    }
-
-    @Synchronized
-    private fun loadVocabulary() = Transformations.map(vocaRepository.getAllVocabulary().asLiveData(viewModelScope.coroutineContext)) {
+    val allVocabulary: LiveData<MutableList<RoomVocabulary?>?> = Transformations.map(
+        vocaRepository.getAllVocabulary().asLiveData(viewModelScope.coroutineContext)
+    ) {
         Logger.d("allVocabulary assigned")
         it.toRoomVocabularyMutableList()
     }
@@ -59,6 +55,9 @@ class NewVocaViewModel @Inject constructor(@RoomVocaRepository private val vocaR
     fun getRandomVocabulary(): LiveData<RoomVocabulary> = Transformations.map(allVocabulary) {
         it?.random() ?: RoomVocabulary.nullVocabulary
     }
+
+    fun getRandomVocabularySync(): RoomVocabulary =
+        allVocabulary.value?.random() ?: RoomVocabulary.nullVocabulary
 
     fun isEmpty(): LiveData<Boolean> = Transformations.map(allVocabulary) {
         it.isNullOrEmpty()
