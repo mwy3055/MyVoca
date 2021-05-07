@@ -57,6 +57,10 @@
         <item name="android:textSize">18sp</item>
     </style>
 
+    <style name="LargeTextViewStyle">
+        <item name="android:textSize">22sp</item>
+    </style>
+
     <style name="QuizTextStyle">
         <item name="android:textSize">40sp</item>
         <item name="fontFamily">@font/maplestory_bold</item>

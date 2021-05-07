@@ -77,6 +77,9 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_extension_version"
 
+    implementation "androidx.datastore:datastore-preferences:$datastore_version"
+    implementation "androidx.datastore:datastore:$datastore_version"
+
     implementation 'com.orhanobut:logger:2.2.0'
 
     // Hilt dependency
@@ -88,6 +91,9 @@ dependencies {
     kaptTest "com.google.dagger:hilt-android-compiler:$hilt_version"
     // Make Hilt generate code in the androidTest folder
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"
+
+    // Color picker
+    implementation 'com.github.QuadFlask:colorpicker:0.0.15'
 
     implementation project(':data')
     implementation project(':domain')
