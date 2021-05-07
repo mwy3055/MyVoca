@@ -89,6 +89,9 @@ dependencies {
     // Make Hilt generate code in the androidTest folder
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"
 
+    // Color picker
+    implementation 'com.github.QuadFlask:colorpicker:0.0.15'
+
     implementation project(':data')
     implementation project(':domain')
 }
