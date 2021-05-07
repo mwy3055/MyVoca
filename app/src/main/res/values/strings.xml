@@ -81,4 +81,5 @@
     <string name="zero">0</string>
     <string name="word_english">word</string>
     <string name="word_korean">단어</string>
+    <string name="close">닫기</string>
 </resources>
