@@ -14,8 +14,9 @@ import hsk.practice.myvoca.framework.RoomVocaDatabase
 import hsk.practice.myvoca.framework.RoomVocabulary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,12 +26,15 @@ class VocaWidgetProvider : AppWidgetProvider() {
     @Inject
     lateinit var vocaDatabase: RoomVocaDatabase
 
-    private val job = SupervisorJob()
-    private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
-
     companion object {
+        private val job = Job()
+        private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
+
         private fun getPendingIntent(context: Context, appWidgetId: Int): PendingIntent =
-            Intent(context, VocaWidgetProvider::class.java).let { intent ->
+            Intent(
+                context,
+                VocaWidgetProvider::class.java
+            ).setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE).let { intent ->
                 // context.applicationContext?
                 PendingIntent.getBroadcast(
                     context,
@@ -56,31 +60,25 @@ class VocaWidgetProvider : AppWidgetProvider() {
             setTextViewText(R.id.widget_eng, vocabulary.eng)
             setTextViewText(R.id.widget_kor, vocabulary.kor)
         }
+
+        fun setRemoteViewTextColor(context: Context, remoteViews: RemoteViews) =
+            coroutineScope.launch {
+                getTextColorFlow(context).take(1).collectLatest { color ->
+                    with(remoteViews) {
+                        setTextColor(R.id.widget_eng, color)
+                        setTextColor(R.id.widget_kor, color)
+                    }
+                }
+            }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
         Logger.d("VocaWidget onReceive(): ${intent.action}")
-        coroutineScope.launch {
-            vocaDatabase.vocaDao()?.loadAllVocabulary()?.collectLatest {
-                val appWidgetManager = AppWidgetManager.getInstance(context)
-                val widgetIds = appWidgetManager.getAppWidgetIds(
-                    ComponentName(
-                        context,
-                        VocaWidgetProvider::class.java
-                    )
-                )
-
-                val vocabulary = it.random()
-                widgetIds.forEach { widgetId ->
-                    updateVocaWidget(
-                        context,
-                        appWidgetManager,
-                        widgetId,
-                        vocabulary
-                    )
-                }
+        when (intent.action) {
+            AppWidgetManager.ACTION_APPWIDGET_UPDATE -> {
+                updateWidgets(context)
             }
         }
     }
@@ -90,8 +88,29 @@ class VocaWidgetProvider : AppWidgetProvider() {
         job.cancel()
     }
 
+    private fun updateWidgets(context: Context) = coroutineScope.launch {
+        vocaDatabase.vocaDao()?.loadAllVocabulary()?.collectLatest {
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val widgetIds = appWidgetManager.getAppWidgetIds(
+                ComponentName(
+                    context,
+                    VocaWidgetProvider::class.java
+                )
+            )
 
-    private fun updateVocaWidget(
+            val vocabulary = it.random()
+            widgetIds.forEach { widgetId ->
+                updateVocaWidget(
+                    context,
+                    appWidgetManager,
+                    widgetId,
+                    vocabulary
+                )
+            }
+        }
+    }
+
+    private suspend fun updateVocaWidget(
         context: Context?,
         appWidgetManager: AppWidgetManager,
         widgetId: Int,
@@ -99,6 +118,7 @@ class VocaWidgetProvider : AppWidgetProvider() {
     ) {
         Logger.d("VocaWidgetProvider.updateVocaWidget(): $vocabulary")
         val remoteViews = remoteViewWithVocabulary(context!!, widgetId, vocabulary)
+        setRemoteViewTextColor(context, remoteViews).join()
         appWidgetManager.updateAppWidget(widgetId, remoteViews)
     }
 }

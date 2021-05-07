@@ -1,11 +1,14 @@
 package hsk.practice.myvoca.widget
 
 import android.appwidget.AppWidgetManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.lifecycleScope
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
@@ -13,16 +16,32 @@ import com.hsk.data.VocaRepository
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.R
+import hsk.practice.myvoca.dataStore
 import hsk.practice.myvoca.databinding.ActivityWidgetSettingBinding
 import hsk.practice.myvoca.framework.toRoomVocabulary
 import hsk.practice.myvoca.module.RoomVocaRepository
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.min
 
+private const val widgetTextColorKey = "widget_text_color"
+private val TEXT_COLOR_KEY = intPreferencesKey(widgetTextColorKey)
+
+fun getTextColorFlow(context: Context): Flow<Int> = context.dataStore.data.map { preferences ->
+    preferences[TEXT_COLOR_KEY] ?: ContextCompat.getColor(
+        context,
+        R.color.material_light_primary_text
+    )
+}
+
 @AndroidEntryPoint
 class WidgetActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityWidgetSettingBinding
 
     @RoomVocaRepository
@@ -49,11 +68,21 @@ class WidgetActivity : AppCompatActivity() {
         binding.buttonClose.setOnClickListener { closeActivity() }
         binding.imageColorPreview.setOnClickListener { showColorPicker() }
         binding.buttonColorComplete.setOnClickListener {
+            lifecycleScope.launch {
+                saveTextColor()
+            }
+            setProgressVisibility(View.VISIBLE)
             setColorPickerVisibility(View.GONE)
             showWidget()
         }
 
-        textColor = ContextCompat.getColor(this, R.color.material_light_primary_text)
+        val textColorFlow = getTextColorFlow(this)
+        lifecycleScope.launch {
+            textColorFlow.take(1).collectLatest { color ->
+                binding.imageColorPreview.setBackgroundColor(color)
+                textColor = color
+            }
+        }
 
         widgetId = intent.getIntExtra(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
@@ -77,6 +106,10 @@ class WidgetActivity : AppCompatActivity() {
                     ?: throw IllegalStateException("Vocabulary is null!")
             VocaWidgetProvider.remoteViewWithVocabulary(context, widgetId, vocabulary)
                 .also { remoteViews ->
+                    with(remoteViews) {
+                        setTextColor(R.id.widget_eng, textColor)
+                        setTextColor(R.id.widget_kor, textColor)
+                    }
                     widgetManager.updateAppWidget(widgetId, remoteViews)
                 }
             waitingJob.join()
@@ -105,6 +138,12 @@ class WidgetActivity : AppCompatActivity() {
             .setNegativeButton("취소") { _, _ -> }
             .build()
             .show()
+    }
+
+    suspend fun saveTextColor() {
+        this.dataStore.edit { settings ->
+            settings[TEXT_COLOR_KEY] = textColor
+        }
     }
 
     private fun setColorPickerSize() {
