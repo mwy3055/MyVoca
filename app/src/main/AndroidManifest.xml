@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".app.MyVocaApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_image"
         android:label="@string/app_name"
@@ -16,8 +17,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.activity.SplashActivity"
-            android:theme="@style/SplashTheme"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -67,8 +68,9 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
+        <!-- widgets -->
         <receiver
-            android:name=".widget.VocaWidget"
+            android:name=".widget.VocaWidgetProvider"
             android:label="단어 위젯">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

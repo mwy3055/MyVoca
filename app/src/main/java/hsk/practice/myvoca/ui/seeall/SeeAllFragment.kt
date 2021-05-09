@@ -21,7 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -29,16 +29,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.orhanobut.logger.Logger
+import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentSeeAllBinding
-import hsk.practice.myvoca.framework.VocaPersistenceDatabase
 import hsk.practice.myvoca.services.notification.ShowNotificationService
-import hsk.practice.myvoca.ui.VocaViewModelFactory
 import hsk.practice.myvoca.ui.activity.EditVocaActivity
-import hsk.practice.myvoca.ui.seeall.VocabularyTouchHelper.VocabularyTouchHelperListener
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.*
+import hsk.practice.myvoca.ui.seeall.recyclerview.VocabularyTouchHelper
+import hsk.practice.myvoca.ui.seeall.recyclerview.VocabularyTouchHelper.VocabularyTouchHelperListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -74,6 +74,7 @@ import kotlinx.coroutines.launch
  * 1. Sort vocabularies in an alphabetic order of the field 'eng'. This is the default sorting method.
  * 2. Sort vocabularies by latest edited time.
  */
+@AndroidEntryPoint
 class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
 
     private var _binding: FragmentSeeAllBinding? = null
@@ -82,7 +83,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         get() = _binding!!
 
     private lateinit var parentActivity: AppCompatActivity
-    private lateinit var seeAllViewModel: SeeAllViewModel
+    private val seeAllViewModel: SeeAllViewModel by viewModels()
 
     private lateinit var toolbar: Toolbar
     private lateinit var drawer: DrawerLayout
@@ -120,7 +121,6 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View {
-        seeAllViewModel = ViewModelProvider(this, VocaViewModelFactory(VocaPersistenceDatabase.getInstance(requireContext()))).get(SeeAllViewModel::class.java)
         seeAllViewModel.currentVocabulary.observe(viewLifecycleOwner) {
             it?.let { vocaRecyclerViewAdapter?.submitList(it) }
         }
@@ -138,19 +138,26 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
 
         // Load adapter asynchronously
         lifecycleScope.launch(Dispatchers.IO) {
-            setAdapter()
+            vocaRecyclerViewAdapter = VocaRecyclerViewAdapter(seeAllViewModel)
+            vocaRecyclerView.adapter = vocaRecyclerViewAdapter
         }
 
         vocaRecyclerView.apply {
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             addItemDecoration(DividerItemDecoration(context, LinearLayoutManager(parentActivity).orientation))
 
-            val callback = VocabularyTouchHelper(0, ItemTouchHelper.LEFT, this@SeeAllFragment)
+            val callback = VocabularyTouchHelper(0, ItemTouchHelper.LEFT, seeAllViewModel.deleteMode, this@SeeAllFragment)
             ItemTouchHelper(callback).attachToRecyclerView(this)
         }
 
+        // what to do when sort method is changed
+        seeAllViewModel.sortState.observe(viewLifecycleOwner) { method ->
+            method?.let {
+                vocaRecyclerViewAdapter?.notifyDataSetChanged()
+            }
+        }
         // what to do when update request is given
-        seeAllViewModel.eventVocabularyUpdated.observe(viewLifecycleOwner) { position ->
+        seeAllViewModel.eventVocabularyUpdateRequest.observe(viewLifecycleOwner) { position ->
             position?.let {
                 val target = seeAllViewModel.currentVocabulary.value?.get(position)
                 Logger.d("Update: $target")
@@ -349,7 +356,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         view.requestFocus()
         view.setOnKeyListener { _, keyCode, _ ->
             keyCode == KeyEvent.KEYCODE_BACK &&
-                    seeAllViewModel.deleteMode &&
+                    seeAllViewModel.deleteMode.value == true &&
                     !drawer.isDrawerOpen(GravityCompat.START)
         }
     }
@@ -363,7 +370,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
      * @param position position of the item in the RecyclerView
      */
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int, position: Int) {
-        if (viewHolder is VocaViewHolder) {
+        if (viewHolder is VocaViewHolder && seeAllViewModel.deleteMode.value == false) {
             onVocabularySwiped(position)
         }
     }
@@ -372,8 +379,6 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
      * Invoked when vocabulary item is swiped. Delete vocabulary and show snack bar to notify the user.
      * Executed with coroutine to enhance the UI performance, but seems less effective..
      *
-     *
-     * TODO: Enhance the UI performance of the RecyclerView
      * @param position position of the item to remove
      */
     private fun onVocabularySwiped(position: Int) = lifecycleScope.launch(Dispatchers.IO) {
@@ -399,20 +404,15 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         sortSpinner.adapter = sortAdapter
         sortSpinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (sortState == position) {
-                    return
-                }
-                sortState = position
-                vocaRecyclerViewAdapter?.sortItems(sortState)
+                seeAllViewModel.setSortState(position)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                sortState = 0
-                vocaRecyclerViewAdapter?.sortItems(sortState)
+                seeAllViewModel.setSortState(0)
             }
         }
         sortSpinner.prompt = "정렬 방법"
-        sortSpinner.setSelection(sortState)
+        sortSpinner.setSelection(0)
         sortSpinner.gravity = Gravity.CENTER
     }
 
@@ -427,17 +427,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         }
     }
 
-    /**
-     * Show adapter when loaded
-     */
-    private fun setAdapter() {
-        vocaRecyclerViewAdapter = VocaRecyclerViewAdapter(seeAllViewModel)
-        vocaRecyclerView.adapter = vocaRecyclerViewAdapter
-    }
-
     companion object {
-        private var sortState = 0
-
         /**
          * Finds color of the current theme.
          *

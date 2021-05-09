@@ -1,10 +1,19 @@
 package hsk.practice.myvoca
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
+/**
+ * Preferences DataStore object. Delegated by preferenceDataStore().
+ * Once this property is initialized, it can be accessed through the whole application.
+ */
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 /**
  * Checks if the given string contains only alphabet.

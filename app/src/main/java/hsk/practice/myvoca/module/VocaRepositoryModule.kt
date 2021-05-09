@@ -1,0 +1,29 @@
+package hsk.practice.myvoca.module
+
+import com.hsk.data.VocaPersistence
+import com.hsk.data.VocaRepository
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Qualifier
+
+/**
+ * 다른 VocaPersistence를 사용하는 VocaRepository를 추가하고 싶다면
+ * 여기에 @Qualifier와 @Provides 메소드를 만들어야 한다.
+ */
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class RoomVocaRepository
+
+@Module
+@InstallIn(SingletonComponent::class)
+object VocaRepositoryModule {
+
+    @RoomVocaRepository
+    @Provides
+    fun provideRoomVocaRepository(
+            @RoomVocaPersistence vocaPersistence: VocaPersistence
+    ): VocaRepository = VocaRepository(vocaPersistence)
+}

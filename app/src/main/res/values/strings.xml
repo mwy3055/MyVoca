@@ -79,4 +79,10 @@
     <!-- for layout/widget_layout -->
     <string name="widget_layout_show_voca">다른 단어</string>
     <string name="zero">0</string>
+    <string name="word_english">word</string>
+    <string name="word_korean">단어</string>
+    <string name="close">닫기</string>
+    <string name="choose_text_color">위젯의 텍스트 색깔을 선택해 주세요.</string>
+    <string name="complete">완료</string>
+    <string name="description_choose_text_color">위젯의 텍스트 색깔을 선택한다.</string>
 </resources>

@@ -1,11 +1,13 @@
 package hsk.practice.myvoca.ui.home
 
 import androidx.lifecycle.*
-import com.hsk.data.VocaPersistence
 import com.hsk.data.VocaRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.toRoomVocabulary
+import hsk.practice.myvoca.module.RoomVocaRepository
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * ViewModel provides data used in the fragment.
@@ -13,9 +15,8 @@ import kotlinx.coroutines.launch
  * There is no fragment-dependent data in this application, so each ViewModel has nothing to do.
  * Just left for further use.
  */
-class HomeViewModel(vocaPersistence: VocaPersistence) : ViewModel() {
-
-    private val vocaRepository: VocaRepository = VocaRepository(vocaPersistence)
+@HiltViewModel
+class HomeViewModel @Inject constructor(@RoomVocaRepository val vocaRepository: VocaRepository) : ViewModel() {
 
     private val _randomVocabulary = MutableLiveData<RoomVocabulary>()
     val randomVocabulary: LiveData<RoomVocabulary>

@@ -7,14 +7,13 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.orhanobut.logger.Logger
+import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentQuizBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
-import hsk.practice.myvoca.framework.VocaPersistenceDatabase
-import hsk.practice.myvoca.ui.VocaViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -28,28 +27,36 @@ import kotlinx.coroutines.launch
  *
  * Numbers of correct and wrong answers are stored in the SharedPreferences and updated in real time.
  */
+@AndroidEntryPoint
 class QuizFragment : Fragment() {
 
     private var _binding: FragmentQuizBinding? = null
     private val binding
         get() = _binding!!
 
-    private lateinit var quizViewModel: QuizViewModel
+    private val quizViewModel: QuizViewModel by viewModels()
 
     private lateinit var quizOptionsList: MutableList<TextView>
 
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentQuizBinding.inflate(inflater, container, false)
 
-        quizViewModel = ViewModelProvider(this, VocaViewModelFactory(VocaPersistenceDatabase.getInstance(requireContext()))).get(QuizViewModel::class.java)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        quizOptionsList = mutableListOf(binding.quizOption1, binding.quizOption2, binding.quizOption3, binding.quizOption4)
+        quizOptionsList = mutableListOf(
+            binding.quizOption1,
+            binding.quizOption2,
+            binding.quizOption3,
+            binding.quizOption4
+        )
         quizOptionsList.forEachIndexed { index, option ->
             option.setOnClickListener { quizViewModel.quizItemSelected(requireContext(), index) }
         }
 
+        quizViewModel.loadValues(requireContext())
         setVersusView()
 
         // Do not execute any code while observing quizAvailable
@@ -57,8 +64,15 @@ class QuizFragment : Fragment() {
         quizViewModel.quizLoadCompleteEvent.observe(viewLifecycleOwner) { loadResult ->
             Logger.d("Quiz load status: $loadResult")
             loadResult?.let {
-                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-                    if (it) showQuiz(quizViewModel.answerVoca.value!!, quizViewModel.quizVocabulary.value!!) else hideQuiz()
+                lifecycleScope.launch(Dispatchers.Main) {
+                    if (it) {
+                        showQuiz(
+                            quizViewModel.answerVoca.value!!,
+                            quizViewModel.quizVocabulary.value!!
+                        )
+                    } else {
+                        hideQuiz()
+                    }
                     quizViewModel.clearQuizPreparedEvent()
                 }
             }
@@ -79,8 +93,10 @@ class QuizFragment : Fragment() {
     }
 
     private fun setVersusView() {
-        quizViewModel.loadPreferences(requireContext())
-        binding.versusView.setValues(quizViewModel.answerCount, quizViewModel.wrongCount)
+        binding.versusView.setValues(
+            quizViewModel.answerCountFlow.value,
+            quizViewModel.wrongCountFlow.value
+        )
     }
 
     private fun showEmptyVoca() {
@@ -117,7 +133,8 @@ class QuizFragment : Fragment() {
             quizWord.text = answerVoca.eng
             Logger.d("Quiz Vocabulary content: $quizVocabulary")
             quizVocabulary.forEachIndexed { index, vocabulary ->
-                quizOptionsList[index].text = getString(R.string.quiz_option_format, index + 1, vocabulary.kor)
+                quizOptionsList[index].text =
+                    getString(R.string.quiz_option_format, index + 1, vocabulary.kor)
             }
             Logger.d("Quiz layout visibility: ${quizLayout.visibility == View.VISIBLE}")
         }

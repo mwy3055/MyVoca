@@ -26,7 +26,7 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel)
     : ListAdapter<RoomVocabulary, VocaViewHolder>(RoomVocabularyDiffCallback()) {
 
     val deleteMode: Boolean
-        get() = viewModel.deleteMode
+        get() = viewModel.deleteMode.value!!
     private val searchMode: Boolean
         get() = viewModel.searchMode
 
@@ -101,7 +101,7 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel)
     }
 
     fun sortItems(method: Int) {
-        viewModel.sortItems(method)
+        viewModel.setSortState(method)
     }
 
     /**
@@ -120,7 +120,8 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel)
 
         // long-click listener
         private val onMenuItemClickListener: MenuItem.OnMenuItemClickListener = MenuItem.OnMenuItemClickListener { item ->
-            val position = adapterPosition
+            val position = layoutPosition
+            // val position = adapterPosition
             val vocabulary = viewModel.currentVocabulary.value?.get(position)
                     ?: return@OnMenuItemClickListener true
             when (item.itemId) {
@@ -143,7 +144,7 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel)
 
         // Create drop-down menu when item is long-clicked
         override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenuInfo?) {
-            if (viewModel.deleteMode) {
+            if (viewModel.deleteMode.value == true) {
                 return
             }
             val edit = menu?.add(Menu.NONE, EDIT_CODE, 1, "수정")

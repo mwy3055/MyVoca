@@ -16,4 +16,5 @@
     <dimen name="activity_add_voca_vertical_margin">10dp</dimen>
 
     <dimen name="fragment_home_kor_horizontal_margin">20dp</dimen>
+    <dimen name="widget_margin">10dp</dimen>
 </resources>

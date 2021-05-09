@@ -12,6 +12,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import com.orhanobut.logger.Logger
+import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.ActivityMainBinding
@@ -25,6 +26,7 @@ import hsk.practice.myvoca.services.notification.ShowNotificationService
  * See res/navigation/mobile_navigation.xml for reference.
  * Other fragments were left for future features.
  */
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
