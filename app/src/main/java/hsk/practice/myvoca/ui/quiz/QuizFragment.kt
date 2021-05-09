@@ -38,17 +38,25 @@ class QuizFragment : Fragment() {
 
     private lateinit var quizOptionsList: MutableList<TextView>
 
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentQuizBinding.inflate(inflater, container, false)
 
         binding.lifecycleOwner = viewLifecycleOwner
 
-        quizOptionsList = mutableListOf(binding.quizOption1, binding.quizOption2, binding.quizOption3, binding.quizOption4)
+        quizOptionsList = mutableListOf(
+            binding.quizOption1,
+            binding.quizOption2,
+            binding.quizOption3,
+            binding.quizOption4
+        )
         quizOptionsList.forEachIndexed { index, option ->
             option.setOnClickListener { quizViewModel.quizItemSelected(requireContext(), index) }
         }
 
+        quizViewModel.loadValues(requireContext())
         setVersusView()
 
         // Do not execute any code while observing quizAvailable
@@ -56,8 +64,15 @@ class QuizFragment : Fragment() {
         quizViewModel.quizLoadCompleteEvent.observe(viewLifecycleOwner) { loadResult ->
             Logger.d("Quiz load status: $loadResult")
             loadResult?.let {
-                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-                    if (it) showQuiz(quizViewModel.answerVoca.value!!, quizViewModel.quizVocabulary.value!!) else hideQuiz()
+                lifecycleScope.launch(Dispatchers.Main) {
+                    if (it) {
+                        showQuiz(
+                            quizViewModel.answerVoca.value!!,
+                            quizViewModel.quizVocabulary.value!!
+                        )
+                    } else {
+                        hideQuiz()
+                    }
                     quizViewModel.clearQuizPreparedEvent()
                 }
             }
@@ -78,8 +93,10 @@ class QuizFragment : Fragment() {
     }
 
     private fun setVersusView() {
-        quizViewModel.loadPreferences(requireContext())
-        binding.versusView.setValues(quizViewModel.answerCount, quizViewModel.wrongCount)
+        binding.versusView.setValues(
+            quizViewModel.answerCountFlow.value,
+            quizViewModel.wrongCountFlow.value
+        )
     }
 
     private fun showEmptyVoca() {
@@ -116,7 +133,8 @@ class QuizFragment : Fragment() {
             quizWord.text = answerVoca.eng
             Logger.d("Quiz Vocabulary content: $quizVocabulary")
             quizVocabulary.forEachIndexed { index, vocabulary ->
-                quizOptionsList[index].text = getString(R.string.quiz_option_format, index + 1, vocabulary.kor)
+                quizOptionsList[index].text =
+                    getString(R.string.quiz_option_format, index + 1, vocabulary.kor)
             }
             Logger.d("Quiz layout visibility: ${quizLayout.visibility == View.VISIBLE}")
         }
