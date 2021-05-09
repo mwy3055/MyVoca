@@ -1,7 +1,7 @@
 [![Build Status](https://app.bitrise.io/app/9dfb3c6ede76aa3c/status.svg?token=tfZLY0r58h_J4uT2eI1AlA&branch=master)](https://app.bitrise.io/app/9dfb3c6ede76aa3c)
 
 # MyVoca: ENG to KOR Wordbook for Android
-## Latest version: [`beta 1.12.1`](https://play.google.com/store/apps/details?id=hsk.practice.myvoca)
+## Latest version: [`1.12.3`](https://play.google.com/store/apps/details?id=hsk.practice.myvoca)
 * Language: Kotlin
 * Support Android 4.1+ (Ice Cream Sandwich)
 * Only Supports ENG to KOR. Other Languages are not supported.
