@@ -1,20 +1,19 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: ''
+name: Refactor request
+about: Report files which need refactoring
+title: 'Refactor'
+labels: 'refactor'
 assignees: mwy3055
+
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Report which files need refactoring. Provide the absolute path.**
+Path of the files. Ex. */src/main/AndroidManifest.xml*
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
-
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+**Describe the problem. Summary from Lint Report is welcomed.**
+A clear and concise description of the problem. Code snippets from the Lint Report is the best. *Upload screenshot of the Lint Report if necessary.*
 
 **Additional context**
-Add any other context or screenshots about the feature request here.
+Add any other context or screenshots which will help refactoring.
+
