@@ -16,7 +16,8 @@ import javax.inject.Inject
  * Just left for further use.
  */
 @HiltViewModel
-class HomeViewModel @Inject constructor(@RoomVocaRepository val vocaRepository: VocaRepository) : ViewModel() {
+class HomeViewModel @Inject constructor(@RoomVocaRepository val vocaRepository: VocaRepository) :
+    ViewModel() {
 
     private val _randomVocabulary = MutableLiveData<RoomVocabulary>()
     val randomVocabulary: LiveData<RoomVocabulary>
@@ -30,13 +31,19 @@ class HomeViewModel @Inject constructor(@RoomVocaRepository val vocaRepository: 
         vocabulary.kor
     }
 
-    val vocabularySize: LiveData<Int> = Transformations.map(vocaRepository.getAllVocabulary().asLiveData(viewModelScope.coroutineContext)) {
+    val vocabularySize: LiveData<Int> = Transformations.map(
+        vocaRepository.getAllVocabulary().asLiveData(viewModelScope.coroutineContext)
+    ) {
         it.size
+    }
+
+    val vocabularyNotEmpty: LiveData<Boolean> = Transformations.map(vocabularySize) {
+        it > 0
     }
 
     fun loadRandomVocabulary() = viewModelScope.launch {
         _randomVocabulary.value = vocaRepository.getRandomVocabulary()?.toRoomVocabulary()
-                ?: RoomVocabulary.nullVocabulary
+            ?: RoomVocabulary.nullVocabulary
     }
 
 }

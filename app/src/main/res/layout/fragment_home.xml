@@ -8,6 +8,8 @@
             name="homeViewModel"
             type="hsk.practice.myvoca.ui.home.HomeViewModel" />
 
+        <import type="android.view.View" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,7 +33,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/home_eng"
-            android:layout_centerInParent="false"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="15dp"
             android:fontFamily="@font/maplestory_light"
@@ -48,9 +49,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/home_kor"
             android:layout_centerHorizontal="true"
-            android:text="@string/home_fragment_load_button"
-            android:visibility="gone"
             android:onClick="@{() -> homeViewModel.loadRandomVocabulary()}"
+            android:text="@string/home_fragment_load_button"
+            android:visibility="@{homeViewModel.vocabularyNotEmpty ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -61,13 +62,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/maplestory_light"
-            android:text=""
             android:textSize="28sp"
-            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/home_eng"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:vocabularySize="@{homeViewModel.vocabularySize}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
