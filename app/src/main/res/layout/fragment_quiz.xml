@@ -7,6 +7,12 @@
             name="quizViewModel"
             type="hsk.practice.myvoca.ui.quiz.QuizViewModel" />
 
+        <variable
+            name="versusViewModel"
+            type="hsk.practice.myvoca.ui.customview.VersusViewModel" />
+
+        <import type="android.view.View" />
+
     </data>
 
     <FrameLayout
@@ -121,7 +127,8 @@
             android:layout_width="320dp"
             android:layout_height="17dp"
             android:layout_gravity="center"
-            android:text="@string/quiz_no_vocabulary" />
+            android:text="@string/quiz_no_vocabulary"
+            android:visibility="visible" />
 
     </FrameLayout>
 </layout>
