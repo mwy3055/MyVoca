@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <data>
+
+        <variable
+            name="viewModel"
+            type="hsk.practice.myvoca.ui.customview.VersusViewModel" />
+    </data>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,7 +24,7 @@
                 style="@style/MediumTextViewStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/zero" />
+                android:text="@{viewModel.leftValue.toString()}" />
 
             <View
                 android:layout_width="0dp"
@@ -29,7 +36,7 @@
                 style="@style/MediumTextViewStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/zero" />
+                android:text="@{viewModel.rightValue.toString()}" />
 
         </LinearLayout>
 
@@ -38,19 +45,21 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <View
+            <LinearLayout
                 android:id="@+id/left_bar"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
-                android:layout_weight="1"
-                android:background="@color/colorPrimary" />
+                android:layout_weight="@{viewModel.leftValue}"
+                android:background="@color/colorPrimary"
+                android:orientation="horizontal" />
 
-            <View
+            <LinearLayout
                 android:id="@+id/right_bar"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
-                android:layout_weight="1"
-                android:background="@color/colorAccent" />
+                android:layout_weight="@{viewModel.rightValue}"
+                android:background="@color/colorAccent"
+                android:orientation="horizontal" />
 
 
         </LinearLayout>
