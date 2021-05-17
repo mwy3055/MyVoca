@@ -9,6 +9,6 @@ fun bindVocabularySizeText(textView: TextView, size: Int) {
     textView.text = if (size > 0) {
         textView.context.getString(R.string.home_fragment_word_count, size)
     } else {
-        textView.context.getString(R.string.home_fragment_home_kor)
+        textView.context.getString(R.string.home_fragment_no_voca)
     }
 }

@@ -2,10 +2,11 @@ package hsk.practice.myvoca.ui.home
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentHomeBinding
@@ -33,7 +34,14 @@ class HomeFragment : Fragment() {
         binding.homeViewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        loadFirstVocabulary()
+        viewModel.vocabularyNotEmpty.observe(viewLifecycleOwner) {
+            if (it) {
+                showVocaLayout()
+                viewModel.loadRandomVocabulary()
+            } else {
+                hideVocaLayout()
+            }
+        }
 
         return binding.root
     }
@@ -48,18 +56,17 @@ class HomeFragment : Fragment() {
         menu.clear()
     }
 
-    /**
-     * Observe only once before XML observer is set.
-     * After the vocabulary is loaded first, button click will show the random vocabulary.
-     */
-    private fun loadFirstVocabulary() {
-        viewModel.vocabularyNotEmpty.observe(viewLifecycleOwner, object : Observer<Boolean> {
-            override fun onChanged(value: Boolean?) {
-                if (value == true) {
-                    viewModel.loadRandomVocabulary()
-                }
-                viewModel.vocabularyNotEmpty.removeObserver(this)
-            }
-        })
+    private fun showVocaLayout() {
+        with(binding) {
+            homeLayout.isVisible = true
+            noVocaLayout.isGone = true
+        }
+    }
+
+    private fun hideVocaLayout() {
+        with(binding) {
+            homeLayout.isGone = true
+            noVocaLayout.isVisible = true
+        }
     }
 }
