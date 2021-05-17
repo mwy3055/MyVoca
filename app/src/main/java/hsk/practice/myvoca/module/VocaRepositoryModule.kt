@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import hsk.practice.myvoca.framework.FakeVocaPersistence
 import javax.inject.Qualifier
 
 /**
@@ -17,6 +18,10 @@ import javax.inject.Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class RoomVocaRepository
 
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class FakeVocaRepository
+
 @Module
 @InstallIn(SingletonComponent::class)
 object VocaRepositoryModule {
@@ -24,6 +29,11 @@ object VocaRepositoryModule {
     @RoomVocaRepository
     @Provides
     fun provideRoomVocaRepository(
-            @RoomVocaPersistence vocaPersistence: VocaPersistence
+        @RoomVocaPersistence vocaPersistence: VocaPersistence
     ): VocaRepository = VocaRepository(vocaPersistence)
+
+    @FakeVocaRepository
+    @Provides
+    fun provideFakeVocaRepository(fakeVocaPersistence: FakeVocaPersistence): VocaRepository =
+        VocaRepository(fakeVocaPersistence)
 }
