@@ -80,17 +80,6 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel)
         }
     }
 
-    /* for search mode */
-    fun enableSearchMode() {
-        viewModel.enableSearchMode()
-    }
-
-    fun disableSearchMode() {
-        if (searchMode) {
-            viewModel.disableSearchMode()
-        }
-    }
-
     fun searchVocabulary(query: String) {
         viewModel.searchVocabulary("%$query%")
     }
