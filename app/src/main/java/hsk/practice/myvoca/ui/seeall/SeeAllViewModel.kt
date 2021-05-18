@@ -19,7 +19,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRepository: VocaRepository) : ViewModel() {
+class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRepository: VocaRepository) :
+    ViewModel() {
 
     private val _allVocabulary = MutableLiveData<List<RoomVocabulary?>?>()
     val allVocabulary: LiveData<List<RoomVocabulary?>?>
@@ -50,10 +51,14 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
         allVocabularyFlow.collectLatest {
             _allVocabulary.postValue(it.toRoomVocabularyList())
             if (!searchMode) {
-                _currentVocabulary.postValue(it.toRoomVocabularyMutableList())
+                val sortedList = sortItems(it, sortState.value!!)
+                _currentVocabulary.postValue(sortedList.toRoomVocabularyMutableList())
             }
         }
     }
+
+    fun getCurrentVocabulary(position: Int): RoomVocabulary? =
+        currentVocabulary.value?.get(position)
 
     fun enableSearchMode() {
         searchMode = true

@@ -62,11 +62,13 @@
 
             </LinearLayout>
 
-            <Spinner
+            <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/spinner_sort"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:prompt="@string/see_all_fragment_spinner_prompt"
                 android:layout_gravity="bottom"
+                android:gravity="center"
                 android:background="@drawable/spinner_background"
                 android:spinnerMode="dialog"
                 android:theme="@style/SpinnerTheme" />
