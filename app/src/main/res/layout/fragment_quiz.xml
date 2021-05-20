@@ -57,45 +57,11 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1" />
 
-                <LinearLayout
-                    android:id="@+id/quiz_layout"
-                    android:layout_width="0dp"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/quiz_recycler_view"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="6"
-                    android:divider="@drawable/empty_vertical_divider"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:showDividers="middle">
-
-                    <TextView
-                        android:id="@+id/quiz_option1"
-                        style="@style/QuizOptionStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/quiz_option_example" />
-
-                    <TextView
-                        android:id="@+id/quiz_option2"
-                        style="@style/QuizOptionStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/quiz_option_example" />
-
-                    <TextView
-                        android:id="@+id/quiz_option3"
-                        style="@style/QuizOptionStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/quiz_option_example" />
-
-                    <TextView
-                        android:id="@+id/quiz_option4"
-                        style="@style/QuizOptionStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/quiz_option_example" />
-
-                </LinearLayout>
+                    android:orientation="vertical" />
 
                 <View
                     android:layout_width="0dp"

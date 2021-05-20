@@ -7,8 +7,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentQuizBinding
 
 /**
@@ -30,6 +31,8 @@ class QuizFragment : Fragment() {
 
     private val quizViewModel: QuizViewModel by viewModels()
 
+    private lateinit var quizAdapter: QuizAdapter
+
     private lateinit var quizOptionsList: List<TextView>
 
     override fun onCreateView(
@@ -45,14 +48,10 @@ class QuizFragment : Fragment() {
         quizViewModel.versusViewModel = binding.versusView.viewModel
         quizViewModel.loadValues(requireContext())
 
-        quizOptionsList = mutableListOf(
-            binding.quizOption1,
-            binding.quizOption2,
-            binding.quizOption3,
-            binding.quizOption4
-        )
-        quizOptionsList.forEachIndexed { index, option ->
-            option.setOnClickListener { quizViewModel.quizItemSelected(requireContext(), index) }
+        quizAdapter = QuizAdapter()
+        binding.quizRecyclerView.apply {
+            adapter = quizAdapter
+            layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         }
 
         quizViewModel.quizData.observe(viewLifecycleOwner) {
@@ -72,21 +71,18 @@ class QuizFragment : Fragment() {
 
     private fun showQuiz(quiz: Quiz) {
         with(binding) {
-            quizLayout.visibility = View.VISIBLE
+            quizRecyclerView.visibility = View.VISIBLE
             noVocaText.visibility = View.GONE
 
             val answer = quiz.answer
             quizWord.text = answer.eng
-            quiz.quizList.forEachIndexed { index, vocabulary ->
-                quizOptionsList[index].text =
-                    getString(R.string.quiz_option_format, index + 1, vocabulary.kor)
-            }
+            quizAdapter.submitList(quiz.quizList)
         }
     }
 
     private fun hideQuiz() {
         with(binding) {
-            quizLayout.visibility = View.GONE
+            quizRecyclerView.visibility = View.GONE
             noVocaText.visibility = View.VISIBLE
         }
     }
