@@ -4,11 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentQuizBinding
 
 /**
@@ -30,7 +31,7 @@ class QuizFragment : Fragment() {
 
     private val quizViewModel: QuizViewModel by viewModels()
 
-    private lateinit var quizOptionsList: List<TextView>
+    private lateinit var quizAdapter: QuizAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,17 +43,33 @@ class QuizFragment : Fragment() {
             binding.lifecycleOwner = it
             binding.versusView.binding.lifecycleOwner = it
         }
+        binding.viewModel = quizViewModel
+
         quizViewModel.versusViewModel = binding.versusView.viewModel
         quizViewModel.loadValues(requireContext())
 
-        quizOptionsList = mutableListOf(
-            binding.quizOption1,
-            binding.quizOption2,
-            binding.quizOption3,
-            binding.quizOption4
-        )
-        quizOptionsList.forEachIndexed { index, option ->
-            option.setOnClickListener { quizViewModel.quizItemSelected(requireContext(), index) }
+        quizAdapter = QuizAdapter { position: Int ->
+            quizViewModel.quizItemSelected(requireContext(), position)
+        }
+        binding.quizRecyclerView.apply {
+            adapter = quizAdapter
+            layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        }
+
+        // Set padding between each items
+        binding.root.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            with(binding) {
+                root.post {
+                    val height = quizRecyclerView[0].measuredHeight
+                    val size = quizRecyclerView.measuredHeight
+                    val padding = (size - height * 4) / 3
+                    if (quizRecyclerView.itemDecorationCount > 0) {
+                        (quizRecyclerView.getItemDecorationAt(0) as ItemDecoration).setSize(padding)
+                    } else {
+                        quizRecyclerView.addItemDecoration(ItemDecoration(padding))
+                    }
+                }
+            }
         }
 
         quizViewModel.quizData.observe(viewLifecycleOwner) {
@@ -72,21 +89,15 @@ class QuizFragment : Fragment() {
 
     private fun showQuiz(quiz: Quiz) {
         with(binding) {
-            quizLayout.visibility = View.VISIBLE
+            quizRecyclerView.visibility = View.VISIBLE
             noVocaText.visibility = View.GONE
-
-            val answer = quiz.answer
-            quizWord.text = answer.eng
-            quiz.quizList.forEachIndexed { index, vocabulary ->
-                quizOptionsList[index].text =
-                    getString(R.string.quiz_option_format, index + 1, vocabulary.kor)
-            }
+            quizAdapter.submitList(quiz.quizList)
         }
     }
 
     private fun hideQuiz() {
         with(binding) {
-            quizLayout.visibility = View.GONE
+            quizRecyclerView.visibility = View.GONE
             noVocaText.visibility = View.VISIBLE
         }
     }
