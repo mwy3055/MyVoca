@@ -1,12 +1,13 @@
 package hsk.practice.myvoca.ui.quiz
 
+import android.graphics.Rect
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.orhanobut.logger.Logger
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.QuizItemBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
@@ -18,9 +19,23 @@ class QuizAdapter : ListAdapter<RoomVocabulary, QuizViewHolder>(RoomVocabularyDi
 
     override fun onBindViewHolder(holder: QuizViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(item, position)
+        holder.bind(item)
     }
 
+}
+
+class ItemDecoration(private val size: Int) : RecyclerView.ItemDecoration() {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: RecyclerView,
+        state: RecyclerView.State
+    ) {
+        super.getItemOffsets(outRect, view, parent, state)
+        if (parent.getChildAdapterPosition(view) != 0) {
+            outRect.top += size
+        }
+    }
 }
 
 class QuizViewHolder private constructor(private val binding: QuizItemBinding) :
@@ -34,16 +49,19 @@ class QuizViewHolder private constructor(private val binding: QuizItemBinding) :
         }
     }
 
-    fun bind(quizOption: RoomVocabulary, position: Int) {
-        binding.position = position
+    fun bind(quizOption: RoomVocabulary) {
         binding.quizOption = quizOption
     }
 }
 
-@BindingAdapter(value = ["position", "quizOption"], requireAll = true)
-fun TextView.bindQuiz(position: Int, quizOption: RoomVocabulary) {
-    val quizText = context.getString(R.string.quiz_option_format, position, quizOption.kor)
-    text = quizText
-    Logger.d("Quiz text set to $quizText")
+@BindingAdapter("quizOption")
+fun TextView.bindQuiz(quizOption: RoomVocabulary) {
+    val basicText =
+        (quizOption.kor ?: context.getString(R.string.quiz_option_no_text, quizOption.eng)).replace(
+            '\n',
+            ' '
+        )
+    text = basicText.takeIf { it.length > 15 }?.apply { basicText.substring(0..15).plus("...") }
+        ?: basicText
 }
 

@@ -41,7 +41,7 @@
     <string name="current_voca_count">현재 등록된 단어: %d개</string>
     <string name="quiz_word_example">keyword</string>
     <string name="quiz_option_example">잠을 자다</string>
-    <string name="quiz_option_format">%d. %s</string>
+    <string name="quiz_option_no_text">오류: %s의 뜻이 없습니다.</string>
 
     <!-- for layout/fragment_go_github -->
     <string name="go_github_fragment_button_text">GitHub 이동</string>

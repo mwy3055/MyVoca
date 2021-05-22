@@ -5,10 +5,6 @@
     <data>
 
         <variable
-            name="position"
-            type="Integer" />
-
-        <variable
             name="quizOption"
             type="hsk.practice.myvoca.framework.RoomVocabulary" />
     </data>
@@ -23,7 +19,6 @@
             style="@style/QuizOptionStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:position="@{position}"
             app:quizOption="@{quizOption}" />
 
     </LinearLayout>
