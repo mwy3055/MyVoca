@@ -2,16 +2,9 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
-
         <variable
-            name="quizViewModel"
+            name="viewModel"
             type="hsk.practice.myvoca.ui.quiz.QuizViewModel" />
-
-        <variable
-            name="versusViewModel"
-            type="hsk.practice.myvoca.ui.customview.VersusViewModel" />
-
-        <import type="android.view.View" />
 
     </data>
 
@@ -39,7 +32,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="8"
                 android:gravity="center_vertical"
-                android:text="@string/quiz_word_example" />
+                android:text="@{viewModel.quizData.answer.eng}" />
 
             <View
                 android:layout_width="wrap_content"

@@ -13,18 +13,24 @@ import hsk.practice.myvoca.databinding.QuizItemBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.ui.seeall.recyclerview.RoomVocabularyDiffCallback
 
-class QuizAdapter : ListAdapter<RoomVocabulary, QuizViewHolder>(RoomVocabularyDiffCallback()) {
+class QuizAdapter(private val onClick: (position: Int) -> Unit) :
+    ListAdapter<RoomVocabulary, QuizViewHolder>(RoomVocabularyDiffCallback()) {
+
+    private val onItemClicked = { position: Int ->
+        onClick.invoke(position)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuizViewHolder =
-        QuizViewHolder.from(parent)
+        QuizViewHolder.from(parent, onClick)
 
     override fun onBindViewHolder(holder: QuizViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(item)
+        holder.bind(item, position)
     }
 
 }
 
-class ItemDecoration(private val size: Int) : RecyclerView.ItemDecoration() {
+class ItemDecoration(private var size: Int) : RecyclerView.ItemDecoration() {
     override fun getItemOffsets(
         outRect: Rect,
         view: View,
@@ -36,20 +42,29 @@ class ItemDecoration(private val size: Int) : RecyclerView.ItemDecoration() {
             outRect.top += size
         }
     }
+
+    fun setSize(size: Int) {
+        this.size = size
+    }
 }
 
-class QuizViewHolder private constructor(private val binding: QuizItemBinding) :
-    RecyclerView.ViewHolder(binding.root) {
+class QuizViewHolder private constructor(
+    private val binding: QuizItemBinding,
+    private val onClicked: (position: Int) -> Unit
+) : RecyclerView.ViewHolder(binding.root) {
 
     companion object {
-        fun from(parent: ViewGroup): QuizViewHolder {
+        fun from(parent: ViewGroup, onItemClicked: (position: Int) -> Unit): QuizViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = QuizItemBinding.inflate(layoutInflater, parent, false)
-            return QuizViewHolder(binding)
+            return QuizViewHolder(binding, onItemClicked)
         }
     }
 
-    fun bind(quizOption: RoomVocabulary) {
+    fun bind(quizOption: RoomVocabulary, position: Int) {
+        binding.root.setOnClickListener {
+            onClicked(position)
+        }
         binding.quizOption = quizOption
     }
 }
