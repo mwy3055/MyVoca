@@ -443,11 +443,11 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
                     position: Int,
                     id: Long
                 ) {
-                    seeAllViewModel.setSortState(position)
+                    seeAllViewModel.setSortState(SortMethod.get(position)!!)
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
-                    seeAllViewModel.setSortState(0)
+                    seeAllViewModel.setSortState(SortMethod.ENG)
                 }
             }
             setSelection(0)

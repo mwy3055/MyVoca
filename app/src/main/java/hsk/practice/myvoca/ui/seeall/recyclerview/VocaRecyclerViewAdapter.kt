@@ -13,6 +13,7 @@ import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.databinding.VocaViewBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.ui.seeall.SeeAllViewModel
+import hsk.practice.myvoca.ui.seeall.SortMethod
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.VocaViewHolder
 import java.util.*
 
@@ -90,7 +91,7 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel)
     }
 
     fun sortItems(method: Int) {
-        viewModel.setSortState(method)
+        viewModel.setSortState(SortMethod.get(method)!!)
     }
 
     /**

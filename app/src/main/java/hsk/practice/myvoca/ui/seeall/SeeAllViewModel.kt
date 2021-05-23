@@ -18,6 +18,16 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+enum class SortMethod(val value: Int) {
+    ENG(0),
+    EDITED_TIME(1);
+
+    companion object {
+        private val VALUES = values()
+        fun get(value: Int) = VALUES.firstOrNull { it.value == value }
+    }
+}
+
 @HiltViewModel
 class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRepository: VocaRepository) :
     ViewModel() {
@@ -38,8 +48,8 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
 
     // state 0: sort alphabetically
     // state 1: sort by latest edited time
-    private val _sortState = MutableLiveData(0)
-    val sortState: LiveData<Int>
+    private val _sortState = MutableLiveData(SortMethod.ENG)
+    val sortState: LiveData<SortMethod>
         get() = _sortState
 
     init {
@@ -94,13 +104,9 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
         vocaRepository.insertVocabulary(target.toVocabulary())
     }
 
-    fun setSortState(method: Int) {
-        if (method in 0..1) {
-            _sortState.value = method
-            sortItems()
-        } else {
-            throw IllegalArgumentException("Wrong sort method: $method")
-        }
+    fun setSortState(method: SortMethod) {
+        _sortState.value = method
+        sortItems()
     }
 
     /**
@@ -109,8 +115,8 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
     fun sortItems() = viewModelScope.launch {
         _currentVocabulary.value?.apply {
             when (sortState.value) {
-                0 -> this.sortBy { it?.eng }
-                1 -> this.sortByDescending { it?.addedTime }
+                SortMethod.ENG -> this.sortBy { it?.eng }
+                SortMethod.EDITED_TIME -> this.sortByDescending { it?.addedTime }
                 else -> {
                     Logger.d("정렬할 수 없습니다: method ${sortState.value}")
                 }
@@ -118,15 +124,10 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
         }
     }
 
-
-    fun sortItems(items: List<Vocabulary?>, method: Int): List<Vocabulary?> {
+    fun sortItems(items: List<Vocabulary?>, method: SortMethod): List<Vocabulary?> {
         return when (method) {
-            0 -> items.sortedBy { it?.eng }
-            1 -> items.sortedByDescending { it?.addedTime }
-            else -> {
-                Logger.d("정렬할 수 없습니다: method $method")
-                items
-            }
+            SortMethod.ENG -> items.sortedBy { it?.eng }
+            SortMethod.EDITED_TIME -> items.sortedByDescending { it?.addedTime }
         }
     }
 
