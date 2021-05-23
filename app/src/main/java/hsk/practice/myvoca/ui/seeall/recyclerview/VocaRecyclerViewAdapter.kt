@@ -177,7 +177,7 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel) :
 
         init {
             vocaBinding.root.setOnClickListener {
-                switchSelectedState(adapterPosition)
+                switchSelectedState(absoluteAdapterPosition)
             }
             vocaBinding.root.setOnCreateContextMenuListener(this)
         }
