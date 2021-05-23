@@ -82,6 +82,11 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
         }
     }
 
+    /**
+     * Searches the vocabulary with a given query.
+     *
+     * @param query String to search with. [query] should not include % character.
+     */
     fun searchVocabulary(query: String) = viewModelScope.launch(Dispatchers.IO) {
         val result = vocaRepository.getVocabulary(query) ?: return@launch
         val sortedResult = sortItems(result, sortState.value!!)
@@ -179,5 +184,36 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
     fun onShowVocabularyComplete() {
         _eventShowVocabulary.value = null
     }
+
+    /**
+     * Data for RecyclerView.
+     *
+     * Manages selected items in a RecyclerView when delete mode is enabled.
+     */
+    private val selectedItems = mutableSetOf<Int>()
+
+    fun isSelected(position: Int) = selectedItems.contains(position)
+
+    fun switchSelectedState(position: Int) {
+        if (selectedItems.contains(position)) {
+            selectedItems.remove(position)
+        } else {
+            selectedItems.add(position)
+        }
+    }
+
+    fun clearSelectedItems() {
+        selectedItems.clear()
+    }
+
+    fun deleteSelectedItems() {
+        deleteItems(selectedItems.toList())
+    }
+
+    fun getSelectedItems() = selectedItems
+
+    fun getSelectedItemsList(): List<Int> = selectedItems.toList()
+
+    fun getSelectedCount() = selectedItems.size
 
 }

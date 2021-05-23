@@ -183,11 +183,11 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
             mode?.let {
                 if (mode) {
                     deleteLayout.visibility = View.VISIBLE
-                    vocaRecyclerViewAdapter.notifyItemsChanged()
                 } else {
                     deleteLayout.visibility = View.GONE
-                    vocaRecyclerViewAdapter.clearSelectedState()
+                    seeAllViewModel.clearSelectedItems()
                 }
+                vocaRecyclerViewAdapter.notifyItemsChanged()
                 seeAllViewModel.onDeleteModeUpdateComplete()
             }
         }
@@ -251,17 +251,16 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         })
     }
 
-    // TODO: ViewModel should have responsibility of deleting vocabulary, not RecyclerView.Adapter
     private fun setDeleteButtonListener() {
         // Delete one or many items (with checkbox)
         deleteVocabularyButton.setOnClickListener {
-            val selectedItems = vocaRecyclerViewAdapter.getSelectedItems()
+            val selectedItemsCount = seeAllViewModel.getSelectedCount()
             val dialog = AlertDialog.Builder(parentActivity).apply {
                 setTitle("삭제")
-                setMessage("${selectedItems.size}개의 단어를 삭제합니다.")
+                setMessage("${selectedItemsCount}개의 단어를 삭제합니다.")
                 setIcon(android.R.drawable.ic_dialog_alert)
                 setPositiveButton("확인") { _, _ ->
-                    vocaRecyclerViewAdapter.deleteVocabularies()
+                    seeAllViewModel.deleteSelectedItems()
                     seeAllViewModel.onDeleteModeChange(false)
                 }
                 setNegativeButton("취소") { _, _ -> }
@@ -277,7 +276,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
      * @param query query string to search, only english supported.
      */
     private fun searchVocabulary(query: String) {
-        vocaRecyclerViewAdapter.searchVocabulary(query)
+        seeAllViewModel.searchVocabulary(query)
     }
 
     /**

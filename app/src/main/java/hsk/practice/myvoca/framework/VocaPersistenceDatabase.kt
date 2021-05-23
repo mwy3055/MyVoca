@@ -73,7 +73,7 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
 
     override suspend fun getVocabulary(query: String): List<Vocabulary?>? {
         return if (query.containsOnlyAlphabet()) {
-            vocaDao.loadVocabularyByEng(query)
+            vocaDao.loadVocabularyByEng("%${query}%")
         } else {
             vocaDao.loadVocabularyByKor(query)
         }?.toVocabularyList()

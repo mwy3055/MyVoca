@@ -1,11 +1,9 @@
 package hsk.practice.myvoca.ui.seeall.recyclerview
 
 import android.os.*
-import android.util.SparseBooleanArray
 import android.view.*
 import android.view.ContextMenu.ContextMenuInfo
 import android.view.View.OnCreateContextMenuListener
-import androidx.core.util.keyIterator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +11,6 @@ import hsk.practice.myvoca.databinding.VocaViewBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.getTimeString
 import hsk.practice.myvoca.ui.seeall.SeeAllViewModel
-import hsk.practice.myvoca.ui.seeall.SortMethod
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.VocaViewHolder
 import java.util.*
 
@@ -28,10 +25,6 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel) :
 
     val deleteMode: Boolean
         get() = viewModel.deleteMode.value!!
-    private val searchMode: Boolean
-        get() = viewModel.searchMode
-
-    private val selectedItems: SparseBooleanArray = SparseBooleanArray()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VocaViewHolder {
         val vocaBinding =
@@ -45,54 +38,11 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel) :
     // Bind the content to the item
     override fun onBindViewHolder(holder: VocaViewHolder, position: Int) {
         val vocabulary = getItem(position) ?: RoomVocabulary.nullVocabulary
-        holder.bind(vocabulary, position)
-    }
-
-    // Methods for managing select state
-    fun isSelected(position: Int) = getSelectedItems().contains(position)
-
-    fun switchSelectedState(position: Int) {
-        if (!deleteMode) return
-        if (selectedItems.get(position)) {
-            selectedItems.delete(position)
-        } else {
-            selectedItems.put(position, true)
-        }
-        notifyItemChanged(position)
-    }
-
-    fun clearSelectedState() {
-        selectedItems.clear()
-        notifyItemsChanged()
-    }
-
-    fun getSelectedItemCount() = selectedItems.size()
-
-    fun getSelectedItems(): List<Int> {
-        val items = mutableListOf<Int>()
-        for (item in selectedItems.keyIterator()) {
-            items.add(item)
-        }
-        return items
+        holder.bind(vocabulary, viewModel.isSelected(position))
     }
 
     fun notifyItemsChanged() {
-        for (i in 0 until itemCount) {
-            notifyItemChanged(i)
-        }
-    }
-
-    fun searchVocabulary(query: String) {
-        viewModel.searchVocabulary("%$query%")
-    }
-
-    fun deleteVocabularies() {
-        val selectedItems = getSelectedItems()
-        viewModel.deleteItems(selectedItems)
-    }
-
-    fun sortItems(method: Int) {
-        viewModel.setSortState(SortMethod.get(method)!!)
+        (0 until itemCount).forEach { notifyItemChanged(it) }
     }
 
     /**
@@ -122,9 +72,8 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel) :
                         viewModel.onVocabularyUpdate(position)
                     }
                     DELETE_CODE -> {
-                        val adapter = this@VocaRecyclerViewAdapter
                         viewModel.onDeleteModeChange(true)
-                        adapter.switchSelectedState(position)
+                        viewModel.switchSelectedState(position)
                     }
                     SHOW_ON_NOTIFICATION_CODE -> {
                         // TODO: show selected vocabulary on notification
@@ -147,11 +96,11 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel) :
             //            showOnNotification.setOnMenuItemClickListener(onMenuItemClickListener);
         }
 
-        fun bind(vocabulary: RoomVocabulary, position: Int) {
+        fun bind(vocabulary: RoomVocabulary, isChecked: Boolean) {
             setVocabulary(vocabulary)
 //            this@VocaRecyclerViewAdapter.vocaClickListener = vocaClickListener
             if (vocabulary != RoomVocabulary.nullVocabulary) {
-                setDeleteCheckBox(position)
+                setDeleteCheckBox(isChecked)
             }
         }
 
@@ -163,11 +112,11 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel) :
             }
         }
 
-        private fun setDeleteCheckBox(position: Int) {
+        private fun setDeleteCheckBox(checked: Boolean) {
             vocaBinding.deleteCheckBox.apply {
                 if (deleteMode) {
                     visibility = View.VISIBLE
-                    isChecked = selectedItems.get(position)
+                    isChecked = checked
                 } else {
                     visibility = View.GONE
                     isChecked = false
@@ -177,7 +126,11 @@ class VocaRecyclerViewAdapter(val viewModel: SeeAllViewModel) :
 
         init {
             vocaBinding.root.setOnClickListener {
-                switchSelectedState(absoluteAdapterPosition)
+                if (deleteMode) {
+                    val position = absoluteAdapterPosition
+                    viewModel.switchSelectedState(position)
+                    notifyItemChanged(position)
+                }
             }
             vocaBinding.root.setOnCreateContextMenuListener(this)
         }
