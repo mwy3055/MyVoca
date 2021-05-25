@@ -1,14 +1,16 @@
 package hsk.practice.myvoca.ui.seeall.recyclerview
 
-import android.view.*
+import android.view.ContextMenu
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import hsk.practice.myvoca.databinding.VocaViewBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.getTimeString
-import hsk.practice.myvoca.ui.seeall.MenuCode
-import hsk.practice.myvoca.ui.seeall.SeeAllViewModel
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.VocaViewHolder
 
 /**
@@ -18,38 +20,67 @@ import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.VocaVi
  * For further information, Please refer the comments above some methods.
  */
 class VocaRecyclerViewAdapter(
-    val viewModel: SeeAllViewModel,
-    private val menuItemClickListener: OnMenuItemClickListener
+    private val deleteData: DeleteData,
+    private val itemListener: ItemListener
 ) :
     ListAdapter<RoomVocabulary, VocaViewHolder>(RoomVocabularyDiffCallback()) {
 
     /**
-     * Menu item click listener for each item in RecyclerView.
+     * Interface which provides data related to delete mode.
      */
-    interface OnMenuItemClickListener {
-        /**
-         * Callback invoked when each menu item is clicked
-         *
-         * @param itemId Id of the menu item
-         * @param position Position of the RecyclerView item
-         */
-        fun onClick(itemId: Int, position: Int)
+    interface DeleteData {
+        val deleteMode: LiveData<Boolean>
+        fun isSelected(position: Int): Boolean
     }
 
-    val deleteMode: Boolean
-        get() = viewModel.deleteMode.value!!
+    /**
+     * Menu item click listener for each item in RecyclerView.
+     * Implementation of this class can vary by context that the adapter is used.
+     */
+    interface ItemListener {
+        /**
+         * Callback invoked when root view is clicked
+         *
+         * @param view Clicked view
+         * @param position Position of the view
+         */
+        fun onRootClick(view: View, position: Int)
+
+        /**
+         * Callback invoked when delete box is clicked
+         *
+         * @param view Clicked view
+         * @param position Position of the view
+         */
+        fun onDeleteCheckBoxClick(view: View, position: Int)
+
+        /**
+         * Callback invoked when context menu has to be created
+         *
+         * @param menu Menu item which will be shown to the user
+         * @param view View which this callback is set
+         * @param contextMenuInfo Extra information about the item for which the context menu should be shown.
+         *                        This information will vary depending on the class of v.
+         */
+        fun onCreateContextMenu(
+            menu: ContextMenu,
+            view: View,
+            contextMenuInfo: ContextMenu.ContextMenuInfo?,
+            position: Int
+        )
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VocaViewHolder {
         val vocaBinding =
             VocaViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
-        val holder = VocaViewHolder(vocaBinding, menuItemClickListener)
+        val holder = VocaViewHolder(vocaBinding, itemListener)
         return holder
     }
 
     override fun onBindViewHolder(holder: VocaViewHolder, position: Int) {
         val vocabulary = getItem(position) ?: RoomVocabulary.nullVocabulary
-        holder.bind(vocabulary, viewModel.isSelected(position))
+        holder.bind(vocabulary, deleteData.isSelected(position))
     }
 
     fun notifyItemsChanged() {
@@ -58,44 +89,31 @@ class VocaRecyclerViewAdapter(
 
     /**
      * ViewHolder for vocabulary object.
-     * Manages the content of the item and action when the item is clicked or long-clicked.
      */
     inner class VocaViewHolder(
         private val vocaBinding: VocaViewBinding,
-        private val onMenuItemClickListener: OnMenuItemClickListener
+        private val itemListener: ItemListener
     ) : RecyclerView.ViewHolder(vocaBinding.root) {
 
-        var viewForeground = vocaBinding.viewForeground
-        var viewBackground = vocaBinding.viewBackground
+        val viewForeground
+            get() = vocaBinding.viewForeground
+        val viewBackground
+            get() = vocaBinding.viewBackground
 
-        val realMenuItemClickListener = MenuItem.OnMenuItemClickListener { item ->
-            onMenuItemClickListener.onClick(item.itemId, absoluteAdapterPosition)
-            true
-        }
+        // Another position rather than absolute position may be needed
+        private val pos: Int
+            get() = absoluteAdapterPosition
 
         init {
             vocaBinding.root.setOnClickListener {
-                if (deleteMode) {
-                    val position = absoluteAdapterPosition
-                    viewModel.switchSelectedState(position)
-                    notifyItemChanged(position)
-                }
+                itemListener.onRootClick(it, pos)
+                notifyItemChanged(pos)
             }
-            /* Create Context pop-up menu when long clicked */
             vocaBinding.root.setOnCreateContextMenuListener { contextMenu, view, contextMenuInfo ->
-                if (deleteMode) {
-                    return@setOnCreateContextMenuListener
-                }
-                contextMenu?.add(Menu.NONE, MenuCode.EDIT.value, 1, "수정")?.apply {
-                    setOnMenuItemClickListener(realMenuItemClickListener)
-                }
-                contextMenu?.add(Menu.NONE, MenuCode.DELETE.value, 2, "삭제")?.apply {
-                    setOnMenuItemClickListener(realMenuItemClickListener)
-                }
-                contextMenu?.add(Menu.NONE, MenuCode.SHOW_ON_NOTIFICATION.value, 3, "알림에 보이기")
-                    ?.apply {
-                        setOnMenuItemClickListener(realMenuItemClickListener)
-                    }
+                itemListener.onCreateContextMenu(contextMenu, view, contextMenuInfo, pos)
+            }
+            vocaBinding.deleteCheckBox.setOnClickListener {
+                itemListener.onDeleteCheckBoxClick(it, pos)
             }
         }
 
@@ -116,7 +134,7 @@ class VocaRecyclerViewAdapter(
 
         private fun setDeleteCheckBox(checked: Boolean) {
             vocaBinding.deleteCheckBox.apply {
-                if (deleteMode) {
+                if (deleteData.deleteMode.value == true) {
                     visibility = View.VISIBLE
                     isChecked = checked
                 } else {

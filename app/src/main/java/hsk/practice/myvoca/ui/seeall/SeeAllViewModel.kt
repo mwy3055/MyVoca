@@ -1,5 +1,9 @@
 package hsk.practice.myvoca.ui.seeall
 
+import android.view.ContextMenu
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -47,8 +51,6 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
 
     var searchMode = false
 
-    // state 0: sort alphabetically
-    // state 1: sort by latest edited time
     private val _sortState = MutableLiveData(SortMethod.ENG)
     val sortState: LiveData<SortMethod>
         get() = _sortState
@@ -217,8 +219,52 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
 
     fun getSelectedCount() = selectedItems.size
 
-    val menuItemClickListener = object : VocaRecyclerViewAdapter.OnMenuItemClickListener {
-        override fun onClick(itemId: Int, position: Int) {
+    /**
+     * Listener for each item in VocaRecyclerView. See [VocaRecyclerViewAdapter.ItemListener].
+     */
+    val itemListener = object : VocaRecyclerViewAdapter.ItemListener {
+        override fun onRootClick(view: View, position: Int) {
+            if (deleteMode.value == true) {
+                switchSelectedState(position)
+            }
+        }
+
+        override fun onDeleteCheckBoxClick(view: View, position: Int) {
+            onRootClick(view, position)
+        }
+
+        override fun onCreateContextMenu(
+            menu: ContextMenu,
+            view: View,
+            contextMenuInfo: ContextMenu.ContextMenuInfo?,
+            position: Int
+        ) {
+            val realMenuItemClickListener = MenuItem.OnMenuItemClickListener { item ->
+                onMenuItemClick(item.itemId, position)
+                true
+            }
+
+            if (deleteMode.value == false) {
+                menu.add(Menu.NONE, MenuCode.EDIT.value, 1, "수정")?.apply {
+                    setOnMenuItemClickListener(realMenuItemClickListener)
+                }
+                menu.add(Menu.NONE, MenuCode.DELETE.value, 2, "삭제")?.apply {
+                    setOnMenuItemClickListener(realMenuItemClickListener)
+                }
+                menu.add(Menu.NONE, MenuCode.SHOW_ON_NOTIFICATION.value, 3, "알림에 보이기")
+                    ?.apply {
+                        setOnMenuItemClickListener(realMenuItemClickListener)
+                    }
+            }
+        }
+
+        /**
+         * Callback invoked when each menu item is clicked
+         *
+         * @param itemId Id of the menu item
+         * @param position Position of the RecyclerView item
+         */
+        fun onMenuItemClick(itemId: Int, position: Int) {
             when (MenuCode.get(itemId)) {
                 MenuCode.EDIT -> {
                     onVocabularyUpdate(position)
@@ -236,6 +282,15 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
         }
     }
 
+    /**
+     * Delete data for VocaRecyclerView. See [VocaRecyclerViewAdapter.DeleteData].
+     */
+    val deleteData = object : VocaRecyclerViewAdapter.DeleteData {
+        override val deleteMode: LiveData<Boolean>
+            get() = this@SeeAllViewModel.deleteMode
+
+        override fun isSelected(position: Int): Boolean = selectedItems.contains(position)
+    }
 }
 
 /**

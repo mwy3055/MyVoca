@@ -139,7 +139,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         // Load adapter asynchronously
         lifecycleScope.launch(Dispatchers.IO) {
             vocaAdapter =
-                VocaRecyclerViewAdapter(seeAllViewModel, seeAllViewModel.menuItemClickListener)
+                VocaRecyclerViewAdapter(seeAllViewModel.deleteData, seeAllViewModel.itemListener)
             vocaRecyclerView.adapter = vocaAdapter
         }
 
@@ -167,7 +167,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         // what to do when update request is given
         seeAllViewModel.eventVocabularyUpdateRequest.observe(viewLifecycleOwner) { position ->
             position?.let {
-                val target = seeAllViewModel.currentVocabulary.value?.get(position)
+                val target = seeAllViewModel.getCurrentVocabulary(position)
                 Logger.d("Update: $target")
                 val intent = Intent(context, EditVocaActivity::class.java)
                 intent.putExtra(Constants.POSITION, position)
@@ -240,7 +240,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         (searchMenuItem.actionView as SearchView).setOnQueryTextListener(object :
             SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let { searchVocabulary(it) }
+                query?.let { seeAllViewModel.searchVocabulary(it) }
                 return false
             }
 
@@ -267,15 +267,6 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
             dialog.show()
         }
         deleteCancelButton.setOnClickListener { seeAllViewModel.onDeleteModeChange(false) }
-    }
-
-    /**
-     * Search the vocabulary and show the result
-     *
-     * @param query query string to search, only english supported.
-     */
-    private fun searchVocabulary(query: String) {
-        seeAllViewModel.searchVocabulary(query)
     }
 
     /**
@@ -382,6 +373,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         return resources?.configuration?.layoutDirection == View.LAYOUT_DIRECTION_RTL
     }
 
+    // TODO: back key when delete mode is enabled
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.isFocusableInTouchMode = true
