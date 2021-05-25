@@ -13,6 +13,7 @@ import hsk.practice.myvoca.framework.toRoomVocabularyList
 import hsk.practice.myvoca.framework.toRoomVocabularyMutableList
 import hsk.practice.myvoca.framework.toVocabulary
 import hsk.practice.myvoca.module.RoomVocaRepository
+import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -216,4 +217,38 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
 
     fun getSelectedCount() = selectedItems.size
 
+    val menuItemClickListener = object : VocaRecyclerViewAdapter.OnMenuItemClickListener {
+        override fun onClick(itemId: Int, position: Int) {
+            when (MenuCode.get(itemId)) {
+                MenuCode.EDIT -> {
+                    onVocabularyUpdate(position)
+                }
+                MenuCode.DELETE -> {
+                    onDeleteModeChange(true)
+                    switchSelectedState(position)
+                }
+                MenuCode.SHOW_ON_NOTIFICATION -> {
+                    val vocabulary = getCurrentVocabulary(position)
+                    vocabulary?.let { onShowVocabulary(it) }
+                }
+                else -> Logger.d("MenuItemClick Else")
+            }
+        }
+    }
+
+}
+
+/**
+ * Menu item code in RecyclerView.
+ * Assigned one-by-one for each menu item.
+ */
+enum class MenuCode(val value: Int) {
+    EDIT(0),
+    DELETE(1),
+    SHOW_ON_NOTIFICATION(2);
+
+    companion object {
+        private val VALUES = values()
+        fun get(value: Int) = VALUES.firstOrNull { it.value == value }
+    }
 }

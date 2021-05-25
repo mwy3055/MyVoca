@@ -33,7 +33,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentSeeAllBinding
-import hsk.practice.myvoca.services.notification.ShowNotificationService
 import hsk.practice.myvoca.ui.activity.EditVocaActivity
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.*
@@ -89,7 +88,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
     private lateinit var drawer: DrawerLayout
 
     private var isSearchMode = false
-    private lateinit var vocaRecyclerViewAdapter: VocaRecyclerViewAdapter
+    private lateinit var vocaAdapter: VocaRecyclerViewAdapter
 
     private val seeAllLayout
         get() = binding.layoutSeeAll
@@ -123,7 +122,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         seeAllViewModel.currentVocabulary.observe(viewLifecycleOwner) {
-            it?.let { vocaRecyclerViewAdapter.submitList(it) }
+            it?.let { vocaAdapter.submitList(it) }
         }
 
         _binding = FragmentSeeAllBinding.inflate(inflater, container, false)
@@ -139,8 +138,9 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
 
         // Load adapter asynchronously
         lifecycleScope.launch(Dispatchers.IO) {
-            vocaRecyclerViewAdapter = VocaRecyclerViewAdapter(seeAllViewModel)
-            vocaRecyclerView.adapter = vocaRecyclerViewAdapter
+            vocaAdapter =
+                VocaRecyclerViewAdapter(seeAllViewModel, seeAllViewModel.menuItemClickListener)
+            vocaRecyclerView.adapter = vocaAdapter
         }
 
         vocaRecyclerView.apply {
@@ -148,7 +148,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
             addItemDecoration(
                 DividerItemDecoration(
                     context,
-                    LinearLayoutManager(parentActivity).orientation
+                    LinearLayoutManager(context).orientation
                 )
             )
             val callback = VocabularyTouchHelper(
@@ -162,9 +162,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
 
         // what to do when sort method is changed
         seeAllViewModel.sortState.observe(viewLifecycleOwner) { method ->
-            method?.let {
-                vocaRecyclerViewAdapter.notifyDataSetChanged()
-            }
+            method?.let { vocaAdapter.notifyDataSetChanged() }
         }
         // what to do when update request is given
         seeAllViewModel.eventVocabularyUpdateRequest.observe(viewLifecycleOwner) { position ->
@@ -187,17 +185,18 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
                     deleteLayout.visibility = View.GONE
                     seeAllViewModel.clearSelectedItems()
                 }
-                vocaRecyclerViewAdapter.notifyItemsChanged()
+                vocaAdapter.notifyItemsChanged()
                 seeAllViewModel.onDeleteModeUpdateComplete()
             }
         }
         // what to do when a user wants to show a vocabulary in the notification
         seeAllViewModel.eventShowVocabulary.observe(viewLifecycleOwner) { vocabulary ->
             vocabulary?.let {
-                val intent = Intent(context, ShowNotificationService::class.java)
-                intent.putExtra(ShowNotificationService.SHOW_VOCA, it)
-                parentActivity.startService(intent)
-                Snackbar.make(seeAllLayout, "알림에 보임: ${it.eng}", Snackbar.LENGTH_LONG).show()
+                Toast.makeText(context, "(구현 예정) 알림에 보임: ${it.eng}", Toast.LENGTH_SHORT).show()
+//                val intent = Intent(context, ShowNotificationService::class.java)
+//                intent.putExtra(ShowNotificationService.SHOW_VOCA, it)
+//                parentActivity.startService(intent)
+//                Snackbar.make(seeAllLayout, "알림에 보임: ${it.eng}", Snackbar.LENGTH_LONG).show()
                 seeAllViewModel.onShowVocabularyComplete()
             }
         }
@@ -456,9 +455,9 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Logger.d("requestCode = $requestCode, resultCode = $resultCode")
         if (requestCode == Constants.CALL_EDIT_VOCA_ACTIVITY && resultCode == Constants.EDIT_NEW_VOCA_OK) {
-            vocaRecyclerViewAdapter.notifyItemsChanged()
+            vocaAdapter.notifyItemsChanged()
         } else if (requestCode == Constants.CALL_ADD_VOCA_ACTIVITY && resultCode == Constants.ADD_NEW_VOCA_OK) {
-            vocaRecyclerViewAdapter.notifyDataSetChanged()
+            vocaAdapter.notifyDataSetChanged()
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
