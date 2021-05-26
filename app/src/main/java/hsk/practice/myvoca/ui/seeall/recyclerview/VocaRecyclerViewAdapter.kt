@@ -89,6 +89,7 @@ class VocaRecyclerViewAdapter(
 
     /**
      * ViewHolder for vocabulary object.
+     * Can be a separate, not a inner, class if deleteData dependency is injected
      */
     inner class VocaViewHolder(
         private val vocaBinding: VocaViewBinding,
@@ -107,7 +108,6 @@ class VocaRecyclerViewAdapter(
         init {
             vocaBinding.root.setOnClickListener {
                 itemListener.onRootClick(it, pos)
-                notifyItemChanged(pos)
             }
             vocaBinding.root.setOnCreateContextMenuListener { contextMenu, view, contextMenuInfo ->
                 itemListener.onCreateContextMenu(contextMenu, view, contextMenuInfo, pos)

@@ -4,6 +4,7 @@ import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.CheckBox
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,7 @@ import com.hsk.data.VocaRepository
 import com.hsk.domain.vocabulary.Vocabulary
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
+import hsk.practice.myvoca.R
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.toRoomVocabularyList
 import hsk.practice.myvoca.framework.toRoomVocabularyMutableList
@@ -225,12 +227,17 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
     val itemListener = object : VocaRecyclerViewAdapter.ItemListener {
         override fun onRootClick(view: View, position: Int) {
             if (deleteMode.value == true) {
-                switchSelectedState(position)
+                val checkBox = view.findViewById<CheckBox>(R.id.delete_check_box)
+                val isChecked = checkBox.isChecked
+                checkBox.isChecked = !isChecked
+                onDeleteCheckBoxClick(checkBox, position)
             }
         }
 
         override fun onDeleteCheckBoxClick(view: View, position: Int) {
-            onRootClick(view, position)
+            if (deleteMode.value == true) {
+                switchSelectedState(position)
+            }
         }
 
         override fun onCreateContextMenu(
