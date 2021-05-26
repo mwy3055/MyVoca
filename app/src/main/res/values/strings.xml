@@ -24,7 +24,7 @@
     <string name="menu_go_github">소스 코드 보기</string>
 
     <!-- for layout/fragment_home -->
-    <string name="home_fragment_home_kor">단어를 추가해 주세요</string>
+    <string name="home_fragment_no_voca">단어를 추가해 주세요</string>
     <string name="home_fragment_load_button">다른 단어 보이기</string>
     <string name="home_fragment_word_count">%d개</string>
 
@@ -34,13 +34,14 @@
     <string name="see_all_fragment_number_word_gae">개</string>
     <string name="see_all_fragment_delete">삭제</string>
     <string name="see_all_fragment_cancel">취소</string>
+    <string name="see_all_fragment_spinner_prompt">정렬 방법</string>
 
     <!-- for layout/fragment_quiz -->
     <string name="quiz_no_vocabulary">퀴즈를 풀기 위해서는 단어를 5개 이상 등록해야 합니다.</string>
     <string name="current_voca_count">현재 등록된 단어: %d개</string>
     <string name="quiz_word_example">keyword</string>
     <string name="quiz_option_example">잠을 자다</string>
-    <string name="quiz_option_format">%d. %s</string>
+    <string name="quiz_option_no_text">오류: %s의 뜻이 없습니다.</string>
 
     <!-- for layout/fragment_go_github -->
     <string name="go_github_fragment_button_text">GitHub 이동</string>

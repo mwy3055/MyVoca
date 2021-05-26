@@ -4,18 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import com.orhanobut.logger.Logger
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.FragmentQuizBinding
-import hsk.practice.myvoca.framework.RoomVocabulary
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 /**
  * Shows word quiz to user.
@@ -25,7 +20,7 @@ import kotlinx.coroutines.launch
  * When user selects the option, quiz word and the VersusView at the bottom of the fragment will be updated.
  *
  *
- * Numbers of correct and wrong answers are stored in the SharedPreferences and updated in real time.
+ * Numbers of correct and wrong answers are stored in the DataStore and updated in real time.
  */
 @AndroidEntryPoint
 class QuizFragment : Fragment() {
@@ -36,7 +31,7 @@ class QuizFragment : Fragment() {
 
     private val quizViewModel: QuizViewModel by viewModels()
 
-    private lateinit var quizOptionsList: MutableList<TextView>
+    private lateinit var quizAdapter: QuizAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,44 +39,44 @@ class QuizFragment : Fragment() {
     ): View {
         _binding = FragmentQuizBinding.inflate(inflater, container, false)
 
-        binding.lifecycleOwner = viewLifecycleOwner
+        viewLifecycleOwner.let {
+            binding.lifecycleOwner = it
+            binding.versusView.binding.lifecycleOwner = it
+        }
+        binding.viewModel = quizViewModel
 
-        quizOptionsList = mutableListOf(
-            binding.quizOption1,
-            binding.quizOption2,
-            binding.quizOption3,
-            binding.quizOption4
-        )
-        quizOptionsList.forEachIndexed { index, option ->
-            option.setOnClickListener { quizViewModel.quizItemSelected(requireContext(), index) }
+        quizViewModel.versusViewModel = binding.versusView.viewModel
+        quizViewModel.loadValues(requireContext())
+
+        quizAdapter = QuizAdapter { position: Int ->
+            quizViewModel.quizItemSelected(requireContext(), position)
+        }
+        binding.quizRecyclerView.apply {
+            adapter = quizAdapter
+            layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         }
 
-        quizViewModel.loadValues(requireContext())
-        setVersusView()
-
-        // Do not execute any code while observing quizAvailable
-        quizViewModel.quizAvailable.observe(viewLifecycleOwner) { }
-        quizViewModel.quizLoadCompleteEvent.observe(viewLifecycleOwner) { loadResult ->
-            Logger.d("Quiz load status: $loadResult")
-            loadResult?.let {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    if (it) {
-                        showQuiz(
-                            quizViewModel.answerVoca.value!!,
-                            quizViewModel.quizVocabulary.value!!
-                        )
+        // Set padding between each items
+        binding.root.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            with(binding) {
+                root.post {
+                    val height = quizRecyclerView[0].measuredHeight
+                    val size = quizRecyclerView.measuredHeight
+                    val padding = (size - height * 4) / 3
+                    if (quizRecyclerView.itemDecorationCount > 0) {
+                        (quizRecyclerView.getItemDecorationAt(0) as ItemDecoration).setSize(padding)
                     } else {
-                        hideQuiz()
+                        quizRecyclerView.addItemDecoration(ItemDecoration(padding))
                     }
-                    quizViewModel.clearQuizPreparedEvent()
                 }
             }
         }
-        quizViewModel.answerEvent.observe(viewLifecycleOwner) { value ->
-            value?.let {
-                setVersusView()
-                showVocaDialog(quizViewModel.answerVoca.value!!, it)
-                quizViewModel.clearAnswerEvent()
+
+        quizViewModel.quizData.observe(viewLifecycleOwner) {
+            if (it != null) {
+                showQuiz(it)
+            } else {
+                hideQuiz()
             }
         }
         return binding.root
@@ -92,69 +87,19 @@ class QuizFragment : Fragment() {
         _binding = null
     }
 
-    private fun setVersusView() {
-        binding.versusView.setValues(
-            quizViewModel.answerCountFlow.value,
-            quizViewModel.wrongCountFlow.value
-        )
-    }
-
-    private fun showEmptyVoca() {
+    private fun showQuiz(quiz: Quiz) {
         with(binding) {
-            noVocaText.visibility = View.VISIBLE
-        }
-    }
-
-    private fun hideEmptyVoca() {
-        with(binding) {
+            quizRecyclerView.visibility = View.VISIBLE
             noVocaText.visibility = View.GONE
-        }
-    }
-
-    private fun showQuizLayout() {
-        with(binding) {
-            quizLayout.visibility = View.VISIBLE
-            quizWord.visibility = View.VISIBLE
-        }
-    }
-
-    private fun hideQuizLayout() {
-        with(binding) {
-            quizLayout.visibility = View.GONE
-            quizWord.visibility = View.GONE
-        }
-    }
-
-    private fun showQuiz(answerVoca: RoomVocabulary, quizVocabulary: List<RoomVocabulary>) {
-        hideEmptyVoca()
-        showQuizLayout()
-        with(binding) {
-            Logger.d("Quiz word: ${answerVoca.eng}")
-            quizWord.text = answerVoca.eng
-            Logger.d("Quiz Vocabulary content: $quizVocabulary")
-            quizVocabulary.forEachIndexed { index, vocabulary ->
-                quizOptionsList[index].text =
-                    getString(R.string.quiz_option_format, index + 1, vocabulary.kor)
-            }
-            Logger.d("Quiz layout visibility: ${quizLayout.visibility == View.VISIBLE}")
+            quizAdapter.submitList(quiz.quizList)
         }
     }
 
     private fun hideQuiz() {
-        hideQuizLayout()
-        showEmptyVoca()
+        with(binding) {
+            quizRecyclerView.visibility = View.GONE
+            noVocaText.visibility = View.VISIBLE
+        }
     }
 
-    // replace new line character to the space
-    fun formatString(str: String?) = str?.replace("\n", " ")
-
-    // TODO: Methods below should be moved into QuizViewModel
-    fun showVocaDialog(voca: RoomVocabulary, isCorrect: Boolean) {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle(if (isCorrect) "맞았습니다!!" else "틀렸습니다")
-        builder.setMessage("${voca.eng}: ${formatString(voca.kor)}")
-        builder.setPositiveButton(android.R.string.ok, null)
-        val dialog = builder.create()
-        dialog.show()
-    }
 }

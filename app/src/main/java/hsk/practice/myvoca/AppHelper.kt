@@ -49,7 +49,7 @@ object AppHelper {
                 e.printStackTrace()
             }
         }
-        val timeString = getTimeString(System.currentTimeMillis())
+        val timeString = System.currentTimeMillis().getTimeString()
         try {
             val bw = BufferedWriter(FileWriter(logFile, true))
             bw.append("$timeString: $text")
@@ -58,24 +58,6 @@ object AppHelper {
         } catch (e: IOException) {
             e.printStackTrace()
         }
-    }
-
-    /**
-     * Returns a time-formatted string by the given timestamp.
-     *
-     * @param timeInMillis Unix epoch timestamp to convert to string
-     * @return Time string of the timestamp
-     */
-    fun getTimeString(timeInMillis: Long): String {
-        val cal = Calendar.getInstance()
-        cal.timeInMillis = timeInMillis
-        val year = cal[Calendar.YEAR]
-        val mon = cal[Calendar.MONTH]
-        val day = cal[Calendar.DAY_OF_MONTH]
-        val hour = cal[Calendar.HOUR_OF_DAY]
-        val min = cal[Calendar.MINUTE]
-        val sec = cal[Calendar.SECOND]
-        return String.format("%d.%02d.%02d. %02d:%02d:%02d", year, mon + 1, day, hour, min, sec)
     }
 
     /**

@@ -4,10 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import java.util.*
 
 /**
  * Preferences DataStore object. Delegated by preferenceDataStore().
@@ -31,15 +28,19 @@ fun String?.containsOnlyAlphabet(): Boolean {
 }
 
 
-@Throws(Exception::class)
-fun <T> LiveData<T>.getValueBlocking(): T {
-    var value: T? = null
-    val latch = CountDownLatch(1)
-    val innerObserver = Observer<T> {
-        value = it
-        latch.countDown()
-    }
-    observeForever(innerObserver)
-    latch.await(10, TimeUnit.SECONDS)
-    return value ?: throw IllegalStateException("Value not set")
+/**
+ * Returns a time-formatted string by the given timestamp.
+ *
+ * @return Time string of the timestamp
+ */
+fun Long.getTimeString(): String {
+    val cal = Calendar.getInstance()
+    cal.timeInMillis = this
+    val year = cal[Calendar.YEAR]
+    val mon = cal[Calendar.MONTH]
+    val day = cal[Calendar.DAY_OF_MONTH]
+    val hour = cal[Calendar.HOUR_OF_DAY]
+    val min = cal[Calendar.MINUTE]
+    val sec = cal[Calendar.SECOND]
+    return String.format("%d.%02d.%02d. %02d:%02d:%02d", year, mon + 1, day, hour, min, sec)
 }

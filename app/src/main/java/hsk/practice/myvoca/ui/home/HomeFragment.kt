@@ -2,6 +2,8 @@ package hsk.practice.myvoca.ui.home
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,32 +21,25 @@ class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
 
-    private val binding
+    private val binding: FragmentHomeBinding
         get() = _binding!!
-
-    val button
-        get() = binding.homeLoadNewVocabularyButton
-
-    private val vocaNumber
-        get() = binding.homeVocaNumber
 
     private val viewModel: HomeViewModel by viewModels()
 
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?, savedInstanceState: Bundle?): View {
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         binding.homeViewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel.vocabularySize.observe(viewLifecycleOwner) { count ->
-            if (count > 0) {
-                showVocaNumber(count)
-                showVocaButton()
+        viewModel.vocabularyNotEmpty.observe(viewLifecycleOwner) {
+            if (it) {
+                showVocaLayout()
                 viewModel.loadRandomVocabulary()
             } else {
-                showNoVocaText()
-                hideVocaButton()
+                hideVocaLayout()
             }
         }
 
@@ -61,26 +56,17 @@ class HomeFragment : Fragment() {
         menu.clear()
     }
 
-    private fun showVocaNumber(number: Int) {
-        vocaNumber.visibility = View.VISIBLE
-        vocaNumber.text = getString(R.string.home_fragment_word_count, number)
+    private fun showVocaLayout() {
+        with(binding) {
+            homeLayout.isVisible = true
+            noVocaLayout.isGone = true
+        }
     }
 
-    private fun hideVocaNumber() {
-        vocaNumber.visibility = View.GONE
-    }
-
-    private fun showNoVocaText() {
-        hideVocaNumber()
-        vocaNumber.visibility = View.VISIBLE
-        vocaNumber.text = getString(R.string.home_fragment_home_kor)
-    }
-
-    private fun showVocaButton() {
-        binding.homeLoadNewVocabularyButton.visibility = View.VISIBLE
-    }
-
-    private fun hideVocaButton() {
-        binding.homeLoadNewVocabularyButton.visibility = View.GONE
+    private fun hideVocaLayout() {
+        with(binding) {
+            homeLayout.isGone = true
+            noVocaLayout.isVisible = true
+        }
     }
 }
