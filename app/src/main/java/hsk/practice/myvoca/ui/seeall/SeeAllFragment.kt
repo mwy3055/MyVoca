@@ -87,11 +87,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
     private lateinit var toolbar: Toolbar
     private lateinit var drawer: DrawerLayout
 
-    private var isSearchMode = false
     private lateinit var vocaAdapter: VocaRecyclerViewAdapter
-
-    private val seeAllLayout
-        get() = binding.layoutSeeAll
 
     private val deleteLayout
         get() = binding.layoutDelete
@@ -260,13 +256,13 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
                 setIcon(android.R.drawable.ic_dialog_alert)
                 setPositiveButton("확인") { _, _ ->
                     seeAllViewModel.deleteSelectedItems()
-                    seeAllViewModel.onDeleteModeChange(false)
+                    seeAllViewModel.changeDeleteMode(false)
                 }
                 setNegativeButton("취소") { _, _ -> }
             }.create()
             dialog.show()
         }
-        deleteCancelButton.setOnClickListener { seeAllViewModel.onDeleteModeChange(false) }
+        deleteCancelButton.setOnClickListener { seeAllViewModel.changeDeleteMode(false) }
     }
 
     /**
@@ -288,7 +284,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         // window.setStatusBarColor(ContextCompat.getColor(parentActivity, android.R.color.white));
         val animationDuration = 500
         if (show) {
-            isSearchMode = true
+            seeAllViewModel.enableSearchMode()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 val width = toolbar.width -
                         (if (containsOverflow) resources.getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material) else 0) -
@@ -310,7 +306,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
                 toolbar.startAnimation(translateAnimation)
             }
         } else {
-            isSearchMode = false
+            seeAllViewModel.disableSearchMode()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 val width = toolbar.width -
                         (if (containsOverflow) resources.getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material) else 0) -
@@ -332,7 +328,6 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
                                 R.attr.colorPrimary
                             )
                         )
-                        //window.setStatusBarColor(getThemeColor(parentActivity, R.attr.colorPrimaryDark));
                     }
                 })
                 createCircularReveal.start()
@@ -359,7 +354,6 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
                 })
                 toolbar.startAnimation(animationSet)
             }
-            //window.setStatusBarColor(getThemeColor(parentActivity, R.attr.colorPrimaryDark));
         }
     }
 
@@ -373,15 +367,26 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         return resources?.configuration?.layoutDirection == View.LAYOUT_DIRECTION_RTL
     }
 
-    // TODO: back key when delete mode is enabled
+    /**
+     * Disables delete mode when delete mode is enabled and back button is pressed.
+     * Otherwise, do nothing.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.isFocusableInTouchMode = true
-        view.requestFocus()
-        view.setOnKeyListener { _, keyCode, _ ->
-            keyCode == KeyEvent.KEYCODE_BACK &&
+        view.apply {
+            isFocusableInTouchMode = true
+            requestFocus()
+            setOnKeyListener { _, keyCode, _ ->
+                if (keyCode == KeyEvent.KEYCODE_BACK &&
                     seeAllViewModel.deleteMode.value == true &&
                     !drawer.isDrawerOpen(GravityCompat.START)
+                ) {
+                    seeAllViewModel.changeDeleteMode(false)
+                    true
+                } else {
+                    false
+                }
+            }
         }
     }
 

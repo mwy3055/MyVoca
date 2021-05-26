@@ -165,7 +165,7 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
     val eventDeleteModeChanged: LiveData<Boolean?>
         get() = _eventDeleteModeChanged
 
-    fun onDeleteModeChange(mode: Boolean) {
+    fun changeDeleteMode(mode: Boolean) {
         _eventDeleteModeChanged.value = mode
         _deleteMode.value = mode
     }
@@ -277,7 +277,7 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
                     onVocabularyUpdate(position)
                 }
                 MenuCode.DELETE -> {
-                    onDeleteModeChange(true)
+                    changeDeleteMode(true)
                     switchSelectedState(position)
                 }
                 MenuCode.SHOW_ON_NOTIFICATION -> {
