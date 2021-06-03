@@ -86,4 +86,5 @@
     <string name="choose_text_color">위젯의 텍스트 색깔을 선택해 주세요.</string>
     <string name="complete">완료</string>
     <string name="description_choose_text_color">위젯의 텍스트 색깔을 선택한다.</string>
+    <string name="settings">설정</string>
 </resources>

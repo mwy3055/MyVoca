@@ -212,7 +212,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
      * @param inflater MenuInflater
      */
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.main, menu)
+        inflater.inflate(R.menu.search_menu, menu)
         Logger.d("onCreateOptionsMenu() in SeeAllFragment")
         searchMenuItem = menu.findItem(R.id.action_search)
         searchMenuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
