@@ -274,7 +274,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
         toolbar.setBackgroundColor(
             ContextCompat.getColor(
                 parentActivity,
-                R.color.design_default_color_primary
+                R.color.primaryDarkColor
             )
         )
         if (window == null) {

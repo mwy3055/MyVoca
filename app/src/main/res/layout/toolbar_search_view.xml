@@ -17,7 +17,7 @@
             android:drawablePadding="0dp"
             android:gravity="center_vertical"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/divider_color"
+            android:textColor="@color/black_50"
             android:visibility="visible" />
 
         <ImageView
@@ -72,7 +72,7 @@
                     android:maxLines="1"
                     android:paddingEnd="8dp"
                     android:textColor="@android:color/black"
-                    android:textColorHint="@color/material_light_hint_text"
+                    android:textColorHint="@color/black_600"
                     android:textSize="20sp" />
 
                 <ImageView

@@ -22,7 +22,7 @@
             android:id="@+id/image_color_preview"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:background="@color/material_light_primary_text"
+            android:background="@color/black_900"
             android:contentDescription="@string/description_choose_text_color"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

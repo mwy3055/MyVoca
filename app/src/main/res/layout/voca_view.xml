@@ -10,7 +10,7 @@
             android:id="@+id/view_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/bg_row_background">
+            android:background="@color/red_600">
 
             <ImageView
                 android:id="@+id/delete_icon"
@@ -37,7 +37,7 @@
             android:id="@+id/view_foreground"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/bg_row_foreground">
+            android:background="@color/grey_50">
 
             <LinearLayout
                 android:id="@+id/voca_layout"
