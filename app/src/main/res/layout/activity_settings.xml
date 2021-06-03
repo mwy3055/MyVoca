@@ -4,18 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/coordinator_layout"
+        android:id="@+id/settings_coordinator"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.activity.MainActivity">
+        tools:context=".ui.settings.SettingsActivity">
 
         <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/app_bar_layout"
+            android:id="@+id/settings_app_bar_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="top">
 
             <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
+                android:id="@+id/settings_toolbar"
                 style="@style/AppTheme.ActionBar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
@@ -23,17 +24,14 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <include layout="@layout/content_main" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/settings_container"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"
-            app:backgroundTint="@color/primaryColor"
-            app:maxImageSize="32dp"
-            app:srcCompat="@drawable/plain_plus" />
+            android:layout_gravity="bottom"
+            app:layout_anchor="@+id/settings_toolbar"
+            app:layout_anchorGravity="bottom" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 </layout>

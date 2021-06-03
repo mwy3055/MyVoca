@@ -86,5 +86,10 @@
     <string name="choose_text_color">위젯의 텍스트 색깔을 선택해 주세요.</string>
     <string name="complete">완료</string>
     <string name="description_choose_text_color">위젯의 텍스트 색깔을 선택한다.</string>
+
+    <!-- for settings -->
     <string name="settings">설정</string>
+    <string name="settings_dark_mode">dark_mode</string>
+    <string name="settings_feedback">feedback</string>
+    <string name="dev_email">mwy3055@gmail.com</string>
 </resources>
