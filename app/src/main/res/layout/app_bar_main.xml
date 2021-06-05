@@ -18,8 +18,7 @@
                 android:id="@+id/toolbar"
                 style="@style/AppTheme.ActionBar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:title="@string/settings" />
+                android:layout_height="?attr/actionBarSize" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -33,7 +32,8 @@
             android:layout_margin="@dimen/fab_margin"
             app:backgroundTint="@color/primaryColor"
             app:maxImageSize="32dp"
-            app:srcCompat="@drawable/plain_plus" />
+            app:srcCompat="@drawable/plain_plus"
+            android:contentDescription="@string/app_bar_main_description_fab" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
