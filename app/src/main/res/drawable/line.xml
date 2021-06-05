@@ -2,9 +2,9 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="@color/grey_300" />
     <padding
-        android:bottom="@dimen/widget_margin"
-        android:left="@dimen/widget_margin"
-        android:right="@dimen/widget_margin"
-        android:top="@dimen/widget_margin" />
+        android:bottom="@dimen/spacing_small"
+        android:left="@dimen/spacing_small"
+        android:right="@dimen/spacing_small"
+        android:top="@dimen/spacing_small" />
 
 </shape>

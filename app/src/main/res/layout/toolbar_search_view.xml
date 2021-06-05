@@ -6,7 +6,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:paddingEnd="8dp">
+        android:paddingStart="@dimen/spacing_small"
+        android:paddingEnd="@dimen/spacing_small">
 
         <!-- This is actually used for the badge icon *or* the badge label (or neither) -->
         <TextView
@@ -60,8 +61,8 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/item_list_horizontal_margin"
-                    android:layout_marginEnd="@dimen/item_list_horizontal_margin"
+                    android:layout_marginStart="@dimen/spacing_small"
+                    android:layout_marginEnd="@dimen/spacing_small"
                     android:layout_weight="1"
                     android:dropDownHeight="wrap_content"
                     android:dropDownHorizontalOffset="0dp"
@@ -70,7 +71,8 @@
                     android:imeOptions="actionSearch"
                     android:inputType="text|textAutoComplete|textNoSuggestions"
                     android:maxLines="1"
-                    android:paddingEnd="8dp"
+                    android:paddingStart="@dimen/spacing_small"
+                    android:paddingEnd="@dimen/spacing_small"
                     android:textColor="@android:color/black"
                     android:textColorHint="@color/black_600"
                     android:textSize="20sp" />

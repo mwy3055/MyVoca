@@ -4,7 +4,7 @@
     android:id="@+id/view_foreground"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/widget_margin"
+    android:padding="@dimen/spacing_small"
     android:orientation="horizontal">
 
     <LinearLayout

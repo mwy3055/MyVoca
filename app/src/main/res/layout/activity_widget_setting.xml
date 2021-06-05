@@ -33,7 +33,7 @@
             android:id="@+id/button_color_complete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/widget_margin"
+            android:layout_marginTop="@dimen/spacing_small"
             android:text="@string/complete"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

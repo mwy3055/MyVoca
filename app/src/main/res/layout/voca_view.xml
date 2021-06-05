@@ -14,18 +14,18 @@
 
             <ImageView
                 android:id="@+id/delete_icon"
-                android:layout_width="@dimen/ic_delete"
-                android:layout_height="@dimen/ic_delete"
+                android:layout_width="@dimen/spacing_ultra"
+                android:layout_height="@dimen/spacing_ultra"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="@dimen/padd_10"
+                android:layout_marginEnd="@dimen/spacing_small"
                 android:src="@drawable/baseline_delete_24" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="@dimen/padd_10"
+                android:layout_marginEnd="@dimen/spacing_small"
                 android:layout_toStartOf="@id/delete_icon"
                 android:text="@string/see_all_fragment_delete"
                 android:textColor="#fff"
