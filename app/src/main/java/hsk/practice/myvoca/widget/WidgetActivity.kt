@@ -35,7 +35,7 @@ private val TEXT_COLOR_KEY = intPreferencesKey(widgetTextColorKey)
 fun getTextColorFlow(context: Context): Flow<Int> = context.dataStore.data.map { preferences ->
     preferences[TEXT_COLOR_KEY] ?: ContextCompat.getColor(
         context,
-        R.color.material_light_primary_text
+        R.color.black_900
     )
 }
 

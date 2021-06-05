@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreferenceCompat
+        app:key="@string/settings_dark_mode"
+        app:title="다크 모드 활성화" />
+
+    <Preference
+        app:key="@string/settings_feedback"
+        app:summary="버그 및 개선 사항 알리기"
+        app:title="의견 보내기" />
+
+</PreferenceScreen>

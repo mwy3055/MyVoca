@@ -10,22 +10,22 @@
             android:id="@+id/view_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/bg_row_background">
+            android:background="@color/red_600">
 
             <ImageView
                 android:id="@+id/delete_icon"
-                android:layout_width="@dimen/ic_delete"
-                android:layout_height="@dimen/ic_delete"
+                android:layout_width="@dimen/spacing_ultra"
+                android:layout_height="@dimen/spacing_ultra"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="@dimen/padd_10"
+                android:layout_marginEnd="@dimen/spacing_small"
                 android:src="@drawable/baseline_delete_24" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="@dimen/padd_10"
+                android:layout_marginEnd="@dimen/spacing_small"
                 android:layout_toStartOf="@id/delete_icon"
                 android:text="@string/see_all_fragment_delete"
                 android:textColor="#fff"
@@ -37,7 +37,7 @@
             android:id="@+id/view_foreground"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/bg_row_foreground">
+            android:background="@color/grey_50">
 
             <LinearLayout
                 android:id="@+id/voca_layout"

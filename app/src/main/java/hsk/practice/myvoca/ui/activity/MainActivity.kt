@@ -3,6 +3,7 @@ package hsk.practice.myvoca.ui.activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
@@ -17,6 +18,7 @@ import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.ActivityMainBinding
 import hsk.practice.myvoca.services.notification.ShowNotificationService
+import hsk.practice.myvoca.ui.settings.SettingsActivity
 
 /**
  * MainActivity shows major fragments of the application.
@@ -51,7 +53,8 @@ class MainActivity : AppCompatActivity() {
         val fab = binding.appBarMain.fab
         fab.setOnClickListener {
             val intent = Intent(applicationContext, AddVocaActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            intent.flags =
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
             startActivityForResult(intent, Constants.CALL_ADD_VOCA_ACTIVITY)
         }
 
@@ -60,10 +63,10 @@ class MainActivity : AppCompatActivity() {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_see_all, R.id.nav_quiz,
-                R.id.nav_tools, R.id.nav_share, R.id.nav_go_github)
-                .setDrawerLayout(drawer)
-                .build()
+            R.id.nav_home, R.id.nav_see_all, R.id.nav_quiz,
+            R.id.nav_tools, R.id.nav_share, R.id.nav_go_github
+        ).setOpenableLayout(drawer)
+            .build()
         val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration)
         NavigationUI.setupWithNavController(navigationView, navController)
@@ -93,8 +96,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_empty, menu)
+        menuInflater.inflate(R.menu.activity_main_menu, menu)
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.settings -> {
+                val intent = Intent(applicationContext, SettingsActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
