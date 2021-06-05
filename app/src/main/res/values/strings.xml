@@ -23,10 +23,20 @@
     <string name="menu_share">Share</string>
     <string name="menu_go_github">소스 코드 보기</string>
 
+    <!-- for layout/app_bar_main -->
+    <string name="app_bar_main_description_fab">단어 추가 화면으로 이동하는 버튼입니다.</string>
+
     <!-- for layout/fragment_home -->
     <string name="home_fragment_no_voca">단어를 추가해 주세요</string>
     <string name="home_fragment_load_button">다른 단어 보이기</string>
     <string name="home_fragment_word_count">%d개</string>
+    <string name="home_fragment_description">
+        홈 화면입니다. 이곳에서는 무작위 단어를 보여줍니다.
+    </string>
+    <string name="home_fragment_description_button">버튼을 누르면 새로운 단어가 보입니다.</string>
+    <string name="home_fragment_description_empty">
+        현재 추가된 단어가 없습니다. 단어를 추가하여 새로운 단어를 보이게 해 보세요.
+    </string>
 
     <!-- for layout/fragment_see_all -->
     <string name="see_all_fragment_number_word_text">단어 수</string>
@@ -45,6 +55,11 @@
 
     <!-- for layout/fragment_go_github -->
     <string name="go_github_fragment_button_text">GitHub 이동</string>
+    <string name="go_github_fragment_description">
+        애플리케이션의 코드가 저장되어 있는 GitHub 리포지토리로 이동합니다.
+        버그 및 개선 사항 등을 등록할 수도 있습니다.
+    </string>
+    <string name="go_github_fragment_description_button">버튼을 누르면 GitHub로 이동합니다.</string>
 
     <!-- for layout/toolbar_search_view -->
     <string name="toolbar_search_view_search_button">단어 검색하기</string>
@@ -59,6 +74,10 @@
     <string name="add_voca_activity_memo_helper_text">메모</string>
     <string name="add_voca_activity_ok_button_text">추가</string>
     <string name="add_voca_activity_cancel_button_text">취소</string>
+    <string name="add_voca_activity_description">
+        새로운 단어를 추가하는 화면입니다. 영어 단어와 단어의 뜻을 입력해야 하며, 필요하다면 메모를 입력할 수 있습니다.
+        단어를 입력한 후 추가 버튼을 눌러 단어를 추가하세요.
+    </string>
 
     <!-- for layout/activity_edit_voca -->
     <string name="edit_voca_activity_toolbar_title">단어 수정하기</string>
@@ -67,6 +86,10 @@
     <string name="edit_voca_activity_memo_helper_text">메모</string>
     <string name="edit_voca_activity_ok_button_text">수정</string>
     <string name="edit_voca_activity_cancel_button_text">취소</string>
+    <string name="edit_voca_activity_description">
+        단어를 수정하는 화면입니다. 단어와 뜻, 메모 모두를 수정할 수 있습니다.
+        수정 사항을 모두 입력한 후 수정 버튼을 눌러 단어를 수정하세요.
+    </string>
 
     <!-- for menu/main -->
     <string name="main_search_item">단어 검색</string>
@@ -76,6 +99,14 @@
 
     <!-- for layout/activity_widget_setting -->
     <string name="widget_setting_activity_message">위젯이 추가되었습니다.</string>
+    <string name="widget_setting_activity_description_select">위젯의 텍스트 색깔을 선택한다.</string>
+    <string name="widget_setting_activity_description">
+        위젯을 설정하는 화면입니다. 위젯에 보일 텍스트의 색깔을 정해야 합니다. 기본값은 검은색입니다.
+        색깔을 선택한 후 완료 버튼을 누르면 위젯이 추가됩니다.
+    </string>
+    <string name="widget_setting_activity_description_button">완료 버튼을 눌러 위젯을 추가하세요.</string>
+    <string name="widget_setting_activity_description_progress">위젯을 추가하는 중입니다.</string>
+    <string name="widget_setting_activity_description_complete">위젯을 추가하였습니다.</string>
 
     <!-- for layout/widget_layout -->
     <string name="widget_layout_show_voca">다른 단어</string>
@@ -85,5 +116,10 @@
     <string name="close">닫기</string>
     <string name="choose_text_color">위젯의 텍스트 색깔을 선택해 주세요.</string>
     <string name="complete">완료</string>
-    <string name="description_choose_text_color">위젯의 텍스트 색깔을 선택한다.</string>
+
+    <!-- for settings -->
+    <string name="settings">설정</string>
+    <string name="settings_dark_mode">dark_mode</string>
+    <string name="settings_feedback">feedback</string>
+    <string name="dev_email">mwy3055@gmail.com</string>
 </resources>

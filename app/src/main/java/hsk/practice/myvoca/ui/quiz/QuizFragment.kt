@@ -60,7 +60,11 @@ class QuizFragment : Fragment() {
         binding.root.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             with(binding) {
                 root.post {
-                    val height = quizRecyclerView[0].measuredHeight
+                    val height = try {
+                        quizRecyclerView[0].measuredHeight
+                    } catch (e: IndexOutOfBoundsException) {
+                        return@post
+                    }
                     val size = quizRecyclerView.measuredHeight
                     val padding = (size - height * 4) / 3
                     if (quizRecyclerView.itemDecorationCount > 0) {

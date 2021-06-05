@@ -1,6 +1,7 @@
 package hsk.practice.myvoca
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
@@ -43,4 +44,18 @@ fun Long.getTimeString(): String {
     val min = cal[Calendar.MINUTE]
     val sec = cal[Calendar.SECOND]
     return String.format("%d.%02d.%02d. %02d:%02d:%02d", year, mon + 1, day, hour, min, sec)
+}
+
+/**
+ * Sets night mode.
+ *
+ * @param value whether to enable night mode
+ */
+fun setNightMode(value: Boolean) {
+    val mode = if (value) {
+        AppCompatDelegate.MODE_NIGHT_YES
+    } else {
+        AppCompatDelegate.MODE_NIGHT_NO
+    }
+    AppCompatDelegate.setDefaultNightMode(mode)
 }

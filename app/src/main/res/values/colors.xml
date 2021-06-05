@@ -1,19 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#7070FF</color>
-    <color name="colorPrimaryDark">#4040FF</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="primaryColor">#b867c6</color>
+    <color name="primaryLightColor">#ec97f9</color>
+    <color name="primaryDarkColor">#863895</color>
+    <color name="secondaryColor">#3f51b5</color>
+    <color name="secondaryLightColor">#757de8</color>
+    <color name="secondaryDarkColor">#002984</color>
+    <color name="primaryTextColor">@color/black</color>
+    <color name="secondaryTextColor">@color/white</color>
 
-    <color name="material_light_primary_text">#DE000000</color>
-    <color name="material_light_hint_text">#61000000</color>
-    <color name="material_light_active_icon">#8A000000</color>
-    <color name="material_ripple_light">#1F000000</color>
-    <color name="divider_color">#1F000000</color>
-    <color name="active_icon_color">#8A000000</color>
-    <color name="cards_and_dialogs_color">@color/material_light_primary_text</color>
-    <color name="quantum_grey_600">#757575</color>
-    <color name="light_grey">#A0A0A0</color>
+    <color name="grey_50">#FAFAFA</color>
+    <color name="black_50">#1F000000</color>
 
-    <color name="bg_row_background">#FA315B</color>
-    <color name="bg_row_foreground">#FAFAFA</color>
+    <color name="grey_300">#E0E0E0</color>
+
+    <color name="blue_600">#1e88e5</color>
+    <color name="red_600">#e53935</color>
+    <color name="grey_600">#757575</color>
+    <color name="black_600">#61000000</color>
+
+    <color name="black_800">#8A000000</color>
+
+    <color name="black_900">#DE000000</color>
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
 </resources>

@@ -5,17 +5,16 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:contentDescription="@string/add_voca_activity_description"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/activity_add_voca_horizontal_margin"
-        android:paddingVertical="@dimen/activity_add_voca_vertical_margin">
+        android:paddingHorizontal="@dimen/activity_horizontal_margin"
+        android:paddingVertical="@dimen/activity_vertical_margin">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_activity_new_voca"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:title="@string/add_voca_activity_toolbar_title" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -65,6 +64,7 @@
 
             <Button
                 android:id="@+id/add_button_cancel"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -72,6 +72,7 @@
 
             <Button
                 android:id="@+id/add_button_ok"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
