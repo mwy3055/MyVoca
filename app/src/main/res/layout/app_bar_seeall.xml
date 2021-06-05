@@ -7,14 +7,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:collapseIcon="@drawable/baseline_report_problem_24"
             app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:theme="@style/ToolbarTheme" />
+            app:theme="@style/SearchToolbarTheme" />
 
         <View
             android:id="@+id/anchor_dropdown"

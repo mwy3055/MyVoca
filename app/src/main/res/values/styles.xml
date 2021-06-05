@@ -40,7 +40,7 @@
         <item name="android:popupElevation">0dp</item>
     </style>
 
-    <style name="ToolbarTheme" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
+    <style name="SearchToolbarTheme" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
         <item name="searchViewStyle">@style/SearchViewTheme</item>
     </style>
 
