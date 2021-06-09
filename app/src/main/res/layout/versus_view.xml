@@ -2,10 +2,9 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
-
         <variable
-            name="viewModel"
-            type="hsk.practice.myvoca.ui.customview.VersusViewModel" />
+            name="data"
+            type="hsk.practice.myvoca.ui.customview.VersusViewData"/>
     </data>
 
     <LinearLayout
@@ -24,7 +23,7 @@
                 style="@style/MediumTextViewStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{viewModel.leftValue.toString()}" />
+                android:text="@{data.left.toString()}" />
 
             <View
                 android:layout_width="0dp"
@@ -36,7 +35,7 @@
                 style="@style/MediumTextViewStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{viewModel.rightValue.toString()}" />
+                android:text="@{data.right.toString()}" />
 
         </LinearLayout>
 
@@ -50,7 +49,7 @@
                 android:id="@+id/left_bar"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
-                android:layout_weight="@{viewModel.leftValue}"
+                android:layout_weight="@{data.left}"
                 android:background="@color/blue_600"
                 android:orientation="horizontal" />
 
@@ -58,7 +57,7 @@
                 android:id="@+id/right_bar"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
-                android:layout_weight="@{viewModel.rightValue}"
+                android:layout_weight="@{data.right}"
                 android:background="@color/red_600"
                 android:orientation="horizontal" />
 
