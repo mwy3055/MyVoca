@@ -17,20 +17,25 @@ import java.io.Serializable
  * @memo: Memo for the word.
  */
 @Entity
-data class RoomVocabulary(@kotlin.jvm.JvmField @PrimaryKey var eng: String,
-                          @kotlin.jvm.JvmField var kor: String?,
-                          @kotlin.jvm.JvmField @ColumnInfo(name = "add_time") var addedTime: Long,
-                          @kotlin.jvm.JvmField @ColumnInfo(name = "last_update") var lastEditedTime: Long,
-                          @kotlin.jvm.JvmField var memo: String?)
-    : Serializable {
+data class RoomVocabulary(
+    @kotlin.jvm.JvmField @PrimaryKey var eng: String,
+    @kotlin.jvm.JvmField var kor: String?,
+    @kotlin.jvm.JvmField @ColumnInfo(name = "add_time") var addedTime: Long,
+    @kotlin.jvm.JvmField @ColumnInfo(name = "last_update") var lastEditedTime: Long,
+    @kotlin.jvm.JvmField var memo: String?
+) : Serializable {
+
+    val answerString: String
+        get() = "$eng: ${kor?.replace("\n", " ")}"
 
     companion object {
         val nullVocabulary = RoomVocabulary(
-                "null",
-                "널입니다.",
-                System.currentTimeMillis() / 1000,
-                System.currentTimeMillis() / 1000,
-                "")
+            "null",
+            "널입니다.",
+            System.currentTimeMillis() / 1000,
+            System.currentTimeMillis() / 1000,
+            ""
+        )
     }
 
     override fun equals(other: Any?) = eng == (other as? RoomVocabulary)?.eng ?: false
