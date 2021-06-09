@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.databinding.FragmentQuizBinding
+import hsk.practice.myvoca.framework.RoomVocabulary
 
 /**
  * Shows word quiz to user.
@@ -45,11 +47,8 @@ class QuizFragment : Fragment() {
         }
         binding.viewModel = quizViewModel
 
-        quizViewModel.versusViewModel = binding.versusView.viewModel
-        quizViewModel.loadValues(requireContext())
-
         quizAdapter = QuizAdapter { position: Int ->
-            quizViewModel.quizItemSelected(requireContext(), position)
+            quizViewModel.quizItemSelected(position)
         }
         binding.quizRecyclerView.apply {
             adapter = quizAdapter
@@ -83,6 +82,23 @@ class QuizFragment : Fragment() {
                 hideQuiz()
             }
         }
+
+        quizViewModel.quizResult.observe(viewLifecycleOwner) {
+            it?.let { result ->
+                val answer = result.answer
+                val isCorrect = result is QuizResult.QuizCorrect
+                with(binding.versusView) {
+                    if (isCorrect) {
+                        increaseLeftValue()
+                    } else {
+                        increaseRightValue()
+                    }
+                }
+                showQuizResultDialog(answer, isCorrect)
+                quizViewModel.quizResultComplete()
+            }
+        }
+
         return binding.root
     }
 
@@ -104,6 +120,15 @@ class QuizFragment : Fragment() {
             quizRecyclerView.visibility = View.GONE
             noVocaText.visibility = View.VISIBLE
         }
+    }
+
+    private fun showQuizResultDialog(answer: RoomVocabulary, isCorrect: Boolean) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(if (isCorrect) "맞았습니다!!" else "틀렸습니다")
+            .setMessage(answer.answerString)
+            .setPositiveButton(android.R.string.ok, null)
+            .create()
+            .show()
     }
 
 }

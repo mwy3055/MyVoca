@@ -1,10 +1,5 @@
 package hsk.practice.myvoca.ui.quiz
 
-import android.content.Context
-import androidx.appcompat.app.AlertDialog
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.hsk.data.VocaRepository
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hsk.practice.myvoca.dataStore
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.toRoomVocabularyList
 import hsk.practice.myvoca.module.RoomVocaRepository
@@ -21,23 +15,10 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-private const val quizCorrectKey = "quiz_correct"
-private val QUIZ_CORRECT_KEY = intPreferencesKey(quizCorrectKey)
-
-private const val quizWrongKey = "quiz_wrong"
-private val QUIZ_WRONG_KEY = intPreferencesKey(quizWrongKey)
-
-fun getIntFlow(context: Context, key: Preferences.Key<Int>): Flow<Int> =
-    context.dataStore.data.map { preferences ->
-        preferences[key] ?: 0
-    }
-
-fun ViewModel.setIntValue(context: Context, key: Preferences.Key<Int>, value: Int) =
-    viewModelScope.launch {
-        context.dataStore.edit { preferences ->
-            preferences[key] = value
-        }
-    }
+sealed class QuizResult(val answer: RoomVocabulary) {
+    class QuizCorrect(answer: RoomVocabulary) : QuizResult(answer)
+    class QuizWrong(answer: RoomVocabulary) : QuizResult(answer)
+}
 
 /**
  * [ViewModel] for QuizFragment.
@@ -55,6 +36,10 @@ class QuizViewModel @Inject constructor(@RoomVocaRepository private val vocaRepo
     private val _quizData = MutableLiveData<Quiz?>()
     val quizData: LiveData<Quiz?>
         get() = _quizData
+
+    private val _quizResult = MutableLiveData<QuizResult?>()
+    val quizResult: LiveData<QuizResult?>
+        get() = _quizResult
 
     init {
         viewModelScope.launch {
@@ -87,15 +72,6 @@ class QuizViewModel @Inject constructor(@RoomVocaRepository private val vocaRepo
         }
     }
 
-    fun loadValues(context: Context) = viewModelScope.launch {
-        getIntFlow(context, QUIZ_CORRECT_KEY).take(1).collectLatest { correct ->
-            versusViewModel.setLeftValue(correct)
-        }
-        getIntFlow(context, QUIZ_WRONG_KEY).take(1).collectLatest { wrong ->
-            versusViewModel.setRightValue(wrong)
-        }
-    }
-
     /**
      * Load quiz options. Size of [allVoca] should be at least 4.
      *
@@ -114,39 +90,20 @@ class QuizViewModel @Inject constructor(@RoomVocaRepository private val vocaRepo
         _quizData.value = null
     }
 
-    fun quizItemSelected(context: Context, index: Int) {
+    fun quizItemSelected(index: Int) {
         val result = (index == quizData.value!!.answerIndex)
-        if (result) {
-            onAnswer(context)
+        val answer = quizData.value!!.answer
+        _quizResult.value = if (result) {
+            QuizResult.QuizCorrect(answer)
         } else {
-            onWrong(context)
+            QuizResult.QuizWrong(answer)
         }
 
-        showVocaDialog(context, quizData.value!!.answer, result)
         prepareQuiz()
     }
 
-    private fun onAnswer(context: Context) {
-        versusViewModel.increaseLeftValue()
-        setIntValue(context, QUIZ_CORRECT_KEY, versusViewModel.leftValue.value!!)
+    fun quizResultComplete() {
+        _quizResult.value = null
     }
-
-    private fun onWrong(context: Context) {
-        versusViewModel.increaseRightValue()
-        setIntValue(context, QUIZ_WRONG_KEY, versusViewModel.rightValue.value!!)
-    }
-
-    private fun showVocaDialog(context: Context, voca: RoomVocabulary, isCorrect: Boolean) {
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle(if (isCorrect) "맞았습니다!!" else "틀렸습니다")
-        builder.setMessage(formatAnswer(voca))
-        builder.setPositiveButton(android.R.string.ok, null)
-        val dialog = builder.create()
-        dialog.show()
-    }
-
-    // replace new line character to the space
-    private fun formatAnswer(voca: RoomVocabulary) =
-        "${voca.eng}: ${voca.kor?.replace("\n", " ")}"
 
 }
