@@ -3,18 +3,22 @@ package hsk.practice.myvoca.ui.activity
 import android.os.Bundle
 import android.view.*
 import android.widget.*
-import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
+import com.hsk.data.VocaRepository
 import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.ActivityAddVocaBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
-import hsk.practice.myvoca.ui.NewVocaViewModel
+import hsk.practice.myvoca.framework.toVocabulary
+import hsk.practice.myvoca.module.RoomVocaRepository
+import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Activity where users can add word.
@@ -26,7 +30,10 @@ class AddVocaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddVocaBinding
 
-    private val newVocaViewModel: NewVocaViewModel by viewModels()
+    @RoomVocaRepository
+    @Inject
+    lateinit var vocaRepository: VocaRepository
+
     private var resultCode = Constants.ADD_NEW_VOCA_CANCEL
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +66,9 @@ class AddVocaActivity : AppCompatActivity() {
         val memo = binding.addInputMemo.text.toString()
         val time = Calendar.getInstance().timeInMillis / 1000
         val vocabulary = RoomVocabulary(eng, kor, time, time, memo)
-        newVocaViewModel.insertVocabulary(vocabulary)
+        lifecycleScope.launch {
+            vocaRepository.insertVocabulary(vocabulary.toVocabulary())
+        }
         Toast.makeText(application, "추가 완료!", Toast.LENGTH_LONG).show()
     }
 

@@ -3,18 +3,22 @@ package hsk.practice.myvoca.ui.activity
 import android.os.Bundle
 import android.view.*
 import android.widget.*
-import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
+import com.hsk.data.VocaRepository
 import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.databinding.ActivityEditVocaBinding
 import hsk.practice.myvoca.framework.RoomVocabulary
-import hsk.practice.myvoca.ui.NewVocaViewModel
+import hsk.practice.myvoca.framework.toVocabulary
+import hsk.practice.myvoca.module.RoomVocaRepository
+import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Activity where users can modify the word.
@@ -30,7 +34,9 @@ class EditVocaActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEditVocaBinding
 
-    private val newVocaViewModel: NewVocaViewModel by viewModels()
+    @RoomVocaRepository
+    @Inject
+    lateinit var vocaRepository: VocaRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,11 +77,13 @@ class EditVocaActivity : AppCompatActivity() {
             return false
         }
         val newVocabulary = RoomVocabulary(eng, kor, vocabulary.addedTime, time, memo)
-        if (vocabulary.eng == newVocabulary.eng) {
-            newVocaViewModel.updateVocabulary(newVocabulary)
-        } else {
-            newVocaViewModel.deleteVocabulary(vocabulary)
-            newVocaViewModel.insertVocabulary(newVocabulary)
+        lifecycleScope.launch {
+            if (vocabulary.eng == newVocabulary.eng) {
+                vocaRepository.updateVocabulary(newVocabulary.toVocabulary())
+            } else {
+                vocaRepository.deleteVocabulary(vocabulary.toVocabulary())
+                vocaRepository.insertVocabulary(newVocabulary.toVocabulary())
+            }
         }
         Toast.makeText(application, "수정 완료!", Toast.LENGTH_LONG).show()
         return true
