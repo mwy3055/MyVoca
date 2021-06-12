@@ -17,8 +17,8 @@ class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScop
     val current = System.currentTimeMillis()
 
     val data = mutableListOf(
-        Vocabulary("apple", "사과", current, current, ""),
-        Vocabulary("banana", "바나나", current, current, "")
+        Vocabulary(1, "apple", "사과", current, current, ""),
+        Vocabulary(2, "banana", "바나나", current, current, "")
     )
 
     private val fakeDataFlow = MutableStateFlow<List<Vocabulary?>>(data)
