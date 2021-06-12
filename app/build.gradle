@@ -107,6 +107,10 @@ dependencies {
     // Color picker
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
 
+    // Sealed enum
+    implementation "com.github.livefront.sealed-enum:runtime:0.3.0"
+    kapt "com.github.livefront.sealed-enum:processor:0.3.0"
+
     implementation project(':data')
     implementation project(':domain')
 }
