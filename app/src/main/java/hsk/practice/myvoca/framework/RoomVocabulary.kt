@@ -18,7 +18,7 @@ import java.io.Serializable
  */
 @Entity
 data class RoomVocabulary(
-    @kotlin.jvm.JvmField @PrimaryKey var id: Int,
+    @kotlin.jvm.JvmField @PrimaryKey(autoGenerate = true) var id: Int,
     @kotlin.jvm.JvmField var eng: String,
     @kotlin.jvm.JvmField var kor: String?,
     @kotlin.jvm.JvmField @ColumnInfo(name = "add_time") var addedTime: Long,
