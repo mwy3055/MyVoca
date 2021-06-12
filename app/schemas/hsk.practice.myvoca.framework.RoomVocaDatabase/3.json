@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "dc8a688d294d0fcd9ef1b917b3ac6b6b",
+    "identityHash": "14373f2617bb1dfa516f4efad5e3696a",
     "entities": [
       {
         "tableName": "RoomVocabulary",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eng` TEXT NOT NULL, `kor` TEXT, `add_time` INTEGER NOT NULL, `last_update` INTEGER NOT NULL, `memo` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `eng` TEXT NOT NULL, `kor` TEXT, `add_time` INTEGER NOT NULL, `last_update` INTEGER NOT NULL, `memo` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -49,7 +49,7 @@
           "columnNames": [
             "id"
           ],
-          "autoGenerate": true
+          "autoGenerate": false
         },
         "indices": [],
         "foreignKeys": []
@@ -58,7 +58,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dc8a688d294d0fcd9ef1b917b3ac6b6b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '14373f2617bb1dfa516f4efad5e3696a')"
     ]
   }
 }

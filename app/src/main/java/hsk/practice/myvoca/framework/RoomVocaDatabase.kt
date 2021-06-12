@@ -18,52 +18,53 @@ abstract class RoomVocaDatabase : RoomDatabase() {
 
     companion object {
         const val vocaDatabaseName = "Vocabulary"
+    }
+}
 
-        val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL(
-                    "CREATE TABLE Vocabulary_new " +
-                            "(eng TEXT PRIMARY KEY NOT NULL," +
-                            " kor TEXT, " +
-                            "add_time INTEGER NOT NULL, " +
-                            "last_update INTEGER NOT NULL," +
-                            "memo TEXT)"
+object RoomMigrations {
+    val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE Vocabulary_new " +
+                        "(eng TEXT PRIMARY KEY NOT NULL," +
+                        " kor TEXT, " +
+                        "add_time INTEGER NOT NULL, " +
+                        "last_update INTEGER NOT NULL," +
+                        "memo TEXT)"
+            )
+            database.execSQL(
+                "INSERT INTO Vocabulary_new (eng, kor, add_time, last_update, memo)" +
+                        "SELECT eng, kor, add_time, last_update, memo FROM RoomVocabulary"
+            )
+            database.execSQL("DROP TABLE RoomVocabulary")
+            database.execSQL("ALTER TABLE Vocabulary_new RENAME TO RoomVocabulary")
+        }
+    }
+
+    val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            with(database) {
+                // Create new table
+                execSQL(
+                    listOf(
+                        "CREATE TABLE Vocabulary_3",
+                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,",
+                        "eng TEXT NOT NULL,",
+                        "kor TEXT,",
+                        "add_time INTEGER NOT NULL,",
+                        "last_update INTEGER NOT NULL,",
+                        "memo TEXT)"
+
+                    ).joinToString(" ")
                 )
-                database.execSQL(
-                    "INSERT INTO Vocabulary_new (eng, kor, add_time, last_update, memo)" +
-                            "SELECT eng, kor, add_time, last_update, memo FROM Vocabulary"
-                )
-                database.execSQL("DROP TABLE Vocabulary")
-                database.execSQL("ALTER TABLE Vocabulary_new RENAME TO Vocabulary")
+                execSQL("INSERT INTO Vocabulary_3 (eng, kor, add_time, last_update, memo)" +
+                        "SELECT eng, kor, add_time, last_update, memo FROM RoomVocabulary")
+                execSQL("DROP TABLE RoomVocabulary")
+                execSQL("ALTER TABLE Vocabulary_3 RENAME TO RoomVocabulary")
             }
         }
-
-        val MIGRATION_2_3 = object : Migration(2, 3) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                with(database) {
-                    // Create new table
-                    execSQL(
-                        listOf(
-                            "CREATE TABLE Vocabulary_3",
-                            "(id INTEGER PRIMARY KEY AUTO INCREMENT NOT NULL,",
-                            "eng TEXT NOT NULL,",
-                            "kor TEXT,",
-                            "add_time INTEGER NOT NULL,",
-                            "last_update INTEGER NOT NULL,",
-                            "memo TEXT)"
-
-                        ).joinToString(" ")
-                    )
-                    execSQL("INSERT INTO Vocabulary_3 (eng, kor, add_time, last_update, memo)" +
-                            "SELECT eng, kor, add_time, last_update, memo FROM Vocabulary")
-                    execSQL("DROP TABLE Vocabulary")
-                    execSQL("ALTER TABLE Vocabulary_3 RENAME TO Vocabulary")
-                }
-            }
-
-        }
-
-        val migrations = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
 
     }
+
+    val migrations = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
 }
