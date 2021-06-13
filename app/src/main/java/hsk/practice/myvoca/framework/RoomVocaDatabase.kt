@@ -12,7 +12,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  *
  * Implemented as Singleton because creating database object is very costly.
  */
-@Database(entities = [RoomVocabulary::class], version = 3)
+@Database(entities = [RoomVocabulary::class], version = 4)
 abstract class RoomVocaDatabase : RoomDatabase() {
     abstract fun vocaDao(): VocaDao?
 
@@ -57,8 +57,10 @@ object RoomMigrations {
 
                     ).joinToString(" ")
                 )
-                execSQL("INSERT INTO Vocabulary_3 (eng, kor, add_time, last_update, memo)" +
-                        "SELECT eng, kor, add_time, last_update, memo FROM RoomVocabulary")
+                execSQL(
+                    "INSERT INTO Vocabulary_3 (eng, kor, add_time, last_update, memo)" +
+                            "SELECT eng, kor, add_time, last_update, memo FROM RoomVocabulary"
+                )
                 execSQL("DROP TABLE RoomVocabulary")
                 execSQL("ALTER TABLE Vocabulary_3 RENAME TO RoomVocabulary")
             }
@@ -66,5 +68,28 @@ object RoomMigrations {
 
     }
 
-    val migrations = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
+    val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            with(database) {
+                execSQL(
+                    listOf(
+                        "CREATE TABLE Vocabulary_4",
+                        "(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,",
+                        "eng TEXT NOT NULL,",
+                        "kor TEXT,",
+                        "add_time INTEGER NOT NULL,",
+                        "last_update INTEGER NOT NULL,",
+                        "memo TEXT)"
+                    ).joinToString(" ")
+                )
+                execSQL("INSERT INTO Vocabulary_4 (id, eng, kor, add_time, last_update, memo) " +
+                        "SELECT id, eng, kor, add_time, last_update, memo FROM RoomVocabulary")
+                execSQL("DROP TABLE RoomVocabulary")
+                execSQL("ALTER TABLE Vocabulary_4 RENAME TO RoomVocabulary")
+            }
+        }
+
+    }
+
+    val migrations = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
 }
