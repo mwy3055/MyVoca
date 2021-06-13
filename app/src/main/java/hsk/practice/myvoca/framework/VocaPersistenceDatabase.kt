@@ -26,7 +26,8 @@ import kotlin.coroutines.CoroutineContext
  * Implemented as singleton to keep the data persistence across the whole app.
  */
 @Singleton
-class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: Context) : VocaPersistence, CoroutineScope {
+class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: Context) :
+    VocaPersistence, CoroutineScope {
 
     @EntryPoint
     @InstallIn(SingletonComponent::class)
@@ -38,20 +39,17 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.IO
 
-//    @Inject
-//    lateinit var databaseRoom: RoomVocaDatabase
-
     private var vocaDao: VocaDao
 
     private val _allVocabulary = MutableStateFlow<List<Vocabulary?>>(emptyList())
 
     init {
-//        synchronized(this) {
-//            databaseRoom = RoomVocaDatabase.getInstance(context)
-//        }
         synchronized(this) {
-           val hiltEntryPoint = EntryPointAccessors.fromApplication(context, VocaPersistenceDatabaseEntryPoint::class.java)
-           vocaDao = hiltEntryPoint.vocaDao()
+            val hiltEntryPoint = EntryPointAccessors.fromApplication(
+                context,
+                VocaPersistenceDatabaseEntryPoint::class.java
+            )
+            vocaDao = hiltEntryPoint.vocaDao()
         }
         loadAllVocabulary()
     }
@@ -59,10 +57,6 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
     override fun getAllVocabulary(): StateFlow<List<Vocabulary?>> {
         return _allVocabulary
     }
-
-//    override suspend fun getAllVocabulary(): List<Vocabulary?> {
-//        return allVocabulary.getOrAwaitValue().toVocabularyList()
-//    }
 
     private fun loadAllVocabulary() = launch {
         vocaDao.loadAllVocabulary().collect {

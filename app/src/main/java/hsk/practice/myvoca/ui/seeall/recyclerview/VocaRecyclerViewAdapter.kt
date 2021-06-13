@@ -8,8 +8,8 @@ import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import hsk.practice.myvoca.VocabularyImpl
 import hsk.practice.myvoca.databinding.VocaViewBinding
-import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.getTimeString
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.VocaViewHolder
 
@@ -22,8 +22,7 @@ import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter.VocaVi
 class VocaRecyclerViewAdapter(
     private val deleteData: DeleteData,
     private val itemListener: ItemListener
-) :
-    ListAdapter<RoomVocabulary, VocaViewHolder>(RoomVocabularyDiffCallback()) {
+) : ListAdapter<VocabularyImpl, VocaViewHolder>(VocabularyImplDiffCallback()) {
 
     /**
      * Interface which provides data related to delete mode.
@@ -79,7 +78,7 @@ class VocaRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: VocaViewHolder, position: Int) {
-        val vocabulary = getItem(position) ?: RoomVocabulary.nullVocabulary
+        val vocabulary = getItem(position) ?: VocabularyImpl.nullVocabulary
         holder.bind(vocabulary, deleteData.isSelected(position))
     }
 
@@ -117,14 +116,14 @@ class VocaRecyclerViewAdapter(
             }
         }
 
-        fun bind(vocabulary: RoomVocabulary, isChecked: Boolean) {
+        fun bind(vocabulary: VocabularyImpl, isChecked: Boolean) {
             setVocabulary(vocabulary)
-            if (vocabulary != RoomVocabulary.nullVocabulary) {
+            if (vocabulary != VocabularyImpl.nullVocabulary) {
                 setDeleteCheckBox(isChecked)
             }
         }
 
-        private fun setVocabulary(vocabulary: RoomVocabulary?) {
+        private fun setVocabulary(vocabulary: VocabularyImpl?) {
             vocabulary?.apply {
                 vocaBinding.vocaEng.text = eng
                 vocaBinding.vocaKor.text = kor
@@ -146,12 +145,13 @@ class VocaRecyclerViewAdapter(
     }
 }
 
-class RoomVocabularyDiffCallback : DiffUtil.ItemCallback<RoomVocabulary>() {
-    override fun areContentsTheSame(oldItem: RoomVocabulary, newItem: RoomVocabulary): Boolean {
+class VocabularyImplDiffCallback : DiffUtil.ItemCallback<VocabularyImpl>() {
+
+    override fun areContentsTheSame(oldItem: VocabularyImpl, newItem: VocabularyImpl): Boolean {
         return oldItem == newItem
     }
 
-    override fun areItemsTheSame(oldItem: RoomVocabulary, newItem: RoomVocabulary): Boolean {
-        return oldItem.eng == newItem.eng
+    override fun areItemsTheSame(oldItem: VocabularyImpl, newItem: VocabularyImpl): Boolean {
+        return oldItem === newItem
     }
 }

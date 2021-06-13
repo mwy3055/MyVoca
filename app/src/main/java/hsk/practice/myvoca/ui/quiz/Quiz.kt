@@ -1,11 +1,11 @@
 package hsk.practice.myvoca.ui.quiz
 
-import hsk.practice.myvoca.framework.RoomVocabulary
+import hsk.practice.myvoca.VocabularyImpl
 
 data class Quiz(
-    val quizList: List<RoomVocabulary>,
+    val quizList: List<VocabularyImpl>,
     val answerIndex: Int
 ) {
-    val answer: RoomVocabulary
+    val answer: VocabularyImpl
         get() = quizList[answerIndex]
 }

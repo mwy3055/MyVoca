@@ -14,10 +14,10 @@ import com.hsk.domain.vocabulary.Vocabulary
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hsk.practice.myvoca.R
-import hsk.practice.myvoca.framework.RoomVocabulary
-import hsk.practice.myvoca.framework.toRoomVocabularyList
-import hsk.practice.myvoca.framework.toRoomVocabularyMutableList
+import hsk.practice.myvoca.VocabularyImpl
 import hsk.practice.myvoca.framework.toVocabulary
+import hsk.practice.myvoca.framework.toVocabularyImpl
+import hsk.practice.myvoca.framework.toVocabularyImplList
 import hsk.practice.myvoca.module.RoomVocaRepository
 import hsk.practice.myvoca.ui.seeall.recyclerview.VocaRecyclerViewAdapter
 import kotlinx.coroutines.Dispatchers
@@ -39,12 +39,12 @@ enum class SortMethod(val value: Int) {
 class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRepository: VocaRepository) :
     ViewModel() {
 
-    private val _allVocabulary = MutableLiveData<List<RoomVocabulary?>?>()
-    val allVocabulary: LiveData<List<RoomVocabulary?>?>
+    private val _allVocabulary = MutableLiveData<List<VocabularyImpl?>?>()
+    val allVocabulary: LiveData<List<VocabularyImpl?>?>
         get() = _allVocabulary
 
-    private val _currentVocabulary = MutableLiveData<MutableList<RoomVocabulary?>?>()
-    val currentVocabulary: LiveData<MutableList<RoomVocabulary?>?>
+    private val _currentVocabulary = MutableLiveData<MutableList<VocabularyImpl?>?>()
+    val currentVocabulary: LiveData<MutableList<VocabularyImpl?>?>
         get() = _currentVocabulary
 
     private val _deleteMode = MutableLiveData(false)
@@ -64,15 +64,15 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
     private fun loadAllVocabulary() = viewModelScope.launch(Dispatchers.IO) {
         val allVocabularyFlow = vocaRepository.getAllVocabulary()
         allVocabularyFlow.collectLatest {
-            _allVocabulary.postValue(it.toRoomVocabularyList())
+            _allVocabulary.postValue(it.toVocabularyImplList())
             if (!searchMode) {
                 val sortedList = sortItems(it, sortState.value!!)
-                _currentVocabulary.postValue(sortedList.toRoomVocabularyMutableList())
+                _currentVocabulary.postValue(sortedList.toVocabularyImplList()?.toMutableList())
             }
         }
     }
 
-    fun getCurrentVocabulary(position: Int): RoomVocabulary? =
+    fun getCurrentVocabulary(position: Int): VocabularyImpl? =
         currentVocabulary.value?.get(position)
 
     fun enableSearchMode() {
@@ -95,9 +95,13 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
     fun searchVocabulary(query: String) = viewModelScope.launch(Dispatchers.IO) {
         val result = vocaRepository.getVocabulary(query) ?: return@launch
         val sortedResult = sortItems(result, sortState.value!!)
-        _currentVocabulary.postValue(sortedResult.toRoomVocabularyMutableList())
+        val sortedMutableList = sortedResult.map {
+            it?.toVocabularyImpl()
+        }.toMutableList()
+        _currentVocabulary.postValue(sortedMutableList)
 //        sortItems(sortState) // TODO: what is this?
     }
+
 
     fun deleteItem(position: Int) = viewModelScope.launch(Dispatchers.IO) {
         val target = currentVocabulary.value?.get(position) ?: return@launch
@@ -110,7 +114,7 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
         }
     }
 
-    fun restoreItem(target: RoomVocabulary) = viewModelScope.launch(Dispatchers.IO) {
+    fun restoreItem(target: VocabularyImpl) = viewModelScope.launch(Dispatchers.IO) {
         vocaRepository.insertVocabulary(target.toVocabulary())
     }
 
@@ -178,11 +182,11 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
      * LiveData object for delivering event.
      * Fired when user wants to show a vocabulary in the notification.
      */
-    private val _eventShowVocabulary = MutableLiveData<RoomVocabulary?>()
-    val eventShowVocabulary: LiveData<RoomVocabulary?>
+    private val _eventShowVocabulary = MutableLiveData<VocabularyImpl?>()
+    val eventShowVocabulary: LiveData<VocabularyImpl?>
         get() = _eventShowVocabulary
 
-    fun onShowVocabulary(vocabulary: RoomVocabulary) {
+    fun onShowVocabulary(vocabulary: VocabularyImpl) {
         _eventShowVocabulary.value = vocabulary
     }
 
