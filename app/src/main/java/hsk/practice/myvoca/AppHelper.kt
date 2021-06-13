@@ -1,8 +1,6 @@
 package hsk.practice.myvoca
 
 import android.Manifest
-import com.orhanobut.logger.AndroidLogAdapter
-import com.orhanobut.logger.Logger
 import hsk.practice.myvoca.ui.activity.MainActivity
 import java.io.BufferedWriter
 import java.io.File
@@ -67,18 +65,5 @@ object AppHelper {
      */
     fun isForeground(): Boolean {
         return MainActivity.isRunning()
-    }
-
-    /**
-     * Load database instances.
-     *
-     * @param context context of the application(mainly SplashActivity)
-     */
-    fun loadInstance() {
-        loadLogger()
-    }
-
-    private fun loadLogger() {
-        Logger.addLogAdapter(AndroidLogAdapter())
     }
 }

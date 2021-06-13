@@ -14,7 +14,8 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:contentDescription="@string/home_fragment_description">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/home_layout"
@@ -41,7 +42,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="15dp"
                 android:fontFamily="@font/maplestory_light"
-                android:paddingHorizontal="@dimen/fragment_home_kor_horizontal_margin"
+                android:paddingHorizontal="@dimen/spacing_large"
                 android:text="@{homeViewModel.vocabularyKor}"
                 android:textSize="28sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -54,6 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/home_kor"
                 android:layout_centerHorizontal="true"
+                android:contentDescription="@string/home_fragment_description_button"
                 android:onClick="@{() -> homeViewModel.loadRandomVocabulary()}"
                 android:text="@string/home_fragment_load_button"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -84,8 +86,9 @@
                 android:id="@+id/no_voca_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="@string/home_fragment_description_empty"
                 android:fontFamily="@font/maplestory_light"
-                android:paddingHorizontal="@dimen/fragment_home_kor_horizontal_margin"
+                android:paddingHorizontal="@dimen/spacing_large"
                 android:text="@string/home_fragment_no_voca"
                 android:textSize="28sp"
                 app:layout_constraintBottom_toTopOf="parent"

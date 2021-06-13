@@ -6,15 +6,16 @@
 
         <variable
             name="target"
-            type="hsk.practice.myvoca.framework.RoomVocabulary" />
+            type="hsk.practice.myvoca.VocabularyImpl" />
     </data>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:contentDescription="@string/edit_voca_activity_description"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/activity_add_voca_horizontal_margin"
-        android:paddingVertical="@dimen/activity_add_voca_vertical_margin">
+        android:paddingHorizontal="@dimen/activity_horizontal_margin"
+        android:paddingVertical="@dimen/activity_vertical_margin">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_activity_edit_voca"
@@ -25,67 +26,82 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:title="@string/edit_voca_activity_toolbar_title" />
 
-        <com.google.android.material.textfield.TextInputLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textShortMessage"
-            app:boxBackgroundMode="none"
-            app:helperText="@string/edit_voca_activity_eng_helper_text">
+            android:layout_height="wrap_content">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edit_input_eng"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
-                android:text="@{target.eng}" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:boxBackgroundMode="none"
-            app:helperText="@string/edit_voca_activity_kor_helper_text">
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textShortMessage"
+                    app:boxBackgroundMode="none"
+                    app:helperText="@string/edit_voca_activity_eng_helper_text">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edit_input_kor"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{target.kor}" />
-        </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_input_eng"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/grey_300"
+                        android:inputType="text"
+                        android:text="@{target.eng}" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:boxBackgroundMode="none"
-            app:helperText="@string/edit_voca_activity_memo_helper_text">
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:boxBackgroundMode="none"
+                    app:helperText="@string/edit_voca_activity_kor_helper_text">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edit_input_memo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{target.memo}" />
-        </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_input_kor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/grey_300"
+                        android:text="@{target.kor}" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:boxBackgroundMode="none"
+                    app:helperText="@string/edit_voca_activity_memo_helper_text">
 
-            <Button
-                android:id="@+id/edit_button_cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/edit_voca_activity_cancel_button_text" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_input_memo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/grey_300"
+                        android:text="@{target.memo}" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-            <Button
-                android:id="@+id/edit_button_ok"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/edit_voca_activity_ok_button_text" />
-        </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
 
+                    <Button
+                        android:id="@+id/edit_button_cancel"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/edit_voca_activity_cancel_button_text" />
+
+                    <Button
+                        android:id="@+id/edit_button_ok"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/edit_voca_activity_ok_button_text" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
 </layout>

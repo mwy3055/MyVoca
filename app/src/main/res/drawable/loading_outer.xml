@@ -5,8 +5,8 @@
     android:useLevel="false">
     <gradient
         android:angle="270"
-        android:centerColor="@color/colorPrimary"
+        android:centerColor="@color/primaryColor"
         android:endColor="@android:color/transparent"
-        android:startColor="@color/colorPrimary"
+        android:startColor="@color/primaryColor"
         android:type="sweep" />
 </shape>
