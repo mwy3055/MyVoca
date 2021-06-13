@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import hsk.practice.myvoca.framework.RoomMigrations
 import hsk.practice.myvoca.framework.RoomVocaDatabase
 import hsk.practice.myvoca.framework.VocaDao
 import javax.inject.Singleton
@@ -22,7 +23,7 @@ object RoomVocaDatabaseModule {
             : RoomVocaDatabase = Room.databaseBuilder(context,
             RoomVocaDatabase::class.java,
             RoomVocaDatabase.vocaDatabaseName)
-            .addMigrations(*RoomVocaDatabase.migrations)
+            .addMigrations(*RoomMigrations.migrations)
             .build()
 
     @Singleton

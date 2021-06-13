@@ -30,7 +30,7 @@ class VocaRepository(private val vocaPersistence: VocaPersistence) : CoroutineSc
             resultVoca = try {
                 it.shuffled().first()
             } catch (e: NoSuchElementException) {
-                Vocabulary("null", "널", 0, 0, "")
+                Vocabulary(-1, "null", "널", 0, 0, "")
             }
         }
         return resultVoca

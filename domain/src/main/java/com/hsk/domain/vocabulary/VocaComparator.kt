@@ -14,7 +14,9 @@ object VocaComparator {
     private var engComparator: EngComparator? = null
     fun getAddedTimeComparator(): AddedTimeComparator? {
         if (addedTimeComparator == null) {
-            synchronized(AddedTimeComparator::class.java) { addedTimeComparator = AddedTimeComparator() }
+            synchronized(AddedTimeComparator::class.java) {
+                addedTimeComparator = AddedTimeComparator()
+            }
         }
         return addedTimeComparator
     }
@@ -24,6 +26,20 @@ object VocaComparator {
             synchronized(EngComparator::class.java) { engComparator = EngComparator() }
         }
         return engComparator
+    }
+
+    class IdComparator : Comparator<Vocabulary?> {
+        override fun compare(o1: Vocabulary?, o2: Vocabulary?): Int {
+            return if (o1 != null && o2 != null) {
+                o1.id.compareTo(o2.id)
+            } else 1
+        }
+
+        override fun equals(other: Any?): Boolean {
+            return if (other is IdComparator) {
+                this === other
+            } else false
+        }
     }
 
     class AddedTimeComparator : Comparator<Vocabulary?> {

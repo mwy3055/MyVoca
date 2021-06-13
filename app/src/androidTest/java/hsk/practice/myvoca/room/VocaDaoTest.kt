@@ -1,4 +1,4 @@
-package hsk.practice.myvoca
+package hsk.practice.myvoca.room
 
 import android.content.Context
 import androidx.room.Room
@@ -27,8 +27,8 @@ class VocaDaoTest {
     fun createDatabase() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         database = Room.inMemoryDatabaseBuilder(context, RoomVocaDatabase::class.java)
-                .allowMainThreadQueries()
-                .build()
+            .allowMainThreadQueries()
+            .build()
         vocaDao = database.vocaDao()!!
     }
 
@@ -42,7 +42,7 @@ class VocaDaoTest {
     @Throws(Exception::class)
     fun insertAndGet() = runBlocking {
         val currentTime = System.currentTimeMillis()
-        val voca = RoomVocabulary("test", "테스트", currentTime, currentTime, "dtd")
+        val voca = RoomVocabulary(1, "test", "테스트", currentTime, currentTime, "dtd")
         vocaDao.insertVocabulary(voca)
         val insertedVoca = vocaDao.loadVocabularyByEng("test")?.get(0)
         assertEquals(voca, insertedVoca)
@@ -52,13 +52,32 @@ class VocaDaoTest {
     @Throws(Exception::class)
     fun insertManyAndGet() = runBlocking {
         val currentTime = System.currentTimeMillis()
-        val vocaList = (0..10).map { RoomVocabulary("dtd", "dtd", currentTime, currentTime, "dtd") }
+        val vocaList = (1..10).mapIndexed { index, _ ->
+            RoomVocabulary(
+                index,
+                "dtd",
+                "테스트",
+                currentTime,
+                currentTime,
+                "dtd"
+            )
+        }
         vocaDao.insertVocabulary(*vocaList.toTypedArray())
         val allVocabulary = vocaDao.loadAllVocabulary().take(1)
         allVocabulary.collectIndexed { _, value ->
             for ((v1, v2) in vocaList.zip(value)) {
                 assertEquals(v1, v2)
             }
+        }
+    }
+
+    @Test
+    fun checkIfKeyGenerated(): Unit = runBlocking {
+        val currentTime = System.currentTimeMillis()
+        val test = RoomVocabulary(0, "test", "테스트", currentTime, currentTime, "")
+        vocaDao.insertVocabulary(test)
+        vocaDao.loadVocabularyByEng("test")?.forEach {
+            it?.let { assertEquals(it.id, 1) }
         }
     }
 }
