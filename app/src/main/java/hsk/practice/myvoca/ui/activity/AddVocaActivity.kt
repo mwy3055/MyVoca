@@ -12,8 +12,8 @@ import com.hsk.data.VocaRepository
 import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
+import hsk.practice.myvoca.VocabularyImpl
 import hsk.practice.myvoca.databinding.ActivityAddVocaBinding
-import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.toVocabulary
 import hsk.practice.myvoca.module.RoomVocaRepository
 import kotlinx.coroutines.launch
@@ -65,7 +65,13 @@ class AddVocaActivity : AppCompatActivity() {
         val kor = binding.addInputKor.text.toString()
         val memo = binding.addInputMemo.text.toString()
         val time = Calendar.getInstance().timeInMillis / 1000
-        val vocabulary = RoomVocabulary(eng, kor, time, time, memo)
+        val vocabulary = VocabularyImpl(
+            eng = eng,
+            kor = kor,
+            addedTime = time,
+            lastEditedTime = time,
+            memo = memo
+        )
         lifecycleScope.launch {
             vocaRepository.insertVocabulary(vocabulary.toVocabulary())
         }

@@ -18,8 +18,8 @@ import com.orhanobut.logger.Logger
 import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.R
-import hsk.practice.myvoca.framework.RoomVocabulary
-import hsk.practice.myvoca.framework.toRoomVocabulary
+import hsk.practice.myvoca.VocabularyImpl
+import hsk.practice.myvoca.framework.toVocabularyImpl
 import hsk.practice.myvoca.module.RoomVocaRepository
 import hsk.practice.myvoca.ui.activity.SplashActivity
 import kotlinx.coroutines.launch
@@ -99,12 +99,13 @@ class ShowNotificationService : LifecycleService() {
 //            }
 //        })
         lifecycleScope.launch {
-            vocaRepository.getAllVocabulary().asLiveData(lifecycleScope.coroutineContext).observeForever {
-                if (intent?.getSerializableExtra(SHOW_VOCA) != null) {
-                    val vocabulary = intent.getSerializableExtra(SHOW_VOCA) as RoomVocabulary
-                    showWordOnNotification(vocabulary)
+            vocaRepository.getAllVocabulary().asLiveData(lifecycleScope.coroutineContext)
+                .observeForever {
+                    if (intent?.getSerializableExtra(SHOW_VOCA) != null) {
+                        val vocabulary = intent.getSerializableExtra(SHOW_VOCA) as VocabularyImpl
+                        showWordOnNotification(vocabulary)
+                    }
                 }
-            }
         }
         return super.onStartCommand(intent, flags, startId)
     }
@@ -129,7 +130,8 @@ class ShowNotificationService : LifecycleService() {
         calendar.add(Calendar.MILLISECOND, 500)
 
         val intent = Intent(applicationContext, AlarmReceiver::class.java)
-        val sendAlarmPI = PendingIntent.getBroadcast(applicationContext, RESTART_SERVICE_CODE, intent, 0)
+        val sendAlarmPI =
+            PendingIntent.getBroadcast(applicationContext, RESTART_SERVICE_CODE, intent, 0)
         val manager = getSystemService(ALARM_SERVICE) as AlarmManager
         manager[AlarmManager.RTC_WAKEUP, calendar.timeInMillis] = sendAlarmPI
     }
@@ -137,37 +139,48 @@ class ShowNotificationService : LifecycleService() {
     /* methods for showing notification */
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(VOCA_NOTIFICATION_CHANNEL_ID, VOCA_NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW)
+            val channel = NotificationChannel(
+                VOCA_NOTIFICATION_CHANNEL_ID,
+                VOCA_NOTIFICATION_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_LOW
+            )
             channel.setSound(null, null)
             channel.setShowBadge(false)
             notificationManager?.createNotificationChannel(channel)
         }
     }
 
-    private fun getBuilder(vocabulary: RoomVocabulary?): NotificationCompat.Builder? {
+    private fun getBuilder(vocabulary: VocabularyImpl): NotificationCompat.Builder? {
         val startAppIntent = Intent(START_APP_ACTION_NAME)
-        val startAppPI = PendingIntent.getBroadcast(applicationContext, START_APP_ACTION_ID, startAppIntent, 0)
+        val startAppPI =
+            PendingIntent.getBroadcast(applicationContext, START_APP_ACTION_ID, startAppIntent, 0)
         val showVocaIntent = Intent(SHOW_RANDOM_VOCA_ACTION_NAME)
-        val showVocaPI = PendingIntent.getBroadcast(applicationContext, SHOW_RANDOM_VOCA_ACTION_ID, showVocaIntent, 0)
-        val action = NotificationCompat.Action(R.drawable.thinking_face, SHOW_RANDOM_VOCA, showVocaPI)
+        val showVocaPI = PendingIntent.getBroadcast(
+            applicationContext,
+            SHOW_RANDOM_VOCA_ACTION_ID,
+            showVocaIntent,
+            0
+        )
+        val action =
+            NotificationCompat.Action(R.drawable.thinking_face, SHOW_RANDOM_VOCA, showVocaPI)
         return NotificationCompat.Builder(applicationContext, VOCA_NOTIFICATION_ID)
-                .setSmallIcon(R.drawable.baseline_bookmark_border_24)
-                .setContentTitle(vocabulary?.eng)
-                .setContentText(vocabulary?.kor)
-                .setAutoCancel(false)
-                .setOngoing(true)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setChannelId(VOCA_NOTIFICATION_CHANNEL_ID)
-                .addAction(action)
-                .setContentIntent(startAppPI)
+            .setSmallIcon(R.drawable.baseline_bookmark_border_24)
+            .setContentTitle(vocabulary.eng)
+            .setContentText(vocabulary.kor)
+            .setAutoCancel(false)
+            .setOngoing(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setChannelId(VOCA_NOTIFICATION_CHANNEL_ID)
+            .addAction(action)
+            .setContentIntent(startAppPI)
     }
 
     private fun showRandomWordOnNotification() = lifecycleScope.launch {
-        val vocabulary = vocaRepository.getRandomVocabulary()?.toRoomVocabulary()
+        val vocabulary = vocaRepository.getRandomVocabulary()?.toVocabularyImpl() ?: return@launch
         showWordOnNotification(vocabulary)
     }
 
-    private fun showWordOnNotification(vocabulary: RoomVocabulary?) {
+    private fun showWordOnNotification(vocabulary: VocabularyImpl) {
         createNotificationChannel()
         val builder = getBuilder(vocabulary)
         notificationManager?.notify(NOTIFICATION_ID, builder?.build())
@@ -181,10 +194,12 @@ class ShowNotificationService : LifecycleService() {
                 Logger.d("Show voca on notification")
                 showRandomWordOnNotification()
             } else if (intent?.action.equals(START_APP_ACTION_NAME, ignoreCase = true)
-                    && !AppHelper.isForeground()) {
+                && !AppHelper.isForeground()
+            ) {
                 Logger.d("Start app")
                 val startAppIntent = Intent(applicationContext, SplashActivity::class.java)
-                startAppIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                startAppIntent.flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 startActivity(startAppIntent)
             }
         }

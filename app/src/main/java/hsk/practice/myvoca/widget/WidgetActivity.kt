@@ -18,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.dataStore
 import hsk.practice.myvoca.databinding.ActivityWidgetSettingBinding
-import hsk.practice.myvoca.framework.toRoomVocabulary
+import hsk.practice.myvoca.framework.toVocabularyImpl
 import hsk.practice.myvoca.module.RoomVocaRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -102,7 +102,7 @@ class WidgetActivity : AppCompatActivity() {
             val widgetManager = AppWidgetManager.getInstance(context)
 
             val vocabulary =
-                vocaRepository.getRandomVocabulary()?.toRoomVocabulary()
+                vocaRepository.getRandomVocabulary()?.toVocabularyImpl()
                     ?: throw IllegalStateException("Vocabulary is null!")
             VocaWidgetProvider.remoteViewWithVocabulary(context, widgetId, vocabulary)
                 .also { remoteViews ->

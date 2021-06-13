@@ -11,8 +11,8 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import hsk.practice.myvoca.VocabularyImpl
 import hsk.practice.myvoca.databinding.FragmentQuizBinding
-import hsk.practice.myvoca.framework.RoomVocabulary
 
 /**
  * Shows word quiz to user.
@@ -122,7 +122,7 @@ class QuizFragment : Fragment() {
         }
     }
 
-    private fun showQuizResultDialog(answer: RoomVocabulary, isCorrect: Boolean) {
+    private fun showQuizResultDialog(answer: VocabularyImpl, isCorrect: Boolean) {
         AlertDialog.Builder(requireContext())
             .setTitle(if (isCorrect) "맞았습니다!!" else "틀렸습니다")
             .setMessage(answer.answerString)

@@ -10,12 +10,14 @@ import android.widget.RemoteViews
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.R
+import hsk.practice.myvoca.VocabularyImpl
 import hsk.practice.myvoca.framework.RoomVocaDatabase
-import hsk.practice.myvoca.framework.RoomVocabulary
+import hsk.practice.myvoca.framework.vocabularyImplList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -55,7 +57,7 @@ class VocaWidgetProvider : AppWidgetProvider() {
         fun remoteViewWithVocabulary(
             context: Context,
             appWidgetId: Int,
-            vocabulary: RoomVocabulary
+            vocabulary: VocabularyImpl
         ): RemoteViews = remoteViewWithPendingIntent(context, appWidgetId).apply {
             setTextViewText(R.id.widget_eng, vocabulary.eng)
             setTextViewText(R.id.widget_kor, vocabulary.kor)
@@ -89,32 +91,34 @@ class VocaWidgetProvider : AppWidgetProvider() {
     }
 
     private fun updateWidgets(context: Context) = coroutineScope.launch {
-        vocaDatabase.vocaDao()?.loadAllVocabulary()?.collectLatest {
-            val appWidgetManager = AppWidgetManager.getInstance(context)
-            val widgetIds = appWidgetManager.getAppWidgetIds(
-                ComponentName(
-                    context,
-                    VocaWidgetProvider::class.java
+        vocaDatabase.vocaDao()?.loadAllVocabulary()
+            ?.map { it.vocabularyImplList() }
+            ?.collectLatest {
+                val appWidgetManager = AppWidgetManager.getInstance(context)
+                val widgetIds = appWidgetManager.getAppWidgetIds(
+                    ComponentName(
+                        context,
+                        VocaWidgetProvider::class.java
+                    )
                 )
-            )
 
-            val vocabulary = it.random()
-            widgetIds.forEach { widgetId ->
-                updateVocaWidget(
-                    context,
-                    appWidgetManager,
-                    widgetId,
-                    vocabulary
-                )
+                val vocabulary = it.random()!!
+                widgetIds.forEach { widgetId ->
+                    updateVocaWidget(
+                        context,
+                        appWidgetManager,
+                        widgetId,
+                        vocabulary
+                    )
+                }
             }
-        }
     }
 
     private suspend fun updateVocaWidget(
         context: Context?,
         appWidgetManager: AppWidgetManager,
         widgetId: Int,
-        vocabulary: RoomVocabulary
+        vocabulary: VocabularyImpl
     ) {
         Logger.d("VocaWidgetProvider.updateVocaWidget(): $vocabulary")
         val remoteViews = remoteViewWithVocabulary(context!!, widgetId, vocabulary)

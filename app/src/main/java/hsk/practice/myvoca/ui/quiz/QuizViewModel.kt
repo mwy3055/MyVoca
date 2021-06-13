@@ -7,17 +7,16 @@ import androidx.lifecycle.viewModelScope
 import com.hsk.data.VocaRepository
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hsk.practice.myvoca.framework.RoomVocabulary
-import hsk.practice.myvoca.framework.toRoomVocabularyList
+import hsk.practice.myvoca.VocabularyImpl
+import hsk.practice.myvoca.framework.toVocabularyImpl
 import hsk.practice.myvoca.module.RoomVocaRepository
-import hsk.practice.myvoca.ui.customview.VersusViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class QuizResult(val answer: RoomVocabulary) {
-    class QuizCorrect(answer: RoomVocabulary) : QuizResult(answer)
-    class QuizWrong(answer: RoomVocabulary) : QuizResult(answer)
+sealed class QuizResult(val answer: VocabularyImpl) {
+    class QuizCorrect(answer: VocabularyImpl) : QuizResult(answer)
+    class QuizWrong(answer: VocabularyImpl) : QuizResult(answer)
 }
 
 /**
@@ -27,11 +26,9 @@ sealed class QuizResult(val answer: RoomVocabulary) {
 class QuizViewModel @Inject constructor(@RoomVocaRepository private val vocaRepository: VocaRepository) :
     ViewModel() {
 
-    private lateinit var allVocabularyFlow: StateFlow<List<RoomVocabulary?>?>
+    private lateinit var allVocabularyFlow: StateFlow<List<VocabularyImpl?>?>
 
     private lateinit var quizAvailable: StateFlow<Boolean>
-
-    lateinit var versusViewModel: VersusViewModel
 
     private val _quizData = MutableLiveData<Quiz?>()
     val quizData: LiveData<Quiz?>
@@ -51,12 +48,13 @@ class QuizViewModel @Inject constructor(@RoomVocaRepository private val vocaRepo
         }
     }
 
-    private suspend fun getAllVocabulary() = vocaRepository.getAllVocabulary().map {
-        Logger.d("QuizViewModel.allVocabularyFlow set!")
-        it.toRoomVocabularyList()
-    }.stateIn(viewModelScope)
+    private suspend fun getAllVocabulary(): StateFlow<List<VocabularyImpl?>> =
+        vocaRepository.getAllVocabulary().map {
+            Logger.d("QuizViewModel.allVocabularyFlow set!")
+            it.map { voca -> voca?.toVocabularyImpl() }
+        }.stateIn(viewModelScope)
 
-    private suspend fun getQuizAvailable(allVocaFlow: StateFlow<List<RoomVocabulary?>?>) =
+    private suspend fun getQuizAvailable(allVocaFlow: StateFlow<List<VocabularyImpl?>?>) =
         allVocaFlow.map {
             it?.let { it.size >= 4 } == true
         }.stateIn(viewModelScope)
@@ -78,8 +76,8 @@ class QuizViewModel @Inject constructor(@RoomVocaRepository private val vocaRepo
      * @param allVoca List of all vocabularies. Length should be at least 4.
      * @return list of quiz items
      */
-    private fun loadQuizVocabulary(allVoca: List<RoomVocabulary?>): List<RoomVocabulary> {
-        val vocaNotNullSet = mutableSetOf<RoomVocabulary>()
+    private fun loadQuizVocabulary(allVoca: List<VocabularyImpl?>): List<VocabularyImpl> {
+        val vocaNotNullSet = mutableSetOf<VocabularyImpl>()
         while (vocaNotNullSet.size < 4) {
             vocaNotNullSet.add(allVoca.random() ?: continue)
         }

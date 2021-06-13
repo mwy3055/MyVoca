@@ -26,9 +26,6 @@ data class RoomVocabulary(
     @kotlin.jvm.JvmField var memo: String?
 ) : Serializable {
 
-    val answerString: String
-        get() = "$eng: ${kor?.replace("\n", " ")}"
-
     companion object {
         val nullVocabulary = RoomVocabulary(
             -1,

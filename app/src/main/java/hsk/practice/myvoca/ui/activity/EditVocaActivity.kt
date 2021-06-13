@@ -12,8 +12,8 @@ import com.hsk.data.VocaRepository
 import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.Constants
 import hsk.practice.myvoca.R
+import hsk.practice.myvoca.VocabularyImpl
 import hsk.practice.myvoca.databinding.ActivityEditVocaBinding
-import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.toVocabulary
 import hsk.practice.myvoca.module.RoomVocaRepository
 import kotlinx.coroutines.launch
@@ -29,7 +29,7 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class EditVocaActivity : AppCompatActivity() {
-    private lateinit var vocabulary: RoomVocabulary
+    private lateinit var vocabulary: VocabularyImpl
     private var exitCode = 0
 
     private lateinit var binding: ActivityEditVocaBinding
@@ -44,7 +44,7 @@ class EditVocaActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_edit_voca)
         binding.lifecycleOwner = this
 
-        vocabulary = intent.getSerializableExtra(Constants.EDIT_VOCA) as RoomVocabulary
+        vocabulary = intent.getSerializableExtra(Constants.EDIT_VOCA) as VocabularyImpl
         binding.target = vocabulary
 
         val toolbar = findViewById<Toolbar?>(R.id.toolbar_activity_edit_voca)
@@ -76,11 +76,22 @@ class EditVocaActivity : AppCompatActivity() {
         if (eng == "") {
             return false
         }
-        val newVocabulary = RoomVocabulary(eng, kor, vocabulary.addedTime, time, memo)
         lifecycleScope.launch {
-            if (vocabulary.eng == newVocabulary.eng) {
-                vocaRepository.updateVocabulary(newVocabulary.toVocabulary())
+            if (vocabulary.eng == eng) {
+                val updatedVocabulary = vocabulary.copy(
+                    kor = kor,
+                    memo = memo,
+                    lastEditedTime = time
+                )
+                vocaRepository.updateVocabulary(updatedVocabulary.toVocabulary())
             } else {
+                val newVocabulary = VocabularyImpl(
+                    eng = eng,
+                    kor = kor,
+                    addedTime = vocabulary.addedTime,
+                    lastEditedTime = time,
+                    memo = memo
+                )
                 vocaRepository.deleteVocabulary(vocabulary.toVocabulary())
                 vocaRepository.insertVocabulary(newVocabulary.toVocabulary())
             }
