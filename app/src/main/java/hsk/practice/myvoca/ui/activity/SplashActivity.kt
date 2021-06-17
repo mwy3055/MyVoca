@@ -7,7 +7,7 @@ import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import hsk.practice.myvoca.AppHelper
+import hsk.practice.myvoca.permissionsList
 import hsk.practice.myvoca.services.notification.ShowNotificationService
 
 /**
@@ -33,9 +33,10 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun getPermissions() {
-        for (permission in AppHelper.getPermissionList()!!) {
-            val check = permission?.let { ContextCompat.checkSelfPermission(applicationContext, it) }
-            if (check == PackageManager.PERMISSION_DENIED) {
+        permissionsList.forEach { permission ->
+            val permissionGranted =
+                ContextCompat.checkSelfPermission(applicationContext, permission)
+            if (permissionGranted == PackageManager.PERMISSION_DENIED) {
                 ActivityCompat.requestPermissions(this, arrayOf(permission), permissionRequestCode)
             }
         }

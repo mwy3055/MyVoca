@@ -1,8 +1,17 @@
 package hsk.practice.myvoca
 
+import android.Manifest
 import androidx.appcompat.app.AppCompatDelegate
 import java.util.*
 
+
+/**
+ * Runtime permissions required for this app.
+ */
+val permissionsList: List<String> = listOf(
+    Manifest.permission.READ_EXTERNAL_STORAGE,
+    Manifest.permission.WRITE_EXTERNAL_STORAGE
+)
 
 /**
  * Checks if the given string contains only alphabet.

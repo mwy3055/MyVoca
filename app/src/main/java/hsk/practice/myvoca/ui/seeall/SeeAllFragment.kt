@@ -76,6 +76,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
 
+    private val CALL_EDIT_VOCA_ACTIVITY = 10
+
     private var _binding: FragmentSeeAllBinding? = null
 
     private val binding
@@ -166,9 +168,8 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
                 val target = seeAllViewModel.getCurrentVocabulary(position)
                 Logger.d("Update: $target")
                 val intent = Intent(context, EditVocaActivity::class.java)
-                intent.putExtra(Constants.POSITION, position)
                 intent.putExtra(Constants.EDIT_VOCA, target)
-                startActivityForResult(intent, Constants.CALL_EDIT_VOCA_ACTIVITY)
+                startActivityForResult(intent, CALL_EDIT_VOCA_ACTIVITY)
                 seeAllViewModel.onVocabularyUpdateComplete()
             }
         }
@@ -451,7 +452,7 @@ class SeeAllFragment : Fragment(), VocabularyTouchHelperListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Logger.d("requestCode = $requestCode, resultCode = $resultCode")
-        if (requestCode == Constants.CALL_EDIT_VOCA_ACTIVITY && resultCode == Constants.EDIT_NEW_VOCA_OK) {
+        if (requestCode == CALL_EDIT_VOCA_ACTIVITY && resultCode == Constants.EDIT_NEW_VOCA_OK) {
             vocaAdapter.notifyItemsChanged()
         } else if (requestCode == Constants.CALL_ADD_VOCA_ACTIVITY && resultCode == Constants.ADD_NEW_VOCA_OK) {
             vocaAdapter.notifyDataSetChanged()
