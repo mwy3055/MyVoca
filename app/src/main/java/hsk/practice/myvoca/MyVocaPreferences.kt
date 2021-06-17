@@ -18,13 +18,13 @@ import kotlinx.coroutines.launch
  */
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-fun <T> Context.getPreferencesFlow(key: Preferences.Key<T>): Flow<T> =
+fun <T> Context.getPreferencesFlow(key: Preferences.Key<T>, defaultValue: T): Flow<T> =
     dataStore.data.map { preferences ->
-        preferences[key] ?: throw NoSuchElementException("Element $key doesn't exist")
+        preferences[key] ?: defaultValue
     }
 
-suspend fun <T> Context.getPreferences(key: Preferences.Key<T>): T {
-    return getPreferencesFlow(key).first()
+suspend fun <T> Context.getPreferences(key: Preferences.Key<T>, defaultValue: T): T {
+    return getPreferencesFlow(key, defaultValue).first()
 }
 
 suspend fun <T> Context.setPreferenceValue(key: Preferences.Key<T>, value: T) =

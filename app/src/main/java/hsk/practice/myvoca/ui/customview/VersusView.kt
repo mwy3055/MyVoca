@@ -44,8 +44,8 @@ class VersusView @JvmOverloads constructor(
 
     init {
         launch {
-            _left.value = context.getPreferences(MyVocaPreferences.quizCorrectKey)
-            _right.value = context.getPreferences(MyVocaPreferences.quizWrongKey)
+            _left.value = context.getPreferences(MyVocaPreferences.quizCorrectKey, 0)
+            _right.value = context.getPreferences(MyVocaPreferences.quizWrongKey, 0)
         }
     }
 
