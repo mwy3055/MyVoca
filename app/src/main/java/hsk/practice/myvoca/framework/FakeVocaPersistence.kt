@@ -2,6 +2,7 @@ package hsk.practice.myvoca.framework
 
 import com.hsk.data.VocaPersistence
 import com.hsk.domain.vocabulary.Vocabulary
+import com.hsk.domain.vocabulary.nullVocabulary
 import hsk.practice.myvoca.containsOnlyAlphabet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,11 +22,18 @@ class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScop
         Vocabulary(2, "banana", "바나나", current, current, "")
     )
 
-    private val fakeDataFlow = MutableStateFlow<List<Vocabulary?>>(data)
+    private val fakeDataFlow = MutableStateFlow<List<Vocabulary>>(data)
 
-    override fun getAllVocabulary(): StateFlow<List<Vocabulary?>> = fakeDataFlow
+    override fun getAllVocabulary(): StateFlow<List<Vocabulary>> = fakeDataFlow
+    override suspend fun getVocabularyById(id: Int): Vocabulary {
+        return try {
+            data.first { it.id == id }
+        } catch (e: NoSuchElementException) {
+            nullVocabulary
+        }
+    }
 
-    override suspend fun getVocabulary(query: String): List<Vocabulary?> {
+    override suspend fun getVocabulary(query: String): List<Vocabulary> {
         return if (query.containsOnlyAlphabet()) {
             data.filter { it.eng.contains(query) }
         } else {
@@ -33,18 +41,18 @@ class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScop
         }
     }
 
-    override suspend fun insertVocabulary(vararg vocabularies: Vocabulary?) {
+    override suspend fun insertVocabulary(vararg vocabularies: Vocabulary) {
         for (voca in vocabularies) {
-            voca?.let { data.add(it) }
+            voca.let { data.add(it) }
         }
         data.sortBy { it.eng }
     }
 
-    override suspend fun updateVocabulary(vararg vocabularies: Vocabulary?) {
+    override suspend fun updateVocabulary(vararg vocabularies: Vocabulary) {
         // Not necessary, so didn't implemented.
     }
 
-    override suspend fun deleteVocabulary(vararg vocabularies: Vocabulary?) {
+    override suspend fun deleteVocabulary(vararg vocabularies: Vocabulary) {
         for (voca in vocabularies) {
             data.remove(voca)
         }
