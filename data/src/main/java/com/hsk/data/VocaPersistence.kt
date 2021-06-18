@@ -12,28 +12,28 @@ interface VocaPersistence {
     /**
      * Loads all vocabularies from the database and return them as LiveData.
      */
-    fun getAllVocabulary(): StateFlow<List<Vocabulary?>>
+    fun getAllVocabulary(): StateFlow<List<Vocabulary>>
 
     /**
      * Loads a vocabulary which matches with the given query.
      * Query can be English or Korean.
      * Loads a vocabulary whose eng(former) or kor(latter) contains the query.
      */
-    suspend fun getVocabulary(query: String): List<Vocabulary?>?
+    suspend fun getVocabulary(query: String): List<Vocabulary>
 
     /**
      * Inserts vocabularies to the database.
      */
-    suspend fun insertVocabulary(vararg vocabularies: Vocabulary?)
+    suspend fun insertVocabulary(vararg vocabularies: Vocabulary)
 
     /**
      * Updates the given vocabulary.
      */
-    suspend fun updateVocabulary(vararg vocabularies: Vocabulary?)
+    suspend fun updateVocabulary(vararg vocabularies: Vocabulary)
 
     /**
      * Deletes the given vocabulary. This operation is permanent.
      */
-    suspend fun deleteVocabulary(vararg vocabularies: Vocabulary?)
+    suspend fun deleteVocabulary(vararg vocabularies: Vocabulary)
 
 }
