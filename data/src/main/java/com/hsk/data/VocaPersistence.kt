@@ -15,6 +15,11 @@ interface VocaPersistence {
     fun getAllVocabulary(): StateFlow<List<Vocabulary>>
 
     /**
+     * Loads a vocabulary whose id is equal to the parameter [id].
+     */
+    suspend fun getVocabularyById(id: Int): Vocabulary?
+
+    /**
      * Loads a vocabulary which matches with the given query.
      * Query can be English or Korean.
      * Loads a vocabulary whose eng(former) or kor(latter) contains the query.

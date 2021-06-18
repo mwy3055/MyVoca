@@ -20,6 +20,10 @@ class VocaRepository(private val vocaPersistence: VocaPersistence) : CoroutineSc
         return vocaPersistence.getAllVocabulary()
     }
 
+    suspend fun getVocabularyById(id: Int): Vocabulary? {
+        return vocaPersistence.getVocabularyById(id)
+    }
+
     suspend fun getVocabulary(query: String): List<Vocabulary> {
         return vocaPersistence.getVocabulary(query)
     }
