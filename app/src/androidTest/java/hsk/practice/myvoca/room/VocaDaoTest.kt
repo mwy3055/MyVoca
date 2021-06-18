@@ -22,6 +22,18 @@ class VocaDaoTest {
     private lateinit var vocaDao: VocaDao
     private lateinit var database: RoomVocaDatabase
 
+    private val vocaList = (1..10).mapIndexed { _, value ->
+        RoomVocabulary(
+            value,
+            "dtd",
+            "테스트",
+            System.currentTimeMillis(),
+            System.currentTimeMillis(),
+            "dtd"
+        )
+    }
+
+
     @Before
     fun createDatabase() {
         val context = ApplicationProvider.getApplicationContext<Context>()
@@ -40,27 +52,15 @@ class VocaDaoTest {
     @Test
     @Throws(Exception::class)
     fun insertAndGet() = runBlocking {
-        val currentTime = System.currentTimeMillis()
-        val voca = RoomVocabulary(1, "test", "테스트", currentTime, currentTime, "dtd")
+        val voca = vocaList[0]
         vocaDao.insertVocabulary(voca)
-        val insertedVoca = vocaDao.loadVocabularyByEng("test")[0]
+        val insertedVoca = vocaDao.loadVocabularyByEng("dtd")[0]
         assertEquals(voca, insertedVoca)
     }
 
     @Test
     @Throws(Exception::class)
     fun insertManyAndGet() = runBlocking {
-        val currentTime = System.currentTimeMillis()
-        val vocaList = (1..10).mapIndexed { _, value ->
-            RoomVocabulary(
-                value,
-                "dtd",
-                "테스트",
-                currentTime,
-                currentTime,
-                "dtd"
-            )
-        }
         vocaDao.insertVocabulary(*vocaList.toTypedArray())
         val allVocabulary = vocaDao.loadAllVocabulary().first()
         for ((v1, v2) in vocaList.zip(allVocabulary)) {
@@ -70,11 +70,20 @@ class VocaDaoTest {
 
     @Test
     fun checkIfKeyGenerated(): Unit = runBlocking {
-        val currentTime = System.currentTimeMillis()
-        val test = RoomVocabulary(0, "test", "테스트", currentTime, currentTime, "")
+        val test = vocaList[0].copy(
+            id = 0
+        )
         vocaDao.insertVocabulary(test)
         vocaDao.loadVocabularyByEng("test").forEach {
             assertEquals(it.id, 1)
         }
+    }
+
+    @Test
+    fun checkIdQuery() = runBlocking {
+        val voca = vocaList[0]
+        vocaDao.insertVocabulary(voca)
+        val testVoca = vocaDao.loadVocabularyById(1)
+        assertEquals(voca, testVoca)
     }
 }
