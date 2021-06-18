@@ -41,6 +41,14 @@ interface VocaDao {
     fun loadAllVocabulary(): Flow<List<RoomVocabulary>>
 
     /**
+     * Loads vocabulary by id.
+     *
+     * @param id id to search
+     */
+    @Query("SELECT * FROM RoomVocabulary WHERE id LIKE :id")
+    suspend fun loadVocabularyById(id: Int): RoomVocabulary?
+
+    /**
      * Loads vocabularies that matches with the english word
      *
      * @param eng english word to search

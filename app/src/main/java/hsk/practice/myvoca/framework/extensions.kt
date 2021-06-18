@@ -12,28 +12,28 @@ fun Vocabulary.toVocabularyImpl() = VocabularyImpl(
     id, eng, kor, addedTime, lastEditedTime, memo
 )
 
-fun List<Vocabulary?>?.toRoomVocabularyList() = this?.map { it?.toRoomVocabulary() }
+fun List<Vocabulary>.toRoomVocabularyList() = this.map { it.toRoomVocabulary() }
 
-fun List<Vocabulary?>?.toRoomVocabularyMutableList() = this?.toRoomVocabularyList()?.toMutableList()
+fun List<Vocabulary>.toRoomVocabularyMutableList() = this.toRoomVocabularyList().toMutableList()
 
-fun List<Vocabulary?>?.toVocabularyImplList() = this?.map { it?.toVocabularyImpl() }
+fun List<Vocabulary>.toVocabularyImplList() = this.map { it.toVocabularyImpl() }
 
-fun Array<out Vocabulary?>.toRoomVocabularyArray() =
-    this.map { it?.toRoomVocabulary() }.toTypedArray()
+fun Array<out Vocabulary>.toRoomVocabularyArray() =
+    this.map { it.toRoomVocabulary() }.toTypedArray()
 
 
 /* Convert RoomVocabulary to other types */
-fun RoomVocabulary?.toVocabulary() =
-    this?.let { Vocabulary(it.id, it.eng, it.kor, it.addedTime, it.lastEditedTime, it.memo) }
+fun RoomVocabulary.toVocabulary() =
+    this.let { Vocabulary(it.id, it.eng, it.kor, it.addedTime, it.lastEditedTime, it.memo) }
 
-fun RoomVocabulary?.toVocabularyImpl() =
-    this?.let { VocabularyImpl(it.id, it.eng, it.kor, it.addedTime, it.lastEditedTime, it.memo) }
+fun RoomVocabulary.toVocabularyImpl() =
+    this.let { VocabularyImpl(it.id, it.eng, it.kor, it.addedTime, it.lastEditedTime, it.memo) }
 
-fun List<RoomVocabulary?>.toVocabularyList() = this.map { it.toVocabulary() }
+fun List<RoomVocabulary>.toVocabularyList() = this.map { it.toVocabulary() }
 
-fun List<RoomVocabulary?>.vocabularyImplList() = this.map { it.toVocabularyImpl() }
+fun List<RoomVocabulary>.vocabularyImplList() = this.map { it.toVocabularyImpl() }
 
-fun Array<out RoomVocabulary?>.toVocabularyArray() = this.map { it?.toVocabulary() }.toTypedArray()
+fun Array<out RoomVocabulary>.toVocabularyArray() = this.map { it.toVocabulary() }.toTypedArray()
 
 
 /* Convert VocabularyImpl to other types */

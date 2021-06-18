@@ -41,7 +41,7 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
 
     private var vocaDao: VocaDao
 
-    private val _allVocabulary = MutableStateFlow<List<Vocabulary?>>(emptyList())
+    private val _allVocabulary = MutableStateFlow<List<Vocabulary>>(emptyList())
 
     init {
         synchronized(this) {
@@ -54,8 +54,12 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
         loadAllVocabulary()
     }
 
-    override fun getAllVocabulary(): StateFlow<List<Vocabulary?>> {
+    override fun getAllVocabulary(): StateFlow<List<Vocabulary>> {
         return _allVocabulary
+    }
+
+    override suspend fun getVocabularyById(id: Int): Vocabulary? {
+        return vocaDao.loadVocabularyById(id)?.toVocabulary()
     }
 
     private fun loadAllVocabulary() = launch {
@@ -65,23 +69,23 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
         }
     }
 
-    override suspend fun getVocabulary(query: String): List<Vocabulary?>? {
+    override suspend fun getVocabulary(query: String): List<Vocabulary> {
         return if (query.containsOnlyAlphabet()) {
             vocaDao.loadVocabularyByEng("%${query}%")
         } else {
             vocaDao.loadVocabularyByKor(query)
-        }?.toVocabularyList()
+        }.toVocabularyList()
     }
 
-    override suspend fun deleteVocabulary(vararg vocabularies: Vocabulary?) {
+    override suspend fun deleteVocabulary(vararg vocabularies: Vocabulary) {
         vocaDao.deleteVocabulary(*vocabularies.toRoomVocabularyArray())
     }
 
-    override suspend fun updateVocabulary(vararg vocabularies: Vocabulary?) {
+    override suspend fun updateVocabulary(vararg vocabularies: Vocabulary) {
         vocaDao.updateVocabulary(*vocabularies.toRoomVocabularyArray())
     }
 
-    override suspend fun insertVocabulary(vararg vocabularies: Vocabulary?) {
+    override suspend fun insertVocabulary(vararg vocabularies: Vocabulary) {
         vocaDao.insertVocabulary(*vocabularies.toRoomVocabularyArray())
     }
 }
