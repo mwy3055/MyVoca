@@ -38,7 +38,7 @@ fun Array<out RoomVocabulary>.toVocabularyArray() = this.map { it.toVocabulary()
 
 /* Convert VocabularyImpl to other types */
 fun VocabularyImpl.toRoomVocabulary(): RoomVocabulary = RoomVocabulary(
-    id = id ?: 0,
+    id = id,
     eng = eng,
     kor = kor,
     addedTime = addedTime,
@@ -47,7 +47,7 @@ fun VocabularyImpl.toRoomVocabulary(): RoomVocabulary = RoomVocabulary(
 )
 
 fun VocabularyImpl.toVocabulary(): Vocabulary = Vocabulary(
-    id = id ?: 0,
+    id = id,
     eng = eng,
     kor = kor,
     addedTime = addedTime,

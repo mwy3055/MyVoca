@@ -39,12 +39,12 @@ enum class SortMethod(val value: Int) {
 class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRepository: VocaRepository) :
     ViewModel() {
 
-    private val _allVocabulary = MutableLiveData<List<VocabularyImpl?>?>()
-    val allVocabulary: LiveData<List<VocabularyImpl?>?>
+    private val _allVocabulary = MutableLiveData<List<VocabularyImpl>>()
+    val allVocabulary: LiveData<List<VocabularyImpl>>
         get() = _allVocabulary
 
-    private val _currentVocabulary = MutableLiveData<MutableList<VocabularyImpl?>?>()
-    val currentVocabulary: LiveData<MutableList<VocabularyImpl?>?>
+    private val _currentVocabulary = MutableLiveData<MutableList<VocabularyImpl>>()
+    val currentVocabulary: LiveData<MutableList<VocabularyImpl>>
         get() = _currentVocabulary
 
     private val _deleteMode = MutableLiveData(false)
@@ -67,7 +67,7 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
             _allVocabulary.postValue(it.toVocabularyImplList())
             if (!searchMode) {
                 val sortedList = sortItems(it, sortState.value!!)
-                _currentVocabulary.postValue(sortedList.toVocabularyImplList()?.toMutableList())
+                _currentVocabulary.postValue(sortedList.toVocabularyImplList().toMutableList())
             }
         }
     }
@@ -93,10 +93,10 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
      * @param query String to search with. [query] should not include % character.
      */
     fun searchVocabulary(query: String) = viewModelScope.launch(Dispatchers.IO) {
-        val result = vocaRepository.getVocabulary(query) ?: return@launch
+        val result = vocaRepository.getVocabulary(query)
         val sortedResult = sortItems(result, sortState.value!!)
         val sortedMutableList = sortedResult.map {
-            it?.toVocabularyImpl()
+            it.toVocabularyImpl()
         }.toMutableList()
         _currentVocabulary.postValue(sortedMutableList)
 //        sortItems(sortState) // TODO: what is this?
@@ -129,8 +129,8 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
     fun sortItems() = viewModelScope.launch {
         _currentVocabulary.value?.apply {
             when (sortState.value) {
-                SortMethod.ENG -> this.sortBy { it?.eng }
-                SortMethod.EDITED_TIME -> this.sortByDescending { it?.addedTime }
+                SortMethod.ENG -> this.sortBy { it.eng }
+                SortMethod.EDITED_TIME -> this.sortByDescending { it.addedTime }
                 else -> {
                     Logger.d("정렬할 수 없습니다: method ${sortState.value}")
                 }
@@ -138,10 +138,10 @@ class SeeAllViewModel @Inject constructor(@RoomVocaRepository private val vocaRe
         }
     }
 
-    fun sortItems(items: List<Vocabulary?>, method: SortMethod): List<Vocabulary?> {
+    fun sortItems(items: List<Vocabulary>, method: SortMethod): List<Vocabulary> {
         return when (method) {
-            SortMethod.ENG -> items.sortedBy { it?.eng }
-            SortMethod.EDITED_TIME -> items.sortedByDescending { it?.addedTime }
+            SortMethod.ENG -> items.sortedBy { it.eng }
+            SortMethod.EDITED_TIME -> items.sortedByDescending { it.addedTime }
         }
     }
 

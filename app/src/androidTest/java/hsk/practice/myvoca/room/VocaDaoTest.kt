@@ -7,8 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import hsk.practice.myvoca.framework.RoomVocaDatabase
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.VocaDao
-import kotlinx.coroutines.flow.collectIndexed
-import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -44,7 +43,7 @@ class VocaDaoTest {
         val currentTime = System.currentTimeMillis()
         val voca = RoomVocabulary(1, "test", "테스트", currentTime, currentTime, "dtd")
         vocaDao.insertVocabulary(voca)
-        val insertedVoca = vocaDao.loadVocabularyByEng("test")?.get(0)
+        val insertedVoca = vocaDao.loadVocabularyByEng("test")[0]
         assertEquals(voca, insertedVoca)
     }
 
@@ -52,9 +51,9 @@ class VocaDaoTest {
     @Throws(Exception::class)
     fun insertManyAndGet() = runBlocking {
         val currentTime = System.currentTimeMillis()
-        val vocaList = (1..10).mapIndexed { index, _ ->
+        val vocaList = (1..10).mapIndexed { _, value ->
             RoomVocabulary(
-                index,
+                value,
                 "dtd",
                 "테스트",
                 currentTime,
@@ -63,11 +62,9 @@ class VocaDaoTest {
             )
         }
         vocaDao.insertVocabulary(*vocaList.toTypedArray())
-        val allVocabulary = vocaDao.loadAllVocabulary().take(1)
-        allVocabulary.collectIndexed { _, value ->
-            for ((v1, v2) in vocaList.zip(value)) {
-                assertEquals(v1, v2)
-            }
+        val allVocabulary = vocaDao.loadAllVocabulary().first()
+        for ((v1, v2) in vocaList.zip(allVocabulary)) {
+            assertEquals(v1, v2)
         }
     }
 
@@ -76,8 +73,8 @@ class VocaDaoTest {
         val currentTime = System.currentTimeMillis()
         val test = RoomVocabulary(0, "test", "테스트", currentTime, currentTime, "")
         vocaDao.insertVocabulary(test)
-        vocaDao.loadVocabularyByEng("test")?.forEach {
-            it?.let { assertEquals(it.id, 1) }
+        vocaDao.loadVocabularyByEng("test").forEach {
+            assertEquals(it.id, 1)
         }
     }
 }
