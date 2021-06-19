@@ -16,11 +16,11 @@ import androidx.lifecycle.lifecycleScope
 import com.hsk.data.VocaRepository
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.AndroidEntryPoint
-import hsk.practice.myvoca.AppHelper
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.VocabularyImpl
 import hsk.practice.myvoca.framework.toVocabularyImpl
 import hsk.practice.myvoca.module.RoomVocaRepository
+import hsk.practice.myvoca.ui.activity.MainActivity
 import hsk.practice.myvoca.ui.activity.SplashActivity
 import kotlinx.coroutines.launch
 import java.util.*
@@ -194,7 +194,7 @@ class ShowNotificationService : LifecycleService() {
                 Logger.d("Show voca on notification")
                 showRandomWordOnNotification()
             } else if (intent?.action.equals(START_APP_ACTION_NAME, ignoreCase = true)
-                && !AppHelper.isForeground()
+                && !MainActivity.isRunning
             ) {
                 Logger.d("Start app")
                 val startAppIntent = Intent(applicationContext, SplashActivity::class.java)

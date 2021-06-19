@@ -7,8 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import hsk.practice.myvoca.framework.RoomVocaDatabase
 import hsk.practice.myvoca.framework.RoomVocabulary
 import hsk.practice.myvoca.framework.VocaDao
-import kotlinx.coroutines.flow.collectIndexed
-import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -22,6 +21,18 @@ class VocaDaoTest {
 
     private lateinit var vocaDao: VocaDao
     private lateinit var database: RoomVocaDatabase
+
+    private val vocaList = (1..10).mapIndexed { _, value ->
+        RoomVocabulary(
+            value,
+            "dtd",
+            "테스트",
+            System.currentTimeMillis(),
+            System.currentTimeMillis(),
+            "dtd"
+        )
+    }
+
 
     @Before
     fun createDatabase() {
@@ -41,43 +52,38 @@ class VocaDaoTest {
     @Test
     @Throws(Exception::class)
     fun insertAndGet() = runBlocking {
-        val currentTime = System.currentTimeMillis()
-        val voca = RoomVocabulary(1, "test", "테스트", currentTime, currentTime, "dtd")
+        val voca = vocaList[0]
         vocaDao.insertVocabulary(voca)
-        val insertedVoca = vocaDao.loadVocabularyByEng("test")?.get(0)
+        val insertedVoca = vocaDao.loadVocabularyByEng("dtd")[0]
         assertEquals(voca, insertedVoca)
     }
 
     @Test
     @Throws(Exception::class)
     fun insertManyAndGet() = runBlocking {
-        val currentTime = System.currentTimeMillis()
-        val vocaList = (1..10).mapIndexed { index, _ ->
-            RoomVocabulary(
-                index,
-                "dtd",
-                "테스트",
-                currentTime,
-                currentTime,
-                "dtd"
-            )
-        }
         vocaDao.insertVocabulary(*vocaList.toTypedArray())
-        val allVocabulary = vocaDao.loadAllVocabulary().take(1)
-        allVocabulary.collectIndexed { _, value ->
-            for ((v1, v2) in vocaList.zip(value)) {
-                assertEquals(v1, v2)
-            }
+        val allVocabulary = vocaDao.loadAllVocabulary().first()
+        for ((v1, v2) in vocaList.zip(allVocabulary)) {
+            assertEquals(v1, v2)
         }
     }
 
     @Test
     fun checkIfKeyGenerated(): Unit = runBlocking {
-        val currentTime = System.currentTimeMillis()
-        val test = RoomVocabulary(0, "test", "테스트", currentTime, currentTime, "")
+        val test = vocaList[0].copy(
+            id = 0
+        )
         vocaDao.insertVocabulary(test)
-        vocaDao.loadVocabularyByEng("test")?.forEach {
-            it?.let { assertEquals(it.id, 1) }
+        vocaDao.loadVocabularyByEng("test").forEach {
+            assertEquals(it.id, 1)
         }
+    }
+
+    @Test
+    fun checkIdQuery() = runBlocking {
+        val voca = vocaList[0]
+        vocaDao.insertVocabulary(voca)
+        val testVoca = vocaDao.loadVocabularyById(1)
+        assertEquals(voca, testVoca)
     }
 }

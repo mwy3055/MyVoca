@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private var isRunning = false
-        fun isRunning() = isRunning
+        var isRunning = false
+            private set
     }
 }
