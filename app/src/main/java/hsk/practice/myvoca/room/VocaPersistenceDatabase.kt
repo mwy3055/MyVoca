@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.framework
+package hsk.practice.myvoca.room
 
 import android.content.Context
 import com.hsk.data.vocabulary.Vocabulary

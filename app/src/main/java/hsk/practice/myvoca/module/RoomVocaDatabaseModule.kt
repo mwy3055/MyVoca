@@ -7,9 +7,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import hsk.practice.myvoca.framework.RoomMigrations
-import hsk.practice.myvoca.framework.RoomVocaDatabase
-import hsk.practice.myvoca.framework.VocaDao
+import hsk.practice.myvoca.room.RoomMigrations
+import hsk.practice.myvoca.room.RoomVocaDatabase
+import hsk.practice.myvoca.room.VocaDao
 import javax.inject.Singleton
 
 @Module

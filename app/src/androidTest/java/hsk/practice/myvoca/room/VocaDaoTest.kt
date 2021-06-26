@@ -4,9 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import hsk.practice.myvoca.framework.RoomVocaDatabase
-import hsk.practice.myvoca.framework.RoomVocabulary
-import hsk.practice.myvoca.framework.VocaDao
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After

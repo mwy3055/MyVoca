@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.framework
+package hsk.practice.myvoca.room
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
