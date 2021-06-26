@@ -1,7 +1,6 @@
-package hsk.practice.myvoca.framework
+package hsk.practice.myvoca.room
 
-import com.hsk.data.vocabulary.Vocabulary
-import com.hsk.data.vocabulary.nullVocabulary
+import com.hsk.data.vocabulary.*
 import com.hsk.domain.VocaPersistence
 import hsk.practice.myvoca.containsOnlyAlphabet
 import kotlinx.coroutines.CoroutineScope
@@ -18,8 +17,8 @@ class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScop
     val current = System.currentTimeMillis()
 
     val data = mutableListOf(
-        Vocabulary(1, "apple", "사과", current, current, ""),
-        Vocabulary(2, "banana", "바나나", current, current, "")
+        Vocabulary(1, "apple", listOf(Meaning(WordClass.NOUN, "사과")), current, current, ""),
+        Vocabulary(2, "banana", listOf(Meaning(WordClass.NOUN, "바나나")), current, current, "")
     )
 
     private val fakeDataFlow = MutableStateFlow<List<Vocabulary>>(data)
@@ -37,7 +36,7 @@ class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScop
         return if (query.containsOnlyAlphabet()) {
             data.filter { it.eng.contains(query) }
         } else {
-            data.filter { it.kor?.contains(query) ?: false }
+            data.filter { it.containsMeaning(query) }
         }
     }
 

@@ -6,7 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import hsk.practice.myvoca.framework.FakeVocaPersistence
+import hsk.practice.myvoca.room.FakeVocaPersistence
 import javax.inject.Qualifier
 
 /**

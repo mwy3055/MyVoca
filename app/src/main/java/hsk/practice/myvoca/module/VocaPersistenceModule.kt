@@ -7,7 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import hsk.practice.myvoca.framework.VocaPersistenceDatabase
+import hsk.practice.myvoca.room.VocaPersistenceDatabase
 import javax.inject.Qualifier
 
 

@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import hsk.practice.myvoca.framework.RoomVocaDatabase
-import hsk.practice.myvoca.framework.RoomVocabulary
-import hsk.practice.myvoca.framework.VocaDao
+import hsk.practice.myvoca.data.MeaningImpl
+import hsk.practice.myvoca.data.VocabularyImpl
+import hsk.practice.myvoca.data.WordClassImpl
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -85,5 +85,26 @@ class VocaDaoTest {
         vocaDao.insertVocabulary(voca)
         val testVoca = vocaDao.loadVocabularyById(1)
         assertEquals(voca, testVoca)
+    }
+
+    @Test
+    fun checkMeaningStored() = runBlocking {
+        val currentTime = System.currentTimeMillis()
+        val testDataImpl: List<VocabularyImpl> = (1..10).map { value ->
+            VocabularyImpl(
+                id = value,
+                eng = "test$value",
+                meaning = listOf(MeaningImpl(WordClassImpl.NOUN, "test $value")),
+                addedTime = currentTime,
+                lastEditedTime = currentTime,
+                memo = ""
+            )
+        }
+        testDataImpl.forEach { vocaDao.insertVocabulary(it.toRoomVocabulary()) }
+        val storedData: List<VocabularyImpl> =
+            vocaDao.loadAllVocabulary().first().sortedBy { it.id }.map { it.toVocabularyImpl() }
+        testDataImpl.zip(storedData).forEach { pair ->
+            assertEquals(pair.first, pair.second)
+        }
     }
 }
