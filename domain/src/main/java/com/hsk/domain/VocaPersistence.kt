@@ -1,6 +1,6 @@
-package com.hsk.data
+package com.hsk.domain
 
-import com.hsk.domain.vocabulary.Vocabulary
+import com.hsk.data.vocabulary.Vocabulary
 import kotlinx.coroutines.flow.StateFlow
 
 /**

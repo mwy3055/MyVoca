@@ -1,4 +1,4 @@
-package com.hsk.domain.vocabulary
+package com.hsk.data.vocabulary
 
 import java.io.Serializable
 
