@@ -1,8 +1,8 @@
 package hsk.practice.myvoca.framework
 
 import android.content.Context
-import com.hsk.data.VocaPersistence
-import com.hsk.domain.vocabulary.Vocabulary
+import com.hsk.data.vocabulary.Vocabulary
+import com.hsk.domain.VocaPersistence
 import com.orhanobut.logger.Logger
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn

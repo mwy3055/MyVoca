@@ -8,6 +8,7 @@ buildscript {
         room_version = '2.3.0'
         hilt_version = '2.37'
         datastore_version = '1.0.0-beta02'
+        compose_version = '1.0.0-beta09'
     }
     repositories {
         google()

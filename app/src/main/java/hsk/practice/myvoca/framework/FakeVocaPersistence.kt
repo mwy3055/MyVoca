@@ -1,8 +1,8 @@
 package hsk.practice.myvoca.framework
 
-import com.hsk.data.VocaPersistence
-import com.hsk.domain.vocabulary.Vocabulary
-import com.hsk.domain.vocabulary.nullVocabulary
+import com.hsk.data.vocabulary.Vocabulary
+import com.hsk.data.vocabulary.nullVocabulary
+import com.hsk.domain.VocaPersistence
 import hsk.practice.myvoca.containsOnlyAlphabet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

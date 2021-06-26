@@ -1,7 +1,7 @@
 package hsk.practice.myvoca.module
 
-import com.hsk.data.VocaPersistence
-import com.hsk.data.VocaRepository
+import com.hsk.domain.VocaPersistence
+import com.hsk.domain.VocaRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

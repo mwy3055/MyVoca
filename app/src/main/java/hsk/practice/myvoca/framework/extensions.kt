@@ -1,6 +1,6 @@
 package hsk.practice.myvoca.framework
 
-import com.hsk.domain.vocabulary.Vocabulary
+import com.hsk.data.vocabulary.Vocabulary
 import hsk.practice.myvoca.VocabularyImpl
 
 /* Convert Vocabulary to other types */

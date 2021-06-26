@@ -1,7 +1,7 @@
 package hsk.practice.myvoca.module
 
 import android.content.Context
-import com.hsk.data.VocaPersistence
+import com.hsk.domain.VocaPersistence
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,5 +26,6 @@ object VocaPersistenceModule {
     @RoomVocaPersistence
     @Provides
     fun provideVocaPersistenceDatabase(
-            @ApplicationContext context: Context): VocaPersistence = VocaPersistenceDatabase(context)
+        @ApplicationContext context: Context
+    ): VocaPersistence = VocaPersistenceDatabase(context)
 }
