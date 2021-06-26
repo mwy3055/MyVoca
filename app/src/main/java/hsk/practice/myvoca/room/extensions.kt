@@ -9,17 +9,22 @@ import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.toMeaning
 import hsk.practice.myvoca.data.toMeaningImpl
+import java.lang.reflect.Type
 
-fun <T> jsonToList(json: String): List<T> {
-    val type = object : TypeToken<List<T>>() {}.type
+internal inline fun <reified T> getTypeTokenType(): Type = object : TypeToken<T>() {}.type
+
+internal inline fun <reified T> Gson.fromJson(json: String) =
+    fromJson<T>(json, getTypeTokenType<T>())
+
+internal inline fun <reified T> List<T>.toJson(): String {
     val gson = Gson()
-    return gson.fromJson(json, type)
+    val type = getTypeTokenType<List<T>>()
+    return gson.toJson(this, type)
 }
 
 /* Convert Vocabulary to other types */
 fun Vocabulary.toRoomVocabulary(): RoomVocabulary {
-    val gson = Gson()
-    val meaningString = gson.toJson(meaning)
+    val meaningString = meaning.toJson()
     return RoomVocabulary(
         id, eng, meaningString, addedTime, lastEditedTime, memo
     )
@@ -41,13 +46,13 @@ fun Array<out Vocabulary>.toRoomVocabularyArray() =
 
 /* Convert RoomVocabulary to other types */
 fun RoomVocabulary.toVocabulary(): Vocabulary {
-    val meaningList = kor?.let { jsonToList<Meaning>(it) } ?: return nullVocabulary
+    val meaningList = kor?.let { Gson().fromJson<List<Meaning>>(it) } ?: return nullVocabulary
     return Vocabulary(id, eng, meaningList, addedTime, lastEditedTime, memo)
 }
 
 fun RoomVocabulary.toVocabularyImpl(): VocabularyImpl {
     val meaningList =
-        kor?.let { jsonToList<MeaningImpl>(it) } ?: return VocabularyImpl.nullVocabulary
+        kor?.let { Gson().fromJson<List<MeaningImpl>>(it) } ?: return VocabularyImpl.nullVocabulary
     return VocabularyImpl(id, eng, meaningList, addedTime, lastEditedTime, memo)
 }
 
@@ -62,7 +67,7 @@ fun Array<out RoomVocabulary>.toVocabularyArray() = this.map { it.toVocabulary()
 fun VocabularyImpl.toRoomVocabulary(): RoomVocabulary = RoomVocabulary(
     id = id,
     eng = eng,
-    kor = Gson().toJson(meaning),
+    kor = meaning.toJson(),
     addedTime = addedTime,
     lastEditedTime = lastEditedTime,
     memo = memo
