@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/code/MyVocabulary/app/src/main/res/drawable/ic_myvoca.xml" value="0.3764102564102564" />
+        <entry key="..\:/code/MyVocabulary/app/src/main/res/font/maven_pro.xml" value="0.3902564102564103" />
         <entry key="..\:/code/MyVocabulary/app/src/main/res/layout/app_bar_main.xml" value="0.19655797101449277" />
         <entry key="..\:/code/MyVocabulary/app/src/main/res/layout/quiz_item.xml" value="0.17806484295845998" />
         <entry key="..\:/code/MyVocabulary/app/src/main/res/layout/versus_view.xml" value="0.19882246376811594" />
