@@ -29,7 +29,7 @@ fun String?.containsOnlyAlphabet(): Boolean {
  *
  * @return Time string of the timestamp
  */
-fun Long.getTimeString(): String {
+fun Long.toTimeString(): String {
     val cal = Calendar.getInstance()
     cal.timeInMillis = this
     val year = cal[Calendar.YEAR]
