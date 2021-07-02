@@ -8,14 +8,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import hsk.practice.myvoca.R
 
-val Alef = FontFamily(
-    Font(R.font.alef_regular),
-    Font(R.font.alef_bold, FontWeight.Bold)
+val Paybooc = FontFamily(
+    Font(R.font.paybooc_medium),
+    Font(R.font.paybooc_light, FontWeight.Light),
+    Font(R.font.paybooc_bold, FontWeight.Bold),
+    Font(R.font.paybooc_extrabold, FontWeight.ExtraBold)
 )
 
 // Set of Material typography styles to start with
 val Typography = Typography(
-    defaultFontFamily = Alef,
+    defaultFontFamily = Paybooc,
     body1 = TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp
