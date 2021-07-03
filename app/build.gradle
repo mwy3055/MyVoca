@@ -61,13 +61,13 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.3.0'
-    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.activity:activity-compose:1.3.0-beta02'
+    implementation 'androidx.activity:activity-compose:1.3.0-rc01'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     // Compose
     implementation "androidx.compose.ui:ui:$compose_version"
@@ -81,7 +81,7 @@ dependencies {
     implementation "androidx.compose.material:material-icons-core:$compose_version"
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
     // Integration with activities
-    implementation 'androidx.activity:activity-compose:1.3.0-beta02'
+    implementation 'androidx.activity:activity-compose:1.3.0-rc01'
     // Integration with ViewModels
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07'
     // Integration with observables
@@ -97,7 +97,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-insets-ui:$accompanist_version"
 
     // KTX libraries
-    implementation 'androidx.core:core-ktx:1.5.0'
+    implementation 'androidx.core:core-ktx:1.6.0'
     implementation "androidx.fragment:fragment-ktx:1.3.5"
     implementation 'androidx.collection:collection-ktx:1.1.0'
     implementation "androidx.palette:palette-ktx:1.0.0"
@@ -106,6 +106,7 @@ dependencies {
     implementation "androidx.navigation:navigation-runtime-ktx:2.3.5"
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
+    implementation 'androidx.navigation:navigation-compose:2.4.0-alpha04'
 
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
