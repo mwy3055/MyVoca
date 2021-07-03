@@ -30,7 +30,7 @@ fun MyVocaTopAppBar() {
         },
 //        backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.75f),
         navigationIcon = {
-            IconButton(onClick = {}) {
+            IconButton(enabled = false, onClick = {}) {
                 Icon(
                     imageVector = Icons.Filled.ContentPaste,
                     contentDescription = null,
