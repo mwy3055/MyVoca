@@ -17,13 +17,13 @@ import javax.inject.Qualifier
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class RoomVocaPersistence
+annotation class LocalVocaPersistence
 
 @Module
 @InstallIn(SingletonComponent::class)
 object VocaPersistenceModule {
 
-    @RoomVocaPersistence
+    @LocalVocaPersistence
     @Provides
     fun provideVocaPersistenceDatabase(
         @ApplicationContext context: Context
