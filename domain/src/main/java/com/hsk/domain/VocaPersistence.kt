@@ -1,6 +1,7 @@
 package com.hsk.domain
 
 import com.hsk.data.vocabulary.Vocabulary
+import com.hsk.data.vocabulary.VocabularyQuery
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -21,10 +22,9 @@ interface VocaPersistence {
 
     /**
      * Loads a vocabulary which matches with the given query.
-     * Query can be English or Korean.
-     * Loads a vocabulary whose eng(former) or kor(latter) contains the query.
+     * Query can include english word and word class.
      */
-    suspend fun getVocabulary(query: String): List<Vocabulary>
+    suspend fun getVocabulary(query: VocabularyQuery): List<Vocabulary>
 
     /**
      * Inserts vocabularies to the database.
