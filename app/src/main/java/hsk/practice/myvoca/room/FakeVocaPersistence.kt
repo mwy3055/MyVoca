@@ -2,7 +2,6 @@ package hsk.practice.myvoca.room
 
 import com.hsk.data.vocabulary.*
 import com.hsk.domain.VocaPersistence
-import hsk.practice.myvoca.containsOnlyAlphabet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,12 +31,8 @@ class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScop
         }
     }
 
-    override suspend fun getVocabulary(query: String): List<Vocabulary> {
-        return if (query.containsOnlyAlphabet()) {
-            data.filter { it.eng.contains(query) }
-        } else {
-            data.filter { it.containsMeaning(query) }
-        }
+    override suspend fun getVocabulary(query: VocabularyQuery): List<Vocabulary> {
+        return data.filter { vocabulary -> vocabulary.matchesWithQuery(query) }
     }
 
     override suspend fun insertVocabulary(vararg vocabularies: Vocabulary) {
