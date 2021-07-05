@@ -1,6 +1,10 @@
 package hsk.practice.myvoca
 
-import com.hsk.data.vocabulary.*
+import com.hsk.data.vocabulary.VocabularyQuery
+import com.hsk.data.vocabulary.WordClass
+import com.hsk.data.vocabulary.matchesWithQuery
+import hsk.practice.myvoca.data.fakeData
+import hsk.practice.myvoca.room.toVocabulary
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -9,22 +13,7 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class VocabularyQueryTest {
 
-    val data = (1..10).map {
-        val currentTime = System.currentTimeMillis()
-        Vocabulary(
-            id = it,
-            eng = "test$it",
-            meaning = listOf(
-                Meaning(
-                    if (it % 2 == 0) WordClass.NOUN else WordClass.VERB,
-                    "테스트$it"
-                )
-            ),
-            addedTime = currentTime,
-            lastEditedTime = currentTime,
-            memo = ""
-        )
-    }
+    private val data = fakeData.map { it.toVocabulary() }
 
     @Test
     fun emptyQueryTest() {

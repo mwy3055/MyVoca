@@ -26,6 +26,23 @@ data class VocabularyImpl(
     }
 }
 
+val fakeData = (1..20).map {
+    val currentTime = System.currentTimeMillis()
+    VocabularyImpl(
+        id = it,
+        eng = "test$it",
+        meaning = listOf(
+            MeaningImpl(
+                if (it % 2 == 0) WordClassImpl.NOUN else WordClassImpl.VERB,
+                "테스트$it"
+            )
+        ),
+        addedTime = currentTime,
+        lastEditedTime = currentTime,
+        memo = ""
+    )
+}
+
 val VocabularyImpl.answerString: String
     get() = "$eng: ${meaning.joinToString("; ") { it.content }}"
 
