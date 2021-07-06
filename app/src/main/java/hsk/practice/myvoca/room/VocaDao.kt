@@ -15,7 +15,7 @@ interface VocaDao {
      * @param vocabularies objects to insert to the database
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertVocabulary(vararg vocabularies: RoomVocabulary)
+    suspend fun insertVocabulary(vocabularies: List<RoomVocabulary>)
 
     /**
      * Updates given vocabularies.
@@ -23,7 +23,7 @@ interface VocaDao {
      * @param vocabularies objects to update from the database
      */
     @Update
-    suspend fun updateVocabulary(vararg vocabularies: RoomVocabulary)
+    suspend fun updateVocabulary(vocabularies: List<RoomVocabulary>)
 
     /**
      * Deletes given vocabularies from the database.
@@ -31,7 +31,7 @@ interface VocaDao {
      * @param vocabularies objects to delete from the database
      */
     @Delete
-    suspend fun deleteVocabulary(vararg vocabularies: RoomVocabulary)
+    suspend fun deleteVocabulary(vocabularies: List<RoomVocabulary>)
 
     /**
      * Loads all vocabulary and sort the result by ascending alphabetic order.
