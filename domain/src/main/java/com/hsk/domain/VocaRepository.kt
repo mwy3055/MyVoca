@@ -37,16 +37,16 @@ class VocaRepository(private val vocaPersistence: VocaPersistence) : CoroutineSc
         }
     }
 
-    suspend fun insertVocabulary(vararg vocabularies: Vocabulary) {
-        vocaPersistence.insertVocabulary(*vocabularies)
+    suspend fun insertVocabulary(vocabularies: List<Vocabulary>) {
+        vocaPersistence.insertVocabulary(vocabularies)
     }
 
-    suspend fun updateVocabulary(vararg vocabularies: Vocabulary) {
-        vocaPersistence.updateVocabulary(*vocabularies)
+    suspend fun updateVocabulary(vocabularies: List<Vocabulary>) {
+        vocaPersistence.updateVocabulary(vocabularies)
     }
 
-    suspend fun deleteVocabulary(vararg vocabularies: Vocabulary) {
-        vocaPersistence.deleteVocabulary(*vocabularies)
+    suspend fun deleteVocabulary(vocabularies: List<Vocabulary>) {
+        vocaPersistence.deleteVocabulary(vocabularies)
     }
 
 }

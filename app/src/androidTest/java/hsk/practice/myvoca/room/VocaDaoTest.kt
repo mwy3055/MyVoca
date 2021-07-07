@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
+import hsk.practice.myvoca.data.fakeData
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -22,17 +23,7 @@ class VocaDaoTest {
     private lateinit var vocaDao: VocaDao
     private lateinit var database: RoomVocaDatabase
 
-    private val vocaList = (1..10).mapIndexed { _, value ->
-        RoomVocabulary(
-            value,
-            "dtd",
-            "테스트",
-            System.currentTimeMillis(),
-            System.currentTimeMillis(),
-            "dtd"
-        )
-    }
-
+    private val vocaList = fakeData.map { it.toRoomVocabulary() }
 
     @Before
     fun createDatabase() {
@@ -61,8 +52,8 @@ class VocaDaoTest {
     @Test
     @Throws(Exception::class)
     fun insertManyAndGet() = runBlocking {
-        vocaDao.insertVocabulary(*vocaList.toTypedArray())
-        val allVocabulary = vocaDao.loadAllVocabulary().first()
+        vocaDao.insertVocabulary(vocaList)
+        val allVocabulary = vocaDao.loadAllVocabulary().first().sortedBy { it.id }
         for ((v1, v2) in vocaList.zip(allVocabulary)) {
             assertEquals(v1, v2)
         }

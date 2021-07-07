@@ -83,15 +83,15 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
         }
     }
 
-    override suspend fun deleteVocabulary(vararg vocabularies: Vocabulary) {
-        vocaDao.deleteVocabulary(*vocabularies.toRoomVocabularyArray())
+    override suspend fun deleteVocabulary(vocabularies: List<Vocabulary>) {
+        vocaDao.deleteVocabulary(vocabularies.toRoomVocabularyList())
     }
 
-    override suspend fun updateVocabulary(vararg vocabularies: Vocabulary) {
-        vocaDao.updateVocabulary(*vocabularies.toRoomVocabularyArray())
+    override suspend fun updateVocabulary(vocabularies: List<Vocabulary>) {
+        vocaDao.updateVocabulary(vocabularies.toRoomVocabularyList())
     }
 
-    override suspend fun insertVocabulary(vararg vocabularies: Vocabulary) {
-        vocaDao.insertVocabulary(*vocabularies.toRoomVocabularyArray())
+    override suspend fun insertVocabulary(vocabularies: List<Vocabulary>) {
+        vocaDao.insertVocabulary(vocabularies.toRoomVocabularyList())
     }
 }

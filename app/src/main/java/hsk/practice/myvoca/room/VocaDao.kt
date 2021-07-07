@@ -12,10 +12,18 @@ interface VocaDao {
     /**
      * Inserts given vocabularies to the database.
      *
-     * @param vocabularies objects to insert to the database
+     * @param vocabularies Vocabulary objects which will be inserted
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertVocabulary(vocabularies: List<RoomVocabulary>)
+
+    /**
+     * Inserts given vocabulary to the database.
+     *
+     * @param vocabulary Vocabulary object which will be inserted
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertVocabulary(vocabulary: RoomVocabulary)
 
     /**
      * Updates given vocabularies.

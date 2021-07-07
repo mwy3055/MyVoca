@@ -29,16 +29,16 @@ interface VocaPersistence {
     /**
      * Inserts vocabularies to the database.
      */
-    suspend fun insertVocabulary(vararg vocabularies: Vocabulary)
+    suspend fun insertVocabulary(vocabularies: List<Vocabulary>)
 
     /**
      * Updates the given vocabulary.
      */
-    suspend fun updateVocabulary(vararg vocabularies: Vocabulary)
+    suspend fun updateVocabulary(vocabularies: List<Vocabulary>)
 
     /**
      * Deletes the given vocabulary. This operation is permanent.
      */
-    suspend fun deleteVocabulary(vararg vocabularies: Vocabulary)
+    suspend fun deleteVocabulary(vocabularies: List<Vocabulary>)
 
 }

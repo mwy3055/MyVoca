@@ -13,7 +13,7 @@ import kotlin.coroutines.CoroutineContext
 
 class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScope {
 
-    val current = System.currentTimeMillis()
+    private val current = System.currentTimeMillis()
 
     val data = mutableListOf(
         Vocabulary(1, "apple", listOf(Meaning(WordClass.NOUN, "사과")), current, current, ""),
@@ -35,21 +35,17 @@ class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScop
         return data.filter { vocabulary -> vocabulary.matchesWithQuery(query) }
     }
 
-    override suspend fun insertVocabulary(vararg vocabularies: Vocabulary) {
-        for (voca in vocabularies) {
-            voca.let { data.add(it) }
-        }
+    override suspend fun insertVocabulary(vocabularies: List<Vocabulary>) {
+        data.addAll(vocabularies)
         data.sortBy { it.eng }
     }
 
-    override suspend fun updateVocabulary(vararg vocabularies: Vocabulary) {
+    override suspend fun updateVocabulary(vocabularies: List<Vocabulary>) {
         // Not necessary, so didn't implemented.
     }
 
-    override suspend fun deleteVocabulary(vararg vocabularies: Vocabulary) {
-        for (voca in vocabularies) {
-            data.remove(voca)
-        }
+    override suspend fun deleteVocabulary(vocabularies: List<Vocabulary>) {
+        data.removeAll(vocabularies)
     }
 
     private val job = Job()
