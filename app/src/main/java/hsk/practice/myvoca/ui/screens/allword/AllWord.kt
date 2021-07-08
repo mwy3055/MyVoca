@@ -1,12 +1,13 @@
 package hsk.practice.myvoca.ui.screens.allword
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ManageSearch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,7 +22,6 @@ import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.state.UiState
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
-import kotlinx.coroutines.launch
 
 @Composable
 fun AllWordScreen(
@@ -32,14 +32,14 @@ fun AllWordScreen(
 
     AllWordLoading(
         uiState = allWordUiState,
-        onRefresh = { coroutineScope.launch { allWordViewModel.refreshChannel.send(Unit) } }
+        onSearchOptionClicked = allWordViewModel::onSearchOptionClicked
     )
 }
 
 @Composable
 fun AllWordLoading(
     uiState: UiState<AllWordData>,
-    onRefresh: () -> Unit = {}
+    onSearchOptionClicked: () -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -50,7 +50,7 @@ fun AllWordLoading(
         uiState.data?.let { data ->
             AllWordContent(
                 data = data,
-                onRefresh = onRefresh
+                onSearchOptionClicked = onSearchOptionClicked
             )
         }
     }
@@ -59,15 +59,40 @@ fun AllWordLoading(
 @Composable
 fun AllWordContent(
     data: AllWordData,
-    onRefresh: () -> Unit
+    onSearchOptionClicked: () -> Unit
 ) {
     Column {
-        Text(
-            text = "${data.currentWordState.size} vocabularies loaded.",
-            modifier = Modifier.clickable(onClick = onRefresh)
+        AllWordHeader(
+            vocabularySize = data.currentWordState.size,
+            onSearchOptionClicked = onSearchOptionClicked
         )
-        Spacer(modifier = Modifier.padding(bottom = 16.dp))
         AllWordItems(data.currentWordState)
+    }
+}
+
+@Composable
+fun AllWordHeader(
+    vocabularySize: Int,
+    onSearchOptionClicked: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .background(MaterialTheme.colors.surface)
+            .padding(8.dp)
+    ) {
+        Text(
+            text = "검색 결과: ${vocabularySize}개",
+            modifier = Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically)
+        )
+        TextButton(onClick = onSearchOptionClicked) {
+            Icon(
+                imageVector = Icons.Filled.ManageSearch,
+                contentDescription = null
+            )
+            Text(text = "검색 옵션")
+        }
     }
 }
 
@@ -75,7 +100,9 @@ fun AllWordContent(
 @Composable
 fun AllWordItems(words: List<VocabularyImpl>) {
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(words) { word ->
+        items(items = words,
+            key = { it.id }
+        ) { word ->
             WordContent(word)
         }
     }
@@ -86,5 +113,15 @@ fun AllWordItems(words: List<VocabularyImpl>) {
 fun AllWordItemsPreview() {
     MyVocaTheme {
         AllWordItems(fakeData)
+    }
+}
+
+@Preview
+@Composable
+fun AllWordHeaderPreview() {
+    MyVocaTheme {
+        AllWordHeader(vocabularySize = 10) {
+
+        }
     }
 }

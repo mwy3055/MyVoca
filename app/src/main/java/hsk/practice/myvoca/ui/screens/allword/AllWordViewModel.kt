@@ -58,6 +58,14 @@ class AllWordViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Event listeners for composable
+     */
+    fun onSearchOptionClicked() {
+        _allWordUiState.value = _allWordUiState.value.copy(
+
+        )
+    }
 }
 
 @Immutable
