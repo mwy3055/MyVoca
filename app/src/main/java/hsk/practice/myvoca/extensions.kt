@@ -54,3 +54,15 @@ fun setNightMode(value: Boolean) {
     }
     AppCompatDelegate.setDefaultNightMode(mode)
 }
+
+/**
+ * Remove the given [element] if this [Collection] contains the [element] or add if doesn't.
+ * This function is similar to bit operator `XOR`.
+ */
+fun <T> Collection<T>.xor(element: T): Collection<T> {
+    return if (this.contains(element)) {
+        this.minus(element)
+    } else {
+        this.plus(element)
+    }
+}
