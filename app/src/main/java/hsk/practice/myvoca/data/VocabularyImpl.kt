@@ -60,7 +60,11 @@ enum class WordClassImpl(val korean: String) {
     PREPOSITION("전치사"),
     CONJUNCTION("접속사"),
     INTERJECTION("감탄사"),
-    UNKNOWN("???")
+    UNKNOWN("???");
+
+    companion object {
+        fun findByKorean(korean: String) = values().find { it.korean == korean }
+    }
 }
 
 /**
