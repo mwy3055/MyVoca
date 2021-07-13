@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -48,11 +49,12 @@ fun AllWordScreen(
 
     AllWordLoading(
         uiState = allWordUiState,
-        onOptionButtonClicked = allWordViewModel::toggleOptionVisibility,
-        onSubmitButtonClicked = allWordViewModel::onNewQuerySubmit,
-        onCancelButtonClicked = allWordViewModel::toggleOptionVisibility,
+        onOptionButtonClicked = allWordViewModel::onOptionButtonClicked,
+        onSubmitButtonClicked = allWordViewModel::onSubmitButtonClicked,
+        onCloseButtonClicked = allWordViewModel::onCloseButtonClicked,
         onQueryWordChanged = allWordViewModel::onQueryTextChanged,
-        onOptionWordClassClick = allWordViewModel::onQueryToggleWordClass
+        onOptionWordClassClick = allWordViewModel::onQueryWordClassToggled,
+        onSortStateClick = allWordViewModel::onSortStateClicked
     )
 }
 
@@ -61,9 +63,10 @@ fun AllWordLoading(
     uiState: UiState<AllWordData>,
     onOptionButtonClicked: () -> Unit,
     onSubmitButtonClicked: () -> Unit,
-    onCancelButtonClicked: () -> Unit,
+    onCloseButtonClicked: () -> Unit,
     onQueryWordChanged: (String) -> Unit,
-    onOptionWordClassClick: (String) -> Unit
+    onOptionWordClassClick: (String) -> Unit,
+    onSortStateClick: (SortState) -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -80,9 +83,10 @@ fun AllWordLoading(
                 data = data,
                 onOptionButtonClicked = onOptionButtonClicked,
                 onSubmitButtonClicked = onSubmitButtonClicked,
-                onCancelButtonClicked = onCancelButtonClicked,
+                onCloseButtonClicked = onCloseButtonClicked,
                 onQueryWordChanged = onQueryWordChanged,
-                onOptionWordClassClick = onOptionWordClassClick
+                onOptionWordClassClick = onOptionWordClassClick,
+                onSortStateClick = onSortStateClick
             )
         }
     }
@@ -94,9 +98,10 @@ fun AllWordContent(
     data: AllWordData,
     onOptionButtonClicked: () -> Unit,
     onSubmitButtonClicked: () -> Unit,
-    onCancelButtonClicked: () -> Unit,
+    onCloseButtonClicked: () -> Unit,
     onQueryWordChanged: (String) -> Unit,
-    onOptionWordClassClick: (String) -> Unit
+    onOptionWordClassClick: (String) -> Unit,
+    onSortStateClick: (SortState) -> Unit
 ) {
     Column {
         AnimatedVisibility(data.optionVisible) {
@@ -105,10 +110,12 @@ fun AllWordContent(
 //                    .background(MaterialTheme.colors.primary)
                     .padding(8.dp),
                 query = data.queryState,
+                sortState = data.sortState,
                 onSubmitButtonClicked = onSubmitButtonClicked,
-                onCancelButtonClicked = onCancelButtonClicked,
+                onCloseButtonClicked = onCloseButtonClicked,
                 onQueryWordChanged = onQueryWordChanged,
-                onOptionWordClassClick = onOptionWordClassClick
+                onOptionWordClassClick = onOptionWordClassClick,
+                onSortStateClick = onSortStateClick
             )
         }
         AllWordHeader(
@@ -149,10 +156,12 @@ fun AllWordHeader(
 fun AllWordQueryOptions(
     modifier: Modifier = Modifier,
     query: VocabularyQuery,
+    sortState: SortState,
     onSubmitButtonClicked: () -> Unit,
-    onCancelButtonClicked: () -> Unit,
+    onCloseButtonClicked: () -> Unit,
     onQueryWordChanged: (String) -> Unit,
-    onOptionWordClassClick: (String) -> Unit
+    onOptionWordClassClick: (String) -> Unit,
+    onSortStateClick: (SortState) -> Unit
 ) {
     Box(
         modifier = modifier
@@ -162,7 +171,7 @@ fun AllWordQueryOptions(
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             // Buttons
             AllWordQueryButtons(
-                onCancelButtonClicked = onCancelButtonClicked,
+                onCloseButtonClicked = onCloseButtonClicked,
                 onSubmitButtonClicked = onSubmitButtonClicked
             )
             AllWordQueryWord(
@@ -173,13 +182,17 @@ fun AllWordQueryOptions(
                 selectedWordClass = query.wordClass,
                 onOptionWordClassClick = onOptionWordClassClick
             )
+            AllWordQuerySortState(
+                currentSortState = sortState,
+                onSortStateClick = onSortStateClick
+            )
         }
     }
 }
 
 @Composable
 fun AllWordQueryButtons(
-    onCancelButtonClicked: () -> Unit,
+    onCloseButtonClicked: () -> Unit,
     onSubmitButtonClicked: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
@@ -187,7 +200,7 @@ fun AllWordQueryButtons(
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         TextButton(
             onClick = {
-                onCancelButtonClicked()
+                onCloseButtonClicked()
                 closeKeyboard()
             },
             modifier = Modifier.weight(1f)
@@ -298,6 +311,53 @@ fun WordClassChip(
     }
 }
 
+@Composable
+fun AllWordQuerySortState(
+    currentSortState: SortState,
+    onSortStateClick: (SortState) -> Unit
+) {
+    val sortStates = SortState.values()
+    Row(
+        modifier = Modifier.height(40.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        sortStates.forEach { sortState ->
+            SortStateChip(
+                modifier = Modifier
+                    .weight(1f),
+                sortState = sortState,
+                selected = (sortState == currentSortState),
+                onClick = onSortStateClick
+            )
+        }
+    }
+}
+
+@Composable
+fun SortStateChip(
+    modifier: Modifier = Modifier,
+    sortState: SortState,
+    selected: Boolean,
+    onClick: (SortState) -> Unit
+) {
+    val background by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.surface)
+    val textColor by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.onPrimary else MaterialTheme.colors.primary)
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(background)
+            .clickable { onClick(sortState) },
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = sortState.korean,
+            color = textColor,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AllWordItems(words: List<VocabularyImpl>) {
@@ -343,17 +403,20 @@ fun AllWordQueryOptionsPreview() {
                 word = word,
                 wordClass = wordClassSet
             ),
+            sortState = SortState.Alphabet,
             onSubmitButtonClicked = {},
-            onCancelButtonClicked = {},
-            onQueryWordChanged = { word = it }
-        ) { wordClassName ->
-            val wordClass = WordClassImpl.findByKorean(wordClassName)?.toWordClass()
-                ?: return@AllWordQueryOptions
-            if (wordClassSet.contains(wordClass)) {
-                wordClassSet.remove(wordClass)
-            } else {
-                wordClassSet.add(wordClass)
+            onCloseButtonClicked = {},
+            onQueryWordChanged = { word = it },
+            onSortStateClick = {},
+            onOptionWordClassClick = { wordClassName ->
+                val wordClass = WordClassImpl.findByKorean(wordClassName)?.toWordClass()
+                    ?: return@AllWordQueryOptions
+                if (wordClassSet.contains(wordClass)) {
+                    wordClassSet.remove(wordClass)
+                } else {
+                    wordClassSet.add(wordClass)
+                }
             }
-        }
+        )
     }
 }

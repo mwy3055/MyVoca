@@ -54,7 +54,7 @@ class AllWordViewModel @Inject constructor(
             delay(1500)
 
             val data = _allWordUiState.value.data ?: AllWordData()
-            val result = loadWords(data.queryState)
+            val result = loadWords(data.queryState).sortedBy(data.sortState)
             _allWordUiState.value = _allWordUiState.value.copy(
                 loading = false,
                 data = data.copy(currentWordState = result)
@@ -71,13 +71,21 @@ class AllWordViewModel @Inject constructor(
         _allWordUiState.value = allWordUiState.value.copy(data = data.copy(optionVisible = value))
     }
 
-    fun toggleOptionVisibility() {
+    private fun toggleOptionVisibility() {
         val current = allWordUiState.value.data?.optionVisible ?: return
         setOptionVisibility(!current)
     }
 
-    fun onNewQuerySubmit() {
+    fun onOptionButtonClicked() {
+        toggleOptionVisibility()
+    }
+
+    fun onSubmitButtonClicked() {
         notifyRefresh()
+    }
+
+    fun onCloseButtonClicked() {
+        toggleOptionVisibility()
     }
 
     private fun onQueryChanged(query: VocabularyQuery) {
@@ -94,7 +102,7 @@ class AllWordViewModel @Inject constructor(
         }
     }
 
-    fun onQueryToggleWordClass(koreanName: String) {
+    fun onQueryWordClassToggled(koreanName: String) {
         allWordUiState.value.data?.queryState?.let { queryState ->
             val current = queryState.wordClass
             val new = if (koreanName == totalWordClassName) {
@@ -104,6 +112,31 @@ class AllWordViewModel @Inject constructor(
                 current.xor(wordClass).toSet()
             }
             onQueryChanged(queryState.copy(wordClass = new))
+        }
+    }
+
+    fun onSortStateClicked(sortState: SortState) {
+        allWordUiState.value.data?.let { data ->
+            val currentSortState = data.sortState
+            if (sortState != currentSortState) {
+                _allWordUiState.value =
+                    allWordUiState.value.copy(data = data.copy(sortState = sortState))
+                notifyRefresh()
+            }
+        }
+    }
+}
+
+private fun Collection<VocabularyImpl>.sortedBy(selector: SortState): List<VocabularyImpl> {
+    return when (selector) {
+        SortState.Alphabet -> {
+            this.sortedBy { it.eng }
+        }
+        SortState.Latest -> {
+            this.sortedByDescending { it.addedTime }
+        }
+        SortState.Random -> {
+            this.shuffled()
         }
     }
 }
@@ -116,6 +149,10 @@ data class AllWordData(
     val currentWordState: List<VocabularyImpl> = emptyList()
 )
 
-enum class SortState { Alphabet, Latest, Random }
+enum class SortState(val korean: String) {
+    Alphabet("알파벳"),
+    Latest("최신순"),
+    Random("무작위")
+}
 
 const val totalWordClassName = "전체"
