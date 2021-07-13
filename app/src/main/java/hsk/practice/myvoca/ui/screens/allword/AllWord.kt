@@ -9,20 +9,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ManageSearch
+import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.HighlightOff
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +40,7 @@ import hsk.practice.myvoca.data.toWordClass
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.state.UiState
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun AllWordScreen(
@@ -361,11 +363,36 @@ fun SortStateChip(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AllWordItems(words: List<VocabularyImpl>) {
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(items = words,
-            key = { it.id }
-        ) { word ->
-            WordContent(word)
+    val coroutineScope = rememberCoroutineScope()
+    Box {
+        val listState = rememberLazyListState()
+        LazyColumn(
+            state = listState,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(items = words,
+                key = { it.id }
+            ) { word ->
+                WordContent(word)
+            }
+        }
+
+        val showButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 } }
+        if (showButton) {
+            IconButton(
+                onClick = {
+                    coroutineScope.launch { listState.animateScrollToItem(0) }
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+                    .background(color = Color.Black.copy(alpha = 0.05f), shape = CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.ArrowUpward,
+                    contentDescription = "목록의 맨 위로 이동합니다."
+                )
+            }
         }
     }
 }
