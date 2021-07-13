@@ -82,8 +82,10 @@ object RoomMigrations {
                         "memo TEXT)"
                     ).joinToString(" ")
                 )
-                execSQL("INSERT INTO Vocabulary_4 (id, eng, kor, add_time, last_update, memo) " +
-                        "SELECT id, eng, kor, add_time, last_update, memo FROM RoomVocabulary")
+                execSQL(
+                    "INSERT INTO Vocabulary_4 (id, eng, kor, add_time, last_update, memo) " +
+                            "SELECT id, eng, kor, add_time, last_update, memo FROM RoomVocabulary"
+                )
                 execSQL("DROP TABLE RoomVocabulary")
                 execSQL("ALTER TABLE Vocabulary_4 RENAME TO RoomVocabulary")
             }
