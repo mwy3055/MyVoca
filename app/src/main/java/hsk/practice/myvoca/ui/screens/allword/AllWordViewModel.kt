@@ -30,7 +30,7 @@ class AllWordViewModel @Inject constructor(
     val allWordUiState: StateFlow<UiState<AllWordData>>
         get() = _allWordUiState
 
-    val refreshChannel = Channel<Unit>(Channel.CONFLATED)
+    private val refreshChannel = Channel<Unit>(Channel.CONFLATED)
 
     init {
         notifyRefresh()
@@ -66,26 +66,8 @@ class AllWordViewModel @Inject constructor(
     /**
      * Event listeners for composable
      */
-    fun setOptionVisibility(value: Boolean) {
-        val data = allWordUiState.value.data ?: return
-        _allWordUiState.value = allWordUiState.value.copy(data = data.copy(optionVisible = value))
-    }
-
-    private fun toggleOptionVisibility() {
-        val current = allWordUiState.value.data?.optionVisible ?: return
-        setOptionVisibility(!current)
-    }
-
-    fun onOptionButtonClicked() {
-        toggleOptionVisibility()
-    }
-
     fun onSubmitButtonClicked() {
         notifyRefresh()
-    }
-
-    fun onCloseButtonClicked() {
-        toggleOptionVisibility()
     }
 
     private fun onQueryChanged(query: VocabularyQuery) {
@@ -143,7 +125,6 @@ private fun Collection<VocabularyImpl>.sortedBy(selector: SortState): List<Vocab
 
 @Immutable
 data class AllWordData(
-    val optionVisible: Boolean = false,
     val sortState: SortState = SortState.Alphabet,
     val queryState: VocabularyQuery = VocabularyQuery(),
     val currentWordState: List<VocabularyImpl> = emptyList()
