@@ -2,14 +2,23 @@ package hsk.practice.myvoca.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import hsk.practice.myvoca.R
+
+val Paybooc = FontFamily(
+    Font(R.font.paybooc_medium),
+    Font(R.font.paybooc_light, FontWeight.Light),
+    Font(R.font.paybooc_bold, FontWeight.Bold),
+    Font(R.font.paybooc_extrabold, FontWeight.ExtraBold)
+)
 
 // Set of Material typography styles to start with
 val Typography = Typography(
+    defaultFontFamily = Paybooc,
     body1 = TextStyle(
-        fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp
     )

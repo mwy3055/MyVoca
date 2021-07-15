@@ -29,7 +29,7 @@ fun String?.containsOnlyAlphabet(): Boolean {
  *
  * @return Time string of the timestamp
  */
-fun Long.getTimeString(): String {
+fun Long.toTimeString(): String {
     val cal = Calendar.getInstance()
     cal.timeInMillis = this
     val year = cal[Calendar.YEAR]
@@ -53,4 +53,16 @@ fun setNightMode(value: Boolean) {
         AppCompatDelegate.MODE_NIGHT_NO
     }
     AppCompatDelegate.setDefaultNightMode(mode)
+}
+
+/**
+ * Remove the given [element] if this [Collection] contains the [element] or add if doesn't.
+ * This function is similar to bit operator `XOR`.
+ */
+fun <T> Collection<T>.xor(element: T): Collection<T> {
+    return if (this.contains(element)) {
+        this.minus(element)
+    } else {
+        this.plus(element)
+    }
 }

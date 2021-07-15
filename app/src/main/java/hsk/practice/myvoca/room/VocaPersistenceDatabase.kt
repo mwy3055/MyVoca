@@ -2,20 +2,21 @@ package hsk.practice.myvoca.room
 
 import android.content.Context
 import com.hsk.data.vocabulary.Vocabulary
+import com.hsk.data.vocabulary.VocabularyQuery
+import com.hsk.data.vocabulary.matchesWithQuery
 import com.hsk.domain.VocaPersistence
-import com.orhanobut.logger.Logger
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import hsk.practice.myvoca.containsOnlyAlphabet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,11 +38,14 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
 
     private val job = Job()
     override val coroutineContext: CoroutineContext
-        get() = job + Dispatchers.IO
+        get() = job
 
     private var vocaDao: VocaDao
 
     private val _allVocabulary = MutableStateFlow<List<Vocabulary>>(emptyList())
+    private val _isLoading = MutableStateFlow(false)
+    private val isLoading: StateFlow<Boolean>
+        get() = _isLoading
 
     init {
         synchronized(this) {
@@ -62,30 +66,32 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
         return vocaDao.loadVocabularyById(id)?.toVocabulary()
     }
 
-    private fun loadAllVocabulary() = launch {
+    private fun loadAllVocabulary() = launch(Dispatchers.IO) {
         vocaDao.loadAllVocabulary().collect {
-            Logger.d("AllVocabulary loaded!")
+//            Logger.d("AllVocabulary loaded!")
             _allVocabulary.value = it.toVocabularyList()
+            _isLoading.value = true
         }
     }
 
-    override suspend fun getVocabulary(query: String): List<Vocabulary> {
-        return if (query.containsOnlyAlphabet()) {
-            vocaDao.loadVocabularyByEng("%${query}%")
-        } else {
-            vocaDao.loadVocabularyByKor(query)
-        }.toVocabularyList()
+    override suspend fun getVocabulary(query: VocabularyQuery): List<Vocabulary> {
+//        Logger.d("Filtering waiting...")
+        isLoading.first { it }
+//        Logger.d("Filtering start with size ${_allVocabulary.value.size}")
+        return _allVocabulary.value.filter { vocabulary ->
+            vocabulary.matchesWithQuery(query)
+        }
     }
 
-    override suspend fun deleteVocabulary(vararg vocabularies: Vocabulary) {
-        vocaDao.deleteVocabulary(*vocabularies.toRoomVocabularyArray())
+    override suspend fun deleteVocabulary(vocabularies: List<Vocabulary>) {
+        vocaDao.deleteVocabulary(vocabularies.toRoomVocabularyList())
     }
 
-    override suspend fun updateVocabulary(vararg vocabularies: Vocabulary) {
-        vocaDao.updateVocabulary(*vocabularies.toRoomVocabularyArray())
+    override suspend fun updateVocabulary(vocabularies: List<Vocabulary>) {
+        vocaDao.updateVocabulary(vocabularies.toRoomVocabularyList())
     }
 
-    override suspend fun insertVocabulary(vararg vocabularies: Vocabulary) {
-        vocaDao.insertVocabulary(*vocabularies.toRoomVocabularyArray())
+    override suspend fun insertVocabulary(vocabularies: List<Vocabulary>) {
+        vocaDao.insertVocabulary(vocabularies.toRoomVocabularyList())
     }
 }

@@ -26,6 +26,23 @@ data class VocabularyImpl(
     }
 }
 
+val fakeData = (1..20).map {
+    val currentTime = System.currentTimeMillis()
+    VocabularyImpl(
+        id = it,
+        eng = "test$it",
+        meaning = listOf(
+            MeaningImpl(
+                if (it % 2 == 0) WordClassImpl.NOUN else WordClassImpl.VERB,
+                "테스트$it"
+            )
+        ),
+        addedTime = currentTime,
+        lastEditedTime = currentTime,
+        memo = ""
+    )
+}
+
 val VocabularyImpl.answerString: String
     get() = "$eng: ${meaning.joinToString("; ") { it.content }}"
 
@@ -34,16 +51,20 @@ data class MeaningImpl(
     val content: String
 ) : Serializable
 
-enum class WordClassImpl {
-    NOUN,
-    PRONOUN,
-    VERB,
-    ADJECTIVE,
-    ADVERB,
-    PREPOSITION,
-    CONJUNCTION,
-    INTERJECTION,
-    UNKNOWN
+enum class WordClassImpl(val korean: String) {
+    NOUN("명사"),
+    PRONOUN("대명사"),
+    VERB("동사"),
+    ADJECTIVE("형용사"),
+    ADVERB("부사"),
+    PREPOSITION("전치사"),
+    CONJUNCTION("접속사"),
+    INTERJECTION("감탄사"),
+    UNKNOWN("???");
+
+    companion object {
+        fun findByKorean(korean: String) = values().find { it.korean == korean }
+    }
 }
 
 /**

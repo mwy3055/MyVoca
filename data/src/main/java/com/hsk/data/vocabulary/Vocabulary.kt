@@ -21,8 +21,16 @@ val nullVocabulary: Vocabulary
         memo = ""
     )
 
-fun Vocabulary.containsMeaning(query: String): Boolean {
-    return meaning.any { it.content.contains(query) }
+fun Vocabulary.matchesWithQuery(query: VocabularyQuery): Boolean {
+    return matchesWithQueryString(query.word) and matchesWithWordClass(query.wordClass)
+}
+
+fun Vocabulary.matchesWithQueryString(query: String): Boolean {
+    return query.isEmpty() or eng.contains(query)
+}
+
+fun Vocabulary.matchesWithWordClass(query: Set<WordClass>): Boolean {
+    return query.isEmpty() or meaning.any { query.contains(it.type) }
 }
 
 data class Meaning(
@@ -41,3 +49,8 @@ enum class WordClass {
     INTERJECTION,
     UNKNOWN
 }
+
+data class VocabularyQuery(
+    val word: String = "",
+    val wordClass: Set<WordClass> = emptySet()
+)

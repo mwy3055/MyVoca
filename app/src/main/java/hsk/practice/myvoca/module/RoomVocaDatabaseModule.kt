@@ -19,12 +19,13 @@ object RoomVocaDatabaseModule {
     @Singleton
     @Provides
     fun provideRoomVocaDatabase(
-            @ApplicationContext context: Context)
-            : RoomVocaDatabase = Room.databaseBuilder(context,
-            RoomVocaDatabase::class.java,
-            RoomVocaDatabase.vocaDatabaseName)
-            .addMigrations(*RoomMigrations.migrations)
-            .build()
+        @ApplicationContext context: Context
+    ): RoomVocaDatabase = Room.databaseBuilder(
+        context,
+        RoomVocaDatabase::class.java,
+        RoomVocaDatabase.vocaDatabaseName
+    ).addMigrations(*RoomMigrations.migrations)
+        .build()
 
     @Singleton
     @Provides

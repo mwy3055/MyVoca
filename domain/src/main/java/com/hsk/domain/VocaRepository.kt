@@ -1,6 +1,7 @@
 package com.hsk.domain
 
 import com.hsk.data.vocabulary.Vocabulary
+import com.hsk.data.vocabulary.VocabularyQuery
 import com.hsk.data.vocabulary.nullVocabulary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +25,7 @@ class VocaRepository(private val vocaPersistence: VocaPersistence) : CoroutineSc
         return vocaPersistence.getVocabularyById(id)
     }
 
-    suspend fun getVocabulary(query: String): List<Vocabulary> {
+    suspend fun getVocabulary(query: VocabularyQuery): List<Vocabulary> {
         return vocaPersistence.getVocabulary(query)
     }
 
@@ -36,16 +37,16 @@ class VocaRepository(private val vocaPersistence: VocaPersistence) : CoroutineSc
         }
     }
 
-    suspend fun insertVocabulary(vararg vocabularies: Vocabulary) {
-        vocaPersistence.insertVocabulary(*vocabularies)
+    suspend fun insertVocabulary(vocabularies: List<Vocabulary>) {
+        vocaPersistence.insertVocabulary(vocabularies)
     }
 
-    suspend fun updateVocabulary(vararg vocabularies: Vocabulary) {
-        vocaPersistence.updateVocabulary(*vocabularies)
+    suspend fun updateVocabulary(vocabularies: List<Vocabulary>) {
+        vocaPersistence.updateVocabulary(vocabularies)
     }
 
-    suspend fun deleteVocabulary(vararg vocabularies: Vocabulary) {
-        vocaPersistence.deleteVocabulary(*vocabularies)
+    suspend fun deleteVocabulary(vocabularies: List<Vocabulary>) {
+        vocaPersistence.deleteVocabulary(vocabularies)
     }
 
 }
