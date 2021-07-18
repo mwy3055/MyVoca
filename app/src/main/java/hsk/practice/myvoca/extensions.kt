@@ -66,3 +66,13 @@ fun <T> Collection<T>.xor(element: T): Collection<T> {
         this.plus(element)
     }
 }
+
+fun <T> Collection<T>.randoms(size: Int): List<T> {
+    if (this.size <= size) return this.toList()
+    val elements = mutableSetOf<T>()
+    while (elements.size < size) {
+        val elem = this.random()
+        elements.add(elem)
+    }
+    return elements.toList()
+}
