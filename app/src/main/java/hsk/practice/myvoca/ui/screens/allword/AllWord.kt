@@ -30,7 +30,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hsk.data.vocabulary.VocabularyQuery
 import com.hsk.data.vocabulary.WordClass
@@ -38,6 +37,7 @@ import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.data.toWordClass
+import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.state.UiState
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
@@ -72,11 +72,7 @@ fun AllWordLoading(
         modifier = Modifier.fillMaxSize()
     ) {
         if (uiState.loading) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .zIndex(1f)
-            )
+            LoadingIndicator(modifier = Modifier.align(Alignment.Center))
         }
         uiState.data?.let { data ->
             AllWordContent(
