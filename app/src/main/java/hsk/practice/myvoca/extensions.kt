@@ -76,3 +76,13 @@ fun <T> Collection<T>.randoms(size: Int): List<T> {
     }
     return elements.toList()
 }
+
+/**
+ * Truncates the given collection to [size]. If size of the given collection is smaller than
+ * [size], original collection is returned. Otherwise, first [size] elements are returned.
+ *
+ * @param size Maximum number of elements to include
+ */
+fun <T> Collection<T>.truncate(size: Int): List<T> {
+    return if (this.size <= size) this.toList() else this.toList().subList(0, size)
+}
