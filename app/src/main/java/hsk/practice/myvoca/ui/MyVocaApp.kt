@@ -22,6 +22,7 @@ import hsk.practice.myvoca.ui.screens.allword.AllWordViewModel
 import hsk.practice.myvoca.ui.screens.home.HomeScreen
 import hsk.practice.myvoca.ui.screens.profile.ProfileScreen
 import hsk.practice.myvoca.ui.screens.quiz.QuizScreen
+import hsk.practice.myvoca.ui.screens.quiz.QuizViewModel
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 
 @ExperimentalAnimationApi
@@ -78,6 +79,7 @@ fun MyVocaNavGraph(
 ) {
     // 여기서 만들면 화면 전환에 상관없이 유지된다.
     val allWordViewModel: AllWordViewModel = hiltViewModel()
+    val quizViewModel: QuizViewModel = hiltViewModel()
     NavHost(
         navController = navController,
         startDestination = MyVocaScreen.Home.name,
@@ -91,7 +93,7 @@ fun MyVocaNavGraph(
             AllWordScreen(allWordViewModel)
         }
         composable(MyVocaScreen.Quiz.name) {
-            QuizScreen()
+            QuizScreen(quizViewModel)
         }
         composable(MyVocaScreen.Profile.name) {
             ProfileScreen()

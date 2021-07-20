@@ -66,3 +66,33 @@ fun <T> Collection<T>.xor(element: T): Collection<T> {
         this.plus(element)
     }
 }
+
+fun <T> Collection<T>.randoms(size: Int): List<T> {
+    if (this.size <= size) return this.toList()
+    val elements = mutableSetOf<T>()
+    while (elements.size < size) {
+        val elem = this.random()
+        elements.add(elem)
+    }
+    return elements.toList()
+}
+
+/**
+ * Truncates the given collection to [size]. If size of the given collection is smaller than
+ * [size], original collection is returned. Otherwise, first [size] elements are returned.
+ *
+ * @param size Maximum number of elements to include
+ */
+fun <T> Collection<T>.truncate(size: Int): List<T> {
+    return if (this.size <= size) this.toList() else this.toList().subList(0, size)
+}
+
+/**
+ * Find the Greatest Common Divisor (GCD).
+ *
+ * @param num Another integer to find the GCD.
+ * @return GCD of this and [num].
+ */
+fun Int.gcd(num: Int): Int {
+    return if (this == 0) num else (num % this).gcd(this)
+}

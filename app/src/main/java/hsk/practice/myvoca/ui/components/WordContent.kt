@@ -57,7 +57,7 @@ fun WordContent(
         WordMeanings(
             meanings = word.meaning,
             expanded = expanded,
-            onExpanded = onExpanded
+            onClick = onExpanded
         )
     }
 }
@@ -78,7 +78,7 @@ fun WordMeanings(
     meanings: List<MeaningImpl>,
     modifier: Modifier = Modifier,
     expanded: Boolean = false,
-    onExpanded: (Boolean) -> Unit = {}
+    onClick: (Boolean) -> Unit = {}
 ) {
     val meaningsTruncated = meanings.size >= 3
     val (firstMeanings, lastMeanings) = if (meaningsTruncated) {
@@ -88,9 +88,8 @@ fun WordMeanings(
     }
 
     Row(
-        modifier = modifier
+        modifier = if (meaningsTruncated) modifier.clickable { onClick(expanded) } else modifier
             .fillMaxWidth()
-            .clickable(enabled = meaningsTruncated, onClick = { onExpanded(expanded) })
     ) {
         Column(
             modifier = Modifier
@@ -113,7 +112,7 @@ fun WordMeanings(
                 targetValue = if (expanded) 180f else 0f,
             )
             IconButton(
-                onClick = { onExpanded(expanded) },
+                onClick = { onClick(expanded) },
                 modifier = Modifier
                     .size(40.dp)
                     .align(Alignment.Bottom)

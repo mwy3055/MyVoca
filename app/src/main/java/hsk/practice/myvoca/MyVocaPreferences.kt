@@ -6,11 +6,13 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Preferences DataStore object. Delegated by preferenceDataStore().
@@ -18,23 +20,25 @@ import kotlinx.coroutines.launch
  */
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-fun <T> Context.getPreferencesFlow(key: Preferences.Key<T>, defaultValue: T): Flow<T> =
-    dataStore.data.map { preferences ->
-        preferences[key] ?: defaultValue
-    }
+class PreferencesDataStore @Inject constructor(@ApplicationContext val context: Context) {
+    fun <T> getPreferencesFlow(key: Preferences.Key<T>, default: T): Flow<T> =
+        context.dataStore.data.map { preferences ->
+            preferences[key] ?: default
+        }
 
-suspend fun <T> Context.getPreferences(key: Preferences.Key<T>, defaultValue: T): T {
-    return getPreferencesFlow(key, defaultValue).first()
-}
+    suspend fun <T> getPreferences(key: Preferences.Key<T>, default: T): T =
+        getPreferencesFlow(key, default).first()
 
-suspend fun <T> Context.setPreferenceValue(key: Preferences.Key<T>, value: T) =
-    coroutineScope {
-        launch {
-            dataStore.edit { preferences ->
-                preferences[key] = value
+    suspend fun <T> setPreferences(key: Preferences.Key<T>, value: T) {
+        coroutineScope {
+            launch {
+                context.dataStore.edit { preferences ->
+                    preferences[key] = value
+                }
             }
         }
     }
+}
 
 
 /**
