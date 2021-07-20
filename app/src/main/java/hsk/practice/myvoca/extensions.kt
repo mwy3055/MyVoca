@@ -86,3 +86,13 @@ fun <T> Collection<T>.randoms(size: Int): List<T> {
 fun <T> Collection<T>.truncate(size: Int): List<T> {
     return if (this.size <= size) this.toList() else this.toList().subList(0, size)
 }
+
+/**
+ * Find the Greatest Common Divisor (GCD).
+ *
+ * @param num Another integer to find the GCD.
+ * @return GCD of this and [num].
+ */
+fun Int.gcd(num: Int): Int {
+    return if (this == 0) num else (num % this).gcd(this)
+}
