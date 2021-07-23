@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hsk.data.vocabulary.VocabularyQuery
 import com.hsk.domain.VocaPersistence
-import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
@@ -14,8 +13,8 @@ import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.room.toVocabularyImplList
 import hsk.practice.myvoca.ui.state.UiState
 import hsk.practice.myvoca.xor
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -41,25 +40,25 @@ class AllWordViewModel @Inject constructor(
         return persistence.getVocabulary(query).toVocabularyImplList()
     }
 
-    private fun notifyRefresh() = viewModelScope.launch {
+    private fun notifyRefresh() = viewModelScope.launch(Dispatchers.Default) {
         refreshChannel.send(Unit)
     }
 
-    private fun lookRefreshChannel() = viewModelScope.launch {
+    private fun lookRefreshChannel() = viewModelScope.launch(Dispatchers.Default) {
         for (refresh in refreshChannel) {
-            Logger.d("Loading start, query: ${_allWordUiState.value.data?.queryState}")
-            _allWordUiState.value = _allWordUiState.value.copy(loading = true)
+            _allWordUiState.value = allWordUiState.value.copy(loading = true)
+//            Logger.d("Loading start, data: ${allWordUiState.value}")
 
             // TODO: remove this when test is finished
-            delay(1500)
+//            delay(1500)
 
             val data = _allWordUiState.value.data ?: AllWordData()
             val result = loadWords(data.queryState).sortedBy(data.sortState)
-            _allWordUiState.value = _allWordUiState.value.copy(
+            _allWordUiState.value = allWordUiState.value.copy(
                 loading = false,
                 data = data.copy(currentWordState = result)
             )
-            Logger.d("Loading complete!")
+//            Logger.d("Loading complete!")
         }
     }
 

@@ -6,10 +6,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -114,7 +111,8 @@ fun AllWordContent(
             AllWordQueryIndicator(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(BackdropScaffoldDefaults.HeaderHeight),
+                    .height(BackdropScaffoldDefaults.HeaderHeight)
+                    .clickable { if (scaffoldState.isConcealed) revealBackdrop() else concealBackdrop() }
             )
         },
         backLayerContent = {
@@ -204,28 +202,26 @@ fun AllWordQueryOptions(
     onOptionWordClassClick: (String) -> Unit,
     onSortStateClick: (SortState) -> Unit
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            AllWordQueryButtons(
-                onCloseButtonClicked = onCloseButtonClicked,
-                onSubmitButtonClicked = onSubmitButtonClicked
-            )
-            AllWordQueryWord(
-                text = query.word,
-                onTextChanged = onQueryWordChanged
-            )
-            AllWordQueryWordClass(
-                selectedWordClass = query.wordClass,
-                onOptionWordClassClick = onOptionWordClassClick
-            )
-            AllWordQuerySortState(
-                currentSortState = sortState,
-                onSortStateClick = onSortStateClick
-            )
-        }
+        AllWordQueryButtons(
+            onCloseButtonClicked = onCloseButtonClicked,
+            onSubmitButtonClicked = onSubmitButtonClicked
+        )
+        AllWordQueryWord(
+            text = query.word,
+            onTextChanged = onQueryWordChanged
+        )
+        AllWordQueryWordClass(
+            selectedWordClass = query.wordClass,
+            onOptionWordClassClick = onOptionWordClassClick
+        )
+        AllWordQuerySortState(
+            currentSortState = sortState,
+            onSortStateClick = onSortStateClick
+        )
     }
 }
 
@@ -291,25 +287,20 @@ fun AllWordQueryWordClass(
     onOptionWordClassClick: (String) -> Unit
 ) {
     val classes = WordClassImpl.values().filter { it != WordClassImpl.UNKNOWN }
-    Column(
-        modifier = Modifier.padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        LazyRow {
-            item {
-                WordClassChip(
-                    className = totalWordClassName,
-                    selected = selectedWordClass.isEmpty(),
-                    onClick = onOptionWordClassClick
-                )
-            }
-            items(classes) { wordClass ->
-                WordClassChip(
-                    className = wordClass.korean,
-                    selected = selectedWordClass.contains(wordClass.toWordClass()),
-                    onClick = onOptionWordClassClick
-                )
-            }
+    LazyRow(modifier = Modifier.padding(8.dp)) {
+        item {
+            WordClassChip(
+                className = totalWordClassName,
+                selected = selectedWordClass.isEmpty(),
+                onClick = onOptionWordClassClick
+            )
+        }
+        items(classes) { wordClass ->
+            WordClassChip(
+                className = wordClass.korean,
+                selected = selectedWordClass.contains(wordClass.toWordClass()),
+                onClick = onOptionWordClassClick
+            )
         }
     }
 }
@@ -324,30 +315,26 @@ fun WordClassChip(
     val background by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.surface)
     val textColor by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.onPrimary else MaterialTheme.colors.primary)
 
-    Surface(
+    Row(
         modifier = Modifier
             .padding(horizontal = 4.dp)
-            .clickable { onClick(className) },
-        elevation = 0.dp,
-        shape = MaterialTheme.shapes.medium,
-        color = background,
+            .clickable { onClick(className) }
+            .background(color = background, shape = MaterialTheme.shapes.medium),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            AnimatedVisibility(selected) {
-                Icon(
-                    imageVector = Icons.Filled.Check,
-                    contentDescription = null
-                )
-            }
-            Text(
-                text = className,
-                modifier = Modifier
-                    .padding(6.dp),
-                color = textColor
+        AnimatedVisibility(selected) {
+            Icon(
+                imageVector = Icons.Filled.Check,
+                contentDescription = null,
+                tint = contentColorFor(backgroundColor = MaterialTheme.colors.primary)
             )
         }
+        Text(
+            text = className,
+            modifier = Modifier
+                .padding(6.dp),
+            color = textColor
+        )
     }
 }
 
@@ -402,8 +389,8 @@ fun SortStateChip(
 @Composable
 fun AllWordItems(words: List<VocabularyImpl>) {
     val coroutineScope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
     Box {
-        val listState = rememberLazyListState()
         LazyColumn(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(8.dp)
