@@ -27,9 +27,10 @@ import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.toTimeString
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 
-@ExperimentalAnimationApi
 @Composable
-fun WordContent(word: VocabularyImpl) {
+fun WordContent(
+    word: VocabularyImpl,
+) {
     var expanded by remember { mutableStateOf(false) }
     WordContent(
         word = word,
@@ -38,7 +39,6 @@ fun WordContent(word: VocabularyImpl) {
     )
 }
 
-@ExperimentalAnimationApi
 @Composable
 fun WordContent(
     word: VocabularyImpl,
@@ -53,26 +53,25 @@ fun WordContent(
             .padding(padding),
         verticalArrangement = Arrangement.spacedBy(padding)
     ) {
-        WordTitle(title = word.eng)
-        WordMeanings(
-            meanings = word.meaning,
-            expanded = expanded,
-            onClick = onExpanded
-        )
+        if (word.id != 0) {
+            WordTitle(title = word.eng)
+            WordMeanings(
+                meanings = word.meaning,
+                expanded = expanded,
+                onClick = onExpanded
+            )
+        }
     }
 }
 
 @Composable
-fun WordTitle(title: String, modifier: Modifier = Modifier) {
-    Box(modifier = modifier) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.h6
-        )
-    }
+fun WordTitle(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.h6,
+    )
 }
 
-@ExperimentalAnimationApi
 @Composable
 fun WordMeanings(
     meanings: List<MeaningImpl>,
@@ -165,7 +164,7 @@ fun WordMetadataShort(addedTime: Long, modifier: Modifier = Modifier) {
     }
 }
 
-@ExperimentalAnimationApi
+@OptIn(ExperimentalAnimationApi::class)
 @Preview
 @Composable
 fun WordContentPreview() {
