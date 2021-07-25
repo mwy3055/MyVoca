@@ -1,7 +1,5 @@
 package hsk.practice.myvoca.ui.state
 
-import hsk.practice.myvoca.data.Result
-
 /**
  * Immutable data class that allows for loading, data, and exception to be managed independently.
  *
@@ -24,17 +22,4 @@ data class UiState<T>(
      */
     val initialLoad: Boolean
         get() = data == null && loading && !hasError
-}
-
-/**
- * Copy a UiState<T> based on a Result<T>.
- *
- * Result.Success will set all fields
- * Result.Error will reset loading and exception only
- */
-fun <T> UiState<T>.copyWithResult(value: Result<T>): UiState<T> {
-    return when (value) {
-        is Result.Success -> copy(loading = false, exception = null, data = value.data)
-        is Result.Error -> copy(loading = false, exception = value.exception)
-    }
 }
