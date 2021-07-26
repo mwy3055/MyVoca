@@ -10,7 +10,7 @@ import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.data.toWordClass
 import hsk.practice.myvoca.module.LocalVocaPersistence
-import hsk.practice.myvoca.room.toVocabularyImplList
+import hsk.practice.myvoca.room.vocabulary.toVocabularyImplList
 import hsk.practice.myvoca.ui.state.UiState
 import hsk.practice.myvoca.xor
 import kotlinx.coroutines.Dispatchers

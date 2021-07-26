@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.room
+package hsk.practice.myvoca.room.persistence
 
 import android.content.Context
 import com.hsk.data.vocabulary.Vocabulary
@@ -10,6 +10,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import hsk.practice.myvoca.room.vocabulary.VocaDao
+import hsk.practice.myvoca.room.vocabulary.toRoomVocabularyList
+import hsk.practice.myvoca.room.vocabulary.toVocabulary
+import hsk.practice.myvoca.room.vocabulary.toVocabularyList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

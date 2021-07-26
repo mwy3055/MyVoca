@@ -11,7 +11,7 @@ import hsk.practice.myvoca.PreferencesDataStore
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.randoms
-import hsk.practice.myvoca.room.toVocabularyImplList
+import hsk.practice.myvoca.room.vocabulary.toVocabularyImplList
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject

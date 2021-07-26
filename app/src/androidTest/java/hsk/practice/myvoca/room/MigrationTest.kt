@@ -10,6 +10,9 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import hsk.practice.myvoca.room.vocabulary.RoomMigrations
+import hsk.practice.myvoca.room.vocabulary.RoomVocaDatabase
+import hsk.practice.myvoca.room.vocabulary.RoomVocabulary
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals

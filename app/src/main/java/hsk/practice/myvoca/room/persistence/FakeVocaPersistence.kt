@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.room
+package hsk.practice.myvoca.room.persistence
 
 import com.hsk.data.vocabulary.*
 import com.hsk.domain.VocaPersistence
