@@ -72,4 +72,14 @@ interface VocaDao {
      */
     @Query("SELECT * from RoomVocabulary WHERE kor LIKE :kor")
     suspend fun loadVocabularyByKor(kor: String?): List<RoomVocabulary>
+
+    /**
+     * Loads ``Today's word`` by referencing ``TodayWords`` table.
+     *
+     * @return List of ``Today's words``
+     */
+    @Transaction
+    @Query("SELECT * FROM RoomVocabulary WHERE id IN (SELECT vocabulary_id FROM TodayWords)")
+    fun getTodayWords(): Flow<List<RoomVocabulary>>
+
 }

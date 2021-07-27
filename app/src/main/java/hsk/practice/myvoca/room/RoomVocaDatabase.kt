@@ -1,9 +1,13 @@
-package hsk.practice.myvoca.room.vocabulary
+package hsk.practice.myvoca.room
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import hsk.practice.myvoca.room.todayword.TodayWord
+import hsk.practice.myvoca.room.todayword.TodayWordDao
+import hsk.practice.myvoca.room.vocabulary.RoomVocabulary
+import hsk.practice.myvoca.room.vocabulary.VocaDao
 
 /**
  * Room database class. Exists at the bottom of the database abstraction.
@@ -12,9 +16,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  *
  * Implemented as Singleton because creating database object is very costly.
  */
-@Database(entities = [RoomVocabulary::class], version = 4)
+@Database(entities = [RoomVocabulary::class, TodayWord::class], version = 4)
 abstract class RoomVocaDatabase : RoomDatabase() {
     abstract fun vocaDao(): VocaDao?
+    abstract fun todayWordDao(): TodayWordDao?
 
     companion object {
         const val vocaDatabaseName = "Vocabulary"

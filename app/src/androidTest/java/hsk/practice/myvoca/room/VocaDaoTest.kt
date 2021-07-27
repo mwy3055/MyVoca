@@ -8,7 +8,6 @@ import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.data.fakeData
-import hsk.practice.myvoca.room.vocabulary.RoomVocaDatabase
 import hsk.practice.myvoca.room.vocabulary.VocaDao
 import hsk.practice.myvoca.room.vocabulary.toRoomVocabulary
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImpl
