@@ -74,6 +74,14 @@ interface VocaDao {
     suspend fun loadVocabularyByKor(kor: String?): List<RoomVocabulary>
 
     /**
+     * Loads total number of row in database.
+     *
+     * @return size of the database
+     */
+    @Query("SELECT COUNT(*) from RoomVocabulary")
+    fun getVocabularySize(): Flow<Int>
+
+    /**
      * Loads ``Today's word`` by referencing ``TodayWords`` table.
      *
      * @return List of ``Today's words``

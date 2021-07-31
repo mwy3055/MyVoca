@@ -17,10 +17,7 @@ import hsk.practice.myvoca.room.vocabulary.toVocabularyList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -65,6 +62,8 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
     override fun getAllVocabulary(): StateFlow<List<Vocabulary>> {
         return _allVocabulary
     }
+
+    override fun getVocabularySize(): Flow<Int> = vocaDao.getVocabularySize().distinctUntilChanged()
 
     override suspend fun getVocabularyById(id: Int): Vocabulary? {
         return vocaDao.loadVocabularyById(id)?.toVocabulary()
