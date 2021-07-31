@@ -1,23 +1,27 @@
 package hsk.practice.myvoca.room.todayword
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TodayWordDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTodayWord(todayWord: TodayWord): Long
+    suspend fun insertTodayWord(roomTodayWord: RoomTodayWord): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTodayWord(todayWords: List<TodayWord>)
+    suspend fun insertTodayWord(roomTodayWords: List<RoomTodayWord>)
+
+    @Update
+    suspend fun updateTodayWord(todayWord: RoomTodayWord)
 
     @Query("DELETE FROM TodayWords")
-    suspend fun deleteTodayWords()
+    suspend fun clearTodayWords()
+
+    @Delete
+    suspend fun deleteTodayWord(todayWord: RoomTodayWord)
 
     @Query("SELECT * FROM TodayWords")
-    suspend fun getTodayWord(): List<TodayWord>
+    fun getTodayWord(): Flow<List<RoomTodayWord>>
 
 }

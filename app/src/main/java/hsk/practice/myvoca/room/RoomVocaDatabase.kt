@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import hsk.practice.myvoca.room.todayword.TodayWord
+import hsk.practice.myvoca.room.todayword.RoomTodayWord
 import hsk.practice.myvoca.room.todayword.TodayWordDao
 import hsk.practice.myvoca.room.vocabulary.RoomVocabulary
 import hsk.practice.myvoca.room.vocabulary.VocaDao
@@ -16,7 +16,7 @@ import hsk.practice.myvoca.room.vocabulary.VocaDao
  *
  * Implemented as Singleton because creating database object is very costly.
  */
-@Database(entities = [RoomVocabulary::class, TodayWord::class], version = 4)
+@Database(entities = [RoomVocabulary::class, RoomTodayWord::class], version = 5)
 abstract class RoomVocaDatabase : RoomDatabase() {
     abstract fun vocaDao(): VocaDao?
     abstract fun todayWordDao(): TodayWordDao?
@@ -98,5 +98,19 @@ object RoomMigrations {
 
     }
 
-    val migrations = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+    val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                """
+            CREATE TABLE IF NOT EXISTS TodayWords
+            (today_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            vocabulary_id INTEGER NOT NULL,
+            checked INTEGER NOT NULL)
+            """.trimIndent()
+            )
+        }
+
+    }
+
+    val migrations = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
 }
