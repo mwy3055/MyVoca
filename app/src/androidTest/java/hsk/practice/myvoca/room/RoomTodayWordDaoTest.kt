@@ -5,7 +5,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import hsk.practice.myvoca.data.fakeData
-import hsk.practice.myvoca.room.todayword.TodayWord
+import hsk.practice.myvoca.room.todayword.RoomTodayWord
 import hsk.practice.myvoca.room.todayword.TodayWordDao
 import hsk.practice.myvoca.room.vocabulary.VocaDao
 import hsk.practice.myvoca.room.vocabulary.toRoomVocabulary
@@ -18,7 +18,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class TodayWordDaoTest {
+class RoomTodayWordDaoTest {
 
     private lateinit var vocaDatabase: RoomVocaDatabase
     private val vocaDao: VocaDao
@@ -46,10 +46,10 @@ class TodayWordDaoTest {
     fun insertTest() = runBlocking {
         vocaDao.insertVocabulary(data)
         val voca = data[0]
-        val todayWord = TodayWord(vocabularyId = voca.id)
+        val todayWord = RoomTodayWord(vocabularyId = voca.id, checked = false)
         todayWordDao.insertTodayWord(todayWord)
         val expected = todayWord.vocabularyId
-        val actual = todayWordDao.getTodayWord().first().vocabularyId
+        val actual = todayWordDao.getTodayWord().first().first().vocabularyId
         assertEquals(expected, actual)
     }
 
@@ -57,7 +57,7 @@ class TodayWordDaoTest {
     fun insertAndGet() = runBlocking {
         vocaDao.insertVocabulary(data)
         val voca = data[0]
-        todayWordDao.insertTodayWord(TodayWord(vocabularyId = voca.id))
+        todayWordDao.insertTodayWord(RoomTodayWord(vocabularyId = voca.id, checked = false))
         val expected = listOf(voca)
         val actual = vocaDao.getTodayWords().first()
         assertEquals(expected, actual)
