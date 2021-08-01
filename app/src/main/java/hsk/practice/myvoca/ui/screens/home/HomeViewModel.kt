@@ -12,10 +12,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import hsk.practice.myvoca.data.TodayWordImpl
 import hsk.practice.myvoca.data.VocabularyImpl
+import hsk.practice.myvoca.data.toTodayWord
 import hsk.practice.myvoca.data.toTodayWordImpl
 import hsk.practice.myvoca.module.LocalTodayWordPersistence
 import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImpl
+import hsk.practice.myvoca.work.setOneTimeTodayWordWork
 import hsk.practice.myvoca.work.setPeriodicTodayWordWork
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,6 +77,25 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    // Click listeners for Ui
+    fun showTodayWordHelp(show: Boolean) {
+        _homeScreenData.value = homeScreenData.value.copy(showTodayWordHelp = show)
+    }
+
+    fun onRefreshTodayWord() {
+        viewModelScope.launch {
+            setOneTimeTodayWordWork(workManager)
+        }
+    }
+
+    fun onTodayWordCheckboxChange(homeTodayWord: HomeTodayWord) {
+        val checked = homeTodayWord.todayWord.checked
+        val copy = homeTodayWord.todayWord.copy(checked = !checked)
+        viewModelScope.launch(Dispatchers.IO) {
+            todayWordPersistence.updateTodayWord(copy.toTodayWord())
+        }
+    }
+
 }
 
 data class HomeTodayWord(
@@ -85,7 +106,8 @@ data class HomeTodayWord(
 data class HomeScreenData(
     val loading: Boolean = false,
     val totalWordCount: Int = 0,
-    val todayWords: List<HomeTodayWord> = emptyList()
+    val todayWords: List<HomeTodayWord> = emptyList(),
+    val showTodayWordHelp: Boolean = false
 )
 
 /**
