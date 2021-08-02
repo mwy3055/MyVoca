@@ -6,12 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.hsk.domain.VocaPersistence
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hsk.practice.myvoca.MyVocaPreferences
-import hsk.practice.myvoca.PreferencesDataStore
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.module.LocalVocaPersistence
-import hsk.practice.myvoca.randoms
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImplList
+import hsk.practice.myvoca.util.MyVocaPreferences
+import hsk.practice.myvoca.util.PreferencesDataStore
+import hsk.practice.myvoca.util.randoms
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject

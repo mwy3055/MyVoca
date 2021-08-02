@@ -1,7 +1,10 @@
-package hsk.practice.myvoca
+package hsk.practice.myvoca.util
 
 import android.Manifest
+import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -95,4 +98,20 @@ fun <T> Collection<T>.truncate(size: Int): List<T> {
  */
 fun Int.gcd(num: Int): Int {
     return if (this == 0) num else (num % this).gcd(this)
+}
+
+/**
+ * Write [log] to the file.
+ *
+ * @param context [Context] of the caller.
+ * @param filename Name of the file which log will be written
+ * @param log Content which will be written
+ */
+fun writeLogToFile(context: Context, filename: String, log: String) {
+    val time = LocalDateTime.now()
+    val timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:MM:ss")
+    val formattedTime = time.format(timeFormatter)
+    context.openFileOutput(filename, Context.MODE_PRIVATE + Context.MODE_APPEND).use {
+        it.write("$formattedTime: $log".toByteArray())
+    }
 }

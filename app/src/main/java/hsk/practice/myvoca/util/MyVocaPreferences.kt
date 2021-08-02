@@ -1,4 +1,4 @@
-package hsk.practice.myvoca
+package hsk.practice.myvoca.util
 
 import android.content.Context
 import androidx.datastore.core.DataStore
