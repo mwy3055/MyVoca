@@ -1,5 +1,7 @@
 package hsk.practice.myvoca.ui.screens.home
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hsk.practice.myvoca.data.TodayWordImpl
@@ -24,12 +27,14 @@ import hsk.practice.myvoca.ui.theme.MyVocaTheme
 fun HomeScreen(viewModel: HomeViewModel) {
     val homeScreenData by viewModel.homeScreenData.collectAsState()
 
-    HomeLoading(
-        data = homeScreenData,
-        showTodayWordHelp = viewModel::showTodayWordHelp,
-        onRefreshTodayWord = viewModel::onRefreshTodayWord,
-        onTodayWordCheckboxChange = viewModel::onTodayWordCheckboxChange
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        HomeLoading(
+            data = homeScreenData,
+            showTodayWordHelp = viewModel::showTodayWordHelp,
+            onRefreshTodayWord = viewModel::onRefreshTodayWord,
+            onTodayWordCheckboxChange = viewModel::onTodayWordCheckboxChange
+        )
+    }
 }
 
 @Composable
@@ -67,7 +72,9 @@ fun HomeContent(
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
 ) {
     Column(
-        modifier = Modifier.padding(8.dp),
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         HomeTitle(size = data.totalWordCount)
@@ -87,7 +94,11 @@ fun HomeTodayWords(
     onRefreshTodayWord: () -> Unit,
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
 ) {
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    // TODO: animate content change (by clicking checkbox...)
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
         item {
             HomeTodayWordHeader(
                 showTodayWordHelp = showTodayWordHelp,
@@ -100,12 +111,10 @@ fun HomeTodayWords(
             }
         } else {
             items(todayWords) { todayWord ->
-                Card(elevation = 6.dp) {
-                    HomeTodayWord(
-                        todayWord,
-                        onTodayWordCheckboxChange = onTodayWordCheckboxChange
-                    )
-                }
+                HomeTodayWord(
+                    todayWord,
+                    onTodayWordCheckboxChange = onTodayWordCheckboxChange
+                )
             }
         }
     }
@@ -159,15 +168,27 @@ fun HomeTodayWord(
     todayWord: HomeTodayWord,
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
 ) {
-    Box {
-        WordContent(todayWord.vocabulary)
-        Checkbox(
-            checked = todayWord.todayWord.checked,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(8.dp),
-            onCheckedChange = { onTodayWordCheckboxChange(todayWord) }
-        )
+    val alpha by animateFloatAsState(targetValue = if (todayWord.todayWord.checked) 0.6f else 1f)
+    val elevation by animateDpAsState(targetValue = if (todayWord.todayWord.checked) 0.dp else 6.dp)
+    Card(
+        elevation = elevation,
+        modifier = Modifier.alpha(alpha)
+    ) {
+        Box {
+            WordContent(
+                todayWord.vocabulary,
+                showExpandButton = false,
+                expanded = true,
+                onExpanded = {}
+            )
+            Checkbox(
+                checked = todayWord.todayWord.checked,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp),
+                onCheckedChange = { onTodayWordCheckboxChange(todayWord) }
+            )
+        }
     }
 }
 

@@ -57,7 +57,8 @@ class HomeViewModel @Inject constructor(
                 val data = homeScreenData.value
                 _homeScreenData.value = homeScreenData.value.copy(loading = true)
 
-                val todayWordList = createTodayWordList(todayWords, actualTodayWords)
+                val todayWordList =
+                    createTodayWordList(todayWords, actualTodayWords).sortTodayWords()
                 data.copy(
                     loading = false,
                     totalWordCount = size,
@@ -94,6 +95,10 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             todayWordPersistence.updateTodayWord(copy.toTodayWord())
         }
+    }
+
+    private fun List<HomeTodayWord>.sortTodayWords(): List<HomeTodayWord> {
+        return this.sortedWith(compareBy({ it.todayWord.checked }, { it.todayWord.id }))
     }
 
 }
