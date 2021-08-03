@@ -30,6 +30,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
     Box(modifier = Modifier.fillMaxSize()) {
         HomeLoading(
             data = homeScreenData,
+            onHelpClose = viewModel::onCloseAlertDialog,
             showTodayWordHelp = viewModel::showTodayWordHelp,
             onRefreshTodayWord = viewModel::onRefreshTodayWord,
             onTodayWordCheckboxChange = viewModel::onTodayWordCheckboxChange
@@ -40,6 +41,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
 @Composable
 fun HomeLoading(
     data: HomeScreenData,
+    onHelpClose: () -> Unit,
     showTodayWordHelp: (Boolean) -> Unit,
     onRefreshTodayWord: () -> Unit,
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
@@ -53,7 +55,7 @@ fun HomeLoading(
             )
         }
         if (data.showTodayWordHelp) {
-            HomeTodayWordHelp()
+            HomeTodayWordHelp(onClose = onHelpClose)
         }
         HomeContent(
             data = data,
@@ -204,8 +206,34 @@ fun HomeTitle(size: Int = 0) {
 }
 
 @Composable
-fun HomeTodayWordHelp() {
+fun HomeTodayWordHelp(
+    onClose: () -> Unit
+) {
     // TODO: AlertDialog
+    AlertDialog(
+        title = {
+            Text(text = "오늘의 단어란?")
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(text = "대충 텍스트")
+                Text(text = "테스트2")
+            }
+        },
+        confirmButton = {
+            Box(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                TextButton(onClick = onClose) {
+                    Text("확인")
+                }
+            }
+        },
+        onDismissRequest = onClose
+    )
 }
 
 @Preview(showBackground = true)

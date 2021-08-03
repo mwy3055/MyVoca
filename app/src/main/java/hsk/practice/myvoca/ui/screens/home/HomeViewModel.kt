@@ -97,6 +97,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun onCloseAlertDialog() {
+        _homeScreenData.value = homeScreenData.value.copy(showTodayWordHelp = false)
+    }
+
     private fun List<HomeTodayWord>.sortTodayWords(): List<HomeTodayWord> {
         return this.sortedWith(compareBy({ it.todayWord.checked }, { it.todayWord.id }))
     }
