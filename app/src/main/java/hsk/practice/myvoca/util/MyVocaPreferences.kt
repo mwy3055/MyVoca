@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.coroutineScope
@@ -45,9 +46,8 @@ class PreferencesDataStore @Inject constructor(@ApplicationContext val context: 
  * Stores preference keys only.
  */
 object MyVocaPreferences {
-    private const val quizCorrectKeyString = "quiz_correct"
-    val quizCorrectKey = intPreferencesKey(quizCorrectKeyString)
+    val quizCorrectKey = intPreferencesKey("quiz_correct")
+    val quizWrongKey = intPreferencesKey("quiz_wrong")
 
-    private const val quizWrongKeyString = "quiz_wrong"
-    val quizWrongKey = intPreferencesKey(quizWrongKeyString)
+    val todayWordLastUpdatedKey = longPreferencesKey("today_word_last_updated")
 }
