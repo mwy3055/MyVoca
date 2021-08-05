@@ -11,6 +11,8 @@ import hsk.practice.myvoca.room.todayword.RoomTodayWord
 import hsk.practice.myvoca.room.todayword.TodayWordDao
 import hsk.practice.myvoca.room.vocabulary.VocaDao
 import hsk.practice.myvoca.ui.screens.home.getSecondsLeft
+import hsk.practice.myvoca.util.MyVocaPreferences
+import hsk.practice.myvoca.util.PreferencesDataStore
 import hsk.practice.myvoca.util.randoms
 import hsk.practice.myvoca.util.writeLogToFile
 import kotlinx.coroutines.flow.first
@@ -20,7 +22,8 @@ import java.util.concurrent.TimeUnit
 class CreateTodayWordWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val database: RoomVocaDatabase
+    private val database: RoomVocaDatabase,
+    private val dataStore: PreferencesDataStore
 ) : CoroutineWorker(context, workerParams) {
 
     private val todayWordSize = 5
@@ -41,6 +44,10 @@ class CreateTodayWordWorker @AssistedInject constructor(
                 context = applicationContext,
                 filename = "today-word-worker.txt",
                 log = "Save Today word - $todayWords"
+            )
+            dataStore.setPreferences(
+                MyVocaPreferences.todayWordLastUpdatedKey,
+                System.currentTimeMillis()
             )
             Result.success()
         } catch (e: Throwable) {

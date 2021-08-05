@@ -17,6 +17,8 @@ import hsk.practice.myvoca.data.toTodayWordImpl
 import hsk.practice.myvoca.module.LocalTodayWordPersistence
 import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImpl
+import hsk.practice.myvoca.util.MyVocaPreferences
+import hsk.practice.myvoca.util.PreferencesDataStore
 import hsk.practice.myvoca.work.setOneTimeTodayWordWork
 import hsk.practice.myvoca.work.setPeriodicTodayWordWork
 import kotlinx.coroutines.Dispatchers
@@ -25,14 +27,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     @ApplicationContext context: Context,
     @LocalVocaPersistence private val vocaPersistence: VocaPersistence,
-    @LocalTodayWordPersistence private val todayWordPersistence: TodayWordPersistence
+    @LocalTodayWordPersistence private val todayWordPersistence: TodayWordPersistence,
+    private val dataStore: PreferencesDataStore
 ) : ViewModel() {
 
     private val workManager = WorkManager.getInstance(context)
@@ -40,7 +45,6 @@ class HomeViewModel @Inject constructor(
     private val _homeScreenData = MutableStateFlow(HomeScreenData(loading = true))
     val homeScreenData: StateFlow<HomeScreenData>
         get() = _homeScreenData
-
 
     init {
         setPeriodicTodayWordWork(workManager)
@@ -53,7 +57,11 @@ class HomeViewModel @Inject constructor(
                 vocaPersistence.getVocabularySize(),
                 todayWordPersistence.loadTodayWords(),
                 todayWordPersistence.loadActualTodayWords(),
-            ) { size, todayWords, actualTodayWords ->
+                dataStore.getPreferencesFlow(
+                    MyVocaPreferences.todayWordLastUpdatedKey,
+                    LocalDateTime.MIN.toEpochSecond(ZoneOffset.UTC)
+                )
+            ) { size, todayWords, actualTodayWords, lastUpdated ->
                 val data = homeScreenData.value
                 _homeScreenData.value = homeScreenData.value.copy(loading = true)
 
@@ -62,7 +70,8 @@ class HomeViewModel @Inject constructor(
                 data.copy(
                     loading = false,
                     totalWordCount = size,
-                    todayWords = todayWordList
+                    todayWords = todayWordList,
+                    todayWordsLastUpdatedTime = lastUpdated
                 )
             }.collect { _homeScreenData.value = it }
         }
@@ -116,6 +125,7 @@ data class HomeScreenData(
     val loading: Boolean = false,
     val totalWordCount: Int = 0,
     val todayWords: List<HomeTodayWord> = emptyList(),
+    val todayWordsLastUpdatedTime: Long = System.currentTimeMillis(),
     val showTodayWordHelp: Boolean = false
 )
 

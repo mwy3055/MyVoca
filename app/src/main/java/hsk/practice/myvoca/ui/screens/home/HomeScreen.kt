@@ -22,6 +22,9 @@ import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import hsk.practice.myvoca.util.getTimeDiffString
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel) {
@@ -81,7 +84,8 @@ fun HomeContent(
     ) {
         HomeTitle(size = data.totalWordCount)
         HomeTodayWords(
-            data.todayWords,
+            todayWords = data.todayWords,
+            lastUpdatedTime = data.todayWordsLastUpdatedTime,
             showTodayWordHelp = showTodayWordHelp,
             onRefreshTodayWord = onRefreshTodayWord,
             onTodayWordCheckboxChange = onTodayWordCheckboxChange
@@ -92,6 +96,7 @@ fun HomeContent(
 @Composable
 fun HomeTodayWords(
     todayWords: List<HomeTodayWord>,
+    lastUpdatedTime: Long,
     showTodayWordHelp: (Boolean) -> Unit,
     onRefreshTodayWord: () -> Unit,
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
@@ -103,6 +108,7 @@ fun HomeTodayWords(
     ) {
         item {
             HomeTodayWordHeader(
+                lastUpdatedTime = lastUpdatedTime,
                 showTodayWordHelp = showTodayWordHelp,
                 onRefreshTodayWord = onRefreshTodayWord
             )
@@ -134,9 +140,12 @@ fun HomeTodayWordEmpty() {
 
 @Composable
 fun HomeTodayWordHeader(
+    lastUpdatedTime: Long,
     showTodayWordHelp: (Boolean) -> Unit,
     onRefreshTodayWord: () -> Unit
 ) {
+    val lastUpdatedTimeString =
+        getTimeDiffString(LocalDateTime.ofEpochSecond(lastUpdatedTime, 0, ZoneOffset.UTC))
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -154,6 +163,10 @@ fun HomeTodayWordHeader(
             )
         }
         Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = "마지막 업데이트: $lastUpdatedTimeString",
+            style = MaterialTheme.typography.caption
+        )
         IconButton(
             onClick = onRefreshTodayWord
         ) {
@@ -216,8 +229,8 @@ fun HomeTodayWordHelp(
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = "대충 텍스트")
-                Text(text = "테스트2")
+                Text(text = "매일매일 새로운 단어를 외워 보세요. 단어는 하루마다 갱신됩니다.")
+                Text(text = "외운 단어는 체크 표시로 구분할 수 있습니다.")
             }
         },
         confirmButton = {
@@ -244,7 +257,8 @@ fun HomeContentPreview() {
         totalWordCount = fakeData.size,
         todayWords = fakeData.subList(0, 5).map { voca ->
             HomeTodayWord(TodayWordImpl(wordId = voca.id), voca)
-        }
+        },
+        todayWordsLastUpdatedTime = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
     )
     MyVocaTheme {
         HomeContent(data,
