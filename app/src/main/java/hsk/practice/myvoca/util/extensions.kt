@@ -4,8 +4,8 @@ import android.Manifest
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 
 /**
@@ -32,16 +32,8 @@ fun String?.containsOnlyAlphabet(): Boolean {
  *
  * @return Time string of the timestamp
  */
-fun Long.toTimeString(): String {
-    val cal = Calendar.getInstance()
-    cal.timeInMillis = this
-    val year = cal[Calendar.YEAR]
-    val mon = cal[Calendar.MONTH]
-    val day = cal[Calendar.DAY_OF_MONTH]
-    val hour = cal[Calendar.HOUR_OF_DAY]
-    val min = cal[Calendar.MINUTE]
-    val sec = cal[Calendar.SECOND]
-    return String.format("%d.%02d.%02d. %02d:%02d:%02d", year, mon + 1, day, hour, min, sec)
+fun Long.toTimeString(formatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE): String {
+    return LocalDateTime.ofEpochSecond(this, 0, ZoneOffset.UTC).format(formatter)
 }
 
 /**
@@ -100,6 +92,8 @@ fun Int.gcd(num: Int): Int {
     return if (this == 0) num else (num % this).gcd(this)
 }
 
+val timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:MM:ss")
+
 /**
  * Write [log] to the file.
  *
@@ -109,9 +103,25 @@ fun Int.gcd(num: Int): Int {
  */
 fun writeLogToFile(context: Context, filename: String, log: String) {
     val time = LocalDateTime.now()
-    val timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:MM:ss")
     val formattedTime = time.format(timeFormatter)
     context.openFileOutput(filename, Context.MODE_PRIVATE + Context.MODE_APPEND).use {
         it.write("$formattedTime: $log".toByteArray())
+    }
+}
+
+/**
+ * Returns the string that best expresses the time difference from the given [time] to current.
+ *
+ * @param time Some time before current.
+ */
+fun getTimeDiffString(time: LocalDateTime): String {
+    if (time == LocalDateTime.MIN) return "오래 전"
+    val timeEpoch = time.toEpochSecond(ZoneOffset.UTC)
+    val currentEpoch = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+    return when (val diff = currentEpoch - timeEpoch) {
+        in 0 until 60 -> "${diff}초 전"
+        in 60 until 60 * 60 -> "${diff % 60}분 전"
+        in 60 * 60 until 60 * 60 * 24 -> "${diff % (60 * 60)}시간 전"
+        else -> "${diff % (60 * 60 * 24)}일 전"
     }
 }
