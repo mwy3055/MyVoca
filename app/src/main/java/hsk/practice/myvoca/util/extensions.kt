@@ -105,7 +105,7 @@ fun writeLogToFile(context: Context, filename: String, log: String) {
     val time = LocalDateTime.now()
     val formattedTime = time.format(timeFormatter)
     context.openFileOutput(filename, Context.MODE_PRIVATE + Context.MODE_APPEND).use {
-        it.write("$formattedTime: $log".toByteArray())
+        it.write("$formattedTime: $log\n".toByteArray())
     }
 }
 
