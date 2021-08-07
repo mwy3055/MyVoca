@@ -15,7 +15,6 @@ import hsk.practice.myvoca.room.todayword.toRoomTodayWord
 import hsk.practice.myvoca.room.todayword.toTodayWord
 import hsk.practice.myvoca.room.vocabulary.VocaDao
 import hsk.practice.myvoca.room.vocabulary.toVocabularyList
-import hsk.practice.myvoca.work.setOneTimeTodayWordWork
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -66,9 +65,6 @@ class TodayWordDatabase @Inject constructor(@ApplicationContext context: Context
 
     override fun loadTodayWords(): Flow<List<TodayWord>> =
         todayWordDao.getTodayWord().map { todayWords ->
-            if (todayWords.isEmpty()) {
-                setOneTimeTodayWordWork(workManager)
-            }
             todayWords.map { it.toTodayWord() }
         }
 

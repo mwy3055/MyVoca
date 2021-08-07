@@ -74,14 +74,13 @@ fun setPeriodicTodayWordWork(workManager: WorkManager) {
     )
 }
 
-// TODO: 잘 안되면 workmanager 대신 application에서 처리해 버릴 수도 있음
 fun setOneTimeTodayWordWork(workManager: WorkManager) {
     val oneTimeWork = OneTimeWorkRequestBuilder<CreateTodayWordWorker>()
         .addTag(createTodayWordWorkerTag)
         .build()
     workManager.enqueueUniqueWork(
         createTodayWordWorkerTag,
-        ExistingWorkPolicy.REPLACE,
+        ExistingWorkPolicy.KEEP,
         oneTimeWork
     )
 }
