@@ -4,7 +4,7 @@ import com.hsk.data.vocabulary.VocabularyQuery
 import com.hsk.data.vocabulary.WordClass
 import com.hsk.data.vocabulary.matchesWithQuery
 import hsk.practice.myvoca.data.fakeData
-import hsk.practice.myvoca.room.toVocabulary
+import hsk.practice.myvoca.room.vocabulary.toVocabulary
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

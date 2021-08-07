@@ -20,6 +20,7 @@ import hsk.practice.myvoca.ui.components.MyVocaTopAppBar
 import hsk.practice.myvoca.ui.screens.allword.AllWordScreen
 import hsk.practice.myvoca.ui.screens.allword.AllWordViewModel
 import hsk.practice.myvoca.ui.screens.home.HomeScreen
+import hsk.practice.myvoca.ui.screens.home.HomeViewModel
 import hsk.practice.myvoca.ui.screens.profile.ProfileScreen
 import hsk.practice.myvoca.ui.screens.quiz.QuizScreen
 import hsk.practice.myvoca.ui.screens.quiz.QuizViewModel
@@ -78,6 +79,7 @@ fun MyVocaNavGraph(
     navController: NavHostController = rememberNavController(),
 ) {
     // 여기서 만들면 화면 전환에 상관없이 유지된다.
+    val homeViewModel: HomeViewModel = hiltViewModel()
     val allWordViewModel: AllWordViewModel = hiltViewModel()
     val quizViewModel: QuizViewModel = hiltViewModel()
     NavHost(
@@ -87,7 +89,7 @@ fun MyVocaNavGraph(
     ) {
         // 여기서 만들면 화면을 전환할 때마다 매번 새로운 객체가 생성된다.
         composable(MyVocaScreen.Home.name) {
-            HomeScreen()
+            HomeScreen(homeViewModel)
         }
         composable(MyVocaScreen.AllWord.name) {
             AllWordScreen(allWordViewModel)

@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import hsk.practice.myvoca.gcd
+import hsk.practice.myvoca.util.gcd
 
 @Composable
 fun VersusView(

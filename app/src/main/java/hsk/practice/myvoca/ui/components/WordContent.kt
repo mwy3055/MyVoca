@@ -24,12 +24,13 @@ import androidx.compose.ui.unit.dp
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
-import hsk.practice.myvoca.toTimeString
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import hsk.practice.myvoca.util.toTimeString
 
-@ExperimentalAnimationApi
 @Composable
-fun WordContent(word: VocabularyImpl) {
+fun WordContent(
+    word: VocabularyImpl,
+) {
     var expanded by remember { mutableStateOf(false) }
     WordContent(
         word = word,
@@ -38,10 +39,10 @@ fun WordContent(word: VocabularyImpl) {
     )
 }
 
-@ExperimentalAnimationApi
 @Composable
 fun WordContent(
     word: VocabularyImpl,
+    showExpandButton: Boolean = true,
     expanded: Boolean,
     onExpanded: (Boolean) -> Unit
 ) {
@@ -53,30 +54,31 @@ fun WordContent(
             .padding(padding),
         verticalArrangement = Arrangement.spacedBy(padding)
     ) {
-        WordTitle(title = word.eng)
-        WordMeanings(
-            meanings = word.meaning,
-            expanded = expanded,
-            onClick = onExpanded
-        )
+        if (word.id != 0) {
+            WordTitle(title = word.eng)
+            WordMeanings(
+                meanings = word.meaning,
+                showExpandButton = showExpandButton,
+                expanded = expanded,
+                onClick = onExpanded
+            )
+        }
     }
 }
 
 @Composable
-fun WordTitle(title: String, modifier: Modifier = Modifier) {
-    Box(modifier = modifier) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.h6
-        )
-    }
+fun WordTitle(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.h6,
+    )
 }
 
-@ExperimentalAnimationApi
 @Composable
 fun WordMeanings(
     meanings: List<MeaningImpl>,
     modifier: Modifier = Modifier,
+    showExpandButton: Boolean = true,
     expanded: Boolean = false,
     onClick: (Boolean) -> Unit = {}
 ) {
@@ -107,7 +109,7 @@ fun WordMeanings(
             }
         }
 
-        if (meaningsTruncated) {
+        if (meaningsTruncated and showExpandButton) {
             val iconAngle by animateFloatAsState(
                 targetValue = if (expanded) 180f else 0f,
             )
@@ -165,7 +167,7 @@ fun WordMetadataShort(addedTime: Long, modifier: Modifier = Modifier) {
     }
 }
 
-@ExperimentalAnimationApi
+@OptIn(ExperimentalAnimationApi::class)
 @Preview
 @Composable
 fun WordContentPreview() {

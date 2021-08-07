@@ -1,12 +1,14 @@
-package hsk.practice.myvoca.room
+package hsk.practice.myvoca.room.persistence
 
 import com.hsk.data.vocabulary.*
 import com.hsk.domain.VocaPersistence
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -23,6 +25,8 @@ class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScop
     private val fakeDataFlow = MutableStateFlow<List<Vocabulary>>(data)
 
     override fun getAllVocabulary(): StateFlow<List<Vocabulary>> = fakeDataFlow
+    override fun getVocabularySize(): Flow<Int> = fakeDataFlow.map { it.size }
+
     override suspend fun getVocabularyById(id: Int): Vocabulary {
         return try {
             data.first { it.id == id }

@@ -12,12 +12,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.fakeData
-import hsk.practice.myvoca.randoms
-import hsk.practice.myvoca.truncate
 import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.components.WordMeanings
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import hsk.practice.myvoca.util.randoms
+import hsk.practice.myvoca.util.truncate
 
 @Composable
 fun QuizScreen(viewModel: QuizViewModel) {

@@ -9,7 +9,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import hsk.practice.myvoca.room.RoomMigrations
 import hsk.practice.myvoca.room.RoomVocaDatabase
-import hsk.practice.myvoca.room.VocaDao
+import hsk.practice.myvoca.room.todayword.TodayWordDao
+import hsk.practice.myvoca.room.vocabulary.VocaDao
 import javax.inject.Singleton
 
 @Module
@@ -30,4 +31,8 @@ object RoomVocaDatabaseModule {
     @Singleton
     @Provides
     fun provideVocaDao(database: RoomVocaDatabase): VocaDao = database.vocaDao()!!
+
+    @Singleton
+    @Provides
+    fun provideTodayWordDao(database: RoomVocaDatabase): TodayWordDao = database.todayWordDao()!!
 }

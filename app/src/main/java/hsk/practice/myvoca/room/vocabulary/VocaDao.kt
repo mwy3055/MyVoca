@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.room
+package hsk.practice.myvoca.room.vocabulary
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
@@ -72,4 +72,22 @@ interface VocaDao {
      */
     @Query("SELECT * from RoomVocabulary WHERE kor LIKE :kor")
     suspend fun loadVocabularyByKor(kor: String?): List<RoomVocabulary>
+
+    /**
+     * Loads total number of row in database.
+     *
+     * @return size of the database
+     */
+    @Query("SELECT COUNT(*) from RoomVocabulary")
+    fun getVocabularySize(): Flow<Int>
+
+    /**
+     * Loads ``Today's word`` by referencing ``TodayWords`` table.
+     *
+     * @return List of ``Today's words``
+     */
+    @Transaction
+    @Query("SELECT * FROM RoomVocabulary WHERE id IN (SELECT vocabulary_id FROM TodayWords)")
+    fun getTodayWords(): Flow<List<RoomVocabulary>>
+
 }

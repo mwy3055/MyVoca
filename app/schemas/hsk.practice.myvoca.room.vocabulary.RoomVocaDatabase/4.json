@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "4641d7f92868cf3e64c59d00df271e99",
+    "identityHash": "991be25a04d222824f911917f9510fa2",
     "entities": [
       {
         "tableName": "RoomVocabulary",
@@ -56,7 +56,7 @@
       },
       {
         "tableName": "TodayWords",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`today_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `vocabulary_id` INTEGER NOT NULL, `checked` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`today_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `vocabulary_id` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "todayWordId",
@@ -67,12 +67,6 @@
           {
             "fieldPath": "vocabularyId",
             "columnName": "vocabulary_id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "checked",
-            "columnName": "checked",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -90,7 +84,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4641d7f92868cf3e64c59d00df271e99')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '991be25a04d222824f911917f9510fa2')"
     ]
   }
 }
