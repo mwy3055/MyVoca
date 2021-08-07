@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.room
+package hsk.practice.myvoca.room.persistence
 
 import android.content.Context
 import com.hsk.data.vocabulary.Vocabulary
@@ -10,13 +10,14 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import hsk.practice.myvoca.room.vocabulary.VocaDao
+import hsk.practice.myvoca.room.vocabulary.toRoomVocabularyList
+import hsk.practice.myvoca.room.vocabulary.toVocabulary
+import hsk.practice.myvoca.room.vocabulary.toVocabularyList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -61,6 +62,8 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
     override fun getAllVocabulary(): StateFlow<List<Vocabulary>> {
         return _allVocabulary
     }
+
+    override fun getVocabularySize(): Flow<Int> = vocaDao.getVocabularySize().distinctUntilChanged()
 
     override suspend fun getVocabularyById(id: Int): Vocabulary? {
         return vocaDao.loadVocabularyById(id)?.toVocabulary()

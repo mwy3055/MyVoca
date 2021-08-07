@@ -2,6 +2,7 @@ package com.hsk.domain
 
 import com.hsk.data.vocabulary.Vocabulary
 import com.hsk.data.vocabulary.VocabularyQuery
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -14,6 +15,11 @@ interface VocaPersistence {
      * Loads all vocabularies from the database and return them as LiveData.
      */
     fun getAllVocabulary(): StateFlow<List<Vocabulary>>
+
+    /**
+     * Loads the number of rows in database.
+     */
+    fun getVocabularySize(): Flow<Int>
 
     /**
      * Loads a vocabulary whose id is equal to the parameter [id].

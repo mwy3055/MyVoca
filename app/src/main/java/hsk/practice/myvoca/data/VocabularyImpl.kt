@@ -26,17 +26,17 @@ data class VocabularyImpl(
     }
 }
 
-val fakeData = (1..20).map {
+val fakeData = (1..20).map { index ->
     val currentTime = System.currentTimeMillis()
     VocabularyImpl(
-        id = it,
-        eng = "test$it",
-        meaning = listOf(
+        id = index,
+        eng = "test$index",
+        meaning = (0..2).map {
             MeaningImpl(
                 if (it % 2 == 0) WordClassImpl.NOUN else WordClassImpl.VERB,
-                "테스트$it"
+                "테스트$index"
             )
-        ),
+        },
         addedTime = currentTime,
         lastEditedTime = currentTime,
         memo = ""

@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.room
+package hsk.practice.myvoca.room.vocabulary
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

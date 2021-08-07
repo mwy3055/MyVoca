@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
-import hsk.practice.myvoca.toTimeString
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import hsk.practice.myvoca.util.toTimeString
 
 @Composable
 fun WordContent(
@@ -42,6 +42,7 @@ fun WordContent(
 @Composable
 fun WordContent(
     word: VocabularyImpl,
+    showExpandButton: Boolean = true,
     expanded: Boolean,
     onExpanded: (Boolean) -> Unit
 ) {
@@ -57,6 +58,7 @@ fun WordContent(
             WordTitle(title = word.eng)
             WordMeanings(
                 meanings = word.meaning,
+                showExpandButton = showExpandButton,
                 expanded = expanded,
                 onClick = onExpanded
             )
@@ -76,6 +78,7 @@ fun WordTitle(title: String) {
 fun WordMeanings(
     meanings: List<MeaningImpl>,
     modifier: Modifier = Modifier,
+    showExpandButton: Boolean = true,
     expanded: Boolean = false,
     onClick: (Boolean) -> Unit = {}
 ) {
@@ -106,7 +109,7 @@ fun WordMeanings(
             }
         }
 
-        if (meaningsTruncated) {
+        if (meaningsTruncated and showExpandButton) {
             val iconAngle by animateFloatAsState(
                 targetValue = if (expanded) 180f else 0f,
             )

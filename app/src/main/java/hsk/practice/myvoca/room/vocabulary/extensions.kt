@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.room
+package hsk.practice.myvoca.room.vocabulary
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
