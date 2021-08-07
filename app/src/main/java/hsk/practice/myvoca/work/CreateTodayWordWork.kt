@@ -16,6 +16,8 @@ import hsk.practice.myvoca.util.PreferencesDataStore
 import hsk.practice.myvoca.util.randoms
 import hsk.practice.myvoca.util.writeLogToFile
 import kotlinx.coroutines.flow.first
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.concurrent.TimeUnit
 
 @HiltWorker
@@ -47,7 +49,7 @@ class CreateTodayWordWorker @AssistedInject constructor(
             )
             dataStore.setPreferences(
                 MyVocaPreferences.todayWordLastUpdatedKey,
-                System.currentTimeMillis()
+                LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
             )
             Result.success()
         } catch (e: Throwable) {
@@ -79,7 +81,7 @@ fun setOneTimeTodayWordWork(workManager: WorkManager) {
         .build()
     workManager.enqueueUniqueWork(
         createTodayWordWorkerTag,
-        ExistingWorkPolicy.KEEP,
+        ExistingWorkPolicy.REPLACE,
         oneTimeWork
     )
 }

@@ -79,7 +79,7 @@ class QuizViewModel @Inject constructor(
                 )
             }.collect {
                 _quizScreenData.value = it
-                Logger.d("Trying to emit new value: $it")
+//                Logger.d("Trying to emit new value: $it")
             }
         }
     }

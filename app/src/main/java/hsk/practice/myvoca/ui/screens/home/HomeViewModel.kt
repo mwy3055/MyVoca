@@ -125,7 +125,7 @@ data class HomeScreenData(
     val loading: Boolean = false,
     val totalWordCount: Int = 0,
     val todayWords: List<HomeTodayWord> = emptyList(),
-    val todayWordsLastUpdatedTime: Long = System.currentTimeMillis(),
+    val todayWordsLastUpdatedTime: Long = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
     val showTodayWordHelp: Boolean = false
 )
 

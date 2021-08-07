@@ -114,14 +114,13 @@ fun writeLogToFile(context: Context, filename: String, log: String) {
  *
  * @param time Some time before current.
  */
-fun getTimeDiffString(time: LocalDateTime): String {
-    if (time == LocalDateTime.MIN) return "오래 전"
-    val timeEpoch = time.toEpochSecond(ZoneOffset.UTC)
+fun getTimeDiffString(time: Long): String {
+    if (time == LocalDateTime.MIN.toEpochSecond(ZoneOffset.UTC)) return "오래 전"
     val currentEpoch = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-    return when (val diff = currentEpoch - timeEpoch) {
+    return when (val diff = currentEpoch - time) {
         in 0 until 60 -> "${diff}초 전"
-        in 60 until 60 * 60 -> "${diff % 60}분 전"
-        in 60 * 60 until 60 * 60 * 24 -> "${diff % (60 * 60)}시간 전"
-        else -> "${diff % (60 * 60 * 24)}일 전"
+        in 60 until 60 * 60 -> "${diff / 60}분 전"
+        in 60 * 60 until 60 * 60 * 24 -> "${diff / (60 * 60)}시간 전"
+        else -> "${diff / (60 * 60 * 24)}일 전"
     }
 }

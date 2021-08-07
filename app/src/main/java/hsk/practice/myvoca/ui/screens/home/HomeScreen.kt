@@ -144,8 +144,7 @@ fun HomeTodayWordHeader(
     showTodayWordHelp: (Boolean) -> Unit,
     onRefreshTodayWord: () -> Unit
 ) {
-    val lastUpdatedTimeString =
-        getTimeDiffString(LocalDateTime.ofEpochSecond(lastUpdatedTime, 0, ZoneOffset.UTC))
+    val lastUpdatedTimeString = getTimeDiffString(lastUpdatedTime)
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
