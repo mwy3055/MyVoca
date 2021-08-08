@@ -123,4 +123,5 @@
     <string name="settings_feedback">feedback</string>
     <string name="dev_email">mwy3055@gmail.com</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_add_word">AddWordActivity</string>
 </resources>

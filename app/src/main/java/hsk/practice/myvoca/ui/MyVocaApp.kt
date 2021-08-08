@@ -1,13 +1,17 @@
 package hsk.practice.myvoca.ui
 
+import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.primarySurface
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -17,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import hsk.practice.myvoca.ui.components.MyVocaBottomAppBar
 import hsk.practice.myvoca.ui.components.MyVocaTopAppBar
+import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.screens.allword.AllWordScreen
 import hsk.practice.myvoca.ui.screens.allword.AllWordViewModel
 import hsk.practice.myvoca.ui.screens.home.HomeScreen
@@ -45,6 +50,8 @@ fun MyVocaApp() {
             )
         }
 
+        val context = LocalContext.current
+
         Scaffold(
             topBar = {
                 MyVocaTopAppBar()
@@ -63,7 +70,23 @@ fun MyVocaApp() {
                     },
                     currentScreen = currentScreen
                 )
-            }
+            },
+            floatingActionButton = {
+                IconButton(
+                    onClick = {
+                        context.startActivity(Intent(context, AddWordActivity::class.java))
+                    },
+                    modifier = Modifier.background(
+                        color = MaterialTheme.colors.secondary,
+                        shape = CircleShape
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Add,
+                        contentDescription = "새로운 단어를 추가할 수 있습니다.",
+                    )
+                }
+            },
         ) { innerPadding ->
             MyVocaNavGraph(
                 modifier = Modifier.padding(innerPadding),
