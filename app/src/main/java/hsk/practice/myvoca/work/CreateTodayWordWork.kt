@@ -69,7 +69,7 @@ fun setPeriodicTodayWordWork(workManager: WorkManager) {
         .build()
     workManager.enqueueUniquePeriodicWork(
         createTodayWordWorkerTag,
-        ExistingPeriodicWorkPolicy.KEEP,
+        ExistingPeriodicWorkPolicy.REPLACE,
         periodicWork
     )
 }
@@ -80,7 +80,7 @@ fun setOneTimeTodayWordWork(workManager: WorkManager) {
         .build()
     workManager.enqueueUniqueWork(
         createTodayWordWorkerTag,
-        ExistingWorkPolicy.KEEP,
+        ExistingWorkPolicy.REPLACE,
         oneTimeWork
     )
 }
