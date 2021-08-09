@@ -286,7 +286,6 @@ fun AllWordQueryWordClass(
     selectedWordClass: Set<WordClass>,
     onOptionWordClassClick: (String) -> Unit
 ) {
-    val classes = WordClassImpl.values().filter { it != WordClassImpl.UNKNOWN }
     LazyRow(modifier = Modifier.padding(8.dp)) {
         item {
             WordClassChip(
@@ -295,7 +294,7 @@ fun AllWordQueryWordClass(
                 onClick = onOptionWordClassClick
             )
         }
-        items(classes) { wordClass ->
+        items(WordClassImpl.actualValues()) { wordClass ->
             WordClassChip(
                 className = wordClass.korean,
                 selected = selectedWordClass.contains(wordClass.toWordClass()),
