@@ -2,6 +2,7 @@ package hsk.practice.myvoca.ui.screens.addword
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -16,7 +17,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.HighlightOff
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -51,9 +55,17 @@ fun AddWordScreen(
 
     val data by viewModel.addWordScreenData.collectAsState()
 
+    val scaffoldState = rememberScaffoldState()
     Scaffold(
+        scaffoldState = scaffoldState,
         modifier = Modifier.fillMaxWidth(),
-        topBar = { AddWordTopBar(onAddWord = viewModel::onAddWord, onClose = onClose) }
+        topBar = {
+            AddWordTopBar(
+                addButtonEnabled = data.canStoreWord,
+                onAddWord = viewModel::onAddWord,
+                onClose = onClose
+            )
+        }
     ) {
         Box(modifier = Modifier.padding(8.dp)) {
             AddWordContent(
@@ -70,9 +82,15 @@ fun AddWordScreen(
 
 @Composable
 private fun AddWordTopBar(
+    addButtonEnabled: Boolean,
     onAddWord: () -> Unit,
     onClose: () -> Unit
 ) {
+    val textColor by animateColorAsState(
+        targetValue = if (addButtonEnabled) Color.White else Color.White.copy(alpha = 0.6f)
+    )
+
+    val focusManager = LocalFocusManager.current
     InsetAwareTopAppBar(
         title = {
             Text(text = "단어 추가")
@@ -87,13 +105,17 @@ private fun AddWordTopBar(
         },
         backgroundColor = MaterialTheme.colors.primaryVariant,
         actions = {
-            TextButton(onClick = {
-                onAddWord()
-                onClose()
-            }) {
+            TextButton(
+                onClick = {
+                    focusManager.clearFocus()
+                    onAddWord()
+                    onClose()
+                },
+                enabled = addButtonEnabled
+            ) {
                 Text(
                     text = "저장",
-                    color = Color.White
+                    color = textColor
                 )
             }
         }
@@ -110,6 +132,7 @@ private fun AddWordContent(
     onMemoUpdate: (String) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(text = "필수 입력사항", style = MaterialTheme.typography.h5)
         AddWordAddWord(
             word = data.word,
             onWordUpdate = onWordUpdate
@@ -120,6 +143,8 @@ private fun AddWordContent(
             onMeaningUpdate = onMeaningUpdate,
             onMeaningDelete = onMeaningDelete
         )
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(text = "선택 입력사항", style = MaterialTheme.typography.h5)
         AddWordMemo(
             memo = data.memo,
             onMemoUpdate = onMemoUpdate
@@ -134,11 +159,13 @@ private fun AddWordAddWord(
     onWordUpdate: (String) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    OutlinedTextField(
+    val textFieldColors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
+    TextField(
         modifier = Modifier.fillMaxWidth(),
         value = word,
         label = { Text("단어") },
         onValueChange = onWordUpdate,
+        colors = textFieldColors,
         trailingIcon = {
             AnimatedVisibility(visible = word.isNotEmpty()) {
                 IconButton(onClick = { onWordUpdate("") }) {
@@ -164,19 +191,25 @@ private fun AddWordAddMeanings(
 ) {
     Column {
         AddWordMeaningChips(onMeaningAdd = onMeaningAdd)
-        AddWordMeanings(
-            meanings = meanings,
-            onMeaningUpdate = onMeaningUpdate,
-            onMeaningDelete = onMeaningDelete
-        )
+        if (meanings.isEmpty()) {
+            AddWordMeaningsEmpty()
+        } else {
+            AddWordMeanings(
+                meanings = meanings,
+                onMeaningUpdate = onMeaningUpdate,
+                onMeaningDelete = onMeaningDelete
+            )
+        }
     }
 }
+
+private val meaningHeight = 210.dp
 
 @Composable
 private fun AddWordMeaningChips(
     onMeaningAdd: (WordClassImpl) -> Unit
 ) {
-    StaggeredGrid {
+    StaggeredGrid(rows = 2) {
         WordClassImpl.actualValues().forEach { wordClass ->
             AddWordWordClassChip(wordClass = wordClass, onMeaningAdd = onMeaningAdd)
         }
@@ -202,10 +235,12 @@ private fun AddWordWordClassChip(
         ) {
             IconButton(
                 onClick = { onMeaningAdd(wordClass) },
-                modifier = Modifier.background(
-                    color = Color.Transparent,
-                    shape = CircleShape
-                ),
+                modifier = Modifier
+                    .size(30.dp)
+                    .background(
+                        color = Color.Transparent,
+                        shape = CircleShape
+                    ),
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Add,
@@ -215,6 +250,30 @@ private fun AddWordWordClassChip(
             Text(
                 text = wordClass.korean,
                 modifier = Modifier.padding(end = 4.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun AddWordMeaningsEmpty() {
+    Box(
+        modifier = Modifier
+            .height(meaningHeight)
+            .fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Add,
+                contentDescription = null
+            )
+            Text(
+                text = "뜻을 추가해 보세요",
+                color = MaterialTheme.colors.onSurface.copy(alpha = 0.8f)
             )
         }
     }
@@ -231,11 +290,12 @@ private fun AddWordMeanings(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .sizeIn(maxHeight = 150.dp)
+            .height(meaningHeight)
             .verticalScroll(scrollState)
     ) {
-        meanings.forEach { meaning ->
+        meanings.forEachIndexed { index, meaning ->
             AddWordMeaning(
+                index = index,
                 meaning = meaning,
                 onMeaningUpdate = onMeaningUpdate,
                 onMeaningDelete = onMeaningDelete
@@ -278,16 +338,37 @@ fun Modifier.simpleVerticalScrollbar(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun AddWordMeaning(
+    index: Int,
     meaning: MeaningImpl,
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
     onMeaningDelete: (Int) -> Unit
 ) {
-    // TODO: word class/content/delete 구현하기
-    Text(
-        text = meaning.type.korean
-    )
+    val focusManager = LocalFocusManager.current
+    val textFieldColors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TextField(
+            modifier = Modifier.weight(1f),
+            value = meaning.content,
+            label = { Text(meaning.type.korean) },
+            colors = textFieldColors,
+            onValueChange = { onMeaningUpdate(index, meaning.copy(content = it)) },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
+        )
+        IconButton(onClick = { onMeaningDelete(index) }) {
+            Icon(
+                imageVector = Icons.Outlined.Close,
+                contentDescription = "${meaning.content} 뜻을 삭제합니다."
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -297,10 +378,12 @@ private fun AddWordMemo(
     onMemoUpdate: (String) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    OutlinedTextField(
+    val textFieldColors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
+    TextField(
         modifier = Modifier.fillMaxWidth(),
         value = memo,
         label = { Text("메모") },
+        colors = textFieldColors,
         onValueChange = onMemoUpdate,
         trailingIcon = {
             AnimatedVisibility(visible = memo.isNotEmpty()) {
@@ -336,9 +419,14 @@ private fun AddWordScreenPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun AddWordWordPreview() {
-    var word by remember { mutableStateOf("") }
+private fun AddWordMeaningPreview() {
+    val meaning = MeaningImpl(WordClassImpl.ADJECTIVE, "따뜻한")
     MyVocaTheme {
-        AddWordAddWord(word = word, onWordUpdate = { word = it })
+        AddWordMeaning(
+            index = 0,
+            meaning = meaning,
+            onMeaningUpdate = { _, _ -> },
+            onMeaningDelete = {}
+        )
     }
 }

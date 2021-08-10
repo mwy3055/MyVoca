@@ -85,7 +85,7 @@ data class AddWordScreenData(
     val word: String = "",
     val wordExist: WordExistStatus = WordExistStatus.WORD_EMPTY,
     val meanings: List<MeaningImpl> = emptyList(),
-    val memo: String = ""
+    val memo: String = "",
 ) {
     fun toVocabularyImpl(): VocabularyImpl {
         val current = System.currentTimeMillis()
@@ -97,4 +97,7 @@ data class AddWordScreenData(
             memo = memo
         )
     }
+
+    val canStoreWord: Boolean
+        get() = word.isNotEmpty() and meanings.all { it.content.isNotEmpty() }
 }
