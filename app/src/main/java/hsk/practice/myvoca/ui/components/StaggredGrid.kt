@@ -4,54 +4,64 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import kotlin.math.max
+import kotlin.math.min
 
 @Composable
 fun StaggeredGrid(
     modifier: Modifier = Modifier,
-    rows: Int = 3,
     content: @Composable () -> Unit
 ) {
     Layout(
         content = content,
         modifier = modifier
     ) { measurables, constraints ->
-        val rowWidths = IntArray(rows) { 0 } // Keep track of the width of each row
-        val rowHeights = IntArray(rows) { 0 } // Keep track of the height of each row
-
         // Don't constrain child views further, measure them with given constraints
-        val placeables = measurables.mapIndexed { index, measurable ->
+        val sizes = mutableListOf<Size>()
+        val placeables = measurables.map { measurable ->
             val placeable = measurable.measure(constraints)
-
-            // Track the width and max height of each row
-            val row = index % rows
-            rowWidths[row] += placeable.width
-            rowHeights[row] = max(rowHeights[row], placeable.height)
-
+            sizes.add(Size(placeable.width, placeable.height))
             placeable
         }
 
-        // Grid's width is the widest row
-        val width = rowWidths.maxOrNull()?.coerceIn(constraints.minWidth, constraints.maxWidth)
-            ?: constraints.minWidth
-        // Grid's height is the sum of each row
-        val height = rowHeights.sum().coerceIn(constraints.minHeight, constraints.maxHeight)
+        val sumOfWidth = sizes.fold(0) { sum, size -> sum + size.width }
+        val width = min(sumOfWidth, constraints.maxWidth)
 
-        // y co-ord of each row
-        val rowY = IntArray(rows) { 0 }
-        for (i in 1 until rows) {
-            rowY[i] = rowY[i - 1] + rowHeights[i - 1]
+        // Calculate x, y coordinate of each placeable
+        var rowX = 0
+        var rowY = 0
+        var maxHeight = 0
+        val places = mutableListOf<Place>()
+        sizes.forEach { size ->
+            if (rowX + size.width > width) {
+                rowX = 0
+                rowY += maxHeight
+                maxHeight = size.height
+            } else {
+                maxHeight = max(maxHeight, size.height)
+            }
+            places.add(Place(rowX, rowY))
+            rowX += size.width
         }
+
+        // Place each placeable
+        val height = rowY
         layout(width, height) {
-            // x co-ord we have placed up to, per row
-            val rowX = IntArray(rows) { 0 }
-            placeables.forEachIndexed { index, placeable ->
-                val row = index % rows
+            places.zip(placeables).forEach { (place, placeable) ->
                 placeable.place(
-                    x = rowX[row],
-                    y = rowY[row]
+                    x = place.x,
+                    y = place.y
                 )
-                rowX[row] += placeable.width
             }
         }
     }
 }
+
+private data class Size(
+    val width: Int,
+    val height: Int
+)
+
+private data class Place(
+    val x: Int,
+    val y: Int
+)
