@@ -221,7 +221,6 @@ fun HomeTitle(size: Int = 0) {
 fun HomeTodayWordHelp(
     onClose: () -> Unit
 ) {
-    // TODO: AlertDialog
     AlertDialog(
         title = {
             Text(text = "오늘의 단어란?")

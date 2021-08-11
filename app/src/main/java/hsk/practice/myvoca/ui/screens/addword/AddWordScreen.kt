@@ -158,6 +158,7 @@ private fun AddWordAddWord(
     word: String,
     onWordUpdate: (String) -> Unit
 ) {
+    // TODO: 단어가 이미 등록되어 있는지 아이콘으로 보여주기
     val focusManager = LocalFocusManager.current
     val textFieldColors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
     TextField(
@@ -209,7 +210,7 @@ private val meaningHeight = 210.dp
 private fun AddWordMeaningChips(
     onMeaningAdd: (WordClassImpl) -> Unit
 ) {
-    StaggeredGrid(rows = 2) {
+    StaggeredGrid {
         WordClassImpl.actualValues().forEach { wordClass ->
             AddWordWordClassChip(wordClass = wordClass, onMeaningAdd = onMeaningAdd)
         }

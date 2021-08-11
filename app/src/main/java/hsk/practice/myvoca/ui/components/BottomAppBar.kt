@@ -119,7 +119,7 @@ fun MyVocaBottomAppBarPreview() {
     MyVocaTheme {
         MyVocaBottomAppBar(
             allScreens = MyVocaScreen.values().toList(),
-            onTabSelected = { /*TODO*/ },
+            onTabSelected = { },
             currentScreen = MyVocaScreen.Home
         )
     }

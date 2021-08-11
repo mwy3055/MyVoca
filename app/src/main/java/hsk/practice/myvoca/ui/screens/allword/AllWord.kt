@@ -433,9 +433,9 @@ fun AllWordContentsPreview() {
                 currentWordState = fakeData,
                 queryState = VocabularyQuery(word = word)
             ),
-            onOptionButtonClicked = { /*TODO*/ },
-            onSubmitButtonClicked = { /*TODO*/ },
-            onCloseButtonClicked = { /*TODO*/ },
+            onOptionButtonClicked = { },
+            onSubmitButtonClicked = { },
+            onCloseButtonClicked = { },
             onQueryWordChanged = { word = it },
             onOptionWordClassClick = { wordClassName ->
                 val wordClass = WordClassImpl.findByKorean(wordClassName)?.toWordClass()
