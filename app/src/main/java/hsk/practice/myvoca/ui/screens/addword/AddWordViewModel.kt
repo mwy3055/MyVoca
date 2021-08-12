@@ -58,17 +58,9 @@ class AddWordViewModel @Inject constructor(
     }
 
     fun onAddWord() {
-        val word = with(addWordScreenData.value) {
-            val time = System.currentTimeMillis()
-            VocabularyImpl(
-                eng = word,
-                meaning = meanings,
-                addedTime = time,
-                lastEditedTime = time, memo = memo
-            )
-        }
+        val word = addWordScreenData.value.toVocabularyImpl()
         viewModelScope.launch {
-            vocaPersistence.insertVocabulary(listOf(word).map { it.toVocabulary() })
+            vocaPersistence.insertVocabulary(listOf(word.toVocabulary()))
         }
     }
 
