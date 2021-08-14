@@ -14,13 +14,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.HighlightOff
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -28,6 +23,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -70,6 +66,7 @@ fun AddWordScreen(
         Box(modifier = Modifier.padding(8.dp)) {
             AddWordContent(
                 data = data,
+                loadStatus = viewModel::loadStatus,
                 onMeaningAdd = viewModel::onMeaningAdd,
                 onWordUpdate = viewModel::onWordUpdate,
                 onMeaningUpdate = viewModel::onMeaningUpdate,
@@ -125,6 +122,7 @@ private fun AddWordTopBar(
 @Composable
 private fun AddWordContent(
     data: AddWordScreenData,
+    loadStatus: suspend (String) -> Unit,
     onWordUpdate: (String) -> Unit,
     onMeaningAdd: (WordClassImpl) -> Unit,
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
@@ -135,6 +133,8 @@ private fun AddWordContent(
         Text(text = "필수 입력사항", style = MaterialTheme.typography.h5)
         AddWordAddWord(
             word = data.word,
+            status = data.wordExistStatus,
+            loadStatus = loadStatus,
             onWordUpdate = onWordUpdate
         )
         AddWordAddMeanings(
@@ -152,35 +152,53 @@ private fun AddWordContent(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun AddWordAddWord(
     word: String,
+    status: WordExistStatus,
+    loadStatus: suspend (String) -> Unit,
     onWordUpdate: (String) -> Unit
 ) {
-    // TODO: 단어가 이미 등록되어 있는지 아이콘으로 보여주기
+    LaunchedEffect(word) {
+        loadStatus(word)
+    }
+
     val focusManager = LocalFocusManager.current
     val textFieldColors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
-    TextField(
-        modifier = Modifier.fillMaxWidth(),
-        value = word,
-        label = { Text("단어") },
-        onValueChange = onWordUpdate,
-        colors = textFieldColors,
-        trailingIcon = {
-            AnimatedVisibility(visible = word.isNotEmpty()) {
-                IconButton(onClick = { onWordUpdate("") }) {
+
+    val statusIcon = getWordStatusIcon(status)
+    val iconColor = getWordStatusIconColor(status)
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        TextField(
+            modifier = Modifier
+                .fillMaxWidth(),
+            value = word,
+            label = { Text("단어") },
+            onValueChange = onWordUpdate,
+            colors = textFieldColors,
+            trailingIcon = {
+                statusIcon?.let {
                     Icon(
-                        imageVector = Icons.Outlined.HighlightOff,
-                        contentDescription = "영어 텍스트를 지웁니다."
+                        imageVector = statusIcon,
+                        contentDescription = null,
+                        tint = iconColor
                     )
                 }
-            }
-        },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
-    )
+            },
+            singleLine = true,
+            isError = (status == WordExistStatus.DUPLICATE),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
+        )
+        Text(
+            text = "이미 등록된 단어입니다.",
+            style = MaterialTheme.typography.caption,
+            color = if (status == WordExistStatus.DUPLICATE) iconColor else Color.Transparent
+        )
+    }
 }
 
 @Composable
@@ -401,6 +419,25 @@ private fun AddWordMemo(
     )
 }
 
+@Composable
+private fun getWordStatusIcon(status: WordExistStatus): ImageVector? {
+    return when (status) {
+        WordExistStatus.NOT_EXISTS -> Icons.Outlined.CheckCircle
+        WordExistStatus.DUPLICATE -> Icons.Outlined.ErrorOutline
+        WordExistStatus.LOADING -> Icons.Outlined.HourglassFull
+        WordExistStatus.WORD_EMPTY -> null
+    }
+}
+
+@Composable
+private fun getWordStatusIconColor(status: WordExistStatus): Color {
+    return when (status) {
+        WordExistStatus.NOT_EXISTS -> MaterialTheme.colors.primary
+        WordExistStatus.DUPLICATE -> MaterialTheme.colors.error
+        else -> LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun AddWordScreenPreview() {
@@ -408,6 +445,7 @@ private fun AddWordScreenPreview() {
     MyVocaTheme {
         Box(modifier = Modifier.fillMaxWidth()) {
             AddWordContent(data = data,
+                loadStatus = {},
                 onWordUpdate = {},
                 onMeaningAdd = {},
                 onMeaningUpdate = { _, _ -> },

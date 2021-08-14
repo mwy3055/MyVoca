@@ -2,6 +2,7 @@ package hsk.practice.myvoca.ui.screens.addword
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hsk.data.vocabulary.VocabularyQuery
 import com.hsk.domain.VocaPersistence
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hsk.practice.myvoca.data.MeaningImpl
@@ -26,6 +27,20 @@ class AddWordViewModel @Inject constructor(
     /* Event Listeners for UI */
     fun onWordUpdate(newWord: String) {
         _addWordScreenData.value = addWordScreenData.value.copy(word = newWord)
+    }
+
+    suspend fun loadStatus(newWord: String) {
+        if (newWord.isEmpty()) {
+            _addWordScreenData.value =
+                addWordScreenData.value.copy(wordExistStatus = WordExistStatus.WORD_EMPTY)
+            return
+        }
+        _addWordScreenData.value = addWordScreenData.value.copy(wordExistStatus = WordExistStatus.LOADING)
+        val query = VocabularyQuery(word = newWord)
+        val result = vocaPersistence.getVocabulary(query)
+        val exists =
+            if (result.any { it.eng == newWord }) WordExistStatus.DUPLICATE else WordExistStatus.NOT_EXISTS
+        _addWordScreenData.value = addWordScreenData.value.copy(wordExistStatus = exists)
     }
 
     fun onMeaningAdd(type: WordClassImpl) {
@@ -67,7 +82,7 @@ class AddWordViewModel @Inject constructor(
 }
 
 enum class WordExistStatus {
-    EXISTS,
+    NOT_EXISTS,
     DUPLICATE,
     LOADING,
     WORD_EMPTY
@@ -75,7 +90,7 @@ enum class WordExistStatus {
 
 data class AddWordScreenData(
     val word: String = "",
-    val wordExist: WordExistStatus = WordExistStatus.WORD_EMPTY,
+    val wordExistStatus: WordExistStatus = WordExistStatus.WORD_EMPTY,
     val meanings: List<MeaningImpl> = emptyList(),
     val memo: String = "",
 ) {
@@ -91,5 +106,8 @@ data class AddWordScreenData(
     }
 
     val canStoreWord: Boolean
-        get() = word.isNotEmpty() and meanings.all { it.content.isNotEmpty() }
+        get() = word.isNotEmpty() &&
+                meanings.isNotEmpty() &&
+                meanings.all { it.content.isNotEmpty() } &&
+                wordExistStatus == WordExistStatus.NOT_EXISTS
 }
