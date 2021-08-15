@@ -3,7 +3,10 @@ package hsk.practice.myvoca.util
 import android.Manifest
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import com.orhanobut.logger.Logger
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
@@ -123,4 +126,13 @@ fun getTimeDiffString(time: Long): String {
         in 60 * 60 until 60 * 60 * 24 -> "${diff / (60 * 60)}시간 전"
         else -> "${diff / (60 * 60 * 24)}일 전"
     }
+}
+
+/**
+ * Calculates the remaining seconds of the day.
+ */
+fun getSecondsLeft(): Long {
+    val time = LocalTime.now(ZoneId.systemDefault())
+    Logger.d("time: $time")
+    return 60 * 60 * 24L - time.toSecondOfDay()
 }

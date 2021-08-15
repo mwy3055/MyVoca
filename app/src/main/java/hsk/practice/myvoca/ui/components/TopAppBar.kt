@@ -1,86 +1,83 @@
 package hsk.practice.myvoca.ui.components
 
-import androidx.compose.foundation.layout.RowScope
+import android.content.Intent
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.statusBarsPadding
 import hsk.practice.myvoca.R
+import hsk.practice.myvoca.ui.MyVocaScreen
+import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
-
-private val TabHeight = 56.dp
+import kotlinx.coroutines.launch
 
 @Composable
-fun MyVocaTopAppBar() {
+fun MyVocaTopAppBar(currentScreen: MyVocaScreen) {
     InsetAwareTopAppBar(
         title = {
-            Text(
-                text = stringResource(R.string.app_name),
-                color = MaterialTheme.colors.onSurface,
-                style = MaterialTheme.typography.h5,
-            )
+            MyVocaTopTitle()
         },
-//        backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.75f),
         navigationIcon = {
-            IconButton(enabled = false, onClick = {}) {
-                Icon(
-                    imageVector = Icons.Filled.ContentPaste,
-                    contentDescription = null,
-                    tint = MaterialTheme.colors.onSurface
-                )
-            }
+            MyVocaTopNavigationIcon()
+        },
+        actions = {
+            MyVocaTopActions(currentScreen = currentScreen)
         },
     )
 }
 
-/**
- * From Jetnews, Google's official sample app.
- *
- * A wrapper around [TopAppBar] which uses [Modifier.statusBarsPadding] to shift the app bar's
- * contents down, but still draws the background behind the status bar too.
- */
 @Composable
-fun InsetAwareTopAppBar(
-    title: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    navigationIcon: @Composable (() -> Unit)? = null,
-    actions: @Composable RowScope.() -> Unit = {},
-    backgroundColor: Color = MaterialTheme.colors.primarySurface,
-    contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = 4.dp
-) {
-    Surface(
-        color = backgroundColor,
-        elevation = elevation,
-        modifier = modifier
-    ) {
-        TopAppBar(
-            title = title,
-            navigationIcon = navigationIcon,
-            actions = actions,
-            backgroundColor = Color.Transparent,
-            contentColor = contentColor,
-            elevation = 0.dp,
-            modifier = Modifier
-                .statusBarsPadding()
-                .navigationBarsPadding(bottom = false),
+private fun MyVocaTopTitle() {
+    Text(
+        text = stringResource(R.string.app_name),
+        color = MaterialTheme.colors.onSurface,
+        style = MaterialTheme.typography.h5,
+    )
+}
+
+@Composable
+private fun MyVocaTopNavigationIcon() {
+    IconButton(enabled = false, onClick = {}) {
+        Icon(
+            imageVector = Icons.Filled.ContentPaste,
+            contentDescription = null,
+            tint = MaterialTheme.colors.onSurface
         )
     }
 }
 
+@Composable
+private fun MyVocaTopActions(currentScreen: MyVocaScreen) {
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    if (currentScreen in listOf(MyVocaScreen.Home, MyVocaScreen.AllWord)) {
+        IconButton(
+            onClick = {
+                coroutineScope.launch {
+                    context.startActivity(
+                        Intent(context, AddWordActivity::class.java)
+                    )
+                }
+            },
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Add,
+                contentDescription = "새로운 단어를 추가할 수 있습니다.",
+                tint = contentColorFor(MaterialTheme.colors.surface)
+            )
+        }
+    }
+}
 
 @Preview
 @Composable
-fun MyVocaTopAppBarPreview() {
+private fun MyVocaTopAppBarPreview() {
     MyVocaTheme {
-        MyVocaTopAppBar()
+        MyVocaTopAppBar(currentScreen = MyVocaScreen.Home)
     }
 }
