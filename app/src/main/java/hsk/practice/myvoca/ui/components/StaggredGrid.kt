@@ -44,7 +44,7 @@ fun StaggeredGrid(
         }
 
         // Place each placeable
-        val height = rowY
+        val height = rowY + maxHeight
         layout(width, height) {
             places.zip(placeables).forEach { (place, placeable) ->
                 placeable.place(
