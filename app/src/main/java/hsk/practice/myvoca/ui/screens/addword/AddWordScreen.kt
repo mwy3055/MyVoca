@@ -3,11 +3,8 @@ package hsk.practice.myvoca.ui.screens.addword
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -18,16 +15,11 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import hsk.practice.myvoca.data.MeaningImpl
@@ -304,7 +296,6 @@ private fun AddWordMeanings(
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
     onMeaningDelete: (Int) -> Unit
 ) {
-    // TODO: make scroll bar. See: NestedScrollBar in Github star
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
@@ -318,40 +309,6 @@ private fun AddWordMeanings(
                 meaning = meaning,
                 onMeaningUpdate = onMeaningUpdate,
                 onMeaningDelete = onMeaningDelete
-            )
-        }
-    }
-}
-
-fun Modifier.simpleVerticalScrollbar(
-    state: LazyListState,
-    width: Dp = 8.dp
-): Modifier = composed {
-    val targetAlpha = if (state.isScrollInProgress) 1f else 0f
-    val duration = if (state.isScrollInProgress) 150 else 500
-
-    val alpha by animateFloatAsState(
-        targetValue = targetAlpha,
-        animationSpec = tween(durationMillis = duration)
-    )
-
-    drawWithContent {
-        drawContent()
-
-        val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
-        val needDrawScrollbar = state.isScrollInProgress || alpha > 0.0f
-
-        // Draw scrollbar if scrolling or if the animation is still running and lazy column has content
-        if (needDrawScrollbar && firstVisibleElementIndex != null) {
-            val elementHeight = this.size.height / state.layoutInfo.totalItemsCount
-            val scrollbarOffsetY = firstVisibleElementIndex * elementHeight
-            val scrollbarHeight = state.layoutInfo.visibleItemsInfo.size * elementHeight
-
-            drawRect(
-                color = Color.Red,
-                topLeft = Offset(this.size.width - width.toPx(), scrollbarOffsetY),
-                size = Size(width.toPx(), scrollbarHeight),
-                alpha = alpha
             )
         }
     }
