@@ -64,6 +64,8 @@ enum class WordClassImpl(val korean: String) {
 
     companion object {
         fun findByKorean(korean: String) = values().find { it.korean == korean }
+
+        fun actualValues(): List<WordClassImpl> = values().filter { it != UNKNOWN }
     }
 }
 

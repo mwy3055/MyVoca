@@ -49,9 +49,6 @@ class AllWordViewModel @Inject constructor(
             _allWordUiState.value = allWordUiState.value.copy(loading = true)
 //            Logger.d("Loading start, data: ${allWordUiState.value}")
 
-            // TODO: remove this when test is finished
-//            delay(1500)
-
             val data = _allWordUiState.value.data ?: AllWordData()
             val result = loadWords(data.queryState).sortedBy(data.sortState)
             _allWordUiState.value = allWordUiState.value.copy(
