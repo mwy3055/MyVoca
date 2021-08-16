@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.ZoneOffset
 import javax.inject.Inject
 
@@ -129,10 +128,3 @@ data class HomeScreenData(
     val showTodayWordHelp: Boolean = false
 )
 
-/**
- * Calculates the remaining seconds of the day.
- */
-fun getSecondsLeft(): Long {
-    val time = LocalTime.now()
-    return (60 * 60 * 24L) - (time.hour * 60 * 60) - (time.minute * 60) - (time.second)
-}

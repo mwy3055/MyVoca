@@ -47,7 +47,7 @@ fun MyVocaApp() {
 
         Scaffold(
             topBar = {
-                MyVocaTopAppBar()
+                MyVocaTopAppBar(currentScreen = currentScreen)
             },
             bottomBar = {
                 MyVocaBottomAppBar(
@@ -63,7 +63,7 @@ fun MyVocaApp() {
                     },
                     currentScreen = currentScreen
                 )
-            }
+            },
         ) { innerPadding ->
             MyVocaNavGraph(
                 modifier = Modifier.padding(innerPadding),
