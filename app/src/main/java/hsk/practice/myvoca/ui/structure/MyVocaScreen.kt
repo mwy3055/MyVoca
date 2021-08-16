@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.ui
+package hsk.practice.myvoca.ui.structure
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle

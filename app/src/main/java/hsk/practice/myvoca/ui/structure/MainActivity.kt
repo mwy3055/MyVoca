@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.ui
+package hsk.practice.myvoca.ui.structure
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
