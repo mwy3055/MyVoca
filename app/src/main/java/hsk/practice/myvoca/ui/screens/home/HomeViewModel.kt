@@ -110,7 +110,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun List<HomeTodayWord>.sortTodayWords(): List<HomeTodayWord> {
-        return this.sortedWith(compareBy({ it.todayWord.checked }, { it.todayWord.id }))
+        return this.sortedBy { it.todayWord.id }
     }
 
 }
