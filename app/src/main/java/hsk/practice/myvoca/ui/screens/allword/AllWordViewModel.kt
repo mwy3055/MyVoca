@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,7 +33,7 @@ class AllWordViewModel @Inject constructor(
     private val refreshChannel = Channel<Unit>(Channel.CONFLATED)
 
     init {
-        notifyRefresh()
+        notifyWhenDatabaseUpdated()
         lookRefreshChannel()
     }
 
@@ -42,6 +43,14 @@ class AllWordViewModel @Inject constructor(
 
     private fun notifyRefresh() = viewModelScope.launch(Dispatchers.Default) {
         refreshChannel.send(Unit)
+    }
+
+    private fun notifyWhenDatabaseUpdated() {
+        viewModelScope.launch {
+            persistence.getAllVocabulary().collectLatest {
+                notifyRefresh()
+            }
+        }
     }
 
     private fun lookRefreshChannel() = viewModelScope.launch(Dispatchers.Default) {
