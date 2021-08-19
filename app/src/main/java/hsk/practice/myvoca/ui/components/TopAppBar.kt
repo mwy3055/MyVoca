@@ -11,8 +11,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import hsk.practice.myvoca.R
-import hsk.practice.myvoca.ui.MyVocaScreen
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
+import hsk.practice.myvoca.ui.structure.MyVocaScreen
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import kotlinx.coroutines.launch
 
