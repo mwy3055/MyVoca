@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.ui
+package hsk.practice.myvoca.ui.structure
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -26,7 +26,7 @@ enum class MyVocaScreen(
     companion object {
         fun fromRoute(route: String?): MyVocaScreen {
             return route?.let {
-                values().first { screen -> route.substringBefore("/") == screen.name }
+                values().firstOrNull { screen -> route.substringBefore("/") == screen.name }
             } ?: Home
         }
     }

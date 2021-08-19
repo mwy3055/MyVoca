@@ -1,6 +1,5 @@
 package hsk.practice.myvoca.ui.components
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -23,7 +22,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import hsk.practice.myvoca.ui.MyVocaScreen
+import hsk.practice.myvoca.ui.structure.MyVocaScreen
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import java.util.*
 
@@ -34,7 +33,6 @@ private const val TabFadeInAnimationDuration = 150
 private const val TabFadeInAnimationDelay = 100
 private const val TabFadeOutAnimationDuration = 100
 
-@ExperimentalAnimationApi
 @Composable
 fun MyVocaBottomAppBar(
     allScreens: List<MyVocaScreen>,
@@ -63,7 +61,6 @@ fun MyVocaBottomAppBar(
     }
 }
 
-@ExperimentalAnimationApi
 @Composable
 private fun MyVocaTab(
     modifier: Modifier = Modifier,
@@ -112,7 +109,6 @@ private fun MyVocaTab(
 }
 
 
-@ExperimentalAnimationApi
 @Preview
 @Composable
 fun MyVocaBottomAppBarPreview() {

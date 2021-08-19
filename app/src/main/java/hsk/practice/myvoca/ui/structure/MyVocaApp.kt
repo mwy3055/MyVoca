@@ -1,12 +1,11 @@
-package hsk.practice.myvoca.ui
+package hsk.practice.myvoca.ui.structure
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -26,7 +25,6 @@ import hsk.practice.myvoca.ui.screens.quiz.QuizScreen
 import hsk.practice.myvoca.ui.screens.quiz.QuizViewModel
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 
-@ExperimentalAnimationApi
 @Composable
 fun MyVocaApp() {
     MyVocaTheme {
@@ -39,7 +37,7 @@ fun MyVocaApp() {
 
         val systemUiController = rememberSystemUiController()
         val systemBarColor = MaterialTheme.colors.primarySurface
-        SideEffect {
+        LaunchedEffect(key1 = true) {
             systemUiController.setStatusBarColor(
                 color = systemBarColor
             )

@@ -22,7 +22,7 @@
             android:label="@string/title_activity_add_word"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.structure.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
