@@ -30,6 +30,7 @@ import hsk.practice.myvoca.ui.theme.MyVocaTheme
 
 @Composable
 fun AddWordScreen(
+    modifier: Modifier = Modifier,
     viewModel: AddWordViewModel,
     onClose: () -> Unit = {}
 ) {
@@ -46,7 +47,7 @@ fun AddWordScreen(
     val scaffoldState = rememberScaffoldState()
     Scaffold(
         scaffoldState = scaffoldState,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         topBar = {
             AddWordTopBar(
                 addButtonEnabled = data.canStoreWord,
