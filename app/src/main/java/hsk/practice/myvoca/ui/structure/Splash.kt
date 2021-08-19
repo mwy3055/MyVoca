@@ -1,26 +1,19 @@
 package hsk.practice.myvoca.ui.structure
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Pages
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -65,29 +58,19 @@ private fun SplashScreen(navController: NavHostController) {
         navController.navigate(MyVocaAppName)
     }
 
-    val t = remember { Animatable(initialValue = 1f, visibilityThreshold = 10f) }
+//    val titleSize by animateFloatAsState(
+//        targetValue = 3f,
+//        animationSpec = spring(
+//            dampingRatio = Spring.DampingRatioLowBouncy,
+//            stiffness = Spring.StiffnessMedium
+//        )
+//    )
 
-    val titleSize by animateFloatAsState(
-        targetValue = 3f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy,
-            stiffness = Spring.StiffnessMedium
-        )
-    )
-
-    LaunchedEffect(true) {
-        t.animateTo(
-            targetValue = 3f,
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = Spring.StiffnessMedium
-            )
-        )
-    }
-
+    SplashBackground()
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .zIndex(zIndex = 1f),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -99,10 +82,26 @@ private fun SplashScreen(navController: NavHostController) {
             text = "MyVoca",
             style = MaterialTheme.typography.h4
         )
-        Icon(
-            imageVector = Icons.Outlined.Pages,
-            contentDescription = null,
-            modifier = Modifier.scale(t.value)
+    }
+}
+
+@Composable
+private fun SplashBackground() {
+    val lineColor = MaterialTheme.colors.primary
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val canvasWidth = size.width
+        val canvasHeight = size.height
+        drawLine(
+            color = lineColor,
+            start = Offset(x = canvasWidth * 2 / 3, y = -100f),
+            end = Offset(x = -250f, y = canvasHeight * 2 / 3),
+            strokeWidth = 350f
+        )
+        drawLine(
+            color = lineColor,
+            start = Offset(x = -250f, y = canvasHeight * 2 / 3),
+            end = Offset(x = canvasWidth * 4 / 3, y = canvasHeight * 8 / 9),
+            strokeWidth = 350f
         )
     }
 }
