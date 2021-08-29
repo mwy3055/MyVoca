@@ -112,7 +112,6 @@ fun AllWordContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(BackdropScaffoldDefaults.HeaderHeight)
-                    .clickable { if (scaffoldState.isConcealed) revealBackdrop() else concealBackdrop() }
             )
         },
         backLayerContent = {

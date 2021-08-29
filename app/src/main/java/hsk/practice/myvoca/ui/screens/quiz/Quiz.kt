@@ -1,13 +1,18 @@
 package hsk.practice.myvoca.ui.screens.quiz
 
+import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hsk.practice.myvoca.data.VocabularyImpl
@@ -15,6 +20,7 @@ import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.components.WordMeanings
+import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import hsk.practice.myvoca.util.randoms
 import hsk.practice.myvoca.util.truncate
@@ -66,12 +72,29 @@ fun QuizLoading(
 
 @Composable
 fun QuizNotAvailable(need: Int) {
-    Box(modifier = Modifier.fillMaxWidth()) {
+    val context = LocalContext.current
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
         Text(
-            modifier = Modifier.align(Alignment.Center),
+//            modifier = Modifier.align(Alignment.Center),
             text = "${need}개의 단어가 더 필요합니다.",
-            style = MaterialTheme.typography.h3
+            style = MaterialTheme.typography.h5,
+            textAlign = TextAlign.Center
         )
+        TextButton(onClick = {
+            context.startActivity(
+                Intent(context, AddWordActivity::class.java)
+            )
+        }) {
+            Icon(
+                imageVector = Icons.Outlined.Add,
+                contentDescription = "클릭하여 단어를 추가합니다."
+            )
+            Text(text = "단어 추가하러 가기")
+        }
     }
 }
 
