@@ -17,7 +17,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             ProvideWindowInsets {
                 MyVocaTheme {
-                    Splash()
+                    Splash(onLaunch = {
+                        WindowCompat.setDecorFitsSystemWindows(window, true)
+                    })
                 }
             }
         }
