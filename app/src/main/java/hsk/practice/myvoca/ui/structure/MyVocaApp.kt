@@ -26,7 +26,7 @@ import hsk.practice.myvoca.ui.screens.quiz.QuizViewModel
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 
 @Composable
-fun MyVocaApp() {
+fun MyVocaApp(onLaunch:suspend ()->Unit = {}) {
     MyVocaTheme {
         val allScreens = MyVocaScreen.values().toList()
         val navController = rememberNavController()
@@ -38,6 +38,7 @@ fun MyVocaApp() {
         val systemUiController = rememberSystemUiController()
         val systemBarColor = MaterialTheme.colors.primarySurface
         LaunchedEffect(key1 = true) {
+            onLaunch()
             systemUiController.setStatusBarColor(
                 color = systemBarColor
             )

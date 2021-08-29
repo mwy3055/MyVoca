@@ -22,10 +22,13 @@ import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import kotlinx.coroutines.delay
 
 @Composable
-fun Splash() {
+fun Splash(onLaunch: suspend () -> Unit = {}) {
     val navController = rememberNavController()
     Box(modifier = Modifier.fillMaxSize()) {
-        SplashNavGraph(navController = navController)
+        SplashNavGraph(
+            navController = navController,
+            onLaunch = onLaunch
+        )
     }
 }
 
@@ -33,7 +36,10 @@ private val SplashName = "splash_screen"
 private val MyVocaAppName = "main_app"
 
 @Composable
-private fun SplashNavGraph(navController: NavHostController) {
+private fun SplashNavGraph(
+    navController: NavHostController,
+    onLaunch: suspend () -> Unit
+) {
     NavHost(
         navController = navController,
         startDestination = SplashName
@@ -42,7 +48,7 @@ private fun SplashNavGraph(navController: NavHostController) {
             SplashScreen(navController = navController)
         }
         composable(MyVocaAppName) {
-            MyVocaApp()
+            MyVocaApp(onLaunch = onLaunch)
         }
     }
 }

@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MyVocaTopAppBar(currentScreen: MyVocaScreen) {
-    InsetAwareTopAppBar(
+    TopAppBar(
         title = {
             MyVocaTopTitle()
         },

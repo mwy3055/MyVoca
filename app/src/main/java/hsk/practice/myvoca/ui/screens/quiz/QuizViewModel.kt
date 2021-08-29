@@ -49,7 +49,7 @@ class QuizViewModel @Inject constructor(
                 ) {
                     // When only allVocabulary has new value, do not change any state
                     Logger.d("1")
-                    return@combine quizScreenData.value
+                    return@combine quizScreenData.value.copy(numberVocabularyNeed = vocabularyRequired - allVocabulary.size)
                 } else if (!initialLoad and
                     (value.quizData.quizStat == QuizStat(correct, wrong))
                 ) {

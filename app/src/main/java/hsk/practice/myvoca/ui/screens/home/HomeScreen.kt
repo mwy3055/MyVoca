@@ -86,6 +86,7 @@ fun HomeContent(
         HomeTodayWords(
             todayWords = data.todayWords,
             lastUpdatedTime = data.todayWordsLastUpdatedTime,
+            enableRefresh = data.totalWordCount > 0,
             showTodayWordHelp = showTodayWordHelp,
             onRefreshTodayWord = onRefreshTodayWord,
             onTodayWordCheckboxChange = onTodayWordCheckboxChange
@@ -97,6 +98,7 @@ fun HomeContent(
 fun HomeTodayWords(
     todayWords: List<HomeTodayWord>,
     lastUpdatedTime: Long,
+    enableRefresh: Boolean,
     showTodayWordHelp: (Boolean) -> Unit,
     onRefreshTodayWord: () -> Unit,
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
@@ -110,6 +112,7 @@ fun HomeTodayWords(
             HomeTodayWordHeader(
                 lastUpdatedTime = lastUpdatedTime,
                 showTodayWordHelp = showTodayWordHelp,
+                enableRefresh = enableRefresh,
                 onRefreshTodayWord = onRefreshTodayWord
             )
         }
@@ -124,6 +127,9 @@ fun HomeTodayWords(
                     onTodayWordCheckboxChange = onTodayWordCheckboxChange
                 )
             }
+        }
+        item {
+            Spacer(modifier = Modifier.height(10.dp))
         }
     }
 }
@@ -142,6 +148,7 @@ fun HomeTodayWordEmpty() {
 fun HomeTodayWordHeader(
     lastUpdatedTime: Long,
     showTodayWordHelp: (Boolean) -> Unit,
+    enableRefresh: Boolean,
     onRefreshTodayWord: () -> Unit
 ) {
     val lastUpdatedTimeString = getTimeDiffString(lastUpdatedTime)
@@ -167,7 +174,8 @@ fun HomeTodayWordHeader(
             style = MaterialTheme.typography.caption
         )
         IconButton(
-            onClick = onRefreshTodayWord
+            onClick = onRefreshTodayWord,
+            enabled = enableRefresh
         ) {
             Icon(
                 imageVector = Icons.Outlined.Autorenew,
