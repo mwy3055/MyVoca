@@ -12,6 +12,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,12 +31,14 @@ import hsk.practice.myvoca.util.toTimeString
 @Composable
 fun WordContent(
     word: VocabularyImpl,
+    iconContent: @Composable RowScope.() -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
     WordContent(
         word = word,
         expanded = expanded,
-        onExpanded = { expanded = !it }
+        onExpanded = { expanded = !it },
+        iconContent = iconContent
     )
 }
 
@@ -44,7 +47,8 @@ fun WordContent(
     word: VocabularyImpl,
     showExpandButton: Boolean = true,
     expanded: Boolean,
-    onExpanded: (Boolean) -> Unit
+    onExpanded: (Boolean) -> Unit,
+    iconContent: @Composable RowScope.() -> Unit = {}
 ) {
     val padding = 8.dp
     Column(
@@ -55,7 +59,13 @@ fun WordContent(
         verticalArrangement = Arrangement.spacedBy(padding)
     ) {
         if (word.id != 0) {
-            WordTitle(title = word.eng)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                WordTitle(
+                    title = word.eng,
+                    modifier = Modifier.weight(1f)
+                )
+                iconContent()
+            }
             WordMeanings(
                 meanings = word.meaning,
                 showExpandButton = showExpandButton,
@@ -67,10 +77,14 @@ fun WordContent(
 }
 
 @Composable
-fun WordTitle(title: String) {
+fun WordTitle(
+    title: String,
+    modifier: Modifier = Modifier
+) {
     Text(
+        modifier = modifier,
         text = title,
-        style = MaterialTheme.typography.h6,
+        style = MaterialTheme.typography.h5,
     )
 }
 
@@ -116,7 +130,7 @@ fun WordMeanings(
             IconButton(
                 onClick = { onClick(expanded) },
                 modifier = Modifier
-                    .size(40.dp)
+//                    .size(40.dp)
                     .align(Alignment.Bottom)
             ) {
                 Icon(
@@ -191,6 +205,11 @@ fun WordContentPreview() {
             word = word,
             expanded = expanded,
             onExpanded = { expanded = !it }
-        )
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Add,
+                contentDescription = null
+            )
+        }
     }
 }
