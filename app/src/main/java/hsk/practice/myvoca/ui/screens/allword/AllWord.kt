@@ -14,14 +14,15 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ManageSearch
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.HighlightOff
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -51,7 +52,9 @@ fun AllWordScreen(
         onSubmitButtonClicked = allWordViewModel::onSubmitButtonClicked,
         onQueryWordChanged = allWordViewModel::onQueryTextChanged,
         onOptionWordClassClick = allWordViewModel::onQueryWordClassToggled,
-        onSortStateClick = allWordViewModel::onSortStateClicked
+        onSortStateClick = allWordViewModel::onSortStateClicked,
+        onClearOption = allWordViewModel::onClearOption,
+        onWordDelete = allWordViewModel::onWordDelete
     )
 }
 
@@ -63,7 +66,9 @@ fun AllWordLoading(
     onCloseButtonClicked: () -> Unit = {},
     onQueryWordChanged: (String) -> Unit = {},
     onOptionWordClassClick: (String) -> Unit = {},
-    onSortStateClick: (SortState) -> Unit = {}
+    onSortStateClick: (SortState) -> Unit = {},
+    onClearOption: () -> Unit = {},
+    onWordDelete: (VocabularyImpl) -> Unit = {}
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -79,7 +84,9 @@ fun AllWordLoading(
                 onCloseButtonClicked = onCloseButtonClicked,
                 onQueryWordChanged = onQueryWordChanged,
                 onOptionWordClassClick = onOptionWordClassClick,
-                onSortStateClick = onSortStateClick
+                onSortStateClick = onSortStateClick,
+                onClearOption = onClearOption,
+                onWordDelete = onWordDelete
             )
         }
     }
@@ -94,7 +101,9 @@ fun AllWordContent(
     onCloseButtonClicked: () -> Unit,
     onQueryWordChanged: (String) -> Unit,
     onOptionWordClassClick: (String) -> Unit,
-    onSortStateClick: (SortState) -> Unit
+    onSortStateClick: (SortState) -> Unit,
+    onClearOption: () -> Unit,
+    onWordDelete: (VocabularyImpl) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed)
@@ -138,12 +147,22 @@ fun AllWordContent(
             Column {
                 AllWordHeader(
                     vocabularySize = data.currentWordState.size,
+                    showOptionClearButton = data.queryState != VocabularyQuery(),
                     onOptionButtonClicked = {
                         onOptionButtonClicked()
                         revealBackdrop()
-                    }
+                    },
+                    onClearOption = onClearOption
                 )
-                AllWordItems(data.currentWordState)
+                AllWordItems(
+                    words = data.currentWordState,
+                    onWordDelete = onWordDelete
+                )
+            }
+            data.deletedWord?.let { deletedWord ->
+                scope.launch {
+                    scaffoldState.snackbarHostState.showSnackbar(message = "${deletedWord.eng}이(가) 삭제되었습니다.")
+                }
             }
         },
         frontLayerElevation = 16.dp,
@@ -154,23 +173,35 @@ fun AllWordContent(
 @Composable
 fun AllWordHeader(
     vocabularySize: Int,
-    onOptionButtonClicked: () -> Unit
+    showOptionClearButton: Boolean,
+    onOptionButtonClicked: () -> Unit,
+    onClearOption: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .background(MaterialTheme.colors.surface)
-            .padding(8.dp)
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = "검색 결과: ${vocabularySize}개",
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically)
+            modifier = Modifier.align(Alignment.CenterVertically)
         )
+        Spacer(modifier = Modifier.weight(1f))
+        if (showOptionClearButton) {
+            TextButton(onClick = onClearOption) {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = "검색 옵션을 초기화합니다."
+                )
+                Text(text = "초기화")
+            }
+
+        }
         TextButton(onClick = onOptionButtonClicked) {
             Icon(
                 imageVector = Icons.Filled.ManageSearch,
-                contentDescription = null
+                contentDescription = "특정 조건에 맞는 단어를 검색합니다."
             )
             Text(text = "검색 옵션")
         }
@@ -385,7 +416,10 @@ fun SortStateChip(
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AllWordItems(words: List<VocabularyImpl>) {
+fun AllWordItems(
+    words: List<VocabularyImpl>,
+    onWordDelete: (VocabularyImpl) -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     Box {
@@ -396,20 +430,25 @@ fun AllWordItems(words: List<VocabularyImpl>) {
             items(items = words,
                 key = { it.id }
             ) { word ->
-                WordContent(word)
+                WordContent(word) {
+                    IconButton(onClick = { onWordDelete(word) }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Close,
+                            contentDescription = "단어를 삭제합니다."
+                        )
+                    }
+                }
             }
         }
 
         val showButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 } }
         if (showButton) {
             IconButton(
-                onClick = {
-                    coroutineScope.launch { listState.animateScrollToItem(0) }
-                },
+                onClick = { coroutineScope.launch { listState.animateScrollToItem(0) } },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(16.dp)
-                    .background(color = Color.Black.copy(alpha = 0.05f), shape = CircleShape)
+                    .background(color = MaterialTheme.colors.secondary, shape = CircleShape)
             ) {
                 Icon(
                     imageVector = Icons.Outlined.ArrowUpward,
@@ -444,9 +483,10 @@ fun AllWordContentsPreview() {
                 } else {
                     wordClassSet.add(wordClass)
                 }
-            }) {
-
-        }
+            },
+            onSortStateClick = {},
+            onClearOption = {},
+            onWordDelete = {})
     }
 }
 
@@ -454,7 +494,7 @@ fun AllWordContentsPreview() {
 @Composable
 fun AllWordItemsPreview() {
     MyVocaTheme {
-        AllWordItems(fakeData)
+        AllWordItems(words = fakeData, onWordDelete = {})
     }
 }
 
