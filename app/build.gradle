@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'androidx.navigation.safeargs'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 31
@@ -148,6 +149,11 @@ dependencies {
 
     // Preference dependency
     implementation "androidx.preference:preference-ktx:1.1.1"
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:28.4.0')
+    // Firebase SDK for Google Analytics
+    implementation 'com.google.firebase:firebase-analytics-ktx'
 
     implementation 'com.orhanobut:logger:2.2.0'
 

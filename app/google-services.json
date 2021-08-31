@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "711192236974",
+    "project_id": "myvoca-268bb",
+    "storage_bucket": "myvoca-268bb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:711192236974:android:0702e3e26fa3238e7eae3f",
+        "android_client_info": {
+          "package_name": "hsk.practice.myvoca"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "711192236974-vbjufot9iln0ttfnu44l7ai69l0dlljp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCc8MEHJBdUCe7TPTZMb1044xTDDWsRWYM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "711192236974-vbjufot9iln0ttfnu44l7ai69l0dlljp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
