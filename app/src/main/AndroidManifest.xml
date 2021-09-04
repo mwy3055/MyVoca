@@ -17,6 +17,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ui.screens.login.LoginActivity"
+            android:exported="true"
+            android:label="@string/login_activity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".ui.screens.addword.AddWordActivity"
             android:exported="true"
             android:label="@string/title_activity_add_word"
