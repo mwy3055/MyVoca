@@ -88,9 +88,10 @@ fun WordMeanings(
     } else {
         Pair(meanings, emptyList())
     }
+    val canExpanded = showExpandButton and meaningsTruncated
 
     Row(
-        modifier = if (meaningsTruncated) modifier.clickable { onClick(expanded) } else modifier
+        modifier = if (canExpanded) modifier.clickable { onClick(expanded) } else modifier
             .fillMaxWidth()
     ) {
         Column(
@@ -109,7 +110,7 @@ fun WordMeanings(
             }
         }
 
-        if (meaningsTruncated and showExpandButton) {
+        if (canExpanded) {
             val iconAngle by animateFloatAsState(
                 targetValue = if (expanded) 180f else 0f,
             )
