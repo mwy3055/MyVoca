@@ -1,5 +1,7 @@
 package hsk.practice.myvoca.ui.screens.login
 
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -9,11 +11,15 @@ import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import hsk.practice.myvoca.R
 import hsk.practice.myvoca.ui.components.InsetAwareTopAppBar
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 
@@ -42,18 +48,19 @@ fun LoginScreen(
         modifier = modifier.fillMaxSize(),
         topBar = { LoginTopAppBar(onClose = onClose) }
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//            Spacer(modifier = Modifier.weight(1f))
-            LoginTitle()
-            LoginBody(
+        Row {
+            Spacer(modifier = Modifier.weight(1f))
+            LoginScreenBody(
+                modifier = Modifier,
                 email = data.email,
                 password = data.password,
                 showPassword = data.showPassword,
                 onEmailChange = viewModel::onEmailChange,
                 onPasswordChange = viewModel::onPasswordChange,
-                onTogglePasswordVisibility = viewModel::onTogglePasswordVisibility
+                onTogglePasswordVisibility = viewModel::onTogglePasswordVisibility,
+                onLogin = viewModel::onLogin
             )
-            LoginDivider()
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
@@ -75,6 +82,41 @@ private fun LoginTopAppBar(onClose: () -> Unit) {
 }
 
 @Composable
+private fun LoginScreenBody(
+    modifier: Modifier = Modifier,
+    email: String,
+    password: String,
+    showPassword: Boolean,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onTogglePasswordVisibility: () -> Unit,
+    onLogin: () -> Unit,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.width(IntrinsicSize.Max)
+    ) {
+        Spacer(modifier = Modifier.weight(1f))
+        LoginTitle()
+        Spacer(modifier = Modifier.weight(1f))
+        LoginBody(
+            email = email,
+            password = password,
+            showPassword = showPassword,
+            onEmailChange = onEmailChange,
+            onPasswordChange = onPasswordChange,
+            onTogglePasswordVisibility = onTogglePasswordVisibility,
+            onLogin = onLogin
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        LoginDivider()
+        Spacer(modifier = Modifier.weight(1f))
+        SignInButtons()
+        Spacer(modifier = Modifier.weight(5f))
+    }
+}
+
+@Composable
 private fun LoginTitle() {
     Text(
         text = "MyVoca",
@@ -90,9 +132,10 @@ private fun LoginBody(
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onTogglePasswordVisibility: () -> Unit,
+    onLogin: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.width(IntrinsicSize.Max),
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -117,40 +160,112 @@ private fun LoginBody(
             },
             visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation()
         )
+        // Login button
+        Button(
+            onClick = onLogin,
+            modifier = Modifier
+                .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)
+        ) {
+            Text(text = "로그인")
+        }
     }
 }
 
 @Composable
 private fun LoginDivider() {
-    Row {
-        Spacer(modifier = Modifier.weight(1f))
-        Divider(modifier = Modifier.weight(3f))
-        Spacer(modifier = Modifier.weight(1f))
+    Divider(modifier = Modifier.fillMaxWidth())
+}
+
+private data class SignInButton(
+    @DrawableRes val iconId: Int,
+    val title: String,
+    val backgroundColor: Color
+)
+
+/* TODO: SignInButton의 정의에 onClick을 추가하여 ViewModel로 옮기기.
+*   버튼 리스트는 StateFlow에 넣지 않고 상수로 선언해도 상관없음 */
+
+@Composable
+private fun SignInButtons() {
+    val buttons = listOf(
+        SignInButton(
+            iconId = R.drawable.ic_round_email_24,
+            title = "이메일로 가입",
+            backgroundColor = MaterialTheme.colors.primary
+        ),
+        SignInButton(
+            iconId = R.drawable.ic_btn_google_light_normal_ios,
+            title = "Google로 로그인",
+            backgroundColor = Color.White
+        ),
+    )
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        buttons.forEach { button ->
+            MySignInButton(
+                iconId = button.iconId,
+                title = button.title,
+                backgroundColor = button.backgroundColor,
+            )
+        }
     }
 }
 
-@Preview
 @Composable
-private fun LoginTopAppBarPreview() {
-    MyVocaTheme {
-        LoginTopAppBar(onClose = {})
+private fun MySignInButton(
+    @DrawableRes iconId: Int,
+    title: String,
+    backgroundColor: Color
+) {
+    Card(
+        modifier = Modifier
+            .padding(4.dp)
+            .fillMaxWidth(),
+        backgroundColor = backgroundColor,
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(painter = painterResource(id = iconId), contentDescription = title)
+            Text(
+                text = title,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun LoginBodyPreview() {
+fun LoginScreenBodyPreview() {
     var email by remember { mutableStateOf("test@gmail.com") }
     var password by remember { mutableStateOf("abcd") }
     var showPassword by remember { mutableStateOf(false) }
     MyVocaTheme {
-        LoginBody(
+        LoginScreenBody(
             email = email,
             password = password,
             showPassword = showPassword,
             onEmailChange = { newEmail -> email = newEmail },
             onPasswordChange = { newPassword -> password = newPassword },
-            onTogglePasswordVisibility = { showPassword = !showPassword }
+            onTogglePasswordVisibility = { showPassword = !showPassword },
+            onLogin = {},
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SignInButtonEmailPreview() {
+    MyVocaTheme {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            SignInButtons()
+        }
     }
 }

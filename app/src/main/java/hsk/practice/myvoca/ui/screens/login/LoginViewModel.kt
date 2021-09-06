@@ -24,6 +24,10 @@ class LoginViewModel : ViewModel() {
         _loginScreenData.value = loginScreenData.value.copy(showPassword = !current)
     }
 
+    fun onLogin() {
+        // TODO: Email login!
+    }
+
 
 }
 
