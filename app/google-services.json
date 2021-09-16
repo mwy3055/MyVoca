@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "711192236974-82ioba8odm7nro8nfs30dn4nerjba3tf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hsk.practice.myvoca",
+            "certificate_hash": "dc5e84b7f68095ae17d89a9962754e6aca677b3b"
+          }
+        },
+        {
+          "client_id": "711192236974-hala9abbnb0vo7lmu97pvkbksae9upe3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hsk.practice.myvoca",
+            "certificate_hash": "6c0d69d4d837197b7ceae91626bffdc76e374782"
+          }
+        },
+        {
           "client_id": "711192236974-vbjufot9iln0ttfnu44l7ai69l0dlljp.apps.googleusercontent.com",
           "client_type": 3
         }
