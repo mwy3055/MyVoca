@@ -124,4 +124,7 @@
     <string name="dev_email">mwy3055@gmail.com</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_add_word">AddWordActivity</string>
+    <string name="login_activity">LoginActivity</string>
+
+    <string name="web_client_id">711192236974-vbjufot9iln0ttfnu44l7ai69l0dlljp.apps.googleusercontent.com</string>
 </resources>
