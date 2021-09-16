@@ -21,6 +21,7 @@ import hsk.practice.myvoca.ui.screens.allword.AllWordViewModel
 import hsk.practice.myvoca.ui.screens.home.HomeScreen
 import hsk.practice.myvoca.ui.screens.home.HomeViewModel
 import hsk.practice.myvoca.ui.screens.profile.ProfileScreen
+import hsk.practice.myvoca.ui.screens.profile.ProfileViewModel
 import hsk.practice.myvoca.ui.screens.quiz.QuizScreen
 import hsk.practice.myvoca.ui.screens.quiz.QuizViewModel
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
@@ -81,6 +82,7 @@ fun MyVocaNavGraph(
     val homeViewModel: HomeViewModel = hiltViewModel()
     val allWordViewModel: AllWordViewModel = hiltViewModel()
     val quizViewModel: QuizViewModel = hiltViewModel()
+    val profileViewModel: ProfileViewModel = hiltViewModel()
     NavHost(
         navController = navController,
         startDestination = MyVocaScreen.Home.name,
@@ -97,7 +99,7 @@ fun MyVocaNavGraph(
             QuizScreen(quizViewModel)
         }
         composable(MyVocaScreen.Profile.name) {
-            ProfileScreen()
+            ProfileScreen(profileViewModel)
         }
     }
 }
