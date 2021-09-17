@@ -6,11 +6,11 @@ import java.io.Serializable
 
 data class VocabularyImpl(
     val id: Int = 0,
-    val eng: String,
-    val meaning: List<MeaningImpl>,
-    val addedTime: Long,
-    val lastEditedTime: Long,
-    val memo: String?
+    val eng: String = "",
+    val meaning: List<MeaningImpl> = emptyList(),
+    val addedTime: Long = 0L,
+    val lastEditedTime: Long = 0L,
+    val memo: String? = ""
 ) : Serializable {
 
     companion object {
@@ -47,8 +47,8 @@ val VocabularyImpl.answerString: String
     get() = "$eng: ${meaning.joinToString("; ") { it.content }}"
 
 data class MeaningImpl(
-    val type: WordClassImpl,
-    val content: String
+    val type: WordClassImpl = WordClassImpl.UNKNOWN,
+    val content: String = ""
 ) : Serializable
 
 enum class WordClassImpl(val korean: String) {
