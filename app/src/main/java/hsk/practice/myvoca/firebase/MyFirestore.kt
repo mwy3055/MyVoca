@@ -1,7 +1,9 @@
 package hsk.practice.myvoca.firebase
 
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 
 /**
  * 데이터 저장 구조: ${uid}(컬렉션) - backup(문서) - data(컬렉션)
@@ -19,5 +21,14 @@ object MyFirestore {
 
     fun backupDataReference(userId: String) =
         Firebase.firestore.collection("$userId/$backupDocument/$backupData")
+
+    suspend fun collectionExists(collection: CollectionReference): Boolean {
+        val result = collection.get().await()
+        return !result.isEmpty
+    }
+
+    suspend fun collectionExists(path: String): Boolean {
+        return collectionExists(Firebase.firestore.collection(path))
+    }
 
 }
