@@ -13,6 +13,7 @@ import hsk.practice.myvoca.room.vocabulary.vocabularyImplList
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
+import java.util.*
 
 @HiltWorker
 class FirestoreUploadWordsWork @AssistedInject constructor(
@@ -20,9 +21,6 @@ class FirestoreUploadWordsWork @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val database: RoomVocaDatabase
 ) : CoroutineWorker(context, workerParams) {
-
-    private val backupDocument = "backup"
-    private val backupData = "data"
 
     companion object {
         const val userIdKey = "user"
@@ -43,7 +41,6 @@ class FirestoreUploadWordsWork @AssistedInject constructor(
                 words.forEach { word ->
                     backupRef.document(word.id.toString()).set(word)
                         .addOnSuccessListener {
-                            Logger.d("Firestore Success!")
                             progress += progressPerWord
                             setProgressAsync(workDataOf(progressKey to progress))
                         }.addOnFailureListener {
@@ -61,11 +58,12 @@ private const val uploadWorkTag = "FirestoreUploadWork"
 fun setFirestoreUploadWork(
     workManager: WorkManager,
     userId: String
-) {
+): UUID {
     val data = workDataOf(FirestoreUploadWordsWork.userIdKey to userId)
     val work = OneTimeWorkRequestBuilder<FirestoreUploadWordsWork>()
         .addTag(uploadWorkTag)
         .setInputData(data)
         .build()
-    workManager.enqueueUniqueWork(uploadWorkTag, ExistingWorkPolicy.KEEP, work)
+    workManager.enqueueUniqueWork(uploadWorkTag, ExistingWorkPolicy.REPLACE, work)
+    return work.id
 }
