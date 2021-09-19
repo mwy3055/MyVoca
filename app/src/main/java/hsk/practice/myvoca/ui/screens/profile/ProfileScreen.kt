@@ -3,11 +3,11 @@ package hsk.practice.myvoca.ui.screens.profile
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -15,11 +15,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.FileDownload
-import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -27,6 +24,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,11 +46,6 @@ fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel()) {
         onTryLogin = viewModel::onTryLogin,
         onLoginButtonClick = viewModel::onLoginButtonClick,
         onLogout = viewModel::onLogout,
-        profileFeatures = viewModel.profileFeatures,
-        onUploadConfirm = viewModel::onUploadConfirm,
-        onUploadDismiss = viewModel::onUploadDismiss,
-        onDownloadConfirm = viewModel::onDownloadConfirm,
-        onDownloadDismiss = viewModel::onDownloadDismiss
     )
 }
 
@@ -61,11 +55,6 @@ private fun ProfileContent(
     onTryLogin: (ActivityResult) -> Unit,
     onLoginButtonClick: (Context, ManagedActivityResultLauncher<Intent, ActivityResult>) -> Unit,
     onLogout: () -> Unit,
-    profileFeatures: List<ProfileFeature>,
-    onUploadConfirm: () -> Unit,
-    onUploadDismiss: () -> Unit,
-    onDownloadConfirm: (() -> Unit) -> Unit,
-    onDownloadDismiss: () -> Unit,
 ) {
     val user = data.user
     Column(
@@ -103,16 +92,10 @@ private fun ProfileContent(
                 .fillMaxWidth()
                 .weight(2f),
             user = user,
-            features = profileFeatures,
+            uploadFeatureData = data.uploadFeatureData,
+            downloadFeatureData = data.downloadFeatureData,
         )
         Spacer(modifier = Modifier.weight(3f))
-    }
-
-    if (data.showUploadDialog) {
-        ProfileUploadDialog(onConfirm = onUploadConfirm, onDismiss = onUploadDismiss)
-    }
-    if (data.showDownloadDialog) {
-        ProfileDownloadDialog(onConfirm = onDownloadConfirm, onDismiss = onDownloadDismiss)
     }
 }
 
@@ -190,14 +173,21 @@ private fun ProfileLogin(
 private fun ProfileFeatures(
     modifier: Modifier = Modifier,
     user: UserImpl?,
-    features: List<ProfileFeature>
+    uploadFeatureData: UploadFeatureData,
+    downloadFeatureData: DownloadFeatureData,
 ) {
     val clickable = user != null
     LazyVerticalGrid(cells = GridCells.Fixed(3), modifier = modifier) {
-        items(features) { feature ->
-            ProfileFeatureItem(
-                feature = feature,
-                enabled = clickable
+        item {
+            ProfileFeatureUploadWords(
+                data = uploadFeatureData,
+                enabled = clickable,
+            )
+        }
+
+        item {
+            ProfileFeatureDownloadWords(
+                data = downloadFeatureData,
             )
         }
     }
@@ -205,15 +195,59 @@ private fun ProfileFeatures(
 }
 
 @Composable
-private fun ProfileFeatureItem(
-    feature: ProfileFeature,
-    enabled: Boolean
+private fun ProfileFeatureUploadWords(
+    data: UploadFeatureData,
+    enabled: Boolean,
 ) {
+    val alpha by animateFloatAsState(targetValue = if (enabled) 1f else 0.5f)
+    val color by animateColorAsState(
+        targetValue = if (data.finished) Color.Green else if (data.uploading) MaterialTheme.colors.primary else Color.Black
+    )
+    val feature = data.featureData
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clickable(enabled = enabled, onClick = data.onClick)
+            .aspectRatio(1f)
+            .alpha(alpha),
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = feature.icon,
+                contentDescription = feature.text,
+                modifier = Modifier.fillMaxSize(fraction = 0.4f),
+                tint = color
+            )
+            if (data.uploadProgress != null) {
+                CircularProgressIndicator(
+                    modifier = Modifier.scale(1.75f),
+                    progress = data.uploadProgress,
+                    color = color,
+                    strokeWidth = 3.dp
+                )
+            }
+        }
+        Text(text = feature.text)
+    }
+
+    if (data.showUploadDialog) {
+        ProfileUploadDialog(onConfirm = data.onConfirm, onDismiss = data.onDismiss)
+    }
+}
+
+@Composable
+private fun ProfileFeatureDownloadWords(
+    data: DownloadFeatureData,
+) {
+    val enabled = data.downloadPossible == true
+    val feature = data.featureData
+
     val alpha by animateFloatAsState(targetValue = if (enabled) 1f else 0.5f)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .clickable(enabled = enabled, onClick = feature.onClick)
+            .clickable(enabled = enabled, onClick = data.onClick)
             .aspectRatio(1f)
             .alpha(alpha),
         verticalArrangement = Arrangement.SpaceEvenly
@@ -221,9 +255,13 @@ private fun ProfileFeatureItem(
         Icon(
             imageVector = feature.icon,
             contentDescription = feature.text,
-            modifier = Modifier.fillMaxSize(0.4f)
+            modifier = Modifier.fillMaxSize(fraction = 0.4f)
         )
         Text(text = feature.text)
+    }
+
+    if (data.showDownloadDialog) {
+        ProfileDownloadDialog(onConfirm = data.onConfirm, onDismiss = data.onDismiss)
     }
 }
 
@@ -256,10 +294,10 @@ private fun ProfileUploadDialog(
 
 @Composable
 private fun ProfileDownloadDialog(
-    onConfirm: (() -> Unit) -> Unit,
+    onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    val context = LocalContext.current
+    LocalContext.current
     AlertDialog(
         title = { Text(text = "단어 복원하기") },
         text = {
@@ -269,12 +307,7 @@ private fun ProfileDownloadDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = {
-                onConfirm {
-                    // When there is no data to restore
-                    Toast.makeText(context, "가져올 데이터가 없습니다.", Toast.LENGTH_LONG).show()
-                }
-            }) {
+            TextButton(onClick = onConfirm) {
                 Text(text = "확인")
             }
         },
@@ -299,22 +332,6 @@ private fun ProfileContentPreview() {
             onTryLogin = {},
             onLoginButtonClick = { _, _ -> },
             onLogout = {},
-            profileFeatures = listOf(
-                ProfileFeature(
-                    icon = Icons.Outlined.FileUpload,
-                    text = "단어 백업하기",
-                    onClick = { }
-                ),
-                ProfileFeature(
-                    icon = Icons.Outlined.FileDownload,
-                    text = "단어 복원하기",
-                    onClick = { }
-                )
-            ),
-            onUploadConfirm = {},
-            onUploadDismiss = {},
-            onDownloadConfirm = {},
-            onDownloadDismiss = {}
         )
     }
 }

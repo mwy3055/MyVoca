@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseUser
@@ -17,11 +18,15 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import hsk.practice.myvoca.firebase.MyFirebaseAuth
 import hsk.practice.myvoca.firebase.MyFirestore
 import hsk.practice.myvoca.firebase.UserImpl
+import hsk.practice.myvoca.work.FirestoreUploadWordsWork
 import hsk.practice.myvoca.work.setFirestoreDownloadWork
 import hsk.practice.myvoca.work.setFirestoreUploadWork
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,27 +35,33 @@ class ProfileViewModel @Inject constructor(@ApplicationContext context: Context)
     private val workManager = WorkManager.getInstance(context)
 
     private val _profileScreenData = MutableStateFlow(ProfileScreenData())
+
     val profileScreenData: StateFlow<ProfileScreenData>
         get() = _profileScreenData
 
-    val profileFeatures = listOf(
-        ProfileFeature(
-            icon = Icons.Outlined.FileUpload,
-            text = "단어 백업하기",
-            onClick = {
-                _profileScreenData.value = profileScreenData.value.copy(showUploadDialog = true)
-            }
-        ),
-        ProfileFeature(
-            icon = Icons.Outlined.FileDownload,
-            text = "단어 복원하기",
-            onClick = {
-                _profileScreenData.value = profileScreenData.value.copy(showDownloadDialog = true)
-            }
-        )
-    )
-
     init {
+        val onUploadClick = {
+            _profileScreenData.value = profileScreenData.value.copy(showUploadDialog = true)
+        }
+        val onDownloadClick = {
+            _profileScreenData.value = profileScreenData.value.copy(showDownloadDialog = true)
+        }
+        val uploadData = UploadFeatureData(
+            onClick = onUploadClick,
+            onConfirm = this::onUploadConfirm,
+            onDismiss = this::onUploadDismiss
+        )
+        val downloadData = DownloadFeatureData(
+            onClick = onDownloadClick,
+            onConfirm = this::onDownloadConfirm,
+            onDismiss = this::onDownloadDismiss
+        )
+
+        _profileScreenData.value = profileScreenData.value.copy(
+            uploadFeatureData = uploadData,
+            downloadFeatureData = downloadData
+        )
+
         MyFirebaseAuth.addAuthStateListener { auth ->
             val user = auth.currentUser
             onLoginStateChange(user)
@@ -58,11 +69,16 @@ class ProfileViewModel @Inject constructor(@ApplicationContext context: Context)
             // Check if backup data exists at the Firestore
             if (user != null) {
                 viewModelScope.launch {
-                    val backupDataPath = MyFirestore.backupDataReference(user.uid)
-                    val exists = MyFirestore.collectionExists(backupDataPath)
-                    _profileScreenData.value =
-                        profileScreenData.value.copy(downloadPossible = exists)
+                    repeat(10000) {
+                        val backupDataPath = MyFirestore.backupDataReference(user.uid)
+                        val exists = MyFirestore.collectionExists(backupDataPath)
+                        _profileScreenData.value =
+                            profileScreenData.value.copy(downloadPossible = exists)
+                        delay(1000L)
+                    }
                 }
+            } else {
+                _profileScreenData.value = profileScreenData.value.copy(downloadPossible = false)
             }
         }
     }
@@ -91,12 +107,13 @@ class ProfileViewModel @Inject constructor(@ApplicationContext context: Context)
 
     fun onLogout() = MyFirebaseAuth.logout()
 
-    fun onUploadConfirm() {
+    private fun onUploadConfirm() {
+        _profileScreenData.value = profileScreenData.value.copy(uploadProgress = 0f)
         scheduleUploadWork()
         hideUploadDialog()
     }
 
-    fun onUploadDismiss() {
+    private fun onUploadDismiss() {
         hideUploadDialog()
     }
 
@@ -104,16 +121,14 @@ class ProfileViewModel @Inject constructor(@ApplicationContext context: Context)
         _profileScreenData.value = profileScreenData.value.copy(showUploadDialog = false)
     }
 
-    fun onDownloadConfirm(onFailure: () -> Unit) {
-        if (profileScreenData.value.downloadPossible == true) {
+    private fun onDownloadConfirm() {
+        if (profileScreenData.value.downloadFeatureData.downloadPossible == true) {
             scheduleDownloadWork()
-        } else {
-            onFailure()
         }
         hideDownloadDialog()
     }
 
-    fun onDownloadDismiss() {
+    private fun onDownloadDismiss() {
         hideDownloadDialog()
     }
 
@@ -123,7 +138,8 @@ class ProfileViewModel @Inject constructor(@ApplicationContext context: Context)
 
     private fun scheduleUploadWork() {
         val user = profileScreenData.value.user ?: return
-        setFirestoreUploadWork(workManager, user.uid!!)
+        val uuid = setFirestoreUploadWork(workManager, user.uid!!)
+        trackProgress(uuid)
     }
 
     private fun scheduleDownloadWork() {
@@ -131,18 +147,93 @@ class ProfileViewModel @Inject constructor(@ApplicationContext context: Context)
         setFirestoreDownloadWork(workManager, user.uid!!)
     }
 
+    private fun trackProgress(workId: UUID) {
+        viewModelScope.launch {
+            workManager.getWorkInfoByIdLiveData(workId).asFlow().collect { workInfo ->
+                // 연속으로 업로드할 경우 이전의 workInfo를 찾을 수 없어 NPE가 발생한다.
+                val progress = try {
+                    workInfo.progress.getFloat(FirestoreUploadWordsWork.progressKey, 0f)
+                } catch (e: NullPointerException) {
+                    0f
+                }
+                _profileScreenData.value = profileScreenData.value.copy(uploadProgress = progress)
+                if (progress >= 1f) {
+                    workManager.cancelWorkById(workId)
+                }
+            }
+        }
+    }
+
+
 }
 
 
 data class ProfileScreenData(
     val user: UserImpl? = null,
-    val showUploadDialog: Boolean = false,
-    val showDownloadDialog: Boolean = false,
-    val downloadPossible: Boolean? = null
-)
+    val uploadFeatureData: UploadFeatureData = UploadFeatureData(),
+    val downloadFeatureData: DownloadFeatureData = DownloadFeatureData()
+) {
+    /**
+     * Copy method for [uploadFeatureData]
+     */
+    fun copy(
+        showUploadDialog: Boolean = uploadFeatureData.showUploadDialog,
+        uploadProgress: Float? = uploadFeatureData.uploadProgress
+    ): ProfileScreenData {
+        val newUploadData = uploadFeatureData.copy(
+            showUploadDialog = showUploadDialog,
+            uploadProgress = uploadProgress
+        )
+        return this.copy(uploadFeatureData = newUploadData)
+    }
+
+    /**
+     * Copy method for [downloadFeatureData]
+     */
+    fun copy(
+        showDownloadDialog: Boolean = downloadFeatureData.showDownloadDialog,
+        downloadPossible: Boolean? = downloadFeatureData.downloadPossible
+    ): ProfileScreenData {
+        val newDownloadData = downloadFeatureData.copy(
+            showDownloadDialog = showDownloadDialog,
+            downloadPossible = downloadPossible
+        )
+        return this.copy(downloadFeatureData = newDownloadData)
+    }
+}
 
 data class ProfileFeature(
     val icon: ImageVector,
     val text: String,
-    val onClick: () -> Unit
 )
+
+data class UploadFeatureData(
+    val showUploadDialog: Boolean = false,
+    val uploadProgress: Float? = null,
+    val onClick: () -> Unit = {},
+    val onConfirm: () -> Unit = {},
+    val onDismiss: () -> Unit = {}
+) {
+    val featureData: ProfileFeature = ProfileFeature(
+        icon = Icons.Outlined.FileUpload,
+        text = "단어 백업하기"
+    )
+
+    val uploading: Boolean
+        get() = uploadProgress != null
+    val finished: Boolean
+        get() = if (uploadProgress == null) false else uploadProgress >= 1f
+}
+
+data class DownloadFeatureData(
+    val showDownloadDialog: Boolean = false,
+    val downloadPossible: Boolean? = null,
+    val onClick: () -> Unit = {},
+    val onConfirm: () -> Unit = {},
+    val onDismiss: () -> Unit = {}
+) {
+    val featureData: ProfileFeature = ProfileFeature(
+        icon = Icons.Outlined.FileDownload,
+        text = "단어 복원하기",
+    )
+}
