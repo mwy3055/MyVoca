@@ -11,7 +11,6 @@ import hsk.practice.myvoca.room.RoomVocaDatabase
 import hsk.practice.myvoca.room.vocabulary.VocaDao
 import hsk.practice.myvoca.room.vocabulary.vocabularyImplList
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
 import java.util.*
 
@@ -32,22 +31,23 @@ class FirestoreUploadWordsWork @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         val uid = inputData.getString(userIdKey) ?: return Result.failure()
-        vocaDao.loadAllVocabulary().take(2).map { list -> list.vocabularyImplList() }
-            .collectLatest { words ->
-                val backupRef = MyFirestore.backupDataReference(uid)
-                var progress = 0f
-                val progressPerWord = 100f / words.size
+        vocaDao.loadAllVocabulary().take(2).collectLatest { wordsList ->
+            val words = wordsList.vocabularyImplList()
 
-                words.forEach { word ->
-                    backupRef.document(word.id.toString()).set(word)
-                        .addOnSuccessListener {
-                            progress += progressPerWord
-                            setProgressAsync(workDataOf(progressKey to progress))
-                        }.addOnFailureListener {
-                            Logger.e("Firestore error!")
-                        }
-                }
+            val backupRef = MyFirestore.backupDataReference(uid)
+            var progress = 0f
+            val progressPerWord = 1f / words.size
+
+            words.forEach { word ->
+                backupRef.document(word.id.toString()).set(word)
+                    .addOnSuccessListener {
+                        progress += progressPerWord
+                        setProgressAsync(workDataOf(progressKey to progress))
+                    }.addOnFailureListener {
+                        Logger.e("Firestore error!")
+                    }
             }
+        }
         return Result.success()
     }
 
