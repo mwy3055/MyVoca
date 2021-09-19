@@ -15,7 +15,6 @@ import kotlinx.coroutines.tasks.await
 
 object MyFirestore {
 
-    // TODO: 백업/복원 기능 추가하기
     private const val backupDocument = "backup"
     private const val backupData = "data"
 
