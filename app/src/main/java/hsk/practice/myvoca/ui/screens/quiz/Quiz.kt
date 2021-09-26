@@ -44,13 +44,6 @@ fun QuizLoading(
 ) {
     Box(modifier = Modifier.background(MaterialTheme.colors.surface)) {
         when (quizScreenData.quizState) {
-            is QuizLoading -> {
-                LoadingIndicator(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .align(Alignment.Center)
-                )
-            }
             is QuizAvailable -> {
                 QuizScreen(
                     quizData = quizScreenData.quizData,
@@ -59,6 +52,13 @@ fun QuizLoading(
             }
             is QuizNotAvailable -> {
                 QuizNotAvailable(need = quizScreenData.numberVocabularyNeed)
+            }
+            else -> {
+                LoadingIndicator(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center)
+                )
             }
         }
         quizScreenData.quizResult?.let { result ->
@@ -182,7 +182,7 @@ fun QuizOption(
             .clickable(onClick = onClick)
             .padding(4.dp),
     ) {
-        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.h5) {
+        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.h6) {
             WordMeanings(
                 meanings = option.meaning.truncate(2),
             )

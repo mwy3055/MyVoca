@@ -3,6 +3,7 @@ package hsk.practice.myvoca.ui.screens.quiz
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hsk.data.vocabulary.Vocabulary
 import com.hsk.domain.VocaPersistence
 import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +26,7 @@ class QuizViewModel @Inject constructor(
     private val preferences: PreferencesDataStore
 ) : ViewModel() {
 
-    private var initialLoad = true
+    private var quizAvailable: Boolean = false
 
     private val _quizScreenData = MutableStateFlow(QuizScreenData())
     val quizScreenData: StateFlow<QuizScreenData>
@@ -43,60 +44,76 @@ class QuizViewModel @Inject constructor(
             ) { allVocabulary, correct, wrong, quizResultData ->
                 // Check if quiz data should be reloaded
                 val value = quizScreenData.value
-                if (!initialLoad and
-                    (value.quizData.quizStat == QuizStat(correct, wrong)) and
-                    (value.quizResult == quizResultData)
-                ) {
-                    // When only allVocabulary has new value, do not change any state
-                    Logger.d("1")
-                    return@combine quizScreenData.value.copy(numberVocabularyNeed = vocabularyRequired - allVocabulary.size)
-                } else if (!initialLoad and
-                    (value.quizData.quizStat == QuizStat(correct, wrong))
-                ) {
-                    // When quiz result is changed, return immediately
-                    Logger.d("2")
-                    return@combine quizScreenData.value.copy(quizResult = quizResultData)
+
+                val newQuizAvailable = allVocabulary.size >= vocabularyRequired
+                val onlyResultChanged = quizResultData != null
+
+                return@combine when {
+                    // 결과값이 있는 경우 결과만 반환
+                    onlyResultChanged -> {
+                        quizAvailable = true
+                        quizScreenData.value.copy(quizResult = quizResultData)
+                    }
+                    // 불가능 -> 가능
+                    newQuizAvailable and !quizAvailable -> {
+                        quizAvailable = true
+                        makeNewQuiz(allVocabulary, correct, wrong)
+                    }
+                    // 가능 -> 가능: 무조건 로드해야 하는 것은 아님
+                    newQuizAvailable -> {
+                        // 전체 단어만 바뀌었다면 새로 로드하지 않음
+                        if ((value.quizData.quizStat == QuizStat(correct, wrong)) and
+                            (value.quizResult == quizResultData)
+                        ) {
+                            value.copy(numberVocabularyNeed = vocabularyRequired - allVocabulary.size)
+                        } else {
+                            // 뭔가 바뀌었을 경우 새로 로드
+                            makeNewQuiz(allVocabulary, correct, wrong)
+                        }
+                    }
+                    else -> {
+                        // 퀴즈를 로드할 수 없는 경우
+                        quizAvailable = false
+                        QuizScreenData(
+                            quizState = QuizNotAvailable,
+                            numberVocabularyNeed = vocabularyRequired - allVocabulary.size,
+                            quizData = QuizData(quizStat = QuizStat(correct, wrong))
+                        )
+                    }
                 }
-                // else: Loading start
-                initialLoad = false
-                _quizScreenData.value =
-                    _quizScreenData.value.copy(quizState = QuizLoading())
-
-                val quizState =
-                    if (allVocabulary.size < vocabularyRequired) QuizNotAvailable() else QuizAvailable()
-                val quizList = if (allVocabulary.size < vocabularyRequired) emptyList() else
-                    allVocabulary.randoms(quizSize).toVocabularyImplList()
-                val answerIndex = (0 until quizSize).random()
-
-                // Loading complete
-                QuizScreenData(
-                    quizState = quizState,
-                    numberVocabularyNeed = vocabularyRequired - allVocabulary.size,
-                    quizData = QuizData(
-                        quiz = Quiz(quizList, answerIndex),
-                        quizStat = QuizStat(correct, wrong)
-                    )
-                )
             }.collect {
                 _quizScreenData.value = it
-//                Logger.d("Trying to emit new value: $it")
             }
         }
+    }
+
+    private fun makeNewQuiz(
+        allVocabulary: List<Vocabulary>,
+        correct: Int,
+        wrong: Int
+    ): QuizScreenData {
+        val quizList = allVocabulary.randoms(quizSize).toVocabularyImplList()
+        val answerIndex = (0 until quizSize).random()
+        return QuizScreenData(
+            quizState = QuizAvailable,
+            numberVocabularyNeed = vocabularyRequired - allVocabulary.size,
+            quizData = QuizData(
+                quiz = Quiz(quizList = quizList, answerIndex = answerIndex),
+                quizStat = QuizStat(correct, wrong)
+            )
+        )
     }
 
     fun onQuizOptionSelected(index: Int) {
         Logger.d("$index item clicked!")
         val quiz = quizScreenData.value.quizData.quiz
-        val result = if (index == quiz.answerIndex) QuizCorrect() else QuizWrong()
+        val result = if (index == quiz.answerIndex) QuizCorrect else QuizWrong
         resultDataFlow.value = QuizResultData(result, quiz.answer)
-//        viewModelScope.launch {
-//            resultDataFlow.emit(QuizResultData(result, quiz.answer))
-//        }
     }
 
     fun onResultDialogClose(resultData: QuizResultData) {
         viewModelScope.launch {
-            resultDataFlow.emit(null)
+            resultDataFlow.value = null
 
             val currentStat = quizScreenData.value.quizData.quizStat
             val (key, value) = if (resultData.result is QuizCorrect) {
@@ -129,10 +146,10 @@ val vocabularyRequired = 10
  */
 sealed class QuizState
 
-class QuizLoading : QuizState()
-class QuizAvailable : QuizState()
-class QuizNotAvailable : QuizState()
-
+object QuizInit : QuizState()
+object QuizLoading : QuizState()
+object QuizAvailable : QuizState()
+object QuizNotAvailable : QuizState()
 
 /**
  * Result of the quiz.
@@ -142,8 +159,8 @@ class QuizNotAvailable : QuizState()
  */
 sealed class QuizResult
 
-class QuizCorrect : QuizResult()
-class QuizWrong : QuizResult()
+object QuizCorrect : QuizResult()
+object QuizWrong : QuizResult()
 
 @Immutable
 data class QuizResultData(val result: QuizResult, val answer: VocabularyImpl)
@@ -171,7 +188,7 @@ data class QuizData(
 
 @Immutable
 data class QuizScreenData(
-    val quizState: QuizState = QuizLoading(),
+    val quizState: QuizState = QuizInit,
     val numberVocabularyNeed: Int = 0,
     val quizData: QuizData = QuizData(),
     val quizResult: QuizResultData? = null,
