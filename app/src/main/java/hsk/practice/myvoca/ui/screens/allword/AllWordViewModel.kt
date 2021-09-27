@@ -1,5 +1,7 @@
 package hsk.practice.myvoca.ui.screens.allword
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +14,7 @@ import hsk.practice.myvoca.data.toWordClass
 import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.room.vocabulary.toVocabulary
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImplList
+import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.state.UiState
 import hsk.practice.myvoca.util.xor
 import kotlinx.coroutines.Dispatchers
@@ -119,8 +122,17 @@ class AllWordViewModel @Inject constructor(
         notifyRefresh()
     }
 
-    fun onWordDelete(word: VocabularyImpl) {
+    fun onWordUpdate(word: VocabularyImpl, context: Context) {
+        val intent = Intent(context, AddWordActivity::class.java).apply {
+            putExtra(AddWordActivity.UPDATE_DATA, word)
+        }
         viewModelScope.launch {
+            context.startActivity(intent)
+        }
+    }
+
+    fun onWordDelete(word: VocabularyImpl) {
+        viewModelScope.launch(Dispatchers.IO) {
             persistence.deleteVocabulary(listOf(word.toVocabulary()))
             _allWordUiState.copyData(deletedWord = word)
             delay(100L)

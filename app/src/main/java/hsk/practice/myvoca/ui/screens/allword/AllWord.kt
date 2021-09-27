@@ -1,5 +1,6 @@
 package hsk.practice.myvoca.ui.screens.allword
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
@@ -15,14 +16,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ManageSearch
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.outlined.ArrowUpward
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.HighlightOff
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -43,18 +42,19 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AllWordScreen(
-    allWordViewModel: AllWordViewModel = viewModel()
+    viewModel: AllWordViewModel = viewModel()
 ) {
-    val allWordUiState by allWordViewModel.allWordUiState.collectAsState()
+    val allWordUiState by viewModel.allWordUiState.collectAsState()
 
     AllWordLoading(
         uiState = allWordUiState,
-        onSubmitButtonClicked = allWordViewModel::onSubmitButtonClicked,
-        onQueryWordChanged = allWordViewModel::onQueryTextChanged,
-        onOptionWordClassClick = allWordViewModel::onQueryWordClassToggled,
-        onSortStateClick = allWordViewModel::onSortStateClicked,
-        onClearOption = allWordViewModel::onClearOption,
-        onWordDelete = allWordViewModel::onWordDelete
+        onSubmitButtonClicked = viewModel::onSubmitButtonClicked,
+        onQueryWordChanged = viewModel::onQueryTextChanged,
+        onOptionWordClassClick = viewModel::onQueryWordClassToggled,
+        onSortStateClick = viewModel::onSortStateClicked,
+        onClearOption = viewModel::onClearOption,
+        onWordUpdate = viewModel::onWordUpdate,
+        onWordDelete = viewModel::onWordDelete
     )
 }
 
@@ -68,6 +68,7 @@ fun AllWordLoading(
     onOptionWordClassClick: (String) -> Unit = {},
     onSortStateClick: (SortState) -> Unit = {},
     onClearOption: () -> Unit = {},
+    onWordUpdate: (VocabularyImpl, Context) -> Unit,
     onWordDelete: (VocabularyImpl) -> Unit = {}
 ) {
     Box(
@@ -86,6 +87,7 @@ fun AllWordLoading(
                 onOptionWordClassClick = onOptionWordClassClick,
                 onSortStateClick = onSortStateClick,
                 onClearOption = onClearOption,
+                onWordUpdate = onWordUpdate,
                 onWordDelete = onWordDelete
             )
         }
@@ -103,6 +105,7 @@ fun AllWordContent(
     onOptionWordClassClick: (String) -> Unit,
     onSortStateClick: (SortState) -> Unit,
     onClearOption: () -> Unit,
+    onWordUpdate: (VocabularyImpl, Context) -> Unit,
     onWordDelete: (VocabularyImpl) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -156,6 +159,7 @@ fun AllWordContent(
                 )
                 AllWordItems(
                     words = data.currentWordState,
+                    onWordUpdate = onWordUpdate,
                     onWordDelete = onWordDelete
                 )
             }
@@ -418,10 +422,12 @@ fun SortStateChip(
 @Composable
 fun AllWordItems(
     words: List<VocabularyImpl>,
+    onWordUpdate: (VocabularyImpl, Context) -> Unit,
     onWordDelete: (VocabularyImpl) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
+    val context = LocalContext.current
     Box {
         LazyColumn(
             state = listState,
@@ -431,10 +437,16 @@ fun AllWordItems(
                 key = { it.id }
             ) { word ->
                 WordContent(word) {
+                    IconButton(onClick = { onWordUpdate(word, context) }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Edit,
+                            contentDescription = "단어 ${word.eng}를 수정합니다."
+                        )
+                    }
                     IconButton(onClick = { onWordDelete(word) }) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
-                            contentDescription = "단어를 삭제합니다."
+                            contentDescription = "단어 ${word.eng}를 삭제합니다."
                         )
                     }
                 }
@@ -486,6 +498,7 @@ fun AllWordContentsPreview() {
             },
             onSortStateClick = {},
             onClearOption = {},
+            onWordUpdate = { _, _ -> },
             onWordDelete = {})
     }
 }
@@ -494,7 +507,11 @@ fun AllWordContentsPreview() {
 @Composable
 fun AllWordItemsPreview() {
     MyVocaTheme {
-        AllWordItems(words = fakeData, onWordDelete = {})
+        AllWordItems(
+            words = fakeData,
+            onWordUpdate = { _, _ -> },
+            onWordDelete = {}
+        )
     }
 }
 
