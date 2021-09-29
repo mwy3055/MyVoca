@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import hsk.practice.myvoca.data.MeaningImpl
+import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.ui.components.InsetAwareTopAppBar
 import hsk.practice.myvoca.ui.components.StaggeredGrid
@@ -32,6 +33,7 @@ import hsk.practice.myvoca.ui.theme.MyVocaTheme
 fun AddWordScreen(
     modifier: Modifier = Modifier,
     viewModel: AddWordViewModel,
+    updateWord: VocabularyImpl? = null,
     onClose: () -> Unit = {}
 ) {
     val systemBarColor = MaterialTheme.colors.primaryVariant
@@ -42,6 +44,10 @@ fun AddWordScreen(
         )
     }
 
+    LaunchedEffect(key1 = true) {
+        if (updateWord != null) viewModel.injectUpdateWord(updateWord)
+    }
+
     val data by viewModel.addWordScreenData.collectAsState()
 
     val scaffoldState = rememberScaffoldState()
@@ -50,6 +56,7 @@ fun AddWordScreen(
         modifier = modifier,
         topBar = {
             AddWordTopBar(
+                screenType = data.screenType,
                 addButtonEnabled = data.canStoreWord,
                 onAddWord = viewModel::onAddWord,
                 onClose = onClose
@@ -72,6 +79,7 @@ fun AddWordScreen(
 
 @Composable
 private fun AddWordTopBar(
+    screenType: ScreenType,
     addButtonEnabled: Boolean,
     onAddWord: () -> Unit,
     onClose: () -> Unit
@@ -80,16 +88,21 @@ private fun AddWordTopBar(
         targetValue = if (addButtonEnabled) Color.White else Color.White.copy(alpha = 0.6f)
     )
 
+    val title = when (screenType) {
+        AddWord -> "단어 추가"
+        UpdateWord -> "단어 수정"
+    }
+
     val focusManager = LocalFocusManager.current
     InsetAwareTopAppBar(
         title = {
-            Text(text = "단어 추가")
+            Text(text = title)
         },
         navigationIcon = {
             IconButton(onClick = onClose) {
                 Icon(
                     imageVector = Icons.Outlined.Close,
-                    contentDescription = "단어 추가 화면을 닫습니다."
+                    contentDescription = "$title 화면을 닫습니다."
                 )
             }
         },

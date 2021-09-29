@@ -17,12 +17,28 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddWordViewModel @Inject constructor(
-    @LocalVocaPersistence private val vocaPersistence: VocaPersistence
+    @LocalVocaPersistence private val vocaPersistence: VocaPersistence,
 ) : ViewModel() {
 
     private val _addWordScreenData = MutableStateFlow(AddWordScreenData())
     val addWordScreenData: StateFlow<AddWordScreenData>
         get() = _addWordScreenData
+
+    /**
+     * 단어 수정 화면이라면 [injectUpdateWord] 함수를 이용하여 [currentVocabulary]를 초기화해야 한다.
+     * 주의! [currentVocabulary]는 단 한 번만 초기화되어야 한다.
+     */
+    private var currentVocabulary: VocabularyImpl? = null
+
+    fun injectUpdateWord(word: VocabularyImpl) {
+        currentVocabulary = word
+        _addWordScreenData.value = addWordScreenData.value.copy(
+            screenType = UpdateWord,
+            word = word.eng,
+            meanings = word.meaning,
+            memo = word.memo ?: ""
+        )
+    }
 
     /* Event Listeners for UI */
     fun onWordUpdate(newWord: String) {
@@ -35,11 +51,18 @@ class AddWordViewModel @Inject constructor(
                 addWordScreenData.value.copy(wordExistStatus = WordExistStatus.WORD_EMPTY)
             return
         }
-        _addWordScreenData.value = addWordScreenData.value.copy(wordExistStatus = WordExistStatus.LOADING)
+        _addWordScreenData.value =
+            addWordScreenData.value.copy(wordExistStatus = WordExistStatus.LOADING)
         val query = VocabularyQuery(word = newWord)
         val result = vocaPersistence.getVocabulary(query)
-        val exists =
-            if (result.any { it.eng == newWord }) WordExistStatus.DUPLICATE else WordExistStatus.NOT_EXISTS
+        val exists = if (currentVocabulary != null && newWord == currentVocabulary!!.eng) {
+            WordExistStatus.NOT_EXISTS
+        } else if (result.any { it.eng == newWord }) {
+            WordExistStatus.DUPLICATE
+        } else {
+            WordExistStatus.NOT_EXISTS
+        }
+
         _addWordScreenData.value = addWordScreenData.value.copy(wordExistStatus = exists)
     }
 
@@ -73,13 +96,28 @@ class AddWordViewModel @Inject constructor(
     }
 
     fun onAddWord() {
-        val word = addWordScreenData.value.toVocabularyImpl()
-        viewModelScope.launch {
-            vocaPersistence.insertVocabulary(listOf(word.toVocabulary()))
+        if (currentVocabulary != null) {
+            // 수정
+            val updatedWord =
+                addWordScreenData.value.toVocabularyImpl().copy(id = currentVocabulary!!.id)
+            viewModelScope.launch {
+                vocaPersistence.updateVocabulary(listOf(updatedWord).map { it.toVocabulary() })
+            }
+        } else {
+            // 추가
+            val newWord = addWordScreenData.value.toVocabularyImpl()
+            viewModelScope.launch {
+                vocaPersistence.insertVocabulary(listOf(newWord).map { it.toVocabulary() })
+            }
         }
     }
 
 }
+
+sealed class ScreenType
+
+object AddWord : ScreenType()
+object UpdateWord : ScreenType()
 
 enum class WordExistStatus {
     NOT_EXISTS,
@@ -89,6 +127,7 @@ enum class WordExistStatus {
 }
 
 data class AddWordScreenData(
+    val screenType: ScreenType = AddWord,
     val word: String = "",
     val wordExistStatus: WordExistStatus = WordExistStatus.WORD_EMPTY,
     val meanings: List<MeaningImpl> = emptyList(),

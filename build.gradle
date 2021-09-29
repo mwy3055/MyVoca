@@ -9,7 +9,7 @@ buildscript {
         hilt_version = '2.38.1'
         datastore_version = '1.0.0'
         compose_version = '1.0.2'
-        accompanist_version = '0.17.0'
+        accompanist_version = '0.18.0'
         paging_version = '2.1.2'
         work_version = '2.6.0'
     }

@@ -103,19 +103,16 @@ fun HomeTodayWords(
     onRefreshTodayWord: () -> Unit,
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
 ) {
-    // TODO: animate content change (by clicking checkbox...)
+    HomeTodayWordHeader(
+        lastUpdatedTime = lastUpdatedTime,
+        showTodayWordHelp = showTodayWordHelp,
+        enableRefresh = enableRefresh,
+        onRefreshTodayWord = onRefreshTodayWord
+    )
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        item {
-            HomeTodayWordHeader(
-                lastUpdatedTime = lastUpdatedTime,
-                showTodayWordHelp = showTodayWordHelp,
-                enableRefresh = enableRefresh,
-                onRefreshTodayWord = onRefreshTodayWord
-            )
-        }
         if (todayWords.isEmpty()) {
             item {
                 HomeTodayWordEmpty()
