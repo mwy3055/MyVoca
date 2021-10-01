@@ -9,6 +9,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import kotlin.math.abs
 
 
 /**
@@ -136,3 +137,11 @@ fun getSecondsLeft(): Long {
     Logger.d("time: $time")
     return 60 * 60 * 24L - time.toSecondOfDay()
 }
+
+
+/**
+ * Floating point equal comparison.
+ * Uses [IBM formula](https://www.ibm.com/developerworks/java/library/j-jtp0114/#N10255), which is more robust
+ * because taking a ratio of 2 numbers **cancels** out the effect of their scale relative to delta.
+ */
+fun Float.equalsDelta(other: Float) = abs(this / other - 1) < 1e-5
