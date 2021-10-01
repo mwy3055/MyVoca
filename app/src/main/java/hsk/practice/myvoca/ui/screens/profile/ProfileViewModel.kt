@@ -18,6 +18,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import hsk.practice.myvoca.firebase.MyFirebaseAuth
 import hsk.practice.myvoca.firebase.MyFirestore
 import hsk.practice.myvoca.firebase.UserImpl
+import hsk.practice.myvoca.util.equalsDelta
 import hsk.practice.myvoca.work.FirestoreUploadWordsWork
 import hsk.practice.myvoca.work.setFirestoreDownloadWork
 import hsk.practice.myvoca.work.setFirestoreUploadWork
@@ -222,7 +223,7 @@ data class UploadFeatureData(
     val uploading: Boolean
         get() = uploadProgress != null
     val finished: Boolean
-        get() = if (uploadProgress == null) false else uploadProgress >= 1f
+        get() = uploadProgress?.equalsDelta(1f) ?: false
 }
 
 data class DownloadFeatureData(
