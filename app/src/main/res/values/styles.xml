@@ -12,36 +12,15 @@
         <item name="colorOnSecondary">@color/secondaryTextColor</item>
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
     <style name="AppTheme.ActionBar" parent="Widget.MaterialComponents.Toolbar.PrimarySurface" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
     <style name="SplashTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
 
-    <style name="SearchViewTheme" parent="Widget.AppCompat.SearchView.ActionBar">
-        <item name="layout">@layout/toolbar_search_view</item>
-        <item name="commitIcon">@drawable/ic_search_commit</item>
-        <item name="colorControlNormal">@color/black_800</item>
-        <item name="colorControlHighlight">@color/black_50</item>
-        <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
-        <item name="suggestionRowLayout">@layout/search_view_suggestion_row</item>
-        <item name="android:maxWidth">9999dp</item>
-    </style>
-
     <style name="AutoCompleteTextViewStyle" parent="Widget.AppCompat.Light.AutoCompleteTextView">
         <item name="android:popupBackground">@drawable/search_suggestions_background</item>
         <item name="android:popupElevation">0dp</item>
-    </style>
-
-    <style name="SearchToolbarTheme" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
-        <item name="searchViewStyle">@style/SearchViewTheme</item>
     </style>
 
     <style name="SpinnerDivideStyle" parent="android:style/Widget.ListView.DropDown">
@@ -63,18 +42,6 @@
 
     <style name="LargeTextViewStyle">
         <item name="android:textSize">22sp</item>
-    </style>
-
-    <style name="QuizTextStyle">
-        <item name="android:textSize">40sp</item>
-        <item name="fontFamily">@font/maplestory_bold</item>
-    </style>
-
-    <style name="QuizOptionStyle">
-        <item name="android:textSize">25sp</item>
-        <item name="android:gravity">center</item>
-        <!--        <item name="android:autoSizeTextType">uniform</item>-->
-        <item name="fontFamily">@font/maplestory_light</item>
     </style>
 
 </resources>

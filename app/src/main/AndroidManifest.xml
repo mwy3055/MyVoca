@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="hsk.practice.myvoca">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -16,76 +17,26 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.activity.SplashActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/SplashTheme">
+            android:name=".ui.screens.addword.AddWordActivity"
+            android:exported="true"
+            android:label="@string/title_activity_add_word"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.structure.MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".ui.settings.SettingsActivity"
-            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
-
-        <activity
-            android:name=".ui.activity.MainActivity"
-            android:excludeFromRecents="true"
-            android:label="@string/app_name"
-            android:launchMode="singleInstance"
-            android:taskAffinity=""
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
-
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".ui.activity.AddVocaActivity"
-            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
-
-        <activity
-            android:name=".ui.activity.EditVocaActivity"
-            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
-
-        <activity android:name=".widget.WidgetActivity">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-            </intent-filter>
-        </activity>
-
-        <service
-            android:name=".services.notification.ShowNotificationService"
-            android:enabled="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <service android:name=".services.notification.RestartService" />
-
-        <receiver android:name=".services.notification.AlarmReceiver" />
-
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
-
-        <!-- widgets -->
-        <receiver
-            android:name=".widget.VocaWidgetProvider"
-            android:label="단어 위젯">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_provider_info" />
-        </receiver>
-
-
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove" />
     </application>
 
 </manifest>

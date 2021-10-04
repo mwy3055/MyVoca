@@ -1,0 +1,96 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 4,
+    "identityHash": "4641d7f92868cf3e64c59d00df271e99",
+    "entities": [
+      {
+        "tableName": "RoomVocabulary",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eng` TEXT NOT NULL, `kor` TEXT, `add_time` INTEGER NOT NULL, `last_update` INTEGER NOT NULL, `memo` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eng",
+            "columnName": "eng",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kor",
+            "columnName": "kor",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "addedTime",
+            "columnName": "add_time",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastEditedTime",
+            "columnName": "last_update",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memo",
+            "columnName": "memo",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "TodayWords",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`today_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `vocabulary_id` INTEGER NOT NULL, `checked` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "todayWordId",
+            "columnName": "today_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vocabularyId",
+            "columnName": "vocabulary_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "checked",
+            "columnName": "checked",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "today_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4641d7f92868cf3e64c59d00df271e99')"
+    ]
+  }
+}
