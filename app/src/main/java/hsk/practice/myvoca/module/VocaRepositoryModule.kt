@@ -1,12 +1,12 @@
 package hsk.practice.myvoca.module
 
-import com.hsk.data.VocaPersistence
-import com.hsk.data.VocaRepository
+import com.hsk.domain.VocaPersistence
+import com.hsk.domain.VocaRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import hsk.practice.myvoca.framework.FakeVocaPersistence
+import hsk.practice.myvoca.room.persistence.FakeVocaPersistence
 import javax.inject.Qualifier
 
 /**
@@ -29,7 +29,7 @@ object VocaRepositoryModule {
     @RoomVocaRepository
     @Provides
     fun provideRoomVocaRepository(
-        @RoomVocaPersistence vocaPersistence: VocaPersistence
+        @LocalVocaPersistence vocaPersistence: VocaPersistence
     ): VocaRepository = VocaRepository(vocaPersistence)
 
     @FakeVocaRepository
