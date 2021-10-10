@@ -10,6 +10,8 @@ import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.room.vocabulary.toVocabulary
+import hsk.practice.myvoca.room.vocabulary.toVocabularyImpl
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -30,14 +32,19 @@ class AddWordViewModel @Inject constructor(
      */
     private var currentVocabulary: VocabularyImpl? = null
 
-    fun injectUpdateWord(word: VocabularyImpl) {
-        currentVocabulary = word
-        _addWordScreenData.value = addWordScreenData.value.copy(
-            screenType = UpdateWord,
-            word = word.eng,
-            meanings = word.meaning,
-            memo = word.memo ?: ""
-        )
+    fun injectUpdateWord(wordId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val word = vocaPersistence.getVocabularyById(wordId)?.toVocabularyImpl()
+            if (word != null) {
+                currentVocabulary = word
+                _addWordScreenData.value = addWordScreenData.value.copy(
+                    screenType = UpdateWord,
+                    word = word.eng,
+                    meanings = word.meaning,
+                    memo = word.memo ?: ""
+                )
+            }
+        }
     }
 
     /* Event Listeners for UI */
