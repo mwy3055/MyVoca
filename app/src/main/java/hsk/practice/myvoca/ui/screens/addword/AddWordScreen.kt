@@ -23,7 +23,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import hsk.practice.myvoca.data.MeaningImpl
-import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.ui.components.InsetAwareTopAppBar
 import hsk.practice.myvoca.ui.components.StaggeredGrid
@@ -33,7 +32,7 @@ import hsk.practice.myvoca.ui.theme.MyVocaTheme
 fun AddWordScreen(
     modifier: Modifier = Modifier,
     viewModel: AddWordViewModel,
-    updateWord: VocabularyImpl? = null,
+    updateWordId: Int,
     onClose: () -> Unit = {}
 ) {
     val systemBarColor = MaterialTheme.colors.primaryVariant
@@ -45,7 +44,7 @@ fun AddWordScreen(
     }
 
     LaunchedEffect(key1 = true) {
-        if (updateWord != null) viewModel.injectUpdateWord(updateWord)
+        if (updateWordId != -1) viewModel.injectUpdateWord(updateWordId)
     }
 
     val data by viewModel.addWordScreenData.collectAsState()

@@ -8,19 +8,18 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.imePadding
 import dagger.hilt.android.AndroidEntryPoint
-import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 
 @AndroidEntryPoint
 class AddWordActivity : ComponentActivity() {
 
     companion object {
-        const val UPDATE_DATA = "update_data"
+        const val updateWordId = "update_data"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val updateWord = intent.getSerializableExtra(UPDATE_DATA) as VocabularyImpl?
+        val wordId = intent.getIntExtra(updateWordId, -1)
         setContent {
             MyVocaTheme {
                 AddWordScreen(
@@ -28,7 +27,7 @@ class AddWordActivity : ComponentActivity() {
                         .fillMaxSize()
                         .imePadding(),
                     viewModel = hiltViewModel(),
-                    updateWord = updateWord,
+                    updateWordId = wordId,
                     onClose = { finish() }
                 )
             }
