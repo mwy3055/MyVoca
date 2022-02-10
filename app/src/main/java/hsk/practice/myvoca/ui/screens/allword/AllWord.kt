@@ -4,10 +4,16 @@ import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -418,7 +424,7 @@ fun SortStateChip(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AllWordItems(
     words: List<VocabularyImpl>,
@@ -433,10 +439,19 @@ fun AllWordItems(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(items = words,
+            items(
+                items = words,
                 key = { it.id }
             ) { word ->
-                WordContent(word) {
+                WordContent(
+                    modifier = Modifier.animateItemPlacement(
+                        tween(
+                            durationMillis = 1500,
+                            easing = CubicBezierEasing(0.7f, 0.1f, 0.3f, 0.9f)
+                        )
+                    ),
+                    word = word
+                ) {
                     IconButton(onClick = { onWordUpdate(word, context) }) {
                         Icon(
                             imageVector = Icons.Outlined.Edit,
