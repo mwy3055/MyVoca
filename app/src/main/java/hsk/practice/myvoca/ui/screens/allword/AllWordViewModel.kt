@@ -112,7 +112,7 @@ class AllWordViewModel @Inject constructor(
             val currentSortState = data.sortState
             if (sortState != currentSortState) {
                 _allWordUiState.copyData(sortState = sortState)
-                notifyRefresh()
+//                notifyRefresh()
             }
         }
     }
