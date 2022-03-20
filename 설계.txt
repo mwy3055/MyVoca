@@ -1,7 +1,0 @@
-DB
-
-eng : PRIMARY KEY, varchar(50) - 단어
-kor : varchar(50) - 품사, 뜻 (여러개 가질 수 있음)
-added_time : integer - 추가한 날짜 (apoch time)
-last_edited_time : integer - 마지막으로 수정한 날짜 (apoch time)
-memo : varchar(100) - 메모

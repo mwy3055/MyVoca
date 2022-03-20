@@ -38,10 +38,8 @@ android {
         compose true
     }
     packagingOptions {
-        exclude 'META-INF/AL2.0'
-        exclude 'META-INF/LGPL2.1'
         resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += ['/META-INF/{AL2.0,LGPL2.1}', 'META-INF/AL2.0', 'META-INF/LGPL2.1']
         }
     }
     compileOptions {
@@ -55,19 +53,19 @@ android {
                 '-Xopt-in=kotlin.RequiresOptIn'
         ]
     }
-    lintOptions {
-        abortOnError false
-    }
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
+    }
+    lint {
+        abortOnError false
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
@@ -85,18 +83,18 @@ dependencies {
     implementation "androidx.compose.material:material-icons-core:$compose_version"
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
     // Integration with activities
-    implementation 'androidx.activity:activity-compose:1.3.1'
+    implementation 'androidx.activity:activity-compose:1.4.0'
     // Integration with ViewModels
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0-rc01'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-alpha01'
     // Integration with observables
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
     implementation "androidx.compose.runtime:runtime-rxjava2:$compose_version"
     // Integration with Hilt
-    implementation "androidx.hilt:hilt-navigation-compose:1.0.0-alpha03"
+    implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
     // UI Tests
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     // Integration with Paging
-    implementation "androidx.paging:paging-compose:1.0.0-alpha13"
+    implementation "androidx.paging:paging-compose:1.0.0-alpha14"
 
     // Accompanist
     implementation "com.google.accompanist:accompanist-placeholder-material:$accompanist_version"
@@ -109,24 +107,24 @@ dependencies {
     implementation 'io.coil-kt:coil-compose:1.3.2'
 
     // KTX libraries
-    implementation 'androidx.core:core-ktx:1.6.0'
-    implementation "androidx.fragment:fragment-ktx:1.3.6"
-    implementation 'androidx.collection:collection-ktx:1.1.0'
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation "androidx.fragment:fragment-ktx:1.4.1"
+    implementation 'androidx.collection:collection-ktx:1.2.0'
     implementation "androidx.palette:palette-ktx:1.0.0"
 
-    implementation 'androidx.paging:paging-runtime-ktx:3.0.1'
+    implementation 'androidx.paging:paging-runtime-ktx:3.1.0'
 
-    implementation "androidx.navigation:navigation-runtime-ktx:2.3.5"
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
-    implementation 'androidx.navigation:navigation-compose:2.4.0-alpha10'
+    implementation "androidx.navigation:navigation-runtime-ktx:2.4.0"
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.4.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.4.0'
+    implementation 'androidx.navigation:navigation-compose:2.5.0-alpha01'
 
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2-native-mt'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.2-native-mt'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-native-mt'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0-native-mt'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0-native-mt'
 
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
@@ -138,7 +136,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:2.3.1"
+    implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:2.4.0"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_extension_version"
     // alternately - if using Java8, use the following instead of lifecycle-compiler
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
@@ -152,10 +150,10 @@ dependencies {
     androidTestImplementation "androidx.work:work-testing:$work_version"
 
     // Preference dependency
-    implementation "androidx.preference:preference-ktx:1.1.1"
+    implementation "androidx.preference:preference-ktx:1.2.0"
 
     // Google Play Services
-    implementation 'com.google.android.gms:play-services-auth:19.2.0'
+    implementation 'com.google.android.gms:play-services-auth:20.1.0'
 
     // Firebase
     implementation platform('com.google.firebase:firebase-bom:28.4.0')
@@ -189,7 +187,7 @@ dependencies {
     kapt "com.github.livefront.sealed-enum:processor:0.3.0"
 
     // Gson
-    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'com.google.code.gson:gson:2.8.9'
 
     implementation project(':data')
     implementation project(':domain')

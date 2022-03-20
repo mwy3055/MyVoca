@@ -1,0 +1,3 @@
+1. develop에서 각 issue당 branch 만들기
+2. issue를 해결한 후 develop에 PR & merge (Bitrise에서 beta-version으로 build됨)
+3. 버전을 출시할 때 master에 PR & merge (Bitrise에서 release로 build됨)

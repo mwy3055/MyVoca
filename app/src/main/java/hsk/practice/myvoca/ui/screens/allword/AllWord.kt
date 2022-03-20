@@ -1,13 +1,18 @@
 package hsk.practice.myvoca.ui.screens.allword
 
 import android.content.Context
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animateColorAsState
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.animation.*
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -290,9 +296,9 @@ fun AllWordQueryButtons(
 
 @Composable
 fun AllWordQueryWord(
-    focusManager: FocusManager = LocalFocusManager.current,
     text: String,
-    onTextChanged: (String) -> Unit
+    onTextChanged: (String) -> Unit,
+    focusManager: FocusManager = LocalFocusManager.current
 ) {
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
@@ -308,10 +314,11 @@ fun AllWordQueryWord(
                 }
             }
         },
+        textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colors.onBackground),
         singleLine = true,
         onValueChange = onTextChanged,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
+        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
     )
 }
 
@@ -345,8 +352,8 @@ fun WordClassChip(
     selected: Boolean,
     onClick: (String) -> Unit,
 ) {
-    val background by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.surface)
-    val textColor by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.onPrimary else MaterialTheme.colors.primary)
+    val background by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.surface else MaterialTheme.colors.surface)
+    val textColor by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface)
 
     Row(
         modifier = Modifier
@@ -359,7 +366,7 @@ fun WordClassChip(
             Icon(
                 imageVector = Icons.Filled.Check,
                 contentDescription = null,
-                tint = contentColorFor(backgroundColor = MaterialTheme.colors.primary)
+                tint = textColor
             )
         }
         Text(
@@ -401,7 +408,7 @@ fun SortStateChip(
     onClick: (SortState) -> Unit
 ) {
     val background by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.surface)
-    val textColor by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.onPrimary else MaterialTheme.colors.primary)
+    val textColor by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onSurface)
 
     Box(
         modifier = modifier
@@ -418,7 +425,7 @@ fun SortStateChip(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AllWordItems(
     words: List<VocabularyImpl>,
@@ -431,12 +438,22 @@ fun AllWordItems(
     Box {
         LazyColumn(
             state = listState,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.background(color = MaterialTheme.colors.background)
         ) {
-            items(items = words,
+            items(
+                items = words,
                 key = { it.id }
             ) { word ->
-                WordContent(word) {
+                WordContent(
+                    modifier = Modifier.animateItemPlacement(
+                        tween(
+                            durationMillis = 1500,
+                            easing = CubicBezierEasing(0.7f, 0.1f, 0.3f, 0.9f)
+                        )
+                    ),
+                    word = word
+                ) {
                     IconButton(onClick = { onWordUpdate(word, context) }) {
                         Icon(
                             imageVector = Icons.Outlined.Edit,
@@ -454,13 +471,21 @@ fun AllWordItems(
         }
 
         val showButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 } }
-        if (showButton) {
+        val density = LocalDensity.current
+        AnimatedVisibility(
+            visible = showButton,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            enter = fadeIn() + slideInVertically { with(density) { -40.dp.roundToPx() } },
+            exit = fadeOut() + slideOutVertically { with(density) { -40.dp.roundToPx() } },
+        ) {
             IconButton(
                 onClick = { coroutineScope.launch { listState.animateScrollToItem(0) } },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-                    .background(color = MaterialTheme.colors.secondary, shape = CircleShape)
+                modifier = Modifier.background(
+                    color = MaterialTheme.colors.secondary,
+                    shape = CircleShape
+                )
             ) {
                 Icon(
                     imageVector = Icons.Outlined.ArrowUpward,
@@ -518,6 +543,39 @@ fun AllWordItemsPreview() {
 @Preview
 @Composable
 fun AllWordQueryOptionsPreview() {
+    var word = "test text"
+    val wordClassSet = mutableSetOf<WordClass>()
+
+    MyVocaTheme {
+        AllWordQueryOptions(
+            modifier = Modifier
+                .background(MaterialTheme.colors.surface)
+                .padding(8.dp),
+            query = VocabularyQuery(
+                word = word,
+                wordClass = wordClassSet
+            ),
+            sortState = SortState.Alphabet,
+            onSubmitButtonClicked = {},
+            onCloseButtonClicked = {},
+            onQueryWordChanged = { word = it },
+            onSortStateClick = {},
+            onOptionWordClassClick = { wordClassName ->
+                val wordClass = WordClassImpl.findByKorean(wordClassName)?.toWordClass()
+                    ?: return@AllWordQueryOptions
+                if (wordClassSet.contains(wordClass)) {
+                    wordClassSet.remove(wordClass)
+                } else {
+                    wordClassSet.add(wordClass)
+                }
+            }
+        )
+    }
+}
+
+@Preview(uiMode = UI_MODE_NIGHT_YES)
+@Composable
+fun AllWordQueryOptionsDarkPreview() {
     var word = "test text"
     val wordClassSet = mutableSetOf<WordClass>()
 

@@ -31,10 +31,12 @@ import hsk.practice.myvoca.util.toTimeString
 @Composable
 fun WordContent(
     word: VocabularyImpl,
+    modifier: Modifier = Modifier,
     iconContent: @Composable RowScope.() -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
     WordContent(
+        modifier = modifier,
         word = word,
         expanded = expanded,
         onExpanded = { expanded = !it },
@@ -45,6 +47,7 @@ fun WordContent(
 @Composable
 fun WordContent(
     word: VocabularyImpl,
+    modifier: Modifier = Modifier,
     showExpandButton: Boolean = true,
     expanded: Boolean,
     onExpanded: (Boolean) -> Unit,
@@ -52,7 +55,7 @@ fun WordContent(
 ) {
     val padding = 8.dp
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(color = MaterialTheme.colors.surface)
             .padding(padding),
