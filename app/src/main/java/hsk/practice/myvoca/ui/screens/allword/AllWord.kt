@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -295,9 +296,9 @@ fun AllWordQueryButtons(
 
 @Composable
 fun AllWordQueryWord(
-    focusManager: FocusManager = LocalFocusManager.current,
     text: String,
-    onTextChanged: (String) -> Unit
+    onTextChanged: (String) -> Unit,
+    focusManager: FocusManager = LocalFocusManager.current
 ) {
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
@@ -470,7 +471,15 @@ fun AllWordItems(
         }
 
         val showButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 } }
-        if (showButton) {
+        val density = LocalDensity.current
+        AnimatedVisibility(
+            visible = showButton,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            enter = fadeIn() + slideInVertically { with(density) { -40.dp.roundToPx() } },
+            exit = fadeOut() + slideOutVertically { with(density) { -40.dp.roundToPx() } },
+        ) {
             IconButton(
                 onClick = { coroutineScope.launch { listState.animateScrollToItem(0) } },
                 modifier = Modifier.background(
