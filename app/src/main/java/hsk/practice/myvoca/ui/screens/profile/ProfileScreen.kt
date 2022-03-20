@@ -106,22 +106,27 @@ private fun ProfileImage(
     imageUrl: Uri?
 ) {
     val imageSize = 150
-    val imagePainter = if (imageUrl == null) {
-        rememberVectorPainter(image = Icons.Outlined.HelpOutline)
+    val modifierWithSize = modifier.size(imageSize.dp)
+    if (imageUrl == null) {
+        Icon(
+            modifier = modifierWithSize,
+            painter = rememberVectorPainter(image = Icons.Outlined.HelpOutline),
+            contentDescription = "아직 로그인되지 않았습니다.",
+            tint = MaterialTheme.colors.onBackground,
+        )
     } else {
-        rememberImagePainter(
-            data = imageUrl,
-            builder = {
-                size(imageSize)
-                transformations(CircleCropTransformation())
-            }
+        Image(
+            modifier = modifierWithSize,
+            painter = rememberImagePainter(
+                data = imageUrl,
+                builder = {
+                    size(imageSize)
+                    transformations(CircleCropTransformation())
+                }
+            ),
+            contentDescription = "프로필 이미지",
         )
     }
-    Image(
-        modifier = modifier.size(imageSize.dp),
-        painter = imagePainter,
-        contentDescription = "프로필 이미지",
-    )
 }
 
 @Composable
@@ -201,7 +206,7 @@ private fun ProfileFeatureUploadWords(
 ) {
     val alpha by animateFloatAsState(targetValue = if (enabled) 1f else 0.5f)
     val color by animateColorAsState(
-        targetValue = if (data.finished) Color.Green else if (data.uploading) MaterialTheme.colors.primary else Color.Black
+        targetValue = if (data.finished) Color.Green else if (data.uploading) MaterialTheme.colors.primary else MaterialTheme.colors.onBackground
     )
     val feature = data.featureData
     Column(

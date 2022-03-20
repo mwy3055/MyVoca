@@ -1,9 +1,8 @@
 package hsk.practice.myvoca.ui.screens.allword
 
 import android.content.Context
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animateColorAsState
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.animation.*
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -314,10 +313,11 @@ fun AllWordQueryWord(
                 }
             }
         },
+        textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colors.onBackground),
         singleLine = true,
         onValueChange = onTextChanged,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
+        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
     )
 }
 
@@ -351,8 +351,8 @@ fun WordClassChip(
     selected: Boolean,
     onClick: (String) -> Unit,
 ) {
-    val background by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.surface)
-    val textColor by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.onPrimary else MaterialTheme.colors.primary)
+    val background by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.surface else MaterialTheme.colors.surface)
+    val textColor by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface)
 
     Row(
         modifier = Modifier
@@ -365,7 +365,7 @@ fun WordClassChip(
             Icon(
                 imageVector = Icons.Filled.Check,
                 contentDescription = null,
-                tint = contentColorFor(backgroundColor = MaterialTheme.colors.primary)
+                tint = textColor
             )
         }
         Text(
@@ -407,7 +407,7 @@ fun SortStateChip(
     onClick: (SortState) -> Unit
 ) {
     val background by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.surface)
-    val textColor by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.onPrimary else MaterialTheme.colors.primary)
+    val textColor by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onSurface)
 
     Box(
         modifier = modifier
@@ -437,7 +437,8 @@ fun AllWordItems(
     Box {
         LazyColumn(
             state = listState,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.background(color = MaterialTheme.colors.background)
         ) {
             items(
                 items = words,
@@ -472,10 +473,10 @@ fun AllWordItems(
         if (showButton) {
             IconButton(
                 onClick = { coroutineScope.launch { listState.animateScrollToItem(0) } },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-                    .background(color = MaterialTheme.colors.secondary, shape = CircleShape)
+                modifier = Modifier.background(
+                    color = MaterialTheme.colors.secondary,
+                    shape = CircleShape
+                )
             ) {
                 Icon(
                     imageVector = Icons.Outlined.ArrowUpward,
@@ -533,6 +534,39 @@ fun AllWordItemsPreview() {
 @Preview
 @Composable
 fun AllWordQueryOptionsPreview() {
+    var word = "test text"
+    val wordClassSet = mutableSetOf<WordClass>()
+
+    MyVocaTheme {
+        AllWordQueryOptions(
+            modifier = Modifier
+                .background(MaterialTheme.colors.surface)
+                .padding(8.dp),
+            query = VocabularyQuery(
+                word = word,
+                wordClass = wordClassSet
+            ),
+            sortState = SortState.Alphabet,
+            onSubmitButtonClicked = {},
+            onCloseButtonClicked = {},
+            onQueryWordChanged = { word = it },
+            onSortStateClick = {},
+            onOptionWordClassClick = { wordClassName ->
+                val wordClass = WordClassImpl.findByKorean(wordClassName)?.toWordClass()
+                    ?: return@AllWordQueryOptions
+                if (wordClassSet.contains(wordClass)) {
+                    wordClassSet.remove(wordClass)
+                } else {
+                    wordClassSet.add(wordClass)
+                }
+            }
+        )
+    }
+}
+
+@Preview(uiMode = UI_MODE_NIGHT_YES)
+@Composable
+fun AllWordQueryOptionsDarkPreview() {
     var word = "test text"
     val wordClassSet = mutableSetOf<WordClass>()
 

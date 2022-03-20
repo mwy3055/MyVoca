@@ -64,14 +64,6 @@ private fun SplashScreen(navController: NavHostController) {
         navController.navigate(MyVocaAppName)
     }
 
-//    val titleSize by animateFloatAsState(
-//        targetValue = 3f,
-//        animationSpec = spring(
-//            dampingRatio = Spring.DampingRatioLowBouncy,
-//            stiffness = Spring.StiffnessMedium
-//        )
-//    )
-
     SplashBackground()
     Column(
         modifier = Modifier
@@ -82,11 +74,13 @@ private fun SplashScreen(navController: NavHostController) {
     ) {
         Text(
             text = "나만의 단어장",
-            style = MaterialTheme.typography.h4
+            style = MaterialTheme.typography.h4,
+            color = MaterialTheme.colors.onBackground
         )
         Text(
             text = "MyVoca",
-            style = MaterialTheme.typography.h4
+            style = MaterialTheme.typography.h4,
+            color = MaterialTheme.colors.onBackground
         )
     }
 }
