@@ -2,7 +2,7 @@ package hsk.practice.myvoca.data
 
 import com.hsk.data.vocabulary.Meaning
 import com.hsk.data.vocabulary.WordClass
-import java.io.Serializable
+import hsk.practice.myvoca.util.removed
 
 data class VocabularyImpl(
     val id: Int = 0,
@@ -11,22 +11,23 @@ data class VocabularyImpl(
     val addedTime: Long = 0L,
     val lastEditedTime: Long = 0L,
     val memo: String? = ""
-) : Serializable {
+) {
+    val answerString: String
+        get() = "$eng: ${meaning.joinToString("; ") { it.content }}"
 
     companion object {
-        val nullVocabulary: VocabularyImpl
-            get() = VocabularyImpl(
-                id = 0,
-                eng = "null",
-                meaning = emptyList(),
-                addedTime = System.currentTimeMillis(),
-                lastEditedTime = System.currentTimeMillis(),
-                memo = ""
-            )
+        val nullVocabulary = VocabularyImpl(
+            id = 0,
+            eng = "null",
+            meaning = emptyList(),
+            addedTime = System.currentTimeMillis(),
+            lastEditedTime = System.currentTimeMillis(),
+            memo = ""
+        )
     }
 }
 
-val fakeData = (1..20).map { index ->
+val fakeData: List<VocabularyImpl> = (1..20).map { index ->
     val currentTime = System.currentTimeMillis()
     VocabularyImpl(
         id = index,
@@ -43,13 +44,10 @@ val fakeData = (1..20).map { index ->
     )
 }
 
-val VocabularyImpl.answerString: String
-    get() = "$eng: ${meaning.joinToString("; ") { it.content }}"
-
 data class MeaningImpl(
     val type: WordClassImpl = WordClassImpl.UNKNOWN,
     val content: String = ""
-) : Serializable
+)
 
 enum class WordClassImpl(val korean: String) {
     NOUN("명사"),
@@ -65,26 +63,20 @@ enum class WordClassImpl(val korean: String) {
     companion object {
         fun findByKorean(korean: String) = values().find { it.korean == korean }
 
-        fun actualValues(): List<WordClassImpl> = values().filter { it != UNKNOWN }
+        fun actualValues(): List<WordClassImpl> = values().removed(UNKNOWN)
     }
 }
 
-/**
- * Application object to data layer object
- */
-fun MeaningImpl.toMeaning(): Meaning = Meaning(
+fun MeaningImpl.toMeaning() = Meaning(
     type = type.toWordClass(),
     content = content
 )
 
-fun WordClassImpl.toWordClass(): WordClass = WordClass.valueOf(name)
-
-/**
- * Data layer object to application object
- */
-fun Meaning.toMeaningImpl(): MeaningImpl = MeaningImpl(
+fun Meaning.toMeaningImpl() = MeaningImpl(
     type = type.toWordClassImpl(),
     content = content
 )
 
-fun WordClass.toWordClassImpl(): WordClassImpl = WordClassImpl.valueOf(name)
+fun WordClassImpl.toWordClass() = WordClass.valueOf(name)
+
+fun WordClass.toWordClassImpl() = WordClassImpl.valueOf(name)

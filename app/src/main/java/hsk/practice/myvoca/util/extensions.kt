@@ -30,6 +30,7 @@ fun String?.containsOnlyAlphabet(): Boolean {
     return all { it in 'a'..'z' || it in 'A'..'Z' || it == '%' }
 }
 
+fun <T> Array<T>.removed(value: T) = this.filter { it != value }
 
 /**
  * Returns a time-formatted string by the given timestamp.

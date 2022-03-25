@@ -10,10 +10,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImplList
-import hsk.practice.myvoca.util.MyVocaPreferences
+import hsk.practice.myvoca.util.MyVocaPreferencesKey
 import hsk.practice.myvoca.util.PreferencesDataStore
 import hsk.practice.myvoca.util.randoms
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -38,8 +40,8 @@ class QuizViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 vocaPersistence.getAllVocabulary(),
-                preferences.getPreferencesFlow(MyVocaPreferences.quizCorrectKey, 0),
-                preferences.getPreferencesFlow(MyVocaPreferences.quizWrongKey, 0),
+                preferences.getPreferenceFlow(MyVocaPreferencesKey.quizCorrectKey, 0),
+                preferences.getPreferenceFlow(MyVocaPreferencesKey.quizWrongKey, 0),
                 resultDataFlow
             ) { allVocabulary, correct, wrong, quizResultData ->
                 // Check if quiz data should be reloaded
@@ -117,11 +119,11 @@ class QuizViewModel @Inject constructor(
 
             val currentStat = quizScreenData.value.quizData.quizStat
             val (key, value) = if (resultData.result is QuizCorrect) {
-                Pair(MyVocaPreferences.quizCorrectKey, currentStat.correct + 1)
+                Pair(MyVocaPreferencesKey.quizCorrectKey, currentStat.correct + 1)
             } else {
-                Pair(MyVocaPreferences.quizWrongKey, currentStat.wrong + 1)
+                Pair(MyVocaPreferencesKey.quizWrongKey, currentStat.wrong + 1)
             }
-            preferences.setPreferences(key, value)
+            preferences.setPreference(key, value)
         }
     }
 

@@ -34,6 +34,7 @@ fun Vocabulary.toVocabularyImpl() = VocabularyImpl(
     id, eng, meaning.map { it.toMeaningImpl() }, addedTime, lastEditedTime, memo
 )
 
+@JvmName("toRoomVocabularyListVocabulary")
 fun List<Vocabulary>.toRoomVocabularyList() = this.map { it.toRoomVocabulary() }
 
 fun List<Vocabulary>.toRoomVocabularyMutableList() = this.toRoomVocabularyList().toMutableList()
@@ -61,6 +62,8 @@ fun List<RoomVocabulary>.toVocabularyList() = this.map { it.toVocabulary() }
 fun List<RoomVocabulary>.vocabularyImplList() = this.map { it.toVocabularyImpl() }
 
 fun Array<out RoomVocabulary>.toVocabularyArray() = this.map { it.toVocabulary() }.toTypedArray()
+
+fun List<VocabularyImpl>.toRoomVocabularyList() = this.map { it.toRoomVocabulary() }
 
 
 /* Convert VocabularyImpl to other types */

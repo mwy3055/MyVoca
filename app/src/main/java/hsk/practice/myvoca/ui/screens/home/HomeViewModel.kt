@@ -17,14 +17,13 @@ import hsk.practice.myvoca.data.toTodayWordImpl
 import hsk.practice.myvoca.module.LocalTodayWordPersistence
 import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImpl
-import hsk.practice.myvoca.util.MyVocaPreferences
+import hsk.practice.myvoca.util.MyVocaPreferencesKey
 import hsk.practice.myvoca.util.PreferencesDataStore
 import hsk.practice.myvoca.work.setOneTimeTodayWordWork
 import hsk.practice.myvoca.work.setPeriodicTodayWordWork
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -56,8 +55,8 @@ class HomeViewModel @Inject constructor(
                 vocaPersistence.getVocabularySize(),
                 todayWordPersistence.loadTodayWords(),
                 todayWordPersistence.loadActualTodayWords(),
-                dataStore.getPreferencesFlow(
-                    MyVocaPreferences.todayWordLastUpdatedKey,
+                dataStore.getPreferenceFlow(
+                    MyVocaPreferencesKey.todayWordLastUpdatedKey,
                     LocalDateTime.MIN.toEpochSecond(ZoneOffset.UTC)
                 )
             ) { size, todayWords, actualTodayWords, lastUpdated ->
