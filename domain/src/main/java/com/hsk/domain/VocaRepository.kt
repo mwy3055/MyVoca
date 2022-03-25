@@ -13,12 +13,15 @@ import kotlin.coroutines.CoroutineContext
 class VocaRepository(private val vocaPersistence: VocaPersistence) : CoroutineScope {
 
     private val job = Job()
-
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.Default
 
     fun getAllVocabulary(): StateFlow<List<Vocabulary>> {
         return vocaPersistence.getAllVocabulary()
+    }
+
+    suspend fun getAllVocabularyFirstValue(): List<Vocabulary> {
+        return getAllVocabulary().first()
     }
 
     suspend fun getVocabularyById(id: Int): Vocabulary? {
@@ -31,7 +34,8 @@ class VocaRepository(private val vocaPersistence: VocaPersistence) : CoroutineSc
 
     suspend fun getRandomVocabulary(): Vocabulary {
         return try {
-            getAllVocabulary().first().shuffled().first()
+            val firstAllVocabulary = getAllVocabularyFirstValue()
+            firstAllVocabulary.random()
         } catch (e: NoSuchElementException) {
             nullVocabulary
         }
