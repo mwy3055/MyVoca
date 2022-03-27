@@ -25,16 +25,15 @@ import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
 /**
- * ``Today's word`` Persistence service by Room.
  * Implemented as [Singleton] to keep the data persistence across the whole app.
  */
 @Singleton
-class TodayWordDatabase @Inject constructor(@ApplicationContext context: Context) :
+class TodayWordPersistenceRoom @Inject constructor(@ApplicationContext context: Context) :
     TodayWordPersistence, CoroutineScope {
 
     @EntryPoint
     @InstallIn(SingletonComponent::class)
-    interface TodayWordDatabaseEntryPoint {
+    interface TodayWordRoomPersistenceEntryPoint {
         fun vocaDao(): VocaDao
         fun todayWordDao(): TodayWordDao
     }
@@ -54,13 +53,21 @@ class TodayWordDatabase @Inject constructor(@ApplicationContext context: Context
 
     private fun loadEntryPoint(context: Context) {
         synchronized(this) {
-            val entryPoint = EntryPointAccessors.fromApplication(
-                context,
-                TodayWordDatabaseEntryPoint::class.java
-            )
-            vocaDao = entryPoint.vocaDao()
-            todayWordDao = entryPoint.todayWordDao()
+            val entryPoint = getTodayWordRoomEntryPoint(context)
+            assignDao(entryPoint)
         }
+    }
+
+    private fun getTodayWordRoomEntryPoint(context: Context): TodayWordRoomPersistenceEntryPoint {
+        return EntryPointAccessors.fromApplication(
+            context,
+            TodayWordRoomPersistenceEntryPoint::class.java
+        )
+    }
+
+    private fun assignDao(persistenceEntryPoint: TodayWordRoomPersistenceEntryPoint) {
+        vocaDao = persistenceEntryPoint.vocaDao()
+        todayWordDao = persistenceEntryPoint.todayWordDao()
     }
 
     override fun loadTodayWords(): Flow<List<TodayWord>> =

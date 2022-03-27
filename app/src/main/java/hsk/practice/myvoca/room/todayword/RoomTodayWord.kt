@@ -16,3 +16,5 @@ data class RoomTodayWord(
     val vocabularyId: Int,
     val checked: Boolean
 )
+
+// TODO: RoomTodayWord -> TodayWordRoomEntity?
