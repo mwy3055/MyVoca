@@ -5,17 +5,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.io.Serializable
 
-/**
- * SQL Entity Object of Vocabulary.
- * Serializable? To pass the word, the object should be put into the intent.
- *
- * Fields
- * @eng: Primary key. English word.
- * @kor: Korean meaning of the word.
- * @add_time: Time when the word was added.
- * @last_update: Time the word was last modified.
- * @memo: Memo for the word.
- */
 @Entity
 data class RoomVocabulary(
     @kotlin.jvm.JvmField @PrimaryKey(autoGenerate = true) var id: Int,
