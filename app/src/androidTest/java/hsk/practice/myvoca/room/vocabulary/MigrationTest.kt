@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.room
+package hsk.practice.myvoca.room.vocabulary
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
@@ -10,7 +10,8 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import hsk.practice.myvoca.room.vocabulary.RoomVocabulary
+import hsk.practice.myvoca.room.RoomMigrations
+import hsk.practice.myvoca.room.RoomVocaDatabase
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals

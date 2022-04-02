@@ -1,8 +1,8 @@
 package hsk.practice.myvoca
 
-import com.hsk.data.vocabulary.VocabularyQuery
-import com.hsk.data.vocabulary.WordClass
-import com.hsk.data.vocabulary.matchesWithQuery
+import com.hsk.data.VocabularyQuery
+import com.hsk.data.WordClass
+import com.hsk.data.matchesWithQuery
 import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.room.vocabulary.toVocabulary
 import org.junit.Assert.assertEquals
