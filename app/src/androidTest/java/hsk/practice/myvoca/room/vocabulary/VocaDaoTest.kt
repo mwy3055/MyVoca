@@ -46,7 +46,7 @@ class VocaDaoTest {
     fun insertAndGet() = runBlocking {
         val voca = vocaList[0]
         vocaDao.insertVocabulary(voca)
-        val insertedVoca = vocaDao.loadVocabularyByEng("dtd")[0]
+        val insertedVoca = vocaDao.loadVocabularyByEng(voca.eng)[0]
         assertEquals(voca, insertedVoca)
     }
 
