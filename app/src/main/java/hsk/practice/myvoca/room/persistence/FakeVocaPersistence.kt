@@ -1,7 +1,8 @@
 package hsk.practice.myvoca.room.persistence
 
-import com.hsk.data.vocabulary.*
+import com.hsk.data.*
 import com.hsk.domain.VocaPersistence
+import com.hsk.domain.VocaPersistenceException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -34,7 +35,7 @@ class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScop
         return try {
             data.first { it.id == id }
         } catch (e: NoSuchElementException) {
-            nullVocabulary
+            throw VocaPersistenceException("id $id doesn't exist")
         }
     }
 
@@ -48,7 +49,21 @@ class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScop
     }
 
     override suspend fun updateVocabulary(vocabularies: List<Vocabulary>) {
-        // Don't have to be implemented
+        vocabularies.forEach { vocabulary -> updateVocabulary(vocabulary) }
+    }
+
+    private fun updateVocabulary(vocabulary: Vocabulary) {
+        val index = findVocabularyIndex(vocabulary.id)
+        data[index] = vocabulary
+    }
+
+    private fun findVocabularyIndex(id: Int): Int {
+        val index = data.indexOfFirst { vocabulary -> vocabulary.id == id }
+        if (index == -1) {
+            throw VocaPersistenceException("id $id doesn't exist")
+        } else {
+            return index
+        }
     }
 
     override suspend fun deleteVocabulary(vocabularies: List<Vocabulary>) {
