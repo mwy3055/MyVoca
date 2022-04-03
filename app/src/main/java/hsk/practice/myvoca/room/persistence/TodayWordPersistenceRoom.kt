@@ -1,9 +1,8 @@
 package hsk.practice.myvoca.room.persistence
 
 import android.content.Context
-import androidx.work.WorkManager
 import com.hsk.data.TodayWord
-import com.hsk.data.vocabulary.Vocabulary
+import com.hsk.data.Vocabulary
 import com.hsk.domain.TodayWordPersistence
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -37,8 +36,6 @@ class TodayWordPersistenceRoom @Inject constructor(@ApplicationContext context: 
         fun vocaDao(): VocaDao
         fun todayWordDao(): TodayWordDao
     }
-
-    private val workManager = WorkManager.getInstance(context)
 
     private val job = Job()
     override val coroutineContext: CoroutineContext
@@ -78,11 +75,11 @@ class TodayWordPersistenceRoom @Inject constructor(@ApplicationContext context: 
     override fun loadActualTodayWords(): Flow<List<Vocabulary>> =
         vocaDao.getTodayWords().distinctUntilChanged().map { it.toVocabularyList() }
 
-    override suspend fun storeTodayWord(todayWord: TodayWord) {
+    override suspend fun insertTodayWord(todayWord: TodayWord) {
         todayWordDao.insertTodayWord(todayWord.toRoomTodayWord())
     }
 
-    override suspend fun storeTodayWords(todayWords: List<TodayWord>) {
+    override suspend fun insertTodayWords(todayWords: List<TodayWord>) {
         todayWordDao.insertTodayWord(todayWords.map { it.toRoomTodayWord() })
     }
 
