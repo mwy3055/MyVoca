@@ -9,6 +9,8 @@ import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.room.RoomVocaDatabase
+import hsk.practice.myvoca.room.TestAfterClear
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -18,8 +20,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
-class VocaDaoTest {
+class VocaDaoTest : TestAfterClear {
 
     private lateinit var vocaDao: VocaDao
     private lateinit var database: RoomVocaDatabase
@@ -43,7 +46,7 @@ class VocaDaoTest {
 
     @Test
     @Throws(Exception::class)
-    fun insertAndGet() = runBlocking {
+    fun insertAndGet() = testAfterClear {
         val voca = vocaList[0]
         vocaDao.insertVocabulary(voca)
         val insertedVoca = vocaDao.loadVocabularyByEng(voca.eng)[0]
@@ -52,7 +55,7 @@ class VocaDaoTest {
 
     @Test
     @Throws(Exception::class)
-    fun insertManyAndGet() = runBlocking {
+    fun insertManyAndGet() = testAfterClear {
         vocaDao.insertVocabulary(vocaList)
         val allVocabulary = vocaDao.loadAllVocabulary().first().sortedBy { it.id }
         for ((v1, v2) in vocaList.zip(allVocabulary)) {
@@ -61,7 +64,7 @@ class VocaDaoTest {
     }
 
     @Test
-    fun checkIfKeyGenerated(): Unit = runBlocking {
+    fun checkIfKeyGenerated(): Unit = testAfterClear {
         val test = vocaList[0].copy(
             id = 0
         )
@@ -72,7 +75,7 @@ class VocaDaoTest {
     }
 
     @Test
-    fun checkIdQuery() = runBlocking {
+    fun checkIdQuery() = testAfterClear {
         val voca = vocaList[0]
         vocaDao.insertVocabulary(voca)
         val testVoca = vocaDao.loadVocabularyById(1)
@@ -80,7 +83,7 @@ class VocaDaoTest {
     }
 
     @Test
-    fun checkMeaningStored() = runBlocking {
+    fun checkMeaningStored() = testAfterClear {
         val currentTime = System.currentTimeMillis()
         val testDataImpl: List<VocabularyImpl> = (1..10).map { value ->
             VocabularyImpl(
@@ -99,4 +102,20 @@ class VocaDaoTest {
             assertEquals(pair.first, pair.second)
         }
     }
+
+    @Test
+    fun testIfDatabaseIsEmpty() = testAfterClear {
+        val allVocabularyFlow = vocaDao.loadAllVocabulary()
+        val actual = allVocabularyFlow.first()
+        val expected = emptyList<RoomVocabulary>()
+        assertEquals(expected, actual)
+    }
+
+    override fun clear() = runBlocking {
+        val allVoca = getAllVocabularyFirst()
+        vocaDao.deleteVocabulary(allVoca)
+    }
+
+
+    private suspend fun getAllVocabularyFirst() = vocaDao.loadAllVocabulary().first()
 }
