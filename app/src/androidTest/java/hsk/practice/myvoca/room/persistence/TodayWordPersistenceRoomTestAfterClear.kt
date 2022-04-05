@@ -16,13 +16,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
 class TodayWordPersistenceRoomTestAfterClear : TestAfterClear {
 
     @get:Rule
-    var hiltRule = HiltAndroidRule(this)
+    val hiltRule = HiltAndroidRule(this)
 
     @Inject
     lateinit var persistence: TodayWordPersistenceRoom
