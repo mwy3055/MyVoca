@@ -69,4 +69,8 @@ class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScop
     override suspend fun deleteVocabulary(vocabularies: List<Vocabulary>) {
         data.removeAll(vocabularies)
     }
+
+    override suspend fun clearVocabulary() {
+        data.clear()
+    }
 }

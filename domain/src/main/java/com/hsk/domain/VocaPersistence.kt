@@ -21,4 +21,6 @@ interface VocaPersistence {
 
     suspend fun deleteVocabulary(vocabularies: List<Vocabulary>)
 
+    suspend fun clearVocabulary()
+
 }

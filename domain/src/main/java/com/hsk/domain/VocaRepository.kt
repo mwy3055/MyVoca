@@ -53,4 +53,8 @@ class VocaRepository(private val vocaPersistence: VocaPersistence) : CoroutineSc
         vocaPersistence.deleteVocabulary(vocabularies)
     }
 
+    suspend fun clearVocabulary() {
+        vocaPersistence.clearVocabulary()
+    }
+
 }
