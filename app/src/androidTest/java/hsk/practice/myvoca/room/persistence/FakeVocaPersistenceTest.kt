@@ -4,6 +4,7 @@ import com.hsk.data.Meaning
 import com.hsk.data.Vocabulary
 import com.hsk.data.VocabularyQuery
 import com.hsk.data.WordClass
+import com.hsk.domain.VocaPersistenceException
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import hsk.practice.myvoca.room.TestAfterClear
@@ -37,7 +38,6 @@ class FakeVocaPersistenceTest : TestAfterClear {
     @Test
     fun testVocabularyIsInserted() = testAfterClear {
         val expected = getExampleVoca()
-//        val persistence = getPersistence()
         persistence.insertVocabulary(listOf(expected))
         val actual = persistence.getVocabularyById(expected.id)
         assertEquals(expected, actual)
@@ -45,15 +45,43 @@ class FakeVocaPersistenceTest : TestAfterClear {
 
     @Test
     fun testVocabulariesIsInserted() = testAfterClear {
-        val expected = (3..10).map {
-            getExampleVoca(id = it)
-        }
+        val expected = getExampleVocabularies()
         persistence.insertVocabulary(expected)
         val actual = getFirstAllVocabulary()
         assertEquals(expected, actual)
     }
 
+    @Test
+    fun testVocabularySizeIsCorrect() = testAfterClear {
+        val vocabularies = getExampleVocabularies()
+        persistence.insertVocabulary(vocabularies)
+
+        val expected = vocabularies.size
+        val actual = persistence.getVocabularySize().first()
+        assertEquals(expected, actual)
+    }
+
     private suspend fun getFirstAllVocabulary() = persistence.getAllVocabulary().first()
+
+    @Test
+    fun testTryToFindVocabularyNotExists() = testAfterClear {
+        val voca = getExampleVoca()
+        try {
+            persistence.getVocabularyById(voca.id)
+        } catch (e: VocaPersistenceException) {
+            assertEquals("id 3 doesn't exist", e.message)
+        }
+    }
+
+    @Test
+    fun testTryToUpdateVocabularyNotExists() = testAfterClear {
+        val voca = getExampleVoca()
+        try {
+            persistence.updateVocabulary(listOf(voca))
+        } catch (e: VocaPersistenceException) {
+            assertEquals("id 3 doesn't exist", e.message)
+        }
+    }
 
     @Test
     fun testVocabularyQuery_notExists() = testAfterClear {
@@ -113,6 +141,10 @@ class FakeVocaPersistenceTest : TestAfterClear {
         meaning = meaning,
         memo = memo
     )
+
+    private fun getExampleVocabularies() = (3..10).map {
+        getExampleVoca(id = it)
+    }
 
     override fun clear() = runBlocking {
         val allVoca = persistence.getAllVocabulary().first()
