@@ -112,7 +112,7 @@ class AllWordViewModel @Inject constructor(
             val currentSortState = data.sortState
             if (sortState != currentSortState) {
                 _allWordUiState.copyData(sortState = sortState)
-                notifyRefresh()
+//                notifyRefresh()
             }
         }
     }
@@ -124,7 +124,7 @@ class AllWordViewModel @Inject constructor(
 
     fun onWordUpdate(word: VocabularyImpl, context: Context) {
         val intent = Intent(context, AddWordActivity::class.java).apply {
-            putExtra(AddWordActivity.UPDATE_DATA, word)
+            putExtra(AddWordActivity.updateWordId, word.id)
         }
         viewModelScope.launch {
             context.startActivity(intent)

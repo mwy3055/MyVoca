@@ -8,9 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette = darkColors(
-    primary = Color.Black,
-    primaryVariant = Color.DarkGray,
-    secondary = Color.LightGray
+    primary = Lavender3,
+    primaryVariant = Lavender5,
+    secondary = Shadow3,
+    secondaryVariant = Shadow6,
+    onPrimary = Color.White,
+    onSurface = Color.White,
+    onBackground = Color.White,
 )
 
 private val LightColorPalette = lightColors(
@@ -30,7 +34,7 @@ private val LightColorPalette = lightColors(
 )
 
 @Composable
-fun MyVocaTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
+fun MyVocaTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val colors = if (darkTheme) {
         DarkColorPalette
     } else {
