@@ -19,7 +19,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
-class TodayWordPersistenceRoomTestAfterClear : TestAfterClear {
+class TodayWordPersistenceRoomTest : TestAfterClear {
 
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
