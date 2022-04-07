@@ -5,9 +5,9 @@ import com.hsk.data.VocabularyQuery
 import com.hsk.domain.VocaPersistenceException
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import hsk.practice.myvoca.room.RoomAndroidTestUtils.getSampleVoca
+import hsk.practice.myvoca.room.RoomAndroidTestUtils.getSampleVocabularies
 import hsk.practice.myvoca.room.TestAfterClear
-import hsk.practice.myvoca.room.getSampleVoca
-import hsk.practice.myvoca.room.getSampleVocabularies
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.last

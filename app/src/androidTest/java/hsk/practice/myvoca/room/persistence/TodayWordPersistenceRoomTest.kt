@@ -4,9 +4,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hsk.data.TodayWord
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import hsk.practice.myvoca.room.RoomAndroidTestUtils.getSampleTodayWord
+import hsk.practice.myvoca.room.RoomAndroidTestUtils.getSampleTodayWords
 import hsk.practice.myvoca.room.TestAfterClear
-import hsk.practice.myvoca.room.getSampleTodayWord
-import hsk.practice.myvoca.room.getSampleTodayWords
 import hsk.practice.myvoca.room.todayword.RoomTodayWord
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
