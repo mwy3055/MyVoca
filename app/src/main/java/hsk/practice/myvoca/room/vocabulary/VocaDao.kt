@@ -73,6 +73,9 @@ interface VocaDao {
     @Query("SELECT * from RoomVocabulary WHERE kor LIKE :kor")
     suspend fun loadVocabularyByKor(kor: String?): List<RoomVocabulary>
 
+    @Query("DELETE from RoomVocabulary")
+    suspend fun clearVocabularies()
+
     /**
      * Loads total number of row in database.
      *
