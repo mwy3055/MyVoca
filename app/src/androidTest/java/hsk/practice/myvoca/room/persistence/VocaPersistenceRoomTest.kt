@@ -1,13 +1,13 @@
 package hsk.practice.myvoca.room.persistence
 
-import com.hsk.data.Meaning
 import com.hsk.data.Vocabulary
 import com.hsk.data.VocabularyQuery
-import com.hsk.data.WordClass
 import com.hsk.domain.VocaPersistenceException
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import hsk.practice.myvoca.room.TestAfterClear
+import hsk.practice.myvoca.room.getSampleVoca
+import hsk.practice.myvoca.room.getSampleVocabularies
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.last
@@ -39,7 +39,7 @@ class VocaPersistenceRoomTest : TestAfterClear {
 
     @Test
     fun testVocabularyIsInserted() = testAfterClear {
-        val expected = getExampleVoca()
+        val expected = getSampleVoca()
         persistence.insertVocabulary(listOf(expected))
 
         val actual = persistence.getVocabularyById(expected.id)
@@ -48,7 +48,7 @@ class VocaPersistenceRoomTest : TestAfterClear {
 
     @Test
     fun testVocabulariesIsInserted() = testAfterClear {
-        val expected = getExampleVocabularies()
+        val expected = getSampleVocabularies()
         persistence.insertVocabulary(expected)
 
         val actual = getSecondAllVocabulary()
@@ -59,7 +59,7 @@ class VocaPersistenceRoomTest : TestAfterClear {
 
     @Test
     fun testVocabularySizeIsCorrect() = testAfterClear {
-        val vocabularies = getExampleVocabularies()
+        val vocabularies = getSampleVocabularies()
         persistence.insertVocabulary(vocabularies)
 
         val expected = vocabularies.size
@@ -69,7 +69,7 @@ class VocaPersistenceRoomTest : TestAfterClear {
 
     @Test
     fun testTryToFindVocabularyNotExists() = testAfterClear {
-        val voca = getExampleVoca()
+        val voca = getSampleVoca()
 
         val actual = persistence.getVocabularyById(voca.id)
         assertEquals(null, actual)
@@ -77,7 +77,7 @@ class VocaPersistenceRoomTest : TestAfterClear {
 
     @Test
     fun testTryToUpdateVocabularyNotExists() = testAfterClear {
-        val voca = getExampleVoca()
+        val voca = getSampleVoca()
         try {
             persistence.updateVocabulary(listOf(voca))
         } catch (e: VocaPersistenceException) {
@@ -94,7 +94,7 @@ class VocaPersistenceRoomTest : TestAfterClear {
 
     @Test
     fun testVocabularyQuery_insertThenQuery() = testAfterClear {
-        val voca = getExampleVoca()
+        val voca = getSampleVoca()
         val expected = listOf(voca)
 
         persistence.insertVocabulary(expected)
@@ -106,7 +106,7 @@ class VocaPersistenceRoomTest : TestAfterClear {
 
     @Test
     fun testUpdateVocabulary() = testAfterClear {
-        val voca = getExampleVoca()
+        val voca = getSampleVoca()
         persistence.insertVocabulary(listOf(voca))
 
         val newVoca = voca.copy(eng = "android")
@@ -120,7 +120,7 @@ class VocaPersistenceRoomTest : TestAfterClear {
 
     @Test
     fun testDeleteVocabulary() = testAfterClear {
-        val voca = getExampleVoca()
+        val voca = getSampleVoca()
 
         persistence.insertVocabulary(listOf(voca))
         persistence.deleteVocabulary(listOf(voca))
@@ -130,22 +130,6 @@ class VocaPersistenceRoomTest : TestAfterClear {
 
         val expected = listOf<Vocabulary>()
         assertEquals(expected, actual)
-    }
-
-    private fun getExampleVoca(
-        id: Int = 3,
-        eng: String = "test",
-        meaning: List<Meaning> = listOf(Meaning(WordClass.NOUN, "테스트")),
-        memo: String = ""
-    ) = Vocabulary.create(
-        id = id,
-        eng = eng,
-        meaning = meaning,
-        memo = memo
-    )
-
-    private fun getExampleVocabularies() = (3..10).map {
-        getExampleVoca(id = it)
     }
 
     override fun clear() = runBlocking {

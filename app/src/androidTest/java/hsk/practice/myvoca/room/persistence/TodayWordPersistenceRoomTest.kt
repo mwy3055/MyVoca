@@ -5,6 +5,8 @@ import com.hsk.data.TodayWord
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import hsk.practice.myvoca.room.TestAfterClear
+import hsk.practice.myvoca.room.getSampleTodayWord
+import hsk.practice.myvoca.room.getSampleTodayWords
 import hsk.practice.myvoca.room.todayword.RoomTodayWord
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -41,7 +43,7 @@ class TodayWordPersistenceRoomTest : TestAfterClear {
 
     @Test
     fun testInsertTodayWord() = testAfterClear {
-        val voca = getExampleTodayWord()
+        val voca = getSampleTodayWord()
         persistence.insertTodayWord(voca)
 
         val actual = loadTodayWordsFlowFirst()
@@ -51,7 +53,7 @@ class TodayWordPersistenceRoomTest : TestAfterClear {
 
     @Test
     fun testInsertTodayWords() = testAfterClear {
-        val actual = getExampleTodayWords()
+        val actual = getSampleTodayWords()
         persistence.insertTodayWords(actual)
 
         val expected = loadTodayWordsFlowFirst()
@@ -60,7 +62,7 @@ class TodayWordPersistenceRoomTest : TestAfterClear {
 
     @Test
     fun testUpdateTodayWords() = testAfterClear {
-        val todayWords = getExampleTodayWords()
+        val todayWords = getSampleTodayWords()
         persistence.insertTodayWords(todayWords)
 
         val expected = todayWords.map { todayWord -> todayWord.copy(checked = true) }
@@ -72,7 +74,7 @@ class TodayWordPersistenceRoomTest : TestAfterClear {
 
     @Test
     fun testDeleteTodayWord() = testAfterClear {
-        val todayWord = getExampleTodayWord()
+        val todayWord = getSampleTodayWord()
         persistence.insertTodayWord(todayWord)
 
         persistence.deleteTodayWord(todayWord)
@@ -87,11 +89,5 @@ class TodayWordPersistenceRoomTest : TestAfterClear {
     }
 
     private suspend fun loadTodayWordsFlowFirst() = persistence.loadTodayWords().first()
-
-    private fun getExampleTodayWord() = getExampleTodayWords()[0]
-
-    private fun getExampleTodayWords() = (3..6).map { index ->
-        TodayWord(todayId = index, wordId = index, checked = false)
-    }
 
 }
