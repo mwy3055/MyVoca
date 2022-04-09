@@ -146,3 +146,11 @@ fun getSecondsLeft(): Long {
  * because taking a ratio of 2 numbers **cancels** out the effect of their scale relative to delta.
  */
 fun Float.equalsDelta(other: Float) = abs(this / other - 1) < 1e-5
+
+fun <T, R> Iterable<T>.zipForEach(other: Iterable<R>, block: (T, R) -> Unit) {
+    this.zip(other).forEach { (thisInstance, otherInstance) -> block(thisInstance, otherInstance) }
+}
+
+fun <T, R> Array<out T>.zipForEach(other: Array<out R>, block: (T, R) -> Unit) {
+    this.zip(other).forEach { (thisInstance, otherInstance) -> block(thisInstance, otherInstance) }
+}
