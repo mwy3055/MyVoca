@@ -11,6 +11,11 @@ jacoco {
     toolVersion = '0.8.7'
 }
 
+task {
+    useJUnitPlatform()
+    jacoco.includeNoLocationClassses = true
+}
+
 task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
 
     reports {
@@ -18,14 +23,14 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
     }
 
     def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
-    def debugTree = fileTree(dir: "${buildDir}/intermediates/javac/debug", excludes: fileFilter)
-    def mainSrc = "${project.projectDir}/src/main/java"
+    def debugTree = fileTree(dir: "$buildDir/tmp/kotlin-classes/debug", excludes: fileFilter)
+    def mainSrc = "$projectDir/src/main/java"
 
-    sourceDirectories.from = ([mainSrc])
+    sourceDirectories.from = files([mainSrc])
     classDirectories.from = files([debugTree])
-    executionData.from = fileTree(dir: "$buildDir", includes: [
-            "jacoco/testDebugUnitTest.exec",
-            "outputs/code-coverage/connected/*coverage.ec"
+    executionData.from = fileTree(dir: buildDir, includes: [
+            'outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec',
+            'outputs/code_coverage/debugAndroidTest/connected/Pixel_4_API_31(AVD) - 12/*.ec'
     ])
 }
 
@@ -54,16 +59,20 @@ android {
     }
     testOptions {
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        animationsDisabled true
         unitTests.all {
             jacoco {
-                includeNoLocationClasses = true
                 excludes = ['jdk.internal.*']
             }
         }
-        unitTests.returnDefaultValues = true
+        unitTests {
+            returnDefaultValues = true
+            includeAndroidResources = true
+        }
     }
     buildTypes {
         release {
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
@@ -71,7 +80,6 @@ android {
         }
     }
     buildFeatures {
-        dataBinding true
         compose true
     }
     packagingOptions {
@@ -108,6 +116,9 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestUtil 'androidx.test:orchestrator:1.4.1'
+
+    // For Unit test
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 
     // Compose
     implementation "androidx.compose.ui:ui:$compose_version"
@@ -164,11 +175,13 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1-native-mt'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1-native-mt'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1-native-mt'
+    androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1-native-mt'
 
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     testImplementation "androidx.room:room-testing:$room_version"
+    androidTestImplementation "androidx.room:room-testing:$room_version"
     androidTestImplementation "android.arch.persistence.room:testing:1.1.1"
 
     // lifecycles
@@ -211,11 +224,9 @@ dependencies {
 
     // Hilt testing dependency
     androidTestImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
-    kaptTest "com.google.dagger:hilt-android-compiler:$hilt_version"
-    // Make Hilt generate code in the androidTest folder
-    kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"
-    // Hilt with ViewModel
-    kapt 'androidx.hilt:hilt-compiler:1.0.0'
+    kaptAndroidTest "com.google.dagger:hilt-compiler:$hilt_version"
+    testImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
+    kaptTest "com.google.dagger:hilt-compiler:$hilt_version"
 
     // Color picker
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'

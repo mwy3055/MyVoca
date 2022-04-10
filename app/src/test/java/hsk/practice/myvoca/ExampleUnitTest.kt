@@ -1,6 +1,6 @@
 package hsk.practice.myvoca
 
-import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
@@ -11,6 +11,6 @@ import org.junit.Test
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        Assert.assertEquals(4, (2 + 2).toLong())
+        assertEquals(4, (2 + 2).toLong())
     }
 }
