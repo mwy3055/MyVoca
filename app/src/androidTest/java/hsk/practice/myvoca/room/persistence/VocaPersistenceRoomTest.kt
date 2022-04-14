@@ -7,12 +7,12 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import hsk.practice.myvoca.room.RoomAndroidTestUtils.getSampleVoca
 import hsk.practice.myvoca.room.RoomAndroidTestUtils.getSampleVocabularies
-import hsk.practice.myvoca.room.TestAfterClear
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -24,7 +24,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(JUnit4::class)
 @HiltAndroidTest
-class VocaPersistenceRoomTest : TestAfterClear {
+class VocaPersistenceRoomTest {
 
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
@@ -33,12 +33,13 @@ class VocaPersistenceRoomTest : TestAfterClear {
     lateinit var persistence: VocaPersistenceRoom
 
     @Before
-    fun initTest() {
+    fun initTest() = runBlocking {
         hiltRule.inject()
+        persistence.clearVocabulary()
     }
 
     @Test
-    fun testVocabularyIsInserted() = testAfterClear {
+    fun testVocabularyIsInserted() = runTest {
         val expected = getSampleVoca()
         persistence.insertVocabulary(listOf(expected))
 
@@ -47,7 +48,7 @@ class VocaPersistenceRoomTest : TestAfterClear {
     }
 
     @Test
-    fun testVocabulariesIsInserted() = testAfterClear {
+    fun testVocabulariesIsInserted() = runTest {
         val expected = getSampleVocabularies()
         persistence.insertVocabulary(expected)
 
@@ -58,7 +59,7 @@ class VocaPersistenceRoomTest : TestAfterClear {
     private suspend fun getSecondAllVocabulary() = persistence.getAllVocabulary().take(2).last()
 
     @Test
-    fun testVocabularySizeIsCorrect() = testAfterClear {
+    fun testVocabularySizeIsCorrect() = runTest {
         val vocabularies = getSampleVocabularies()
         persistence.insertVocabulary(vocabularies)
 
@@ -68,7 +69,7 @@ class VocaPersistenceRoomTest : TestAfterClear {
     }
 
     @Test
-    fun testTryToFindVocabularyNotExists() = testAfterClear {
+    fun testTryToFindVocabularyNotExists() = runTest {
         val voca = getSampleVoca()
 
         val actual = persistence.getVocabularyById(voca.id)
@@ -76,7 +77,7 @@ class VocaPersistenceRoomTest : TestAfterClear {
     }
 
     @Test
-    fun testTryToUpdateVocabularyNotExists() = testAfterClear {
+    fun testTryToUpdateVocabularyNotExists() = runTest {
         val voca = getSampleVoca()
         try {
             persistence.updateVocabulary(listOf(voca))
@@ -86,14 +87,14 @@ class VocaPersistenceRoomTest : TestAfterClear {
     }
 
     @Test
-    fun testVocabularyQuery_notExists() = testAfterClear {
+    fun testVocabularyQuery_notExists() = runTest {
         val expected = listOf<Vocabulary>()
         val actual = persistence.getVocabulary(VocabularyQuery(word = "empty"))
         assertEquals(expected, actual)
     }
 
     @Test
-    fun testVocabularyQuery_insertThenQuery() = testAfterClear {
+    fun testVocabularyQuery_insertThenQuery() = runTest {
         val voca = getSampleVoca()
         val expected = listOf(voca)
 
@@ -105,7 +106,7 @@ class VocaPersistenceRoomTest : TestAfterClear {
     }
 
     @Test
-    fun testUpdateVocabulary() = testAfterClear {
+    fun testUpdateVocabulary() = runTest {
         val voca = getSampleVoca()
         persistence.insertVocabulary(listOf(voca))
 
@@ -119,7 +120,7 @@ class VocaPersistenceRoomTest : TestAfterClear {
     }
 
     @Test
-    fun testDeleteVocabulary() = testAfterClear {
+    fun testDeleteVocabulary() = runTest {
         val voca = getSampleVoca()
 
         persistence.insertVocabulary(listOf(voca))
@@ -130,10 +131,6 @@ class VocaPersistenceRoomTest : TestAfterClear {
 
         val expected = listOf<Vocabulary>()
         assertEquals(expected, actual)
-    }
-
-    override fun clear() = runBlocking {
-        persistence.clearVocabulary()
     }
 
 }

@@ -6,11 +6,11 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import hsk.practice.myvoca.room.RoomAndroidTestUtils.getSampleTodayWord
 import hsk.practice.myvoca.room.RoomAndroidTestUtils.getSampleTodayWords
-import hsk.practice.myvoca.room.TestAfterClear
 import hsk.practice.myvoca.room.todayword.RoomTodayWord
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -21,7 +21,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
-class TodayWordPersistenceRoomTest : TestAfterClear {
+class TodayWordPersistenceRoomTest {
 
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
@@ -30,19 +30,20 @@ class TodayWordPersistenceRoomTest : TestAfterClear {
     lateinit var persistence: TodayWordPersistenceRoom
 
     @Before
-    fun initTest() {
+    fun initTest() = runBlocking {
         hiltRule.inject()
+        persistence.clearTodayWords()
     }
 
     @Test
-    fun testInitialTodayWordIsEmpty() = testAfterClear {
+    fun testInitialTodayWordIsEmpty() = runTest {
         val actual = persistence.loadTodayWords().first()
         val expected = emptyList<RoomTodayWord>()
         assertEquals(expected, actual)
     }
 
     @Test
-    fun testInsertTodayWord() = testAfterClear {
+    fun testInsertTodayWord() = runTest {
         val voca = getSampleTodayWord()
         persistence.insertTodayWord(voca)
 
@@ -52,7 +53,7 @@ class TodayWordPersistenceRoomTest : TestAfterClear {
     }
 
     @Test
-    fun testInsertTodayWords() = testAfterClear {
+    fun testInsertTodayWords() = runTest {
         val actual = getSampleTodayWords()
         persistence.insertTodayWords(actual)
 
@@ -61,7 +62,7 @@ class TodayWordPersistenceRoomTest : TestAfterClear {
     }
 
     @Test
-    fun testUpdateTodayWords() = testAfterClear {
+    fun testUpdateTodayWords() = runTest {
         val todayWords = getSampleTodayWords()
         persistence.insertTodayWords(todayWords)
 
@@ -73,7 +74,7 @@ class TodayWordPersistenceRoomTest : TestAfterClear {
     }
 
     @Test
-    fun testDeleteTodayWord() = testAfterClear {
+    fun testDeleteTodayWord() = runTest {
         val todayWord = getSampleTodayWord()
         persistence.insertTodayWord(todayWord)
 
@@ -82,10 +83,6 @@ class TodayWordPersistenceRoomTest : TestAfterClear {
         val expected = emptyList<TodayWord>()
         val actual = loadTodayWordsFlowFirst()
         assertEquals(expected, actual)
-    }
-
-    override fun clear() = runBlocking {
-        persistence.clearTodayWords()
     }
 
     private suspend fun loadTodayWordsFlowFirst() = persistence.loadTodayWords().first()
