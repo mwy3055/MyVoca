@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.room
+package hsk.practice.myvoca
 
 import com.hsk.data.Meaning
 import com.hsk.data.TodayWord
@@ -11,7 +11,7 @@ import hsk.practice.myvoca.room.todayword.RoomTodayWord
 import hsk.practice.myvoca.room.vocabulary.RoomVocabulary
 import hsk.practice.myvoca.room.vocabulary.toJson
 
-object RoomTestUtils {
+object TestSampleData {
     fun getSampleVoca(
         id: Int = 3,
         eng: String = "test",

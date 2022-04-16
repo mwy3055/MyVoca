@@ -1,7 +1,7 @@
 package hsk.practice.myvoca.room.todayword
 
-import hsk.practice.myvoca.room.RoomTestUtils.getSampleRoomTodayWord
-import hsk.practice.myvoca.room.RoomTestUtils.getSampleTodayWord
+import hsk.practice.myvoca.TestSampleData.getSampleRoomTodayWord
+import hsk.practice.myvoca.TestSampleData.getSampleTodayWord
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

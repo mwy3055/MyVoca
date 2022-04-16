@@ -1,11 +1,11 @@
 package hsk.practice.myvoca.room.vocabulary
 
 import com.hsk.data.Meaning
+import hsk.practice.myvoca.TestSampleData.getSampleRoomVocabularies
+import hsk.practice.myvoca.TestSampleData.getSampleVoca
+import hsk.practice.myvoca.TestSampleData.getSampleVocaImpls
+import hsk.practice.myvoca.TestSampleData.getSampleVocabularies
 import hsk.practice.myvoca.data.MeaningImpl
-import hsk.practice.myvoca.room.RoomTestUtils.getSampleRoomVocabularies
-import hsk.practice.myvoca.room.RoomTestUtils.getSampleVoca
-import hsk.practice.myvoca.room.RoomTestUtils.getSampleVocaImpls
-import hsk.practice.myvoca.room.RoomTestUtils.getSampleVocabularies
 import hsk.practice.myvoca.util.zipForEach
 import org.junit.Assert.assertEquals
 import org.junit.Test
