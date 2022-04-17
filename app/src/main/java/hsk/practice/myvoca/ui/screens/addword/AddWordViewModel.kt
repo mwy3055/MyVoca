@@ -119,6 +119,22 @@ class AddWordViewModel @Inject constructor(
         }
     }
 
+    private fun updateUiState(
+        screenType: ScreenType = uiStateFlow.value.screenType,
+        word: String = uiStateFlow.value.word,
+        wordExistStatus: WordExistStatus = uiStateFlow.value.wordExistStatus,
+        meanings: List<MeaningImpl> = uiStateFlow.value.meanings,
+        memo: String = uiStateFlow.value.memo
+    ) {
+        _uiStateFlow.value = AddWordScreenData(
+            screenType = screenType,
+            word = word,
+            wordExistStatus = wordExistStatus,
+            meanings = meanings,
+            memo = memo
+        )
+    }
+
 }
 
 sealed class ScreenType
