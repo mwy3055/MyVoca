@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.ui.screens.allword
+package hsk.practice.myvoca.ui.screens.addword
 
 import com.hsk.data.VocabularyQuery
 import com.hsk.domain.VocaPersistence
@@ -7,9 +7,6 @@ import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.data.toMeaning
 import hsk.practice.myvoca.room.persistence.FakeVocaPersistence
-import hsk.practice.myvoca.ui.screens.addword.AddWordScreenData
-import hsk.practice.myvoca.ui.screens.addword.AddWordViewModel
-import hsk.practice.myvoca.ui.screens.addword.WordExistStatus
 import hsk.practice.myvoca.util.zipForEach
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
