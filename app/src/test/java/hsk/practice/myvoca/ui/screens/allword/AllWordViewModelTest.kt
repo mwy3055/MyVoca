@@ -1,24 +1,28 @@
 package hsk.practice.myvoca.ui.screens.allword
 
 import com.hsk.domain.VocaPersistence
+import hsk.practice.myvoca.MainCoroutineRule
 import hsk.practice.myvoca.TestSampleData
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.data.toWordClass
 import hsk.practice.myvoca.room.persistence.FakeVocaPersistence
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImpl
 import hsk.practice.myvoca.ui.state.UiState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AllWordViewModelTest {
+
+    private val testDispatcher = StandardTestDispatcher()
+
+    @get:Rule
+    var mainCoroutineRule = MainCoroutineRule(testDispatcher)
 
     private val vocaPersistence: VocaPersistence = FakeVocaPersistence()
 
@@ -28,18 +32,16 @@ class AllWordViewModelTest {
     private val uiData: AllWordData
         get() = uiState.data!!
 
-    init {
-        Dispatchers.setMain(StandardTestDispatcher())
-    }
-
     @Before
-    fun initTest() = runBlocking {
+    fun initTest() = runTest {
         vocaPersistence.clearVocabulary()
-        viewModel = AllWordViewModel(vocaPersistence)
         vocaPersistence.insertVocabulary(TestSampleData.getSampleVocabularies())
-        delay(100)
+        viewModel = AllWordViewModel(
+            vocaPersistence,
+            computingDispatcher = testDispatcher,
+            ioDispatcher = testDispatcher
+        )
     }
-
 
     @Test
     fun onQueryTextChanged_EmptyToNotEmpty() {
@@ -118,12 +120,11 @@ class AllWordViewModelTest {
     }
 
     @Test
-    fun onWordDelete() = runBlocking {
+    fun onWordDelete() = runTest {
         val sampleWord = TestSampleData.getSampleVoca()
-        viewModel.onWordDelete(sampleWord.toVocabularyImpl())
-        delay(200)
+        viewModel.onWordDelete(sampleWord.toVocabularyImpl()).join()
 
-        assertNull(vocaPersistence.getVocabularyById(sampleWord.id))
+        assertFalse(uiData.currentWordState.contains(sampleWord.toVocabularyImpl()))
     }
 
 
