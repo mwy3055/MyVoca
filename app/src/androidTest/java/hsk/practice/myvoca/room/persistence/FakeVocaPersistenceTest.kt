@@ -33,8 +33,7 @@ class FakeVocaPersistenceTest {
     @Before
     fun initTest() = runBlocking {
         hiltRule.inject()
-        val allVoca = persistence.getAllVocabulary().first()
-        persistence.deleteVocabulary(allVoca)
+        persistence.clearVocabulary()
     }
 
     @Test
