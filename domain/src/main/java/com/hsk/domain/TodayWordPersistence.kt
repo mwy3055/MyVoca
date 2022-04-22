@@ -1,7 +1,7 @@
 package com.hsk.domain
 
 import com.hsk.data.TodayWord
-import com.hsk.data.vocabulary.Vocabulary
+import com.hsk.data.Vocabulary
 import kotlinx.coroutines.flow.Flow
 
 interface TodayWordPersistence {
