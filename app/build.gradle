@@ -127,6 +127,7 @@ dependencies {
 
     // For Unit test
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation "org.robolectric:robolectric:4.7"
 
     // Compose
     implementation "androidx.compose.ui:ui:$compose_version"
