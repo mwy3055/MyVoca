@@ -1,38 +1,34 @@
 package hsk.practice.myvoca.room.persistence
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hsk.data.Vocabulary
 import com.hsk.data.VocabularyQuery
+import com.hsk.domain.VocaPersistence
 import com.hsk.domain.VocaPersistenceException
-import dagger.hilt.android.testing.HiltAndroidRule
-import dagger.hilt.android.testing.HiltAndroidTest
-import hsk.practice.myvoca.room.RoomAndroidTestUtils.getSampleVoca
-import hsk.practice.myvoca.room.RoomAndroidTestUtils.getSampleVocabularies
+import hsk.practice.myvoca.MainCoroutineRule
+import hsk.practice.myvoca.TestSampleData.getSampleVoca
+import hsk.practice.myvoca.TestSampleData.getSampleVocabularies
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import javax.inject.Inject
+
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(AndroidJUnit4::class)
-@HiltAndroidTest
 class FakeVocaPersistenceTest {
 
-    @get:Rule
-    val hiltRule = HiltAndroidRule(this)
+    private val dispatcher = StandardTestDispatcher()
 
-    @Inject
-    lateinit var persistence: FakeVocaPersistence
+    @get:Rule
+    val hiltRule = MainCoroutineRule(dispatcher)
+
+    private val persistence: VocaPersistence = FakeVocaPersistence()
 
     @Before
-    fun initTest() = runBlocking {
-        hiltRule.inject()
+    fun initTest() = runTest {
         persistence.clearVocabulary()
     }
 

@@ -1,37 +1,33 @@
 package hsk.practice.myvoca.room.persistence
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hsk.data.TodayWord
-import dagger.hilt.android.testing.HiltAndroidRule
-import dagger.hilt.android.testing.HiltAndroidTest
-import hsk.practice.myvoca.room.RoomAndroidTestUtils.getSampleTodayWord
-import hsk.practice.myvoca.room.RoomAndroidTestUtils.getSampleTodayWords
+import com.hsk.domain.TodayWordPersistence
+import hsk.practice.myvoca.MainCoroutineRule
+import hsk.practice.myvoca.TestSampleData.getSampleTodayWord
+import hsk.practice.myvoca.TestSampleData.getSampleTodayWords
 import hsk.practice.myvoca.room.todayword.RoomTodayWord
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(AndroidJUnit4::class)
-@HiltAndroidTest
 class TodayWordPersistenceTest {
 
-    @get:Rule
-    val hiltRule = HiltAndroidRule(this)
+    private val dispatcher = StandardTestDispatcher()
 
-    @Inject
-    lateinit var persistence: FakeTodayWordPersistence
+    @get:Rule
+    val hiltRule = MainCoroutineRule(dispatcher)
+
+    // Any subclass of TodayWordPersistence
+    private val persistence: TodayWordPersistence = FakeTodayWordPersistence()
 
     @Before
-    fun initTest() = runBlocking {
-        hiltRule.inject()
+    fun initTest() = runTest {
         persistence.clearTodayWords()
     }
 
