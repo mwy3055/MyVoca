@@ -23,7 +23,7 @@ class FakeVocaPersistenceTest {
     private val dispatcher = StandardTestDispatcher()
 
     @get:Rule
-    val hiltRule = MainCoroutineRule(dispatcher)
+    val rule = MainCoroutineRule(dispatcher)
 
     private val persistence: VocaPersistence = FakeVocaPersistence()
 

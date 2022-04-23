@@ -21,7 +21,7 @@ class TodayWordPersistenceTest {
     private val dispatcher = StandardTestDispatcher()
 
     @get:Rule
-    val hiltRule = MainCoroutineRule(dispatcher)
+    val rule = MainCoroutineRule(dispatcher)
 
     // Any subclass of TodayWordPersistence
     private val persistence: TodayWordPersistence = FakeTodayWordPersistence()
