@@ -13,6 +13,7 @@ import hsk.practice.myvoca.data.toTodayWordImpl
 import hsk.practice.myvoca.room.persistence.FakeTodayWordPersistence
 import hsk.practice.myvoca.room.persistence.FakeVocaPersistence
 import hsk.practice.myvoca.util.PreferencesDataStore
+import hsk.practice.myvoca.withDelay
 import hsk.practice.myvoca.work.createTodayWordWorkerTag
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -90,12 +91,14 @@ class HomeViewModelTest {
     fun onTodayWordCheckboxChange_CheckPersistence() = runTest {
         val todayWord = TestSampleData.getSampleTodayWord()
         todayWordPersistence.insertTodayWord(todayWord)
-        viewModel.onTodayWordCheckboxChange(
-            HomeTodayWord(
-                todayWord.toTodayWordImpl(),
-                TestSampleData.getSampleVocaImpl()
+        withDelay(testDispatcher) {
+            viewModel.onTodayWordCheckboxChange(
+                HomeTodayWord(
+                    todayWord.toTodayWordImpl(),
+                    TestSampleData.getSampleVocaImpl()
+                )
             )
-        ).join()
+        }
 
         val todayWords = todayWordPersistence.loadTodayWords().first()
         val insertedTodayWord = todayWords.find { it.todayId == todayWord.todayId }
