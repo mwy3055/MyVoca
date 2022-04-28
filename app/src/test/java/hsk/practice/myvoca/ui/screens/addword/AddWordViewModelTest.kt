@@ -59,7 +59,7 @@ class AddWordViewModelTest {
     }
 
     private suspend fun injectUpdateWordThenDelay(wordId: Int) = delayAfter {
-        viewModel.injectUpdateWord(wordId)
+        viewModel.injectUpdateTarget(wordId)
     }
 
 
