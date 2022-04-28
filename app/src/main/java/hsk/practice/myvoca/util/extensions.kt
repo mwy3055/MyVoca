@@ -69,12 +69,11 @@ fun <T> Collection<T>.xor(element: T): Collection<T> {
 
 fun <T> Collection<T>.randoms(size: Int): List<T> {
     if (this.size <= size) return this.toList()
-    val elements = mutableSetOf<T>()
-    while (elements.size < size) {
-        val elem = this.random()
-        elements.add(elem)
+    val elements = mutableListOf<T>()
+    repeat(size) {
+        elements.add(this.random())
     }
-    return elements.toList()
+    return elements
 }
 
 /**
@@ -84,6 +83,7 @@ fun <T> Collection<T>.randoms(size: Int): List<T> {
  * @param size Maximum number of elements to include
  */
 fun <T> Collection<T>.truncate(size: Int): List<T> {
+    if (size < 0) throw IllegalArgumentException("Size must be non-negative")
     return if (this.size <= size) this.toList() else this.toList().subList(0, size)
 }
 
@@ -115,14 +115,16 @@ fun writeLogToFile(context: Context, filename: String, log: String) {
 }
 
 /**
- * Returns the string that best expresses the time difference from the given [time] to current.
+ * Returns the string that best expresses the time difference from the given [anotherTime] to current.
  *
- * @param time Some time before current.
+ * @param anotherTime Some time before current.
  */
-fun getTimeDiffString(time: Long): String {
-    if (time == LocalDateTime.MIN.toEpochSecond(ZoneOffset.UTC)) return "오래 전"
-    val currentEpoch = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-    return when (val diff = currentEpoch - time) {
+fun getTimeDiffString(
+    currentTime: Long = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+    anotherTime: Long
+): String {
+    if (anotherTime == LocalDateTime.MIN.toEpochSecond(ZoneOffset.UTC)) return "오래 전"
+    return when (val diff = anotherTime - currentTime) {
         in 0 until 60 -> "${diff}초 전"
         in 60 until 60 * 60 -> "${diff / 60}분 전"
         in 60 * 60 until 60 * 60 * 24 -> "${diff / (60 * 60)}시간 전"
@@ -133,10 +135,9 @@ fun getTimeDiffString(time: Long): String {
 /**
  * Calculates the remaining seconds of the day.
  */
-fun getSecondsLeft(): Long {
-    val time = LocalTime.now(ZoneId.systemDefault())
-    Logger.d("time: $time")
-    return 60 * 60 * 24L - time.toSecondOfDay()
+fun getSecondsLeft(current: LocalTime = LocalTime.now(ZoneId.systemDefault())): Long {
+    Logger.d("Current time: $current")
+    return 60 * 60 * 24L - current.toSecondOfDay()
 }
 
 
@@ -146,3 +147,11 @@ fun getSecondsLeft(): Long {
  * because taking a ratio of 2 numbers **cancels** out the effect of their scale relative to delta.
  */
 fun Float.equalsDelta(other: Float) = abs(this / other - 1) < 1e-5
+
+fun <T, R> Iterable<T>.zipForEach(other: Iterable<R>, block: (T, R) -> Unit) {
+    this.zip(other).forEach { (thisInstance, otherInstance) -> block(thisInstance, otherInstance) }
+}
+
+fun <T, R> Array<out T>.zipForEach(other: Array<out R>, block: (T, R) -> Unit) {
+    this.zip(other).forEach { (thisInstance, otherInstance) -> block(thisInstance, otherInstance) }
+}

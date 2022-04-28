@@ -89,6 +89,10 @@ class VocaPersistenceRoom @Inject constructor(@ApplicationContext context: Conte
         vocaDao.deleteVocabulary(vocabularies.toRoomVocabularyList())
     }
 
+    override suspend fun clearVocabulary() {
+        vocaDao.clearVocabularies()
+    }
+
     override suspend fun updateVocabulary(vocabularies: List<Vocabulary>) {
         vocaDao.updateVocabulary(vocabularies.toRoomVocabularyList())
     }

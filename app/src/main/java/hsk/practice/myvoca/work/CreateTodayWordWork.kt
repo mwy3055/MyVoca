@@ -57,7 +57,7 @@ class CreateTodayWordWorker @AssistedInject constructor(
     private suspend fun getRandomTodayWords(): List<RoomTodayWord> {
         val allVocabulary = vocaDao.loadAllVocabulary().first()
         return allVocabulary
-            .randoms(todayWordSize)
+            .distinctRandoms(todayWordSize)
             .map { RoomTodayWord(vocabularyId = it.id, checked = false) }
     }
 

@@ -1,7 +1,7 @@
 package com.hsk.domain
 
 import com.hsk.data.TodayWord
-import com.hsk.data.vocabulary.Vocabulary
+import com.hsk.data.Vocabulary
 import kotlinx.coroutines.flow.Flow
 
 interface TodayWordPersistence {
@@ -10,9 +10,9 @@ interface TodayWordPersistence {
 
     fun loadActualTodayWords(): Flow<List<Vocabulary>>
 
-    suspend fun storeTodayWord(todayWord: TodayWord)
+    suspend fun insertTodayWord(todayWord: TodayWord)
 
-    suspend fun storeTodayWords(todayWords: List<TodayWord>)
+    suspend fun insertTodayWords(todayWords: List<TodayWord>)
 
     suspend fun updateTodayWord(todayWord: TodayWord)
 
