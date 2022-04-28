@@ -19,7 +19,7 @@ class AddWordActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val wordId = intent.getIntExtra(updateWordId, -1)
+        val wordId = getUpdateWordId()
         setContent {
             MyVocaTheme {
                 AddWordScreen(
@@ -33,4 +33,7 @@ class AddWordActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun getUpdateWordId(defaultValue: Int = -1) =
+        intent.getIntExtra(updateWordId, defaultValue)
 }
