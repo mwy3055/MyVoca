@@ -14,8 +14,8 @@ import hsk.practice.myvoca.data.toWordClass
 import hsk.practice.myvoca.module.ComputingDispatcher
 import hsk.practice.myvoca.module.IoDispatcher
 import hsk.practice.myvoca.module.LocalVocaPersistence
-import hsk.practice.myvoca.room.vocabulary.toVocabulary
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImplList
+import hsk.practice.myvoca.room.vocabulary.toVocabularyList
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.state.UiState
 import hsk.practice.myvoca.util.xor
@@ -49,12 +49,12 @@ class AllWordViewModel @Inject constructor(
     private fun notifyWhenDatabaseUpdated() {
         viewModelScope.launch(computingDispatcher) {
             persistence.getAllVocabulary().collectLatest {
-                refreshWordState()
+                refreshWords()
             }
         }
     }
 
-    private fun refreshWordState() {
+    private fun refreshWords() {
         viewModelScope.launch(ioDispatcher) {
             _allWordUiState.value = allWordUiState.value.copy(loading = true)
 
@@ -72,19 +72,19 @@ class AllWordViewModel @Inject constructor(
      * Event listeners for composable
      */
     fun onSubmitButtonClicked() {
-        refreshWordState()
+        refreshWords()
     }
 
     private fun onQueryChanged(query: VocabularyQuery) {
-        val originalQuery = allWordUiState.value.data?.queryState
-        if (originalQuery == null || originalQuery != query) {
+        val currentQuery = allWordUiState.value.data?.queryState
+        if (currentQuery == null || currentQuery != query) {
             _allWordUiState.copyData(queryState = query)
         }
     }
 
-    fun onQueryTextChanged(value: String) {
+    fun onQueryTextChanged(newQueryText: String) {
         val query = allWordUiState.value.data?.queryState ?: VocabularyQuery()
-        onQueryChanged(query.copy(word = value))
+        onQueryChanged(query.copy(word = newQueryText))
     }
 
     fun onQueryWordClassToggled(koreanName: String) {
@@ -113,7 +113,7 @@ class AllWordViewModel @Inject constructor(
             sortState = SortState.defaultValue,
             queryState = VocabularyQuery(),
         )
-        refreshWordState()
+        refreshWords()
     }
 
     fun onWordUpdate(word: VocabularyImpl, context: Context) {
@@ -126,12 +126,11 @@ class AllWordViewModel @Inject constructor(
     }
 
     fun onWordDelete(word: VocabularyImpl) = viewModelScope.launch(ioDispatcher) {
-        persistence.deleteVocabulary(listOf(word.toVocabulary()))
+        persistence.deleteVocabulary(listOf(word).toVocabularyList())
         _allWordUiState.copyData(deletedWord = word)
-        delay(100L)
+        delay(50L)
         _allWordUiState.copyData(deletedWord = null)
     }
-
 }
 
 private fun Collection<VocabularyImpl>.sortedBy(selector: SortState): List<VocabularyImpl> {
@@ -180,9 +179,8 @@ enum class SortState(val korean: String) {
     Random("무작위");
 
     companion object {
-        val defaultValue: SortState
-            get() = Alphabet
+        val defaultValue: SortState = Alphabet
     }
 }
 
-const val totalWordClassName = "전체"
+internal const val totalWordClassName = "전체"
