@@ -1,5 +1,6 @@
 package hsk.practice.myvoca.ui.screens.home
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
@@ -63,7 +64,7 @@ class HomeViewModel @Inject constructor(
                 _homeScreenData.value = homeScreenData.value.copy(loading = true)
 
                 val todayWordList =
-                    createTodayWordList(todayWords, actualTodayWords).sortTodayWords()
+                    createHomeTodayWords(todayWords, actualTodayWords).sortTodayWords()
                 data.copy(
                     loading = false,
                     totalWordCount = size,
@@ -74,19 +75,20 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun createTodayWordList(
+    private fun createHomeTodayWords(
         todayWords: List<TodayWord>,
         actualList: List<Vocabulary>
     ): List<HomeTodayWord> {
         return todayWords.map { today ->
-            val actual = actualList.find { it.id == today.wordId } ?: return emptyList()
+            val actual = actualList.find { it.id == today.wordId }
+                ?: throw NoSuchElementException("$today doesn't exist in vocabulary database")
             HomeTodayWord(today.toTodayWordImpl(), actual.toVocabularyImpl())
         }
     }
 
-    // Click listeners for Ui
+    // Click listeners for UI
     fun showTodayWordHelp(show: Boolean) {
-        _homeScreenData.value = homeScreenData.value.copy(showTodayWordHelp = show)
+        _homeScreenData.copyData(showTodayWordHelp = show)
     }
 
     fun onRefreshTodayWord() = viewModelScope.launch {
@@ -102,7 +104,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onCloseAlertDialog() {
-        _homeScreenData.value = homeScreenData.value.copy(showTodayWordHelp = false)
+        _homeScreenData.copyData(showTodayWordHelp = false)
     }
 
     private fun List<HomeTodayWord>.sortTodayWords(): List<HomeTodayWord> {
@@ -111,11 +113,31 @@ class HomeViewModel @Inject constructor(
 
 }
 
+private fun MutableStateFlow<HomeScreenData>.copyData(
+    loading: Boolean = value.loading,
+    totalWordCount: Int = value.totalWordCount,
+    todayWords: List<HomeTodayWord> = value.todayWords,
+    todayWordsLastUpdatedTime: Long = value.todayWordsLastUpdatedTime,
+    showTodayWordHelp: Boolean = value.showTodayWordHelp
+) {
+    synchronized(this) {
+        value.copy(
+            loading = loading,
+            totalWordCount = totalWordCount,
+            todayWords = todayWords,
+            todayWordsLastUpdatedTime = todayWordsLastUpdatedTime,
+            showTodayWordHelp = showTodayWordHelp
+        ).also { value = it }
+    }
+}
+
+@Immutable
 data class HomeTodayWord(
     val todayWord: TodayWordImpl,
     val vocabulary: VocabularyImpl
 )
 
+@Immutable
 data class HomeScreenData(
     val loading: Boolean = false,
     val totalWordCount: Int = 0,
