@@ -45,8 +45,6 @@ class HomeViewModel @Inject constructor(
         get() = _homeScreenData
 
     init {
-        // TODO: where to move this?
-//        setPeriodicTodayWordWork(workManager)
         loadScreenData()
     }
 

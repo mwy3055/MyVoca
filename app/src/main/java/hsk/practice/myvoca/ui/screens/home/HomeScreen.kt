@@ -10,25 +10,35 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Autorenew
 import androidx.compose.material.icons.outlined.Help
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.work.WorkManager
 import hsk.practice.myvoca.data.TodayWordImpl
 import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import hsk.practice.myvoca.util.getTimeDiffString
+import hsk.practice.myvoca.work.setPeriodicTodayWordWork
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel) {
     val homeScreenData by viewModel.homeScreenData.collectAsState()
+
+    val context = LocalContext.current
+    LaunchedEffect(true) {
+        val workManager = WorkManager.getInstance(context)
+        setPeriodicTodayWordWork(workManager)
+    }
 
     Loading(
         data = homeScreenData,
