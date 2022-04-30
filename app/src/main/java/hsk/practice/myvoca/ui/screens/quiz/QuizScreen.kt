@@ -19,6 +19,8 @@ import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.components.WordMeanings
+import hsk.practice.myvoca.ui.components.versus.VersusView
+import hsk.practice.myvoca.ui.components.versus.rememberVersusViewState
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import hsk.practice.myvoca.util.distinctRandoms
@@ -103,6 +105,8 @@ private fun QuizContent(
     quizStat: QuizStat,
     onOptionClick: (Int) -> Unit
 ) {
+    val versusViewState =
+        rememberVersusViewState(leftValue = quizStat.correct, rightValue = quizStat.wrong)
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -121,8 +125,7 @@ private fun QuizContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            leftValue = quizStat.correct,
-            rightValue = quizStat.wrong
+            versusViewState = versusViewState
         )
     }
 }
