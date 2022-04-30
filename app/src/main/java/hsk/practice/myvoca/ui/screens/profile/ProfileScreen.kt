@@ -41,7 +41,7 @@ import hsk.practice.myvoca.ui.theme.MyVocaTheme
 fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel()) {
     val data by viewModel.profileScreenData.collectAsState()
 
-    ProfileContent(
+    Content(
         data = data,
         onTryLogin = viewModel::onTryLogin,
         onLoginButtonClick = viewModel::onLoginButtonClick,
@@ -50,7 +50,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel()) {
 }
 
 @Composable
-private fun ProfileContent(
+private fun Content(
     data: ProfileScreenData,
     onTryLogin: (ActivityResult) -> Unit,
     onLoginButtonClick: (Context, ManagedActivityResultLauncher<Intent, ActivityResult>) -> Unit,
@@ -72,28 +72,28 @@ private fun ProfileContent(
             modifier = Modifier.height(48.dp),
             contentAlignment = Alignment.CenterStart
         ) {
-            if (user != null) {
-                ProfileUserDetail(
+            if (user == null) {
+                Login(
+                    onTryLogin = onTryLogin,
+                    onLoginButtonClick = onLoginButtonClick
+                )
+            } else {
+                UserInfo(
                     username = user.username ?: "알 수 없는 이름입니다.",
                     email = user.email ?: "알 수 없는 이메일입니다.",
                     onLogout = onLogout
-                )
-            } else {
-                ProfileLogin(
-                    onTryLogin = onTryLogin,
-                    onLoginButtonClick = onLoginButtonClick
                 )
             }
         }
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
 
-        ProfileFeatures(
+        UserActions(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(2f),
             user = user,
-            uploadFeatureData = data.uploadFeatureData,
-            downloadFeatureData = data.downloadFeatureData,
+            uploadActionData = data.uploadActionData,
+            downloadActionData = data.downloadActionData,
         )
         Spacer(modifier = Modifier.weight(3f))
     }
@@ -130,8 +130,9 @@ private fun ProfileImage(
 }
 
 @Composable
-private fun ProfileUserDetail(
-    username: String, email: String,
+private fun UserInfo(
+    username: String,
+    email: String,
     onLogout: () -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -139,26 +140,38 @@ private fun ProfileUserDetail(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.weight(1f)
         ) {
-            Text(
-                text = username,
-                style = MaterialTheme.typography.h5
-            )
-            Text(
-                text = email,
-                style = MaterialTheme.typography.body1
-            )
+            Username(username = username)
+            UserEmail(email = email)
         }
-
-        TextButton(
-            onClick = onLogout
-        ) {
-            Text(text = "로그아웃")
-        }
+        LogOutButton(onLogout)
     }
 }
 
 @Composable
-private fun ProfileLogin(
+private fun LogOutButton(onLogout: () -> Unit) {
+    TextButton(onClick = onLogout) {
+        Text(text = "로그아웃")
+    }
+}
+
+@Composable
+private fun UserEmail(email: String) {
+    Text(
+        text = email,
+        style = MaterialTheme.typography.body1
+    )
+}
+
+@Composable
+private fun Username(username: String) {
+    Text(
+        text = username,
+        style = MaterialTheme.typography.h5
+    )
+}
+
+@Composable
+private fun Login(
     onTryLogin: (ActivityResult) -> Unit,
     onLoginButtonClick: (Context, ManagedActivityResultLauncher<Intent, ActivityResult>) -> Unit
 ) {
@@ -175,40 +188,44 @@ private fun ProfileLogin(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ProfileFeatures(
+private fun UserActions(
     modifier: Modifier = Modifier,
     user: UserImpl?,
-    uploadFeatureData: UploadFeatureData,
-    downloadFeatureData: DownloadFeatureData,
+    uploadActionData: UploadActionData,
+    downloadActionData: DownloadActionData,
 ) {
     val clickable = user != null
     LazyVerticalGrid(cells = GridCells.Fixed(3), modifier = modifier) {
         item {
-            ProfileFeatureUploadWords(
-                data = uploadFeatureData,
+            UserActionUploadWords(
+                data = uploadActionData,
                 enabled = clickable,
             )
         }
-
         item {
-            ProfileFeatureDownloadWords(
-                data = downloadFeatureData,
+            UserActionDownloadWords(
+                data = downloadActionData,
             )
         }
     }
-
 }
 
+private const val actionIconFraction = 0.4f
+
 @Composable
-private fun ProfileFeatureUploadWords(
-    data: UploadFeatureData,
+private fun UserActionUploadWords(
+    data: UploadActionData,
     enabled: Boolean,
 ) {
     val alpha by animateFloatAsState(targetValue = if (enabled) 1f else 0.5f)
     val color by animateColorAsState(
-        targetValue = if (data.finished) Color.Green else if (data.uploading) MaterialTheme.colors.primary else MaterialTheme.colors.onBackground
+        targetValue = when {
+            data.finished -> Color.Green
+            data.uploading -> MaterialTheme.colors.primary
+            else -> MaterialTheme.colors.onBackground
+        }
     )
-    val feature = data.featureData
+    val actionData = data.actionData
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -219,9 +236,9 @@ private fun ProfileFeatureUploadWords(
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
-                imageVector = feature.icon,
-                contentDescription = feature.text,
-                modifier = Modifier.fillMaxSize(fraction = 0.4f),
+                imageVector = actionData.icon,
+                contentDescription = actionData.text,
+                modifier = Modifier.fillMaxSize(fraction = actionIconFraction),
                 tint = color
             )
             if (data.uploadProgress != null) {
@@ -233,45 +250,43 @@ private fun ProfileFeatureUploadWords(
                 )
             }
         }
-        Text(text = feature.text)
+        Text(text = actionData.text)
     }
 
     if (data.showUploadDialog) {
-        ProfileUploadDialog(onConfirm = data.onConfirm, onDismiss = data.onDismiss)
+        UploadDialog(onConfirm = data.onConfirm, onDismiss = data.onDismiss)
     }
 }
 
 @Composable
-private fun ProfileFeatureDownloadWords(
-    data: DownloadFeatureData,
-) {
-    val enabled = data.downloadPossible == true
-    val feature = data.featureData
+private fun UserActionDownloadWords(data: DownloadActionData) {
+    val enabled = (data.downloadPossible == true)
+    val actionData = data.actionData
 
-    val alpha by animateFloatAsState(targetValue = if (enabled) 1f else 0.5f)
+    val contentAlpha by animateFloatAsState(targetValue = if (enabled) 1f else 0.5f)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .clickable(enabled = enabled, onClick = data.onClick)
             .aspectRatio(1f)
-            .alpha(alpha),
+            .alpha(contentAlpha),
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Icon(
-            imageVector = feature.icon,
-            contentDescription = feature.text,
-            modifier = Modifier.fillMaxSize(fraction = 0.4f)
+            imageVector = actionData.icon,
+            contentDescription = actionData.text,
+            modifier = Modifier.fillMaxSize(fraction = actionIconFraction)
         )
-        Text(text = feature.text)
+        Text(text = actionData.text)
     }
 
     if (data.showDownloadDialog) {
-        ProfileDownloadDialog(onConfirm = data.onConfirm, onDismiss = data.onDismiss)
+        DownloadDialog(onConfirm = data.onConfirm, onDismiss = data.onDismiss)
     }
 }
 
 @Composable
-private fun ProfileUploadDialog(
+private fun UploadDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -298,11 +313,10 @@ private fun ProfileUploadDialog(
 }
 
 @Composable
-private fun ProfileDownloadDialog(
+private fun DownloadDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    LocalContext.current
     AlertDialog(
         title = { Text(text = "단어 복원하기") },
         text = {
@@ -327,12 +341,12 @@ private fun ProfileDownloadDialog(
 
 @Preview(showBackground = true)
 @Composable
-private fun ProfileContentPreview() {
+private fun ContentPreview() {
     val data = ProfileScreenData(
         user = UserImpl(uid = "dtd", username = "hsk", email = null, profileImageUrl = null)
     )
     MyVocaTheme {
-        ProfileContent(
+        Content(
             data = data,
             onTryLogin = {},
             onLoginButtonClick = { _, _ -> },
