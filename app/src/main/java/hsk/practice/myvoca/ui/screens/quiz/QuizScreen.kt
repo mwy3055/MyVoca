@@ -1,7 +1,6 @@
 package hsk.practice.myvoca.ui.screens.quiz
 
 import android.content.Intent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,14 +21,14 @@ import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.components.WordMeanings
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
-import hsk.practice.myvoca.util.randoms
+import hsk.practice.myvoca.util.distinctRandoms
 import hsk.practice.myvoca.util.truncate
 
 @Composable
 fun QuizScreen(viewModel: QuizViewModel) {
     val quizScreenData by viewModel.quizScreenData.collectAsState()
 
-    QuizLoading(
+    Loading(
         quizScreenData = quizScreenData,
         onOptionClick = viewModel::onQuizOptionSelected,
         onCloseDialog = viewModel::onResultDialogClose
@@ -37,7 +36,7 @@ fun QuizScreen(viewModel: QuizViewModel) {
 }
 
 @Composable
-fun QuizLoading(
+private fun Loading(
     quizScreenData: QuizScreenData,
     onOptionClick: (Int) -> Unit,
     onCloseDialog: (QuizResultData) -> Unit
@@ -45,8 +44,9 @@ fun QuizLoading(
     Box(modifier = Modifier.background(MaterialTheme.colors.surface)) {
         when (quizScreenData.quizState) {
             is QuizAvailable -> {
-                QuizScreen(
-                    quizData = quizScreenData.quizData,
+                QuizContent(
+                    quiz = quizScreenData.quiz,
+                    quizStat = quizScreenData.quizStat,
                     onOptionClick = onOptionClick
                 )
             }
@@ -61,9 +61,9 @@ fun QuizLoading(
                 )
             }
         }
-        quizScreenData.quizResult?.let { result ->
-            QuizResult(
-                resultData = result,
+        if (quizScreenData.quizResult != null) {
+            Result(
+                resultData = quizScreenData.quizResult,
                 onCloseDialog = onCloseDialog
             )
         }
@@ -71,7 +71,7 @@ fun QuizLoading(
 }
 
 @Composable
-fun QuizNotAvailable(need: Int) {
+private fun QuizNotAvailable(need: Int) {
     val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -79,7 +79,6 @@ fun QuizNotAvailable(need: Int) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-//            modifier = Modifier.align(Alignment.Center),
             text = "${need}개의 단어가 더 필요합니다.",
             style = MaterialTheme.typography.h5,
             textAlign = TextAlign.Center
@@ -99,8 +98,9 @@ fun QuizNotAvailable(need: Int) {
 }
 
 @Composable
-fun QuizScreen(
-    quizData: QuizData,
+private fun QuizContent(
+    quiz: Quiz,
+    quizStat: QuizStat,
     onOptionClick: (Int) -> Unit
 ) {
     Column(
@@ -110,25 +110,25 @@ fun QuizScreen(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Spacer(modifier = Modifier.weight(2f))
-        QuizTitle(quizData.quiz.answer)
+        QuizTitle(quiz.answer)
         Spacer(modifier = Modifier.weight(1f))
         QuizOptions(
             modifier = Modifier.weight(8f),
-            options = quizData.quiz.quizList,
+            options = quiz.quizList,
             onOptionClick = onOptionClick
         )
         VersusView(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            leftValue = quizData.quizStat.correct,
-            rightValue = quizData.quizStat.wrong
+            leftValue = quizStat.correct,
+            rightValue = quizStat.wrong
         )
     }
 }
 
 @Composable
-fun QuizTitle(answer: VocabularyImpl) {
+private fun QuizTitle(answer: VocabularyImpl) {
     // Reduce text size when overflow
     val textStyleTitle3 = MaterialTheme.typography.h3
     val (textStyle, updateTextStyle) = remember { mutableStateOf(textStyleTitle3) }
@@ -147,9 +147,8 @@ fun QuizTitle(answer: VocabularyImpl) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun QuizOptions(
+private fun QuizOptions(
     modifier: Modifier = Modifier,
     options: List<VocabularyImpl>,
     onOptionClick: (Int) -> Unit
@@ -168,18 +167,16 @@ fun QuizOptions(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun QuizOption(
+private fun QuizOption(
     modifier: Modifier = Modifier,
     index: Int,
     option: VocabularyImpl,
     onOptionClick: (Int) -> Unit
 ) {
-    val onClick = { onOptionClick(index) }
     Box(
         modifier = modifier
-            .clickable(onClick = onClick)
+            .clickable(onClick = { onOptionClick(index) })
             .padding(4.dp),
     ) {
         CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.h6) {
@@ -190,9 +187,8 @@ fun QuizOption(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun QuizResult(
+private fun Result(
     resultData: QuizResultData,
     onCloseDialog: (QuizResultData) -> Unit
 ) {
@@ -220,10 +216,9 @@ fun QuizResult(
     )
 }
 
-
 @Preview(showBackground = true)
 @Composable
-fun QuizNotAvailablePreview() {
+private fun QuizNotAvailablePreview() {
     MyVocaTheme {
         QuizNotAvailable(need = 5)
     }
@@ -231,18 +226,18 @@ fun QuizNotAvailablePreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun QuizScreenPreview() {
-    val quizData = QuizData(
-        quiz = Quiz(fakeData.randoms(quizSize), answerIndex = (0 until quizSize).random()),
-        quizStat = QuizStat(10, 5)
-    )
+private fun QuizScreenPreview() {
+    val quiz = Quiz(fakeData.distinctRandoms(quizSize), answerIndex = (0 until quizSize).random())
+    val quizStat = QuizStat(10, 5)
+
     var text by remember { mutableStateOf("dtd") }
 
     MyVocaTheme {
         Column {
             Text(text = text)
-            QuizScreen(
-                quizData = quizData,
+            QuizContent(
+                quiz = quiz,
+                quizStat = quizStat,
                 onOptionClick = { text = it.toString() }
             )
         }

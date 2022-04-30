@@ -3,29 +3,30 @@ package hsk.practice.myvoca.ui.screens.quiz
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hsk.data.vocabulary.Vocabulary
+import com.hsk.data.Vocabulary
 import com.hsk.domain.VocaPersistence
-import com.orhanobut.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hsk.practice.myvoca.data.VocabularyImpl
+import hsk.practice.myvoca.module.ComputingDispatcher
+import hsk.practice.myvoca.module.IoDispatcher
 import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImplList
 import hsk.practice.myvoca.util.MyVocaPreferencesKey
 import hsk.practice.myvoca.util.PreferencesDataStore
 import hsk.practice.myvoca.util.randoms
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * [ViewModel] for QuizFragment.
- */
 @HiltViewModel
 class QuizViewModel @Inject constructor(
     @LocalVocaPersistence private val vocaPersistence: VocaPersistence,
-    private val preferences: PreferencesDataStore
+    private val preferences: PreferencesDataStore,
+    @ComputingDispatcher private val computingDispatcher: CoroutineDispatcher,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private var quizAvailable: Boolean = false
@@ -37,7 +38,7 @@ class QuizViewModel @Inject constructor(
     private val resultDataFlow = MutableStateFlow<QuizResultData?>(null)
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(computingDispatcher) {
             combine(
                 vocaPersistence.getAllVocabulary(),
                 preferences.getPreferenceFlow(MyVocaPreferencesKey.quizCorrectKey, 0),
@@ -54,23 +55,23 @@ class QuizViewModel @Inject constructor(
                     // 결과값이 있는 경우 결과만 반환
                     onlyResultChanged -> {
                         quizAvailable = true
-                        quizScreenData.value.copy(quizResult = quizResultData)
+                        value.copy(quizResult = quizResultData)
                     }
                     // 불가능 -> 가능
                     newQuizAvailable and !quizAvailable -> {
                         quizAvailable = true
-                        makeNewQuiz(allVocabulary, correct, wrong)
+                        makeNewQuizData(allVocabulary, correct, wrong)
                     }
                     // 가능 -> 가능: 무조건 로드해야 하는 것은 아님
                     newQuizAvailable -> {
                         // 전체 단어만 바뀌었다면 새로 로드하지 않음
-                        if ((value.quizData.quizStat == QuizStat(correct, wrong)) and
+                        if ((value.quizStat == QuizStat(correct, wrong)) and
                             (value.quizResult == quizResultData)
                         ) {
                             value.copy(numberVocabularyNeed = vocabularyRequired - allVocabulary.size)
                         } else {
                             // 뭔가 바뀌었을 경우 새로 로드
-                            makeNewQuiz(allVocabulary, correct, wrong)
+                            makeNewQuizData(allVocabulary, correct, wrong)
                         }
                     }
                     else -> {
@@ -79,7 +80,7 @@ class QuizViewModel @Inject constructor(
                         QuizScreenData(
                             quizState = QuizNotAvailable,
                             numberVocabularyNeed = vocabularyRequired - allVocabulary.size,
-                            quizData = QuizData(quizStat = QuizStat(correct, wrong))
+                            quizStat = QuizStat(correct, wrong)
                         )
                     }
                 }
@@ -89,7 +90,7 @@ class QuizViewModel @Inject constructor(
         }
     }
 
-    private fun makeNewQuiz(
+    private fun makeNewQuizData(
         allVocabulary: List<Vocabulary>,
         correct: Int,
         wrong: Int
@@ -99,68 +100,45 @@ class QuizViewModel @Inject constructor(
         return QuizScreenData(
             quizState = QuizAvailable,
             numberVocabularyNeed = vocabularyRequired - allVocabulary.size,
-            quizData = QuizData(
-                quiz = Quiz(quizList = quizList, answerIndex = answerIndex),
-                quizStat = QuizStat(correct, wrong)
-            )
+            quiz = Quiz(quizList = quizList, answerIndex = answerIndex),
+            quizStat = QuizStat(correct, wrong)
         )
     }
 
     fun onQuizOptionSelected(index: Int) {
-        Logger.d("$index item clicked!")
-        val quiz = quizScreenData.value.quizData.quiz
+        val quiz = quizScreenData.value.quiz
         val result = if (index == quiz.answerIndex) QuizCorrect else QuizWrong
         resultDataFlow.value = QuizResultData(result, quiz.answer)
     }
 
     fun onResultDialogClose(resultData: QuizResultData) {
-        viewModelScope.launch {
-            resultDataFlow.value = null
+        resultDataFlow.value = null
+        setQuizStatPreferences(resultData)
+    }
 
-            val currentStat = quizScreenData.value.quizData.quizStat
-            val (key, value) = if (resultData.result is QuizCorrect) {
-                Pair(MyVocaPreferencesKey.quizCorrectKey, currentStat.correct + 1)
-            } else {
-                Pair(MyVocaPreferencesKey.quizWrongKey, currentStat.wrong + 1)
-            }
+    private fun setQuizStatPreferences(resultData: QuizResultData) {
+        val currentStat = quizScreenData.value.quizStat
+        val (key, value) = if (resultData.result is QuizCorrect) {
+            Pair(MyVocaPreferencesKey.quizCorrectKey, currentStat.correct + 1)
+        } else {
+            Pair(MyVocaPreferencesKey.quizWrongKey, currentStat.wrong + 1)
+        }
+
+        viewModelScope.launch(ioDispatcher) {
             preferences.setPreference(key, value)
         }
     }
-
 }
 
-/**
- * Number of vocabulary in quiz
- */
-val quizSize = 4
+const val quizSize = 4
+const val vocabularyRequired = 10
 
-/**
- * Minimum number of vocabulary required to solve the quiz
- */
-val vocabularyRequired = 10
-
-/**
- * State of the quiz data.
- *
- * [QuizLoading] indicates that the data is currently loading
- * [QuizAvailable] indicates that the quiz is available.
- * [QuizNotAvailable] indicates that the quiz is not available (due to lack of vocabulary, etc.)
- */
 sealed class QuizState
-
 object QuizInit : QuizState()
-object QuizLoading : QuizState()
 object QuizAvailable : QuizState()
 object QuizNotAvailable : QuizState()
 
-/**
- * Result of the quiz.
- *
- * [QuizCorrect] indicates that the user chose the right answer.
- * [QuizWrong] indicates that the user failed the quiz.
- */
 sealed class QuizResult
-
 object QuizCorrect : QuizResult()
 object QuizWrong : QuizResult()
 
@@ -177,21 +155,13 @@ data class Quiz(
 }
 
 @Immutable
-data class QuizStat(val correct: Int = 0, val wrong: Int = 0) {
-    val valid: Boolean
-        get() = (correct != 0) or (wrong != 0)
-}
-
-@Immutable
-data class QuizData(
-    val quiz: Quiz = Quiz(),
-    val quizStat: QuizStat = QuizStat(),
-)
+data class QuizStat(val correct: Int = 0, val wrong: Int = 0)
 
 @Immutable
 data class QuizScreenData(
     val quizState: QuizState = QuizInit,
     val numberVocabularyNeed: Int = 0,
-    val quizData: QuizData = QuizData(),
+    val quiz: Quiz = Quiz(),
+    val quizStat: QuizStat = QuizStat(),
     val quizResult: QuizResultData? = null,
 )
