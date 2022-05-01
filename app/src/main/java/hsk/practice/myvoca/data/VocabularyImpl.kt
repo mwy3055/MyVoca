@@ -1,7 +1,7 @@
 package hsk.practice.myvoca.data
 
-import com.hsk.data.vocabulary.Meaning
-import com.hsk.data.vocabulary.WordClass
+import com.hsk.data.Meaning
+import com.hsk.data.WordClass
 import hsk.practice.myvoca.util.removed
 
 data class VocabularyImpl(

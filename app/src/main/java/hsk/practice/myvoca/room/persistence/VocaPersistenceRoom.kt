@@ -1,9 +1,9 @@
 package hsk.practice.myvoca.room.persistence
 
 import android.content.Context
-import com.hsk.data.vocabulary.Vocabulary
-import com.hsk.data.vocabulary.VocabularyQuery
-import com.hsk.data.vocabulary.matchesWithQuery
+import com.hsk.data.Vocabulary
+import com.hsk.data.VocabularyQuery
+import com.hsk.data.matchesWithQuery
 import com.hsk.domain.VocaPersistence
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn

@@ -1,8 +1,8 @@
 package com.hsk.domain
 
-import com.hsk.data.vocabulary.Vocabulary
-import com.hsk.data.vocabulary.VocabularyQuery
-import com.hsk.data.vocabulary.nullVocabulary
+import com.hsk.data.Vocabulary
+import com.hsk.data.VocabularyQuery
+import com.hsk.data.nullVocabulary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

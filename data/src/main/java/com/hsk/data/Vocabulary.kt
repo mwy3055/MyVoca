@@ -1,4 +1,4 @@
-package com.hsk.data.vocabulary
+package com.hsk.data
 
 import java.io.Serializable
 
@@ -9,15 +9,27 @@ data class Vocabulary(
     val addedTime: Long,
     val lastEditedTime: Long,
     val memo: String?
-) : Serializable
+) : Serializable {
+    companion object {
+        fun create(id: Int, eng: String, meaning: List<Meaning>, memo: String?): Vocabulary {
+            val currentTime = System.currentTimeMillis()
+            return Vocabulary(
+                id = id,
+                eng = eng,
+                meaning = meaning,
+                addedTime = currentTime,
+                lastEditedTime = currentTime,
+                memo = memo
+            )
+        }
+    }
+}
 
 val nullVocabulary: Vocabulary
-    get() = Vocabulary(
+    get() = Vocabulary.create(
         id = 0,
         eng = "null",
         meaning = emptyList(),
-        addedTime = System.currentTimeMillis(),
-        lastEditedTime = System.currentTimeMillis(),
         memo = ""
     )
 

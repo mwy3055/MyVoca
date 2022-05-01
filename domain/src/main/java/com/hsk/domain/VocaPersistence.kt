@@ -1,7 +1,7 @@
 package com.hsk.domain
 
-import com.hsk.data.vocabulary.Vocabulary
-import com.hsk.data.vocabulary.VocabularyQuery
+import com.hsk.data.Vocabulary
+import com.hsk.data.VocabularyQuery
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
