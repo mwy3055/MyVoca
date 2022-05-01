@@ -31,7 +31,7 @@ class UiStateTest {
             exception = null,
             data = null
         )
-        assert(state.initialLoad)
+        assert(state.initialLoading)
     }
 
     @Test
@@ -41,7 +41,7 @@ class UiStateTest {
             exception = IndexOutOfBoundsException(),
             data = null
         )
-        assertFalse(state.initialLoad)
+        assertFalse(state.initialLoading)
     }
 
     @Test
@@ -51,7 +51,7 @@ class UiStateTest {
             exception = null,
             data = 3
         )
-        assertFalse(state.initialLoad)
+        assertFalse(state.initialLoading)
     }
 
     @Test
@@ -61,7 +61,7 @@ class UiStateTest {
             exception = null,
             data = 3
         )
-        assertFalse(state.initialLoad)
+        assertFalse(state.initialLoading)
     }
 
     private fun createState(
