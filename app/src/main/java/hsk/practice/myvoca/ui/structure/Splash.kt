@@ -22,21 +22,26 @@ import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import kotlinx.coroutines.delay
 
 @Composable
-fun Splash(onLaunch: suspend () -> Unit = {}) {
+fun Splash(
+    loadApp: suspend () -> Unit,
+    onLaunch: suspend () -> Unit = {}
+) {
     val navController = rememberNavController()
     Box(modifier = Modifier.fillMaxSize()) {
         SplashNavGraph(
+            loadApp = loadApp,
             navController = navController,
             onLaunch = onLaunch
         )
     }
 }
 
-private val SplashName = "splash_screen"
-private val MyVocaAppName = "main_app"
+private const val SplashName = "splash_screen"
+private const val MyVocaAppName = "main_app"
 
 @Composable
 private fun SplashNavGraph(
+    loadApp: suspend () -> Unit,
     navController: NavHostController,
     onLaunch: suspend () -> Unit
 ) {
@@ -45,7 +50,10 @@ private fun SplashNavGraph(
         startDestination = SplashName
     ) {
         composable(SplashName) {
-            SplashScreen(navController = navController)
+            SplashScreen(
+                loadApp = loadApp,
+                navController = navController
+            )
         }
         composable(MyVocaAppName) {
             MyVocaApp(onLaunch = onLaunch)
@@ -53,36 +61,19 @@ private fun SplashNavGraph(
     }
 }
 
-// 스플래시 화면
-
 @Composable
-private fun SplashScreen(navController: NavHostController) {
-    // 1.5초 후에 메인 화면으로 이동
+private fun SplashScreen(
+    loadApp: suspend () -> Unit,
+    navController: NavHostController
+) {
     LaunchedEffect(true) {
-        delay(1000L)
+        loadApp()
         navController.popBackStack()
         navController.navigate(MyVocaAppName)
     }
 
     SplashBackground()
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .zIndex(zIndex = 1f),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "나만의 단어장",
-            style = MaterialTheme.typography.h4,
-            color = MaterialTheme.colors.onBackground
-        )
-        Text(
-            text = "MyVoca",
-            style = MaterialTheme.typography.h4,
-            color = MaterialTheme.colors.onBackground
-        )
-    }
+    SplashLogo()
 }
 
 @Composable
@@ -106,10 +97,35 @@ private fun SplashBackground() {
     }
 }
 
+@Composable
+private fun SplashLogo() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .zIndex(zIndex = 1f),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "나만의 단어장",
+            style = MaterialTheme.typography.h4,
+            color = MaterialTheme.colors.onBackground
+        )
+        Text(
+            text = "MyVoca",
+            style = MaterialTheme.typography.h4,
+            color = MaterialTheme.colors.onBackground
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun SplashScreenPreview() {
     MyVocaTheme {
-        SplashScreen(navController = rememberNavController())
+        SplashScreen(
+            loadApp = { delay(1000L) },
+            navController = rememberNavController()
+        )
     }
 }

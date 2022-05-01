@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -15,9 +16,9 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             MyVocaTheme {
-                Splash(onLaunch = {
-                    WindowCompat.setDecorFitsSystemWindows(window, true)
-                })
+                Splash(
+                    loadApp = { delay(1000L) },
+                    onLaunch = { WindowCompat.setDecorFitsSystemWindows(window, true) })
             }
         }
     }
