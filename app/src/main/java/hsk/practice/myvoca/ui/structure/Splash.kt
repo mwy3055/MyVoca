@@ -23,14 +23,13 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun Splash(
-    loadApp: suspend () -> Unit,
+    loadApp: suspend () -> Unit = {},
     onLaunch: suspend () -> Unit = {}
 ) {
-    val navController = rememberNavController()
     Box(modifier = Modifier.fillMaxSize()) {
         SplashNavGraph(
             loadApp = loadApp,
-            navController = navController,
+            navController = rememberNavController(),
             onLaunch = onLaunch
         )
     }
@@ -72,12 +71,12 @@ private fun SplashScreen(
         navController.navigate(MyVocaAppName)
     }
 
-    SplashBackground()
-    SplashLogo()
+    Background()
+    Logo()
 }
 
 @Composable
-private fun SplashBackground() {
+private fun Background() {
     val lineColor = MaterialTheme.colors.primary
     Canvas(modifier = Modifier.fillMaxSize()) {
         val canvasWidth = size.width
@@ -98,7 +97,7 @@ private fun SplashBackground() {
 }
 
 @Composable
-private fun SplashLogo() {
+private fun Logo() {
     Column(
         modifier = Modifier
             .fillMaxSize()
