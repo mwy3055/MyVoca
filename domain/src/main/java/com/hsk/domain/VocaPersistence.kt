@@ -24,3 +24,5 @@ interface VocaPersistence {
     suspend fun clearVocabulary()
 
 }
+
+class VocaPersistenceException(override val message: String) : Exception()
