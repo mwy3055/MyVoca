@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -26,7 +27,6 @@ import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
-import hsk.practice.myvoca.util.toTimeString
 
 @Composable
 fun WordContent(
@@ -34,7 +34,7 @@ fun WordContent(
     modifier: Modifier = Modifier,
     iconContent: @Composable RowScope.() -> Unit = {}
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
     WordContent(
         modifier = modifier,
         word = word,
@@ -47,10 +47,10 @@ fun WordContent(
 @Composable
 fun WordContent(
     word: VocabularyImpl,
-    modifier: Modifier = Modifier,
-    showExpandButton: Boolean = true,
     expanded: Boolean,
     onExpanded: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    showExpandButton: Boolean = true,
     iconContent: @Composable RowScope.() -> Unit = {}
 ) {
     val padding = 8.dp
@@ -100,15 +100,11 @@ fun WordMeanings(
     onClick: (Boolean) -> Unit = {}
 ) {
     val meaningsTruncated = meanings.size >= 3
-    val (firstMeanings, lastMeanings) = if (meaningsTruncated) {
-        Pair(meanings.subList(0, 2), meanings.subList(2, meanings.size))
-    } else {
-        Pair(meanings, emptyList())
-    }
-    val canExpanded = showExpandButton and meaningsTruncated
+    val canExpand = showExpandButton and meaningsTruncated
 
+    val (firstMeanings, lastMeanings) = getTruncatedMeanings(meaningsTruncated, meanings)
     Row(
-        modifier = if (canExpanded) modifier.clickable { onClick(expanded) } else modifier
+        modifier = if (canExpand) modifier.clickable { onClick(expanded) } else modifier
             .fillMaxWidth()
     ) {
         Column(
@@ -127,14 +123,13 @@ fun WordMeanings(
             }
         }
 
-        if (canExpanded) {
+        if (canExpand) {
             val iconAngle by animateFloatAsState(
                 targetValue = if (expanded) 180f else 0f,
             )
             IconButton(
                 onClick = { onClick(expanded) },
                 modifier = Modifier
-//                    .size(40.dp)
                     .align(Alignment.Bottom)
             ) {
                 Icon(
@@ -146,6 +141,14 @@ fun WordMeanings(
         }
     }
 }
+
+private fun getTruncatedMeanings(meaningsTruncated: Boolean, meanings: List<MeaningImpl>) =
+    if (meaningsTruncated) {
+        Pair(meanings.subList(0, 2), meanings.subList(2, meanings.size))
+    } else {
+        Pair(meanings, emptyList())
+    }
+
 
 @Composable
 fun WordMeaning(
@@ -170,17 +173,6 @@ fun WordMeaning(
         )
         Text(
             text = meaning.content
-        )
-    }
-}
-
-@Composable
-fun WordMetadataShort(addedTime: Long, modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = "${addedTime.toTimeString()} 추가",
-            style = MaterialTheme.typography.caption,
-            modifier = Modifier.align(Alignment.CenterEnd)
         )
     }
 }

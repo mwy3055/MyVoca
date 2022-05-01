@@ -2,15 +2,16 @@ package hsk.practice.myvoca.ui.screens.addword
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hsk.data.vocabulary.VocabularyQuery
+import com.hsk.data.Vocabulary
+import com.hsk.data.VocabularyQuery
 import com.hsk.domain.VocaPersistence
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.module.LocalVocaPersistence
-import hsk.practice.myvoca.room.vocabulary.toVocabulary
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImpl
+import hsk.practice.myvoca.room.vocabulary.toVocabularyList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,101 +23,127 @@ class AddWordViewModel @Inject constructor(
     @LocalVocaPersistence private val vocaPersistence: VocaPersistence,
 ) : ViewModel() {
 
-    private val _addWordScreenData = MutableStateFlow(AddWordScreenData())
-    val addWordScreenData: StateFlow<AddWordScreenData>
-        get() = _addWordScreenData
+    private val _uiStateFlow = MutableStateFlow(AddWordScreenData())
+    val uiStateFlow: StateFlow<AddWordScreenData>
+        get() = _uiStateFlow
 
     /**
-     * 단어 수정 화면이라면 [injectUpdateWord] 함수를 이용하여 [currentVocabulary]를 초기화해야 한다.
-     * 주의! [currentVocabulary]는 단 한 번만 초기화되어야 한다.
+     * 단어 수정 화면이라면 [injectUpdateTarget] 함수를 이용하여 [updateTarget]를 초기화해야 한다.
+     * 주의! [updateTarget]은 단 한 번만 초기화되어야 한다.
      */
-    private var currentVocabulary: VocabularyImpl? = null
+    private var updateTarget: VocabularyImpl? = null
 
-    fun injectUpdateWord(wordId: Int) {
+    fun injectUpdateTarget(wordId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val word = vocaPersistence.getVocabularyById(wordId)?.toVocabularyImpl()
+            val word = getVocabulary(wordId)?.toVocabularyImpl()
             if (word != null) {
-                currentVocabulary = word
-                _addWordScreenData.value = addWordScreenData.value.copy(
-                    screenType = UpdateWord,
-                    word = word.eng,
-                    meanings = word.meaning,
-                    memo = word.memo ?: ""
-                )
+                updateTargetWord(word)
             }
         }
     }
 
+    private fun updateTargetWord(word: VocabularyImpl) {
+        updateTarget = word
+        updateUiState(
+            screenType = UpdateWord,
+            word = word.eng,
+            meanings = word.meaning,
+            memo = word.memo ?: ""
+        )
+    }
+
+    private suspend fun getVocabulary(id: Int): Vocabulary? = vocaPersistence.getVocabularyById(id)
+
     /* Event Listeners for UI */
     fun onWordUpdate(newWord: String) {
-        _addWordScreenData.value = addWordScreenData.value.copy(word = newWord)
+        updateUiState(word = newWord)
     }
 
     suspend fun loadStatus(newWord: String) {
         if (newWord.isEmpty()) {
-            _addWordScreenData.value =
-                addWordScreenData.value.copy(wordExistStatus = WordExistStatus.WORD_EMPTY)
+            updateUiState(wordExistStatus = WordExistStatus.WORD_EMPTY)
             return
         }
-        _addWordScreenData.value =
-            addWordScreenData.value.copy(wordExistStatus = WordExistStatus.LOADING)
+
+        updateUiState(wordExistStatus = WordExistStatus.LOADING)
+
         val query = VocabularyQuery(word = newWord)
         val result = vocaPersistence.getVocabulary(query)
-        val exists = if (currentVocabulary != null && newWord == currentVocabulary!!.eng) {
-            WordExistStatus.NOT_EXISTS
-        } else if (result.any { it.eng == newWord }) {
+
+        val exists = if (updateTarget == null && result.any { it.eng == newWord }) {
             WordExistStatus.DUPLICATE
         } else {
             WordExistStatus.NOT_EXISTS
         }
-
-        _addWordScreenData.value = addWordScreenData.value.copy(wordExistStatus = exists)
+        updateUiState(wordExistStatus = exists)
     }
 
     fun onMeaningAdd(type: WordClassImpl) {
-        val newMeanings = addWordScreenData.value.meanings.toMutableList().apply {
+        val newMeanings = applyToMeanings {
             add(MeaningImpl(type, ""))
         }
-        applyNewMeanings(newMeanings)
+        updateUiState(meanings = newMeanings)
     }
 
     fun onMeaningUpdate(index: Int, meaning: MeaningImpl) {
-        val newMeanings = addWordScreenData.value.meanings.toMutableList().apply {
+        val newMeanings = applyToMeanings {
             this[index] = meaning
         }
-        applyNewMeanings(newMeanings)
+        updateUiState(meanings = newMeanings)
     }
 
     fun onMeaningDelete(index: Int) {
-        val newMeanings = addWordScreenData.value.meanings.toMutableList().apply {
+        val newMeanings = applyToMeanings {
             removeAt(index)
         }
-        applyNewMeanings(newMeanings)
+        updateUiState(meanings = newMeanings)
     }
 
-    private fun applyNewMeanings(newMeanings: List<MeaningImpl>) {
-        _addWordScreenData.value = addWordScreenData.value.copy(meanings = newMeanings)
+    private fun applyToMeanings(block: MutableList<MeaningImpl>.() -> Unit): List<MeaningImpl> {
+        val meanings = uiStateFlow.value.meanings.toMutableList()
+        return meanings.apply { block() }
     }
 
     fun onMemoUpdate(memo: String) {
-        _addWordScreenData.value = addWordScreenData.value.copy(memo = memo)
+        updateUiState(memo = memo)
     }
 
     fun onAddWord() {
-        if (currentVocabulary != null) {
-            // 수정
-            val updatedWord =
-                addWordScreenData.value.toVocabularyImpl().copy(id = currentVocabulary!!.id)
-            viewModelScope.launch {
-                vocaPersistence.updateVocabulary(listOf(updatedWord).map { it.toVocabulary() })
-            }
+        if (updateTarget == null) {
+            insertVocabulary()
         } else {
-            // 추가
-            val newWord = addWordScreenData.value.toVocabularyImpl()
-            viewModelScope.launch {
-                vocaPersistence.insertVocabulary(listOf(newWord).map { it.toVocabulary() })
-            }
+            updateVocabulary()
         }
+    }
+
+    private fun insertVocabulary() {
+        val newWord = uiStateFlow.value.toVocabularyImpl()
+        viewModelScope.launch(Dispatchers.IO) {
+            vocaPersistence.insertVocabulary(listOf(newWord).toVocabularyList())
+        }
+    }
+
+    private fun updateVocabulary() {
+        val updatedWord = uiStateFlow.value.toVocabularyImpl().copy(id = updateTarget!!.id)
+        viewModelScope.launch(Dispatchers.IO) {
+            vocaPersistence.updateVocabulary(listOf(updatedWord).toVocabularyList())
+        }
+    }
+
+    private fun updateUiState(
+        screenType: ScreenType = uiStateFlow.value.screenType,
+        word: String = uiStateFlow.value.word,
+        wordExistStatus: WordExistStatus = uiStateFlow.value.wordExistStatus,
+        meanings: List<MeaningImpl> = uiStateFlow.value.meanings,
+        memo: String = uiStateFlow.value.memo
+    ) {
+        _uiStateFlow.value = AddWordScreenData(
+            screenType = screenType,
+            word = word,
+            wordExistStatus = wordExistStatus,
+            meanings = meanings,
+            memo = memo
+        )
     }
 
 }

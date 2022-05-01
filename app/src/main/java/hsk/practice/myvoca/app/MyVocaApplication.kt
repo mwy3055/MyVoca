@@ -1,6 +1,8 @@
 package hsk.practice.myvoca.app
 
 import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.preference.PreferenceManager
@@ -29,12 +31,18 @@ class MyVocaApplication : Application(), Configuration.Provider {
     }
 
     private fun setDarkModeLayout() {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        val darkMode = sharedPreferences.getBoolean(getString(R.string.settings_dark_mode), false)
-        setNightMode(darkMode)
+        val sharedPreferences = getDefaultSharedPreferences(applicationContext)
+        val isDarkMode = sharedPreferences.getBoolean(getString(R.string.settings_dark_mode), false)
+        setNightMode(isDarkMode)
+    }
+
+    private fun getDefaultSharedPreferences(context: Context): SharedPreferences {
+        return PreferenceManager.getDefaultSharedPreferences(context)
     }
 
     override fun getWorkManagerConfiguration() =
-        Configuration.Builder().setWorkerFactory(workerFactory).setMinimumLoggingLevel(Log.DEBUG)
+        Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .setMinimumLoggingLevel(Log.DEBUG)
             .build()
 }

@@ -8,8 +8,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import hsk.practice.myvoca.room.persistence.TodayWordDatabase
-import hsk.practice.myvoca.room.persistence.VocaPersistenceDatabase
+import hsk.practice.myvoca.room.persistence.TodayWordPersistenceRoom
+import hsk.practice.myvoca.room.persistence.VocaPersistenceRoom
 import javax.inject.Qualifier
 
 
@@ -27,17 +27,17 @@ annotation class LocalTodayWordPersistence
 
 @Module
 @InstallIn(SingletonComponent::class)
-object VocaPersistenceModule {
+object PersistenceModule {
 
     @LocalVocaPersistence
     @Provides
     fun provideVocaPersistenceDatabase(
         @ApplicationContext context: Context
-    ): VocaPersistence = VocaPersistenceDatabase(context)
+    ): VocaPersistence = VocaPersistenceRoom(context)
 
     @LocalTodayWordPersistence
     @Provides
     fun provideTodayWordDatabase(
         @ApplicationContext context: Context
-    ): TodayWordPersistence = TodayWordDatabase(context)
+    ): TodayWordPersistence = TodayWordPersistenceRoom(context)
 }

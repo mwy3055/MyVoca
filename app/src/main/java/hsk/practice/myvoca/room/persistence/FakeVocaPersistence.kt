@@ -1,7 +1,8 @@
 package hsk.practice.myvoca.room.persistence
 
-import com.hsk.data.vocabulary.*
+import com.hsk.data.*
 import com.hsk.domain.VocaPersistence
+import com.hsk.domain.VocaPersistenceException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -15,13 +16,16 @@ import kotlin.coroutines.CoroutineContext
 
 class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScope {
 
+    private val job = Job()
+    override val coroutineContext: CoroutineContext
+        get() = job + Dispatchers.Main
+
     private val current = System.currentTimeMillis()
 
-    val data = mutableListOf(
+    private val data = mutableListOf(
         Vocabulary(1, "apple", listOf(Meaning(WordClass.NOUN, "사과")), current, current, ""),
         Vocabulary(2, "banana", listOf(Meaning(WordClass.NOUN, "바나나")), current, current, "")
     )
-
     private val fakeDataFlow = MutableStateFlow<List<Vocabulary>>(data)
 
     override fun getAllVocabulary(): StateFlow<List<Vocabulary>> = fakeDataFlow
@@ -31,7 +35,7 @@ class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScop
         return try {
             data.first { it.id == id }
         } catch (e: NoSuchElementException) {
-            nullVocabulary
+            throw VocaPersistenceException("id $id doesn't exist")
         }
     }
 
@@ -45,14 +49,28 @@ class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScop
     }
 
     override suspend fun updateVocabulary(vocabularies: List<Vocabulary>) {
-        // Not necessary, so didn't implemented.
+        vocabularies.forEach { vocabulary -> updateVocabulary(vocabulary) }
+    }
+
+    private fun updateVocabulary(vocabulary: Vocabulary) {
+        val index = findVocabularyIndex(vocabulary.id)
+        data[index] = vocabulary
+    }
+
+    private fun findVocabularyIndex(id: Int): Int {
+        val index = data.indexOfFirst { vocabulary -> vocabulary.id == id }
+        if (index == -1) {
+            throw VocaPersistenceException("id $id doesn't exist")
+        } else {
+            return index
+        }
     }
 
     override suspend fun deleteVocabulary(vocabularies: List<Vocabulary>) {
         data.removeAll(vocabularies)
     }
 
-    private val job = Job()
-    override val coroutineContext: CoroutineContext
-        get() = job + Dispatchers.Main
+    override suspend fun clearVocabulary() {
+        data.clear()
+    }
 }

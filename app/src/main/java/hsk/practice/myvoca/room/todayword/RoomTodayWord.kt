@@ -4,9 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-/**
- * SQL Entity object for storing ``Today's word``.
- */
 @Entity(tableName = "TodayWords")
 data class RoomTodayWord(
     @PrimaryKey(autoGenerate = true)

@@ -25,7 +25,6 @@ import hsk.practice.myvoca.work.setFirestoreUploadWork
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -47,20 +46,20 @@ class ProfileViewModel @Inject constructor(@ApplicationContext context: Context)
         val onDownloadClick = {
             _profileScreenData.value = profileScreenData.value.copy(showDownloadDialog = true)
         }
-        val uploadData = UploadFeatureData(
+        val uploadData = UploadActionData(
             onClick = onUploadClick,
             onConfirm = this::onUploadConfirm,
             onDismiss = this::onUploadDismiss
         )
-        val downloadData = DownloadFeatureData(
+        val downloadData = DownloadActionData(
             onClick = onDownloadClick,
             onConfirm = this::onDownloadConfirm,
             onDismiss = this::onDownloadDismiss
         )
 
         _profileScreenData.value = profileScreenData.value.copy(
-            uploadFeatureData = uploadData,
-            downloadFeatureData = downloadData
+            uploadActionData = uploadData,
+            downloadActionData = downloadData
         )
 
         MyFirebaseAuth.addAuthStateListener { auth ->
@@ -123,7 +122,7 @@ class ProfileViewModel @Inject constructor(@ApplicationContext context: Context)
     }
 
     private fun onDownloadConfirm() {
-        if (profileScreenData.value.downloadFeatureData.downloadPossible == true) {
+        if (profileScreenData.value.downloadActionData.downloadPossible == true) {
             scheduleDownloadWork()
         }
         hideDownloadDialog()
@@ -164,58 +163,49 @@ class ProfileViewModel @Inject constructor(@ApplicationContext context: Context)
             }
         }
     }
-
-
 }
-
 
 data class ProfileScreenData(
     val user: UserImpl? = null,
-    val uploadFeatureData: UploadFeatureData = UploadFeatureData(),
-    val downloadFeatureData: DownloadFeatureData = DownloadFeatureData()
+    val uploadActionData: UploadActionData = UploadActionData(),
+    val downloadActionData: DownloadActionData = DownloadActionData()
 ) {
-    /**
-     * Copy method for [uploadFeatureData]
-     */
     fun copy(
-        showUploadDialog: Boolean = uploadFeatureData.showUploadDialog,
-        uploadProgress: Float? = uploadFeatureData.uploadProgress
+        showUploadDialog: Boolean = uploadActionData.showUploadDialog,
+        uploadProgress: Float? = uploadActionData.uploadProgress
     ): ProfileScreenData {
-        val newUploadData = uploadFeatureData.copy(
+        val newUploadData = uploadActionData.copy(
             showUploadDialog = showUploadDialog,
             uploadProgress = uploadProgress
         )
-        return this.copy(uploadFeatureData = newUploadData)
+        return this.copy(uploadActionData = newUploadData)
     }
 
-    /**
-     * Copy method for [downloadFeatureData]
-     */
     fun copy(
-        showDownloadDialog: Boolean = downloadFeatureData.showDownloadDialog,
-        downloadPossible: Boolean? = downloadFeatureData.downloadPossible
+        showDownloadDialog: Boolean = downloadActionData.showDownloadDialog,
+        downloadPossible: Boolean? = downloadActionData.downloadPossible
     ): ProfileScreenData {
-        val newDownloadData = downloadFeatureData.copy(
+        val newDownloadData = downloadActionData.copy(
             showDownloadDialog = showDownloadDialog,
             downloadPossible = downloadPossible
         )
-        return this.copy(downloadFeatureData = newDownloadData)
+        return this.copy(downloadActionData = newDownloadData)
     }
 }
 
-data class ProfileFeature(
+data class ProfileAction(
     val icon: ImageVector,
     val text: String,
 )
 
-data class UploadFeatureData(
+data class UploadActionData(
     val showUploadDialog: Boolean = false,
     val uploadProgress: Float? = null,
     val onClick: () -> Unit = {},
     val onConfirm: () -> Unit = {},
     val onDismiss: () -> Unit = {}
 ) {
-    val featureData: ProfileFeature = ProfileFeature(
+    val actionData: ProfileAction = ProfileAction(
         icon = Icons.Outlined.FileUpload,
         text = "단어 백업하기"
     )
@@ -226,14 +216,14 @@ data class UploadFeatureData(
         get() = uploadProgress?.equalsDelta(1f) ?: false
 }
 
-data class DownloadFeatureData(
+data class DownloadActionData(
     val showDownloadDialog: Boolean = false,
     val downloadPossible: Boolean? = null,
     val onClick: () -> Unit = {},
     val onConfirm: () -> Unit = {},
     val onDismiss: () -> Unit = {}
 ) {
-    val featureData: ProfileFeature = ProfileFeature(
+    val actionData: ProfileAction = ProfileAction(
         icon = Icons.Outlined.FileDownload,
         text = "단어 복원하기",
     )

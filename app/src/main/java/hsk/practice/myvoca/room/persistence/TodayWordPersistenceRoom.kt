@@ -1,9 +1,8 @@
 package hsk.practice.myvoca.room.persistence
 
 import android.content.Context
-import androidx.work.WorkManager
 import com.hsk.data.TodayWord
-import com.hsk.data.vocabulary.Vocabulary
+import com.hsk.data.Vocabulary
 import com.hsk.domain.TodayWordPersistence
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -25,21 +24,18 @@ import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
 /**
- * ``Today's word`` Persistence service by Room.
  * Implemented as [Singleton] to keep the data persistence across the whole app.
  */
 @Singleton
-class TodayWordDatabase @Inject constructor(@ApplicationContext context: Context) :
+class TodayWordPersistenceRoom @Inject constructor(@ApplicationContext context: Context) :
     TodayWordPersistence, CoroutineScope {
 
     @EntryPoint
     @InstallIn(SingletonComponent::class)
-    interface TodayWordDatabaseEntryPoint {
+    interface TodayWordRoomPersistenceEntryPoint {
         fun vocaDao(): VocaDao
         fun todayWordDao(): TodayWordDao
     }
-
-    private val workManager = WorkManager.getInstance(context)
 
     private val job = Job()
     override val coroutineContext: CoroutineContext
@@ -54,13 +50,21 @@ class TodayWordDatabase @Inject constructor(@ApplicationContext context: Context
 
     private fun loadEntryPoint(context: Context) {
         synchronized(this) {
-            val entryPoint = EntryPointAccessors.fromApplication(
-                context,
-                TodayWordDatabaseEntryPoint::class.java
-            )
-            vocaDao = entryPoint.vocaDao()
-            todayWordDao = entryPoint.todayWordDao()
+            val entryPoint = getTodayWordRoomEntryPoint(context)
+            assignDao(entryPoint)
         }
+    }
+
+    private fun getTodayWordRoomEntryPoint(context: Context): TodayWordRoomPersistenceEntryPoint {
+        return EntryPointAccessors.fromApplication(
+            context,
+            TodayWordRoomPersistenceEntryPoint::class.java
+        )
+    }
+
+    private fun assignDao(persistenceEntryPoint: TodayWordRoomPersistenceEntryPoint) {
+        vocaDao = persistenceEntryPoint.vocaDao()
+        todayWordDao = persistenceEntryPoint.todayWordDao()
     }
 
     override fun loadTodayWords(): Flow<List<TodayWord>> =
@@ -71,11 +75,11 @@ class TodayWordDatabase @Inject constructor(@ApplicationContext context: Context
     override fun loadActualTodayWords(): Flow<List<Vocabulary>> =
         vocaDao.getTodayWords().distinctUntilChanged().map { it.toVocabularyList() }
 
-    override suspend fun storeTodayWord(todayWord: TodayWord) {
+    override suspend fun insertTodayWord(todayWord: TodayWord) {
         todayWordDao.insertTodayWord(todayWord.toRoomTodayWord())
     }
 
-    override suspend fun storeTodayWords(todayWords: List<TodayWord>) {
+    override suspend fun insertTodayWords(todayWords: List<TodayWord>) {
         todayWordDao.insertTodayWord(todayWords.map { it.toRoomTodayWord() })
     }
 

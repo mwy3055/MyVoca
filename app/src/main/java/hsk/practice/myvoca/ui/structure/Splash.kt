@@ -22,21 +22,25 @@ import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import kotlinx.coroutines.delay
 
 @Composable
-fun Splash(onLaunch: suspend () -> Unit = {}) {
-    val navController = rememberNavController()
+fun Splash(
+    loadApp: suspend () -> Unit = {},
+    onLaunch: suspend () -> Unit = {}
+) {
     Box(modifier = Modifier.fillMaxSize()) {
         SplashNavGraph(
-            navController = navController,
+            loadApp = loadApp,
+            navController = rememberNavController(),
             onLaunch = onLaunch
         )
     }
 }
 
-private val SplashName = "splash_screen"
-private val MyVocaAppName = "main_app"
+private const val SplashName = "splash_screen"
+private const val MyVocaAppName = "main_app"
 
 @Composable
 private fun SplashNavGraph(
+    loadApp: suspend () -> Unit,
     navController: NavHostController,
     onLaunch: suspend () -> Unit
 ) {
@@ -45,7 +49,10 @@ private fun SplashNavGraph(
         startDestination = SplashName
     ) {
         composable(SplashName) {
-            SplashScreen(navController = navController)
+            SplashScreen(
+                loadApp = loadApp,
+                navController = navController
+            )
         }
         composable(MyVocaAppName) {
             MyVocaApp(onLaunch = onLaunch)
@@ -53,18 +60,44 @@ private fun SplashNavGraph(
     }
 }
 
-// 스플래시 화면
-
 @Composable
-private fun SplashScreen(navController: NavHostController) {
-    // 1.5초 후에 메인 화면으로 이동
+private fun SplashScreen(
+    loadApp: suspend () -> Unit,
+    navController: NavHostController
+) {
     LaunchedEffect(true) {
-        delay(1000L)
+        loadApp()
         navController.popBackStack()
         navController.navigate(MyVocaAppName)
     }
 
-    SplashBackground()
+    Background()
+    Logo()
+}
+
+@Composable
+private fun Background() {
+    val lineColor = MaterialTheme.colors.primary
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val canvasWidth = size.width
+        val canvasHeight = size.height
+        drawLine(
+            color = lineColor,
+            start = Offset(x = canvasWidth * 2 / 3, y = -100f),
+            end = Offset(x = -250f, y = canvasHeight * 2 / 3),
+            strokeWidth = 350f
+        )
+        drawLine(
+            color = lineColor,
+            start = Offset(x = -250f, y = canvasHeight * 2 / 3),
+            end = Offset(x = canvasWidth * 4 / 3, y = canvasHeight * 8 / 9),
+            strokeWidth = 350f
+        )
+    }
+}
+
+@Composable
+private fun Logo() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -85,31 +118,13 @@ private fun SplashScreen(navController: NavHostController) {
     }
 }
 
-@Composable
-private fun SplashBackground() {
-    val lineColor = MaterialTheme.colors.primary
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        val canvasWidth = size.width
-        val canvasHeight = size.height
-        drawLine(
-            color = lineColor,
-            start = Offset(x = canvasWidth * 2 / 3, y = -100f),
-            end = Offset(x = -250f, y = canvasHeight * 2 / 3),
-            strokeWidth = 350f
-        )
-        drawLine(
-            color = lineColor,
-            start = Offset(x = -250f, y = canvasHeight * 2 / 3),
-            end = Offset(x = canvasWidth * 4 / 3, y = canvasHeight * 8 / 9),
-            strokeWidth = 350f
-        )
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun SplashScreenPreview() {
     MyVocaTheme {
-        SplashScreen(navController = rememberNavController())
+        SplashScreen(
+            loadApp = { delay(1000L) },
+            navController = rememberNavController()
+        )
     }
 }
