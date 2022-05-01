@@ -10,7 +10,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,9 +21,6 @@ class PreferencesDataStore @Inject constructor(@ApplicationContext val context: 
         context.dataStore.data.map { preferences ->
             preferences[key] ?: default
         }
-
-    suspend fun <T> getPreference(key: Preferences.Key<T>, default: T): T =
-        getPreferenceFlow(key, default).first()
 
     suspend fun <T> setPreference(key: Preferences.Key<T>, value: T) {
         coroutineScope {
