@@ -89,7 +89,7 @@ class CreateTodayWordWorker @AssistedInject constructor(
 const val createTodayWordWorkerTag = "create_today_word_work"
 
 fun setPeriodicTodayWordWork(workManager: WorkManager) {
-    val secondsLeft = getSecondsLeft()
+    val secondsLeft = getSecondsLeftOfDay()
     val periodicWork = PeriodicWorkRequestBuilder<CreateTodayWordWorker>(1, TimeUnit.DAYS)
         .addTag(createTodayWordWorkerTag)
         .setInitialDelay(secondsLeft, TimeUnit.SECONDS)

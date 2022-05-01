@@ -94,22 +94,33 @@ class ExtensionsTest {
     }
 
     @Test
+    fun distinctRandoms_SameElements() {
+        val manyOnes = (1..10).map { 1 }
+
+        val actual = manyOnes.distinctRandoms(4)
+        val expected = listOf(1)
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun testCollectionTruncate_SliceMiddle() {
-        val numbers = (1..100).toList()
+        val numbers = (1..100).toMutableList()
 
         val truncateSize = 50
         val expected = (1..50).toList()
         val actual = numbers.truncate(truncateSize)
+        numbers[11] = 1
         assertEquals(expected, actual)
     }
 
     @Test
     fun testCollectionTruncate_SliceOver() {
-        val numbers = (1..100).toList()
+        val numbers = (1..100).toMutableList()
 
         val truncateSize = 1000
         val expected = (1..100).toList()
         val actual = numbers.truncate(truncateSize)
+        numbers[11] = 1
         assertEquals(expected, actual)
     }
 
@@ -179,7 +190,7 @@ class ExtensionsTest {
     }
 
     private fun testSecondsLeft(current: LocalTime, expected: Long) {
-        val actual = getSecondsLeft(current)
+        val actual = getSecondsLeftOfDay(current)
         assertEquals(expected, actual)
     }
 
