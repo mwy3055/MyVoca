@@ -27,7 +27,7 @@ annotation class LocalTodayWordPersistence
 
 @Module
 @InstallIn(SingletonComponent::class)
-object VocaPersistenceModule {
+object PersistenceModule {
 
     @LocalVocaPersistence
     @Provides
