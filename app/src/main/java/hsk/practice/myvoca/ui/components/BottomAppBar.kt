@@ -29,9 +29,9 @@ import java.util.*
 private val TabHeight = 56.dp
 private const val InactiveTabOpacity = 0.60f
 
-private const val TabFadeInAnimationDuration = 150
-private const val TabFadeInAnimationDelay = 100
-private const val TabFadeOutAnimationDuration = 100
+private const val TabFadeInDuration = 150
+private const val TabFadeInDelay = 100
+private const val TabFadeOutDuration = 100
 
 @Composable
 fun MyVocaBottomAppBar(
@@ -40,7 +40,7 @@ fun MyVocaBottomAppBar(
     currentScreen: MyVocaScreen
 ) {
     Surface(
-        Modifier
+        modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
     ) {
@@ -63,20 +63,20 @@ fun MyVocaBottomAppBar(
 
 @Composable
 private fun MyVocaTab(
-    modifier: Modifier = Modifier,
     text: String,
     icon: ImageVector,
     onSelected: () -> Unit,
-    selected: Boolean
+    selected: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val color =
         if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface.copy(alpha = InactiveTabOpacity)
-    val durationMillis = if (selected) TabFadeInAnimationDuration else TabFadeOutAnimationDuration
-    val animationSpec = remember {
+    val durationMillis = if (selected) TabFadeInDuration else TabFadeOutDuration
+    val animationSpec = remember(durationMillis) {
         tween<Color>(
             durationMillis = durationMillis,
             easing = LinearEasing,
-            delayMillis = TabFadeInAnimationDelay
+            delayMillis = TabFadeInDelay
         )
     }
 

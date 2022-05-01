@@ -17,6 +17,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        Assert.assertEquals("com.example.myvoca", appContext.packageName)
+        Assert.assertEquals("hsk.practice.myvoca", appContext.packageName)
     }
 }

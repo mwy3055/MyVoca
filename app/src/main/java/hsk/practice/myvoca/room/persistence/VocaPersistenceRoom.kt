@@ -1,9 +1,9 @@
 package hsk.practice.myvoca.room.persistence
 
 import android.content.Context
-import com.hsk.data.vocabulary.Vocabulary
-import com.hsk.data.vocabulary.VocabularyQuery
-import com.hsk.data.vocabulary.matchesWithQuery
+import com.hsk.data.Vocabulary
+import com.hsk.data.VocabularyQuery
+import com.hsk.data.matchesWithQuery
 import com.hsk.domain.VocaPersistence
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -28,12 +28,12 @@ import kotlin.coroutines.CoroutineContext
  * Implemented as singleton to keep the data persistence across the whole app.
  */
 @Singleton
-class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: Context) :
+class VocaPersistenceRoom @Inject constructor(@ApplicationContext context: Context) :
     VocaPersistence, CoroutineScope {
 
     @EntryPoint
     @InstallIn(SingletonComponent::class)
-    interface VocaPersistenceDatabaseEntryPoint {
+    interface VocaPersistenceRoomEntryPoint {
         fun vocaDao(): VocaDao
     }
 
@@ -41,7 +41,7 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
     override val coroutineContext: CoroutineContext
         get() = job
 
-    private var vocaDao: VocaDao
+    private lateinit var vocaDao: VocaDao
 
     private val _allVocabulary = MutableStateFlow<List<Vocabulary>>(emptyList())
     private val _isLoading = MutableStateFlow(false)
@@ -50,18 +50,20 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
 
     init {
         synchronized(this) {
-            val hiltEntryPoint = EntryPointAccessors.fromApplication(
-                context,
-                VocaPersistenceDatabaseEntryPoint::class.java
-            )
-            vocaDao = hiltEntryPoint.vocaDao()
+            val entryPoint = getVocaPersistenceRoomEntryPoint(context)
+            assignDao(entryPoint)
         }
         loadAllVocabulary()
     }
 
-    override fun getAllVocabulary(): StateFlow<List<Vocabulary>> {
-        return _allVocabulary
+    private fun getVocaPersistenceRoomEntryPoint(context: Context) =
+        EntryPointAccessors.fromApplication(context, VocaPersistenceRoomEntryPoint::class.java)
+
+    private fun assignDao(entryPoint: VocaPersistenceRoomEntryPoint) {
+        vocaDao = entryPoint.vocaDao()
     }
+
+    override fun getAllVocabulary(): StateFlow<List<Vocabulary>> = _allVocabulary
 
     override fun getVocabularySize(): Flow<Int> = vocaDao.getVocabularySize().distinctUntilChanged()
 
@@ -71,16 +73,13 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
 
     private fun loadAllVocabulary() = launch(Dispatchers.IO) {
         vocaDao.loadAllVocabulary().collect {
-//            Logger.d("AllVocabulary loaded!")
             _allVocabulary.value = it.toVocabularyList()
             _isLoading.value = true
         }
     }
 
     override suspend fun getVocabulary(query: VocabularyQuery): List<Vocabulary> {
-//        Logger.d("Filtering waiting...")
         isLoading.first { it }
-//        Logger.d("Filtering start with size ${_allVocabulary.value.size}")
         return _allVocabulary.value.filter { vocabulary ->
             vocabulary.matchesWithQuery(query)
         }
@@ -88,6 +87,10 @@ class VocaPersistenceDatabase @Inject constructor(@ApplicationContext context: C
 
     override suspend fun deleteVocabulary(vocabularies: List<Vocabulary>) {
         vocaDao.deleteVocabulary(vocabularies.toRoomVocabularyList())
+    }
+
+    override suspend fun clearVocabulary() {
+        vocaDao.clearVocabularies()
     }
 
     override suspend fun updateVocabulary(vocabularies: List<Vocabulary>) {

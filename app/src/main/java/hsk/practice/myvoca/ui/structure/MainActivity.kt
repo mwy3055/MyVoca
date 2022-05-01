@@ -4,9 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
-import com.google.accompanist.insets.ProvideWindowInsets
 import dagger.hilt.android.AndroidEntryPoint
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -15,12 +15,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            ProvideWindowInsets {
-                MyVocaTheme {
-                    Splash(onLaunch = {
-                        WindowCompat.setDecorFitsSystemWindows(window, true)
-                    })
-                }
+            MyVocaTheme {
+                Splash(
+                    loadApp = { delay(1000L) },
+                    onLaunch = { WindowCompat.setDecorFitsSystemWindows(window, true) })
             }
         }
     }

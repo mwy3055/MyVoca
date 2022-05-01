@@ -2,9 +2,9 @@ package hsk.practice.myvoca.room.vocabulary
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.hsk.data.vocabulary.Meaning
-import com.hsk.data.vocabulary.Vocabulary
-import com.hsk.data.vocabulary.nullVocabulary
+import com.hsk.data.Meaning
+import com.hsk.data.Vocabulary
+import com.hsk.data.nullVocabulary
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.toMeaning
@@ -34,6 +34,7 @@ fun Vocabulary.toVocabularyImpl() = VocabularyImpl(
     id, eng, meaning.map { it.toMeaningImpl() }, addedTime, lastEditedTime, memo
 )
 
+@JvmName("toRoomVocabularyListVocabulary")
 fun List<Vocabulary>.toRoomVocabularyList() = this.map { it.toRoomVocabulary() }
 
 fun List<Vocabulary>.toRoomVocabularyMutableList() = this.toRoomVocabularyList().toMutableList()
@@ -62,6 +63,10 @@ fun List<RoomVocabulary>.vocabularyImplList() = this.map { it.toVocabularyImpl()
 
 fun Array<out RoomVocabulary>.toVocabularyArray() = this.map { it.toVocabulary() }.toTypedArray()
 
+fun List<VocabularyImpl>.toRoomVocabularyList() = this.map { it.toRoomVocabulary() }
+
+@JvmName("toVocabularyListVocabularyImpl")
+fun List<VocabularyImpl>.toVocabularyList() = this.map { it.toVocabulary() }
 
 /* Convert VocabularyImpl to other types */
 fun VocabularyImpl.toRoomVocabulary(): RoomVocabulary = RoomVocabulary(

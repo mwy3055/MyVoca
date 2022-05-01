@@ -1,14 +1,13 @@
-package hsk.practice.myvoca.room
+package hsk.practice.myvoca.room.vocabulary
 
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import hsk.practice.myvoca.data.fakeData
+import hsk.practice.myvoca.room.RoomVocaDatabase
 import hsk.practice.myvoca.room.todayword.RoomTodayWord
 import hsk.practice.myvoca.room.todayword.TodayWordDao
-import hsk.practice.myvoca.room.vocabulary.VocaDao
-import hsk.practice.myvoca.room.vocabulary.toRoomVocabulary
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After

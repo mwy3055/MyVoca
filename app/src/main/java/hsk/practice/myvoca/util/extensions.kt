@@ -1,6 +1,5 @@
 package hsk.practice.myvoca.util
 
-import android.Manifest
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import com.orhanobut.logger.Logger
@@ -11,40 +10,13 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import kotlin.math.abs
 
-
-/**
- * Runtime permissions required for this app.
- */
-val permissionsList: List<String> = listOf(
-    Manifest.permission.READ_EXTERNAL_STORAGE,
-    Manifest.permission.WRITE_EXTERNAL_STORAGE
-)
-
-/**
- * Checks if the given string contains only alphabet.
- *
- * @return `true` if string contains only alphabet, `false` otherwise
- */
 fun String?.containsOnlyAlphabet(): Boolean {
     if (isNullOrEmpty()) return false
-    return all { it in 'a'..'z' || it in 'A'..'Z' || it == '%' }
+    return all { it.isLowerCase() || it.isUpperCase() || it == '%' }
 }
 
+fun <T> Array<T>.removed(value: T) = this.filter { it != value }
 
-/**
- * Returns a time-formatted string by the given timestamp.
- *
- * @return Time string of the timestamp
- */
-fun Long.toTimeString(formatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE): String {
-    return LocalDateTime.ofEpochSecond(this, 0, ZoneOffset.UTC).format(formatter)
-}
-
-/**
- * Sets night mode.
- *
- * @param value whether to enable night mode
- */
 fun setNightMode(value: Boolean) {
     val mode = if (value) {
         AppCompatDelegate.MODE_NIGHT_YES
@@ -54,10 +26,6 @@ fun setNightMode(value: Boolean) {
     AppCompatDelegate.setDefaultNightMode(mode)
 }
 
-/**
- * Remove the given [element] if this [Collection] contains the [element] or add if doesn't.
- * This function is similar to bit operator `XOR`.
- */
 fun <T> Collection<T>.xor(element: T): Collection<T> {
     return if (this.contains(element)) {
         this.minus(element)
@@ -68,43 +36,30 @@ fun <T> Collection<T>.xor(element: T): Collection<T> {
 
 fun <T> Collection<T>.randoms(size: Int): List<T> {
     if (this.size <= size) return this.toList()
-    val elements = mutableSetOf<T>()
-    while (elements.size < size) {
-        val elem = this.random()
-        elements.add(elem)
+    val elements = mutableListOf<T>()
+    repeat(size) {
+        elements.add(this.random())
     }
-    return elements.toList()
+    return elements
 }
 
-/**
- * Truncates the given collection to [size]. If size of the given collection is smaller than
- * [size], original collection is returned. Otherwise, first [size] elements are returned.
- *
- * @param size Maximum number of elements to include
- */
+fun <T> Collection<T>.distinctRandoms(size: Int): List<T> {
+    val duplicateRemoved = distinct()
+    if (duplicateRemoved.size <= size) return duplicateRemoved
+    return duplicateRemoved.shuffled().take(size)
+}
+
 fun <T> Collection<T>.truncate(size: Int): List<T> {
-    return if (this.size <= size) this.toList() else this.toList().subList(0, size)
+    if (size < 0) throw IllegalArgumentException("Size must be non-negative")
+    return if (this.size <= size) this.toList() else this.take(size)
 }
 
-/**
- * Find the Greatest Common Divisor (GCD).
- *
- * @param num Another integer to find the GCD.
- * @return GCD of this and [num].
- */
 fun Int.gcd(num: Int): Int {
     return if (this == 0) num else (num % this).gcd(this)
 }
 
-val timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:MM:ss")
+val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:MM:ss")
 
-/**
- * Write [log] to the file.
- *
- * @param context [Context] of the caller.
- * @param filename Name of the file which log will be written
- * @param log Content which will be written
- */
 fun writeLogToFile(context: Context, filename: String, log: String) {
     val time = LocalDateTime.now()
     val formattedTime = time.format(timeFormatter)
@@ -113,15 +68,12 @@ fun writeLogToFile(context: Context, filename: String, log: String) {
     }
 }
 
-/**
- * Returns the string that best expresses the time difference from the given [time] to current.
- *
- * @param time Some time before current.
- */
-fun getTimeDiffString(time: Long): String {
-    if (time == LocalDateTime.MIN.toEpochSecond(ZoneOffset.UTC)) return "오래 전"
-    val currentEpoch = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-    return when (val diff = currentEpoch - time) {
+fun getTimeDiffString(
+    currentTime: Long = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
+    anotherTime: Long
+): String {
+    if (anotherTime == LocalDateTime.MIN.toEpochSecond(ZoneOffset.UTC)) return "오래 전"
+    return when (val diff = anotherTime - currentTime) {
         in 0 until 60 -> "${diff}초 전"
         in 60 until 60 * 60 -> "${diff / 60}분 전"
         in 60 * 60 until 60 * 60 * 24 -> "${diff / (60 * 60)}시간 전"
@@ -129,15 +81,10 @@ fun getTimeDiffString(time: Long): String {
     }
 }
 
-/**
- * Calculates the remaining seconds of the day.
- */
-fun getSecondsLeft(): Long {
-    val time = LocalTime.now(ZoneId.systemDefault())
-    Logger.d("time: $time")
-    return 60 * 60 * 24L - time.toSecondOfDay()
+fun getSecondsLeftOfDay(current: LocalTime = LocalTime.now(ZoneId.systemDefault())): Long {
+    Logger.d("Current time: $current")
+    return 60 * 60 * 24L - current.toSecondOfDay()
 }
-
 
 /**
  * Floating point equal comparison.
@@ -145,3 +92,11 @@ fun getSecondsLeft(): Long {
  * because taking a ratio of 2 numbers **cancels** out the effect of their scale relative to delta.
  */
 fun Float.equalsDelta(other: Float) = abs(this / other - 1) < 1e-5
+
+fun <T, R> Iterable<T>.zipForEach(other: Iterable<R>, block: (T, R) -> Unit) {
+    this.zip(other).forEach { (thisInstance, otherInstance) -> block(thisInstance, otherInstance) }
+}
+
+fun <T, R> Array<out T>.zipForEach(other: Array<out R>, block: (T, R) -> Unit) {
+    this.zip(other).forEach { (thisInstance, otherInstance) -> block(thisInstance, otherInstance) }
+}

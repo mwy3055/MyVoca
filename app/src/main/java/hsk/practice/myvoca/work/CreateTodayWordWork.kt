@@ -33,32 +33,63 @@ class CreateTodayWordWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         return try {
-            todayWordDao.clearTodayWords()
-            val allVocabulary = vocaDao.loadAllVocabulary().first()
-            val todayWords = allVocabulary.map { it.id }.randoms(todayWordSize)
-                .map { RoomTodayWord(vocabularyId = it, checked = false) }
-            todayWordDao.insertTodayWord(todayWords)
-            writeLogToFile(
-                context = applicationContext,
-                filename = "today-word-worker.txt",
-                log = "Save Today word - $todayWords"
-            )
-            dataStore.setPreferences(
-                MyVocaPreferences.todayWordLastUpdatedKey,
-                LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-            )
-            Result.success()
+            tryUpdateTodayWords()
         } catch (e: Throwable) {
-            Logger.e(e, "Error while refreshing Today's Word")
-            Result.failure()
+            onTodayWordError(e)
         }
+    }
+
+    private suspend fun tryUpdateTodayWords(): Result {
+        clearTodayWords()
+
+        val todayWords = getRandomTodayWords()
+        updateTodayWords(todayWords)
+        setLastUpdatedTime()
+
+        writeUpdateLog(todayWords)
+        return Result.success()
+    }
+
+    private suspend fun clearTodayWords() {
+        todayWordDao.clearTodayWords()
+    }
+
+    private suspend fun getRandomTodayWords(): List<RoomTodayWord> {
+        val allVocabulary = vocaDao.loadAllVocabulary().first()
+        return allVocabulary
+            .distinctRandoms(todayWordSize)
+            .map { RoomTodayWord(vocabularyId = it.id, checked = false) }
+    }
+
+    private suspend fun updateTodayWords(todayWords: List<RoomTodayWord>) {
+        todayWordDao.insertTodayWord(todayWords)
+    }
+
+    private fun writeUpdateLog(todayWords: List<RoomTodayWord>) {
+        writeLogToFile(
+            context = applicationContext,
+            filename = "today-word-worker.txt",
+            log = "Save Today word - $todayWords"
+        )
+    }
+
+    private suspend fun setLastUpdatedTime() {
+        dataStore.setPreference(
+            MyVocaPreferencesKey.todayWordLastUpdatedKey,
+            LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        )
+    }
+
+    private fun onTodayWordError(e: Throwable): Result {
+        Logger.e(e, "Error while refreshing Today's Word")
+        return Result.failure()
     }
 }
 
 const val createTodayWordWorkerTag = "create_today_word_work"
 
 fun setPeriodicTodayWordWork(workManager: WorkManager) {
-    val secondsLeft = getSecondsLeft()
+    val secondsLeft = getSecondsLeftOfDay()
     val periodicWork = PeriodicWorkRequestBuilder<CreateTodayWordWorker>(1, TimeUnit.DAYS)
         .addTag(createTodayWordWorkerTag)
         .setInitialDelay(secondsLeft, TimeUnit.SECONDS)

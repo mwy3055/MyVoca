@@ -10,19 +10,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Autorenew
 import androidx.compose.material.icons.outlined.Help
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.work.WorkManager
 import hsk.practice.myvoca.data.TodayWordImpl
 import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import hsk.practice.myvoca.util.getTimeDiffString
+import hsk.practice.myvoca.work.setPeriodicTodayWordWork
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -30,19 +34,23 @@ import java.time.ZoneOffset
 fun HomeScreen(viewModel: HomeViewModel) {
     val homeScreenData by viewModel.homeScreenData.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        HomeLoading(
-            data = homeScreenData,
-            onHelpClose = viewModel::onCloseAlertDialog,
-            showTodayWordHelp = viewModel::showTodayWordHelp,
-            onRefreshTodayWord = viewModel::onRefreshTodayWord,
-            onTodayWordCheckboxChange = viewModel::onTodayWordCheckboxChange
-        )
+    val context = LocalContext.current
+    LaunchedEffect(true) {
+        val workManager = WorkManager.getInstance(context)
+        setPeriodicTodayWordWork(workManager)
     }
+
+    Loading(
+        data = homeScreenData,
+        onHelpClose = viewModel::onCloseAlertDialog,
+        showTodayWordHelp = viewModel::showTodayWordHelp,
+        onRefreshTodayWord = viewModel::onRefreshTodayWord,
+        onTodayWordCheckboxChange = viewModel::onTodayWordCheckboxChange
+    )
 }
 
 @Composable
-fun HomeLoading(
+private fun Loading(
     data: HomeScreenData,
     onHelpClose: () -> Unit,
     showTodayWordHelp: (Boolean) -> Unit,
@@ -58,9 +66,9 @@ fun HomeLoading(
             )
         }
         if (data.showTodayWordHelp) {
-            HomeTodayWordHelp(onClose = onHelpClose)
+            TodayWordHelp(onClose = onHelpClose)
         }
-        HomeContent(
+        Content(
             data = data,
             showTodayWordHelp = showTodayWordHelp,
             onRefreshTodayWord = onRefreshTodayWord,
@@ -70,7 +78,7 @@ fun HomeLoading(
 }
 
 @Composable
-fun HomeContent(
+private fun Content(
     data: HomeScreenData,
     showTodayWordHelp: (Boolean) -> Unit,
     onRefreshTodayWord: () -> Unit,
@@ -82,8 +90,8 @@ fun HomeContent(
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        HomeTitle(size = data.totalWordCount)
-        HomeTodayWords(
+        Title(size = data.totalWordCount)
+        TodayWords(
             todayWords = data.todayWords,
             lastUpdatedTime = data.todayWordsLastUpdatedTime,
             enableRefresh = data.totalWordCount > 0,
@@ -95,7 +103,7 @@ fun HomeContent(
 }
 
 @Composable
-fun HomeTodayWords(
+private fun TodayWords(
     todayWords: List<HomeTodayWord>,
     lastUpdatedTime: Long,
     enableRefresh: Boolean,
@@ -103,24 +111,35 @@ fun HomeTodayWords(
     onRefreshTodayWord: () -> Unit,
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
 ) {
-    HomeTodayWordHeader(
+    TodayWordHeader(
         lastUpdatedTime = lastUpdatedTime,
         showTodayWordHelp = showTodayWordHelp,
         enableRefresh = enableRefresh,
         onRefreshTodayWord = onRefreshTodayWord
     )
+    TodayWordItems(
+        todayWords = todayWords,
+        onTodayWordCheckboxChange = onTodayWordCheckboxChange
+    )
+}
+
+@Composable
+private fun TodayWordItems(
+    todayWords: List<HomeTodayWord>,
+    onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         if (todayWords.isEmpty()) {
             item {
-                HomeTodayWordEmpty()
+                TodayWordEmptyIndicator()
             }
         } else {
             items(todayWords) { todayWord ->
-                HomeTodayWord(
-                    todayWord,
+                TodayWordContent(
+                    todayWord = todayWord,
                     onTodayWordCheckboxChange = onTodayWordCheckboxChange
                 )
             }
@@ -132,7 +151,7 @@ fun HomeTodayWords(
 }
 
 @Composable
-fun HomeTodayWordEmpty() {
+private fun TodayWordEmptyIndicator() {
     Box(modifier = Modifier.fillMaxSize()) {
         Text(
             text = "아직 아무것도 없습니다.",
@@ -142,48 +161,71 @@ fun HomeTodayWordEmpty() {
 }
 
 @Composable
-fun HomeTodayWordHeader(
+private fun TodayWordHeader(
     lastUpdatedTime: Long,
     showTodayWordHelp: (Boolean) -> Unit,
     enableRefresh: Boolean,
     onRefreshTodayWord: () -> Unit
 ) {
-    val lastUpdatedTimeString = getTimeDiffString(lastUpdatedTime)
+    val lastUpdatedTimeString = getTimeDiffString(anotherTime = lastUpdatedTime)
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "오늘의 단어",
-            style = MaterialTheme.typography.h6
-        )
-        IconButton(
-            onClick = { showTodayWordHelp(true) }
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Help,
-                contentDescription = "오늘의 단어란?"
-            )
-        }
+        HeaderTitle()
+        HelpIcon(showTodayWordHelp = showTodayWordHelp)
         Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = "마지막 업데이트: $lastUpdatedTimeString",
-            style = MaterialTheme.typography.caption
+        LastUpdateTimeText(lastUpdatedTimeString = lastUpdatedTimeString)
+        RefreshIcon(
+            onRefreshTodayWord = onRefreshTodayWord,
+            enableRefresh = enableRefresh
         )
-        IconButton(
-            onClick = onRefreshTodayWord,
-            enabled = enableRefresh
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Autorenew,
-                contentDescription = "오늘의 단어 새로고침하기"
-            )
-        }
     }
 }
 
 @Composable
-fun HomeTodayWord(
+private fun RefreshIcon(onRefreshTodayWord: () -> Unit, enableRefresh: Boolean) {
+    IconButton(
+        onClick = onRefreshTodayWord,
+        enabled = enableRefresh
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Autorenew,
+            contentDescription = "오늘의 단어 새로고침하기"
+        )
+    }
+}
+
+@Composable
+private fun LastUpdateTimeText(lastUpdatedTimeString: String) {
+    Text(
+        text = "마지막 업데이트: $lastUpdatedTimeString",
+        style = MaterialTheme.typography.caption
+    )
+}
+
+@Composable
+private fun HelpIcon(showTodayWordHelp: (Boolean) -> Unit) {
+    IconButton(
+        onClick = { showTodayWordHelp(true) }
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Help,
+            contentDescription = "오늘의 단어란?"
+        )
+    }
+}
+
+@Composable
+private fun HeaderTitle() {
+    Text(
+        text = "오늘의 단어",
+        style = MaterialTheme.typography.h6
+    )
+}
+
+@Composable
+private fun TodayWordContent(
     todayWord: HomeTodayWord,
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
 ) {
@@ -195,7 +237,7 @@ fun HomeTodayWord(
     ) {
         Box {
             WordContent(
-                todayWord.vocabulary,
+                word = todayWord.vocabulary,
                 showExpandButton = false,
                 expanded = true,
                 onExpanded = {}
@@ -212,7 +254,7 @@ fun HomeTodayWord(
 }
 
 @Composable
-fun HomeTitle(size: Int = 0) {
+private fun Title(size: Int = 0) {
     val titleText = if (size == 0) "등록된 단어가\n없습니다" else "${size}개의 단어가\n등록되어 있어요"
     Text(
         text = titleText,
@@ -223,7 +265,7 @@ fun HomeTitle(size: Int = 0) {
 }
 
 @Composable
-fun HomeTodayWordHelp(
+private fun TodayWordHelp(
     onClose: () -> Unit
 ) {
     AlertDialog(
@@ -254,7 +296,7 @@ fun HomeTodayWordHelp(
 
 @Preview(showBackground = true)
 @Composable
-fun HomeContentPreview() {
+private fun ContentPreview() {
     val data = HomeScreenData(
         loading = false,
         totalWordCount = fakeData.size,
@@ -264,10 +306,18 @@ fun HomeContentPreview() {
         todayWordsLastUpdatedTime = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
     )
     MyVocaTheme {
-        HomeContent(data,
+        Content(data,
             showTodayWordHelp = {},
             onRefreshTodayWord = {},
             onTodayWordCheckboxChange = {}
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TodayWordHelpPreview() {
+    MyVocaTheme {
+        TodayWordHelp(onClose = {})
     }
 }

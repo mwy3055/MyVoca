@@ -1,5 +1,6 @@
 package hsk.practice.myvoca.ui.components
 
+import android.content.Context
 import android.content.Intent
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -53,15 +54,13 @@ private fun MyVocaTopNavigationIcon() {
 
 @Composable
 private fun MyVocaTopActions(currentScreen: MyVocaScreen) {
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
     if (currentScreen in listOf(MyVocaScreen.Home, MyVocaScreen.AllWord)) {
+        val coroutineScope = rememberCoroutineScope()
+        val context = LocalContext.current
         IconButton(
             onClick = {
                 coroutineScope.launch {
-                    context.startActivity(
-                        Intent(context, AddWordActivity::class.java)
-                    )
+                    context.startActivity(getAddWordActivityIntent(context))
                 }
             },
         ) {
@@ -73,6 +72,9 @@ private fun MyVocaTopActions(currentScreen: MyVocaScreen) {
         }
     }
 }
+
+private fun getAddWordActivityIntent(context: Context) =
+    Intent(context, AddWordActivity::class.java)
 
 @Preview
 @Composable

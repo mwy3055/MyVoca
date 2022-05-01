@@ -9,10 +9,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -34,8 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.hsk.data.vocabulary.VocabularyQuery
-import com.hsk.data.vocabulary.WordClass
+import com.hsk.data.VocabularyQuery
+import com.hsk.data.WordClass
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.data.fakeData
@@ -44,16 +41,17 @@ import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.state.UiState
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
 fun AllWordScreen(
     viewModel: AllWordViewModel = viewModel()
 ) {
-    val allWordUiState by viewModel.allWordUiState.collectAsState()
+    val uiState by viewModel.allWordUiState.collectAsState()
 
-    AllWordLoading(
-        uiState = allWordUiState,
+    Loading(
+        uiState = uiState,
         onSubmitButtonClicked = viewModel::onSubmitButtonClicked,
         onQueryWordChanged = viewModel::onQueryTextChanged,
         onOptionWordClassClick = viewModel::onQueryWordClassToggled,
@@ -65,7 +63,7 @@ fun AllWordScreen(
 }
 
 @Composable
-fun AllWordLoading(
+private fun Loading(
     uiState: UiState<AllWordData>,
     onOptionButtonClicked: () -> Unit = {},
     onSubmitButtonClicked: () -> Unit = {},
@@ -84,7 +82,7 @@ fun AllWordLoading(
             LoadingIndicator(modifier = Modifier.align(Alignment.Center))
         }
         uiState.data?.let { data ->
-            AllWordContent(
+            Content(
                 data = data,
                 onOptionButtonClicked = onOptionButtonClicked,
                 onSubmitButtonClicked = onSubmitButtonClicked,
@@ -102,7 +100,7 @@ fun AllWordLoading(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun AllWordContent(
+private fun Content(
     data: AllWordData,
     onOptionButtonClicked: () -> Unit,
     onSubmitButtonClicked: () -> Unit,
@@ -126,14 +124,14 @@ fun AllWordContent(
 
     BackdropScaffold(
         appBar = {
-            AllWordQueryIndicator(
+            QueryHeader(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(BackdropScaffoldDefaults.HeaderHeight)
             )
         },
         backLayerContent = {
-            AllWordQueryOptions(
+            QueryOptions(
                 modifier = Modifier
                     .padding(8.dp),
                 query = data.queryState,
@@ -154,7 +152,7 @@ fun AllWordContent(
         backLayerBackgroundColor = MaterialTheme.colors.surface,
         frontLayerContent = {
             Column {
-                AllWordHeader(
+                Header(
                     vocabularySize = data.currentWordState.size,
                     showOptionClearButton = data.queryState != VocabularyQuery(),
                     onOptionButtonClicked = {
@@ -163,7 +161,7 @@ fun AllWordContent(
                     },
                     onClearOption = onClearOption
                 )
-                AllWordItems(
+                WordItems(
                     words = data.currentWordState,
                     onWordUpdate = onWordUpdate,
                     onWordDelete = onWordDelete
@@ -181,7 +179,7 @@ fun AllWordContent(
 }
 
 @Composable
-fun AllWordHeader(
+private fun Header(
     vocabularySize: Int,
     showOptionClearButton: Boolean,
     onOptionButtonClicked: () -> Unit,
@@ -193,33 +191,59 @@ fun AllWordHeader(
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "검색 결과: ${vocabularySize}개",
+        HeaderText(
+            vocabularySize = vocabularySize,
             modifier = Modifier.align(Alignment.CenterVertically)
         )
         Spacer(modifier = Modifier.weight(1f))
-        if (showOptionClearButton) {
-            TextButton(onClick = onClearOption) {
-                Icon(
-                    imageVector = Icons.Filled.Refresh,
-                    contentDescription = "검색 옵션을 초기화합니다."
-                )
-                Text(text = "초기화")
-            }
+        SearchOptionClearButton(
+            showOptionClearButton = showOptionClearButton,
+            onClearOption = onClearOption
+        )
+        ShowSearchOptionButton(onButtonClicked = onOptionButtonClicked)
+    }
+}
 
-        }
-        TextButton(onClick = onOptionButtonClicked) {
+@Composable
+private fun SearchOptionClearButton(
+    showOptionClearButton: Boolean,
+    onClearOption: () -> Unit
+) {
+    if (showOptionClearButton) {
+        TextButton(onClick = onClearOption) {
             Icon(
-                imageVector = Icons.Filled.ManageSearch,
-                contentDescription = "특정 조건에 맞는 단어를 검색합니다."
+                imageVector = Icons.Filled.Refresh,
+                contentDescription = "검색 옵션을 초기화합니다."
             )
-            Text(text = "검색 옵션")
+            Text(text = "초기화")
         }
     }
 }
 
 @Composable
-fun AllWordQueryIndicator(modifier: Modifier = Modifier) {
+private fun ShowSearchOptionButton(onButtonClicked: () -> Unit) {
+    TextButton(onClick = onButtonClicked) {
+        Icon(
+            imageVector = Icons.Filled.ManageSearch,
+            contentDescription = "특정 조건에 맞는 단어를 검색합니다."
+        )
+        Text(text = "검색 옵션")
+    }
+}
+
+@Composable
+private fun HeaderText(
+    vocabularySize: Int,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = "검색 결과: ${vocabularySize}개",
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun QueryHeader(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
@@ -232,7 +256,7 @@ fun AllWordQueryIndicator(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun AllWordQueryOptions(
+private fun QueryOptions(
     modifier: Modifier = Modifier,
     query: VocabularyQuery,
     sortState: SortState,
@@ -246,19 +270,19 @@ fun AllWordQueryOptions(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        AllWordQueryButtons(
+        QueryActions(
             onCloseButtonClicked = onCloseButtonClicked,
             onSubmitButtonClicked = onSubmitButtonClicked
         )
-        AllWordQueryWord(
+        QueryWord(
             text = query.word,
             onTextChanged = onQueryWordChanged
         )
-        AllWordQueryWordClass(
+        QueryWordClass(
             selectedWordClass = query.wordClass,
             onOptionWordClassClick = onOptionWordClassClick
         )
-        AllWordQuerySortState(
+        QuerySortState(
             currentSortState = sortState,
             onSortStateClick = onSortStateClick
         )
@@ -266,36 +290,62 @@ fun AllWordQueryOptions(
 }
 
 @Composable
-fun AllWordQueryButtons(
+private fun QueryActions(
     onCloseButtonClicked: () -> Unit,
     onSubmitButtonClicked: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     val closeKeyboard = { focusManager.clearFocus() }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        TextButton(
-            onClick = {
-                onCloseButtonClicked()
-                closeKeyboard()
-            },
+        CloseQueryButton(
+            onCloseButtonClicked = onCloseButtonClicked,
+            closeKeyboard = closeKeyboard,
             modifier = Modifier.weight(1f)
-        ) {
-            Text("닫기")
-        }
-        Button(
-            onClick = {
-                onSubmitButtonClicked()
-                closeKeyboard()
-            },
+        )
+        SubmitQueryButton(
+            onSubmitButtonClicked = onSubmitButtonClicked,
+            closeKeyboard = closeKeyboard,
             modifier = Modifier.weight(1f)
-        ) {
-            Text("검색")
-        }
+        )
     }
 }
 
 @Composable
-fun AllWordQueryWord(
+private fun CloseQueryButton(
+    onCloseButtonClicked: () -> Unit,
+    closeKeyboard: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TextButton(
+        onClick = {
+            onCloseButtonClicked()
+            closeKeyboard()
+        },
+        modifier = modifier
+    ) {
+        Text("닫기")
+    }
+}
+
+@Composable
+private fun SubmitQueryButton(
+    onSubmitButtonClicked: () -> Unit,
+    closeKeyboard: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = {
+            onSubmitButtonClicked()
+            closeKeyboard()
+        },
+        modifier = modifier
+    ) {
+        Text("검색")
+    }
+}
+
+@Composable
+private fun QueryWord(
     text: String,
     onTextChanged: (String) -> Unit,
     focusManager: FocusManager = LocalFocusManager.current
@@ -323,7 +373,7 @@ fun AllWordQueryWord(
 }
 
 @Composable
-fun AllWordQueryWordClass(
+private fun QueryWordClass(
     selectedWordClass: Set<WordClass>,
     onOptionWordClassClick: (String) -> Unit
 ) {
@@ -347,13 +397,15 @@ fun AllWordQueryWordClass(
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun WordClassChip(
+private fun WordClassChip(
     className: String,
     selected: Boolean,
     onClick: (String) -> Unit,
 ) {
-    val background by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.surface else MaterialTheme.colors.surface)
-    val textColor by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface)
+    val background = MaterialTheme.colors.surface
+    val textColor by animateColorAsState(
+        targetValue = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
+    )
 
     Row(
         modifier = Modifier
@@ -365,21 +417,20 @@ fun WordClassChip(
         AnimatedVisibility(selected) {
             Icon(
                 imageVector = Icons.Filled.Check,
-                contentDescription = null,
+                contentDescription = "$className 선택됨",
                 tint = textColor
             )
         }
         Text(
             text = className,
-            modifier = Modifier
-                .padding(6.dp),
+            modifier = Modifier.padding(6.dp),
             color = textColor
         )
     }
 }
 
 @Composable
-fun AllWordQuerySortState(
+private fun QuerySortState(
     currentSortState: SortState,
     onSortStateClick: (SortState) -> Unit
 ) {
@@ -401,14 +452,18 @@ fun AllWordQuerySortState(
 }
 
 @Composable
-fun SortStateChip(
+private fun SortStateChip(
     modifier: Modifier = Modifier,
     sortState: SortState,
     selected: Boolean,
     onClick: (SortState) -> Unit
 ) {
-    val background by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.surface)
-    val textColor by animateColorAsState(targetValue = if (selected) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onSurface)
+    val background by animateColorAsState(
+        targetValue = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.surface
+    )
+    val textColor by animateColorAsState(
+        targetValue = contentColorFor(background)
+    )
 
     Box(
         modifier = modifier
@@ -427,7 +482,7 @@ fun SortStateChip(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AllWordItems(
+private fun WordItems(
     words: List<VocabularyImpl>,
     onWordUpdate: (VocabularyImpl, Context) -> Unit,
     onWordDelete: (VocabularyImpl) -> Unit
@@ -469,41 +524,53 @@ fun AllWordItems(
                 }
             }
         }
-
-        val showButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 } }
-        val density = LocalDensity.current
-        AnimatedVisibility(
-            visible = showButton,
-            modifier = Modifier
+        ScrollTopButton(
+            listState = listState,
+            coroutineScope = coroutineScope,
+            modifier = Modifier.Companion
                 .align(Alignment.BottomEnd)
-                .padding(16.dp),
-            enter = fadeIn() + slideInVertically { with(density) { -40.dp.roundToPx() } },
-            exit = fadeOut() + slideOutVertically { with(density) { -40.dp.roundToPx() } },
+                .padding(16.dp)
+        )
+    }
+}
+
+@Composable
+private fun ScrollTopButton(
+    listState: LazyListState,
+    coroutineScope: CoroutineScope,
+    modifier: Modifier = Modifier
+) {
+    val showButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 } }
+    val density = LocalDensity.current
+    AnimatedVisibility(
+        visible = showButton,
+        modifier = modifier,
+        enter = fadeIn() + slideInVertically { with(density) { -40.dp.roundToPx() } },
+        exit = fadeOut() + slideOutVertically { with(density) { -40.dp.roundToPx() } },
+    ) {
+        IconButton(
+            onClick = { coroutineScope.launch { listState.animateScrollToItem(0) } },
+            modifier = Modifier.background(
+                color = MaterialTheme.colors.secondary,
+                shape = CircleShape
+            )
         ) {
-            IconButton(
-                onClick = { coroutineScope.launch { listState.animateScrollToItem(0) } },
-                modifier = Modifier.background(
-                    color = MaterialTheme.colors.secondary,
-                    shape = CircleShape
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.ArrowUpward,
-                    contentDescription = "목록의 맨 위로 이동합니다."
-                )
-            }
+            Icon(
+                imageVector = Icons.Outlined.ArrowUpward,
+                contentDescription = "목록의 맨 위로 이동합니다."
+            )
         }
     }
 }
 
 @Preview
 @Composable
-fun AllWordContentsPreview() {
+private fun ContentsPreview() {
     var word = "test text"
     val wordClassSet = mutableSetOf<WordClass>()
 
     MyVocaTheme {
-        AllWordContent(
+        Content(
             data = AllWordData(
                 currentWordState = fakeData,
                 queryState = VocabularyQuery(word = word)
@@ -514,7 +581,7 @@ fun AllWordContentsPreview() {
             onQueryWordChanged = { word = it },
             onOptionWordClassClick = { wordClassName ->
                 val wordClass = WordClassImpl.findByKorean(wordClassName)?.toWordClass()
-                    ?: return@AllWordContent
+                    ?: return@Content
                 if (wordClassSet.contains(wordClass)) {
                     wordClassSet.remove(wordClass)
                 } else {
@@ -530,9 +597,9 @@ fun AllWordContentsPreview() {
 
 @Preview
 @Composable
-fun AllWordItemsPreview() {
+private fun WordItemsPreview() {
     MyVocaTheme {
-        AllWordItems(
+        WordItems(
             words = fakeData,
             onWordUpdate = { _, _ -> },
             onWordDelete = {}
@@ -542,12 +609,12 @@ fun AllWordItemsPreview() {
 
 @Preview
 @Composable
-fun AllWordQueryOptionsPreview() {
+private fun QueryOptionsPreview() {
     var word = "test text"
     val wordClassSet = mutableSetOf<WordClass>()
 
     MyVocaTheme {
-        AllWordQueryOptions(
+        QueryOptions(
             modifier = Modifier
                 .background(MaterialTheme.colors.surface)
                 .padding(8.dp),
@@ -562,7 +629,7 @@ fun AllWordQueryOptionsPreview() {
             onSortStateClick = {},
             onOptionWordClassClick = { wordClassName ->
                 val wordClass = WordClassImpl.findByKorean(wordClassName)?.toWordClass()
-                    ?: return@AllWordQueryOptions
+                    ?: return@QueryOptions
                 if (wordClassSet.contains(wordClass)) {
                     wordClassSet.remove(wordClass)
                 } else {
@@ -575,12 +642,12 @@ fun AllWordQueryOptionsPreview() {
 
 @Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable
-fun AllWordQueryOptionsDarkPreview() {
+private fun QueryOptionsPreview_DarkMode() {
     var word = "test text"
     val wordClassSet = mutableSetOf<WordClass>()
 
     MyVocaTheme {
-        AllWordQueryOptions(
+        QueryOptions(
             modifier = Modifier
                 .background(MaterialTheme.colors.surface)
                 .padding(8.dp),
@@ -595,7 +662,7 @@ fun AllWordQueryOptionsDarkPreview() {
             onSortStateClick = {},
             onOptionWordClassClick = { wordClassName ->
                 val wordClass = WordClassImpl.findByKorean(wordClassName)?.toWordClass()
-                    ?: return@AllWordQueryOptions
+                    ?: return@QueryOptions
                 if (wordClassSet.contains(wordClass)) {
                     wordClassSet.remove(wordClass)
                 } else {

@@ -1,4 +1,4 @@
-package hsk.practice.myvoca.room
+package hsk.practice.myvoca.room.vocabulary
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
