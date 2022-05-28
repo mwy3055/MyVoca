@@ -84,6 +84,12 @@ android {
         debug {
             testCoverageEnabled true
         }
+        benchmark {
+            initWith buildTypes.release
+            signingConfig signingConfigs.debug
+            matchingFallbacks = ['release']
+            debuggable false
+        }
     }
     buildFeatures {
         compose true

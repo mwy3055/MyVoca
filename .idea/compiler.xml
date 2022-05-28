@@ -3,6 +3,7 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.8">
       <module name="MyVoca.app" target="11" />
+      <module name="MyVoca.macrobenchmark" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>
