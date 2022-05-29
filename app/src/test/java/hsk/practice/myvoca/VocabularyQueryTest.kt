@@ -5,12 +5,9 @@ import com.hsk.data.WordClass
 import com.hsk.data.matchesWithQuery
 import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.room.vocabulary.toVocabulary
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
-@RunWith(JUnit4::class)
 class VocabularyQueryTest {
 
     private val data = fakeData.map { it.toVocabulary() }

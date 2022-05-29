@@ -1,7 +1,7 @@
 package hsk.practice.myvoca.ui.screens.allword
 
 import com.hsk.domain.VocaPersistence
-import hsk.practice.myvoca.MainCoroutineRule
+import hsk.practice.myvoca.MainCoroutineExtension
 import hsk.practice.myvoca.TestSampleData
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.data.toWordClass
@@ -11,18 +11,18 @@ import hsk.practice.myvoca.ui.state.UiState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AllWordViewModelTest {
 
-    private val testDispatcher = StandardTestDispatcher()
+    private val dispatcher = StandardTestDispatcher()
 
-    @get:Rule
-    var mainCoroutineRule = MainCoroutineRule(testDispatcher)
+    @RegisterExtension
+    val coroutineExtension = MainCoroutineExtension(dispatcher)
 
     private val vocaPersistence: VocaPersistence = FakeVocaPersistence()
 
@@ -32,14 +32,14 @@ class AllWordViewModelTest {
     private val uiData: AllWordData
         get() = uiState.data!!
 
-    @Before
+    @BeforeEach
     fun initTest() = runTest {
         vocaPersistence.clearVocabulary()
         vocaPersistence.insertVocabulary(TestSampleData.getSampleVocabularies())
         viewModel = AllWordViewModel(
             vocaPersistence,
-            computingDispatcher = testDispatcher,
-            ioDispatcher = testDispatcher
+            computingDispatcher = dispatcher,
+            ioDispatcher = dispatcher
         )
     }
 

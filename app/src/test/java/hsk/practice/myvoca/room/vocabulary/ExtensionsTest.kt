@@ -7,8 +7,8 @@ import hsk.practice.myvoca.TestSampleData.getSampleVocaImpls
 import hsk.practice.myvoca.TestSampleData.getSampleVocabularies
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.util.zipForEach
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 class ExtensionsTest {
 

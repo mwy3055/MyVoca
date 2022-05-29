@@ -4,17 +4,17 @@ import com.hsk.data.Vocabulary
 import com.hsk.data.VocabularyQuery
 import com.hsk.domain.VocaPersistence
 import com.hsk.domain.VocaPersistenceException
-import hsk.practice.myvoca.MainCoroutineRule
+import hsk.practice.myvoca.MainCoroutineExtension
 import hsk.practice.myvoca.TestSampleData.getSampleVoca
 import hsk.practice.myvoca.TestSampleData.getSampleVocabularies
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -22,12 +22,12 @@ class FakeVocaPersistenceTest {
 
     private val dispatcher = StandardTestDispatcher()
 
-    @get:Rule
-    val rule = MainCoroutineRule(dispatcher)
+    @RegisterExtension
+    val coroutineExtension = MainCoroutineExtension(dispatcher)
 
     private val persistence: VocaPersistence = FakeVocaPersistence()
 
-    @Before
+    @BeforeEach
     fun initTest() = runTest {
         persistence.clearVocabulary()
     }

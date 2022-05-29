@@ -2,7 +2,7 @@ package hsk.practice.myvoca.room.persistence
 
 import com.hsk.data.TodayWord
 import com.hsk.domain.TodayWordPersistence
-import hsk.practice.myvoca.MainCoroutineRule
+import hsk.practice.myvoca.MainCoroutineExtension
 import hsk.practice.myvoca.TestSampleData.getSampleTodayWord
 import hsk.practice.myvoca.TestSampleData.getSampleTodayWords
 import hsk.practice.myvoca.room.todayword.RoomTodayWord
@@ -10,23 +10,23 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TodayWordPersistenceTest {
 
     private val dispatcher = StandardTestDispatcher()
 
-    @get:Rule
-    val rule = MainCoroutineRule(dispatcher)
+    @RegisterExtension
+    val coroutineExtension = MainCoroutineExtension(dispatcher)
 
     // Any subclass of TodayWordPersistence
     private val persistence: TodayWordPersistence = FakeTodayWordPersistence()
 
-    @Before
+    @BeforeEach
     fun initTest() = runTest {
         persistence.clearTodayWords()
     }

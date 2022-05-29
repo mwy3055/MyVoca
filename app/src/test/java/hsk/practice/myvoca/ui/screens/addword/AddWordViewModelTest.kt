@@ -2,24 +2,29 @@ package hsk.practice.myvoca.ui.screens.addword
 
 import com.hsk.data.VocabularyQuery
 import com.hsk.domain.VocaPersistence
+import hsk.practice.myvoca.MainCoroutineExtension
 import hsk.practice.myvoca.TestSampleData
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.data.toMeaning
 import hsk.practice.myvoca.room.persistence.FakeVocaPersistence
 import hsk.practice.myvoca.util.zipForEach
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.setMain
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AddWordViewModelTest {
+
+    private val dispatcher = StandardTestDispatcher()
+
+    @RegisterExtension
+    val coroutineExtension = MainCoroutineExtension(dispatcher)
 
     private val vocaPersistence: VocaPersistence = FakeVocaPersistence()
 
@@ -30,11 +35,7 @@ class AddWordViewModelTest {
     private val uiMeanings: List<MeaningImpl>
         get() = uiState.meanings
 
-    init {
-        Dispatchers.setMain(StandardTestDispatcher())
-    }
-
-    @Before
+    @BeforeEach
     fun initTest() = runBlocking {
         delayAfter {
             vocaPersistence.clearVocabulary()

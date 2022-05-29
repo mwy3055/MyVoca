@@ -1,8 +1,8 @@
 package hsk.practice.myvoca.ui.screens.addword
 
 import hsk.practice.myvoca.data.MeaningImpl
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 class AddWordScreenDataTest {
 
