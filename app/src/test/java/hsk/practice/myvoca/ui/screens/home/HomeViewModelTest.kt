@@ -79,6 +79,7 @@ class HomeViewModelTest {
         assertFalse(uiData.showTodayWordHelp)
     }
 
+    // TODO: 코루틴 이슈로 테스트 실패하는 문제 해결하기
     @Test
     fun onRefreshTodayWord_CheckIfWorkCreated() = runTest {
         viewModel.onRefreshTodayWord().join()
