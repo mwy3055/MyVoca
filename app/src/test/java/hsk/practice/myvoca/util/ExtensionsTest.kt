@@ -1,42 +1,12 @@
 package hsk.practice.myvoca.util
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Test
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
 
 class ExtensionsTest {
-
-    @Test
-    fun testStringContainsOnlyAlphabet_True() {
-        val string = "abcdef"
-        assert(string.containsOnlyAlphabet())
-    }
-
-    @Test
-    fun testStringContainsOnlyAlphabet_Number() {
-        val string = "abcd3f"
-        assertFalse(string.containsOnlyAlphabet())
-    }
-
-    @Test
-    fun testStringContainsOnlyAlphabet_SpecialCharacter() {
-        val string = "abcd#f"
-        assertFalse(string.containsOnlyAlphabet())
-    }
-
-    @Test
-    fun testStringContainsOnlyAlphabet_Null() {
-        val string: String? = null
-        assertFalse(string.containsOnlyAlphabet())
-    }
-
-    @Test
-    fun testStringContainsOnlyAlphabet_Empty() {
-        assertFalse("".containsOnlyAlphabet())
-    }
 
     @Test
     fun testArrayRemoved_Exists() {
