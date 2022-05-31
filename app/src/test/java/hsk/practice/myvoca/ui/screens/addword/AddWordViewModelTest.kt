@@ -13,9 +13,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -44,117 +46,112 @@ class AddWordViewModelTest {
     }
 
     @Test
-    fun injectUpdateWord_InjectExistWord() = runBlocking {
-        val sampleWord = TestSampleData.getSampleVoca()
-        vocaPersistence.insertVocabulary(listOf(sampleWord))
+    fun injectUpdateWord_InjectExistWord(): Unit = runBlocking {
+        val sample = TestSampleData.getSampleVoca()
+        vocaPersistence.insertVocabulary(listOf(sample))
 
-        injectUpdateWordThenDelay(sampleWord.id)
-        assertEquals(sampleWord.eng, uiState.word)
+        injectUpdateWordThenDelay(sample.id)
+        assertThat(uiState.word).isEqualTo(sample.eng)
     }
 
     @Test
     fun injectUpdateWord_InjectNotExistWord() = runBlocking {
         injectUpdateWordThenDelay(1)
-
-        assert(uiState.word.isEmpty())
+        assertThat(uiState.word).isEmpty()
     }
 
     private suspend fun injectUpdateWordThenDelay(wordId: Int) = delayAfter {
         viewModel.injectUpdateTarget(wordId)
     }
 
-
     private suspend fun delayAfter(block: suspend () -> Unit) {
         block()
         delay(50L)
     }
 
-    // onWordUpdate
     @Test
     fun onWordUpdate_SingleUpdate() {
-        val sampleWord = TestSampleData.getSampleVoca()
+        val sample = TestSampleData.getSampleVoca()
 
-        viewModel.onWordUpdate(sampleWord.eng)
-        assertEquals(sampleWord.eng, uiState.word)
+        viewModel.onWordUpdate(sample.eng)
+        assertThat(uiState.word).isEqualTo(sample.eng)
     }
 
     @Test
     fun onWordUpdate_ManyUpdates() {
-        val sampleWordEng = TestSampleData.getSampleVoca().eng
+        val sampleEng = TestSampleData.getSampleVoca().eng
 
-        sampleWordEng.indices.forEach {
-            viewModel.onWordUpdate(sampleWordEng.take(it + 1))
+        sampleEng.indices.forEach {
+            viewModel.onWordUpdate(sampleEng.take(it + 1))
         }
-        assertEquals(sampleWordEng, uiState.word)
+        assertThat(uiState.word).isEqualTo(sampleEng)
     }
 
     @Test
-    fun loadStatus_WordEmpty() = runBlocking {
+    fun loadStatus_WordEmpty(): Unit = runBlocking {
         viewModel.loadStatus("")
-        assertEquals(WordExistStatus.WORD_EMPTY, uiState.wordExistStatus)
+        assertThat(uiState.wordExistStatus).isEqualTo(WordExistStatus.WORD_EMPTY)
     }
 
     @Test
-    fun loadStatus_NotExists() = runBlocking {
+    fun loadStatus_NotExists(): Unit = runBlocking {
         viewModel.loadStatus("NotExists")
-        assertEquals(WordExistStatus.NOT_EXISTS, uiState.wordExistStatus)
+        assertThat(uiState.wordExistStatus).isEqualTo(WordExistStatus.NOT_EXISTS)
     }
 
     @Test
-    fun loadStatus_Exists() = runBlocking {
-        val sampleWord = TestSampleData.getSampleVoca()
-        vocaPersistence.insertVocabulary(listOf(sampleWord))
+    fun loadStatus_Exists(): Unit = runBlocking {
+        val sample = TestSampleData.getSampleVoca()
+        vocaPersistence.insertVocabulary(listOf(sample))
 
-        viewModel.loadStatus(sampleWord.eng)
-        assertEquals(WordExistStatus.DUPLICATE, uiState.wordExistStatus)
+        viewModel.loadStatus(sample.eng)
+        assertThat(uiState.wordExistStatus).isEqualTo(WordExistStatus.DUPLICATE)
     }
 
     @Test
-    fun loadStatus_NewWordIsSame() = runBlocking {
-        val sampleWord = TestSampleData.getSampleVoca()
-        vocaPersistence.insertVocabulary(listOf(sampleWord))
+    fun loadStatus_NewWordIsSame(): Unit = runBlocking {
+        val sample = TestSampleData.getSampleVoca()
+        vocaPersistence.insertVocabulary(listOf(sample))
 
-        injectUpdateWordThenDelay(sampleWord.id)
+        injectUpdateWordThenDelay(sample.id)
 
-        viewModel.loadStatus(sampleWord.eng)
-        assertEquals(WordExistStatus.NOT_EXISTS, uiState.wordExistStatus)
+        viewModel.loadStatus(sample.eng)
+        assertThat(uiState.wordExistStatus).isEqualTo(WordExistStatus.NOT_EXISTS)
     }
 
     @Test
-    fun loadStatus_newWordIsDifferent() = runBlocking {
-        val sampleWord = TestSampleData.getSampleVoca()
-        vocaPersistence.insertVocabulary(listOf(sampleWord))
+    fun loadStatus_newWordIsDifferent(): Unit = runBlocking {
+        val sample = TestSampleData.getSampleVoca()
+        vocaPersistence.insertVocabulary(listOf(sample))
 
-        injectUpdateWordThenDelay(sampleWord.id)
+        injectUpdateWordThenDelay(sample.id)
 
-        viewModel.loadStatus(sampleWord.eng.dropLast(1))
-        assertEquals(WordExistStatus.NOT_EXISTS, uiState.wordExistStatus)
+        viewModel.loadStatus(sample.eng.dropLast(1))
+        assertThat(uiState.wordExistStatus).isEqualTo(WordExistStatus.NOT_EXISTS)
     }
-
-
-    //    - onMeaningAdd
 
     @Test
     fun onMeaningAdd_AddOneType() {
         val type = WordClassImpl.NOUN
         viewModel.onMeaningAdd(type)
 
-        assertEquals(1, uiMeanings.size)
-        assertEquals(type, uiMeanings[0].type)
-        assert(uiMeanings[0].content.isEmpty())
+        assertThat(uiMeanings.size).isEqualTo(1)
+        SoftAssertions().apply {
+            assertThat(uiMeanings[0].type).isEqualTo(type)
+            assertThat(uiMeanings[0].content).isEmpty()
+        }.assertAll()
     }
 
     @Test
     fun onMeaningAdd_AddManyTypes() {
-        val types = WordClassImpl.actualValues().take(5)
-        types.forEach { type ->
-            viewModel.onMeaningAdd(type)
+        val types = WordClassImpl.actualValues().take(5).also {
+            it.forEach { type -> viewModel.onMeaningAdd(type) }
         }
 
-        assertEquals(types.size, uiMeanings.size)
+        assertThat(uiMeanings.size).isEqualTo(types.size)
         types.zipForEach(uiMeanings) { expectedType, actualMeaning ->
-            assertEquals(expectedType, actualMeaning.type)
-            assert(actualMeaning.content.isEmpty())
+            assertThat(actualMeaning.type).isEqualTo(expectedType)
+            assertThat(actualMeaning.content).isEmpty()
         }
     }
 
@@ -166,14 +163,13 @@ class AddWordViewModelTest {
             viewModel.onMeaningAdd(type)
         }
 
-        assertEquals(addNumber, uiMeanings.size)
+        assertThat(uiMeanings.size).isEqualTo(addNumber)
         uiMeanings.forEach { uiMeaning ->
-            assertEquals(type, uiMeaning.type)
-            assert(uiMeaning.content.isEmpty())
+            assertThat(uiMeaning.type).isEqualTo(type)
+            assertThat(uiMeaning.content).isEmpty()
         }
     }
 
-    //    - onMeaningUpdate
     @Test
     fun onMeaningUpdate_UpdateOneType() {
         val verbType = WordClassImpl.VERB
@@ -182,7 +178,7 @@ class AddWordViewModelTest {
         val meaning = MeaningImpl(verbType, "Something")
         viewModel.onMeaningUpdate(0, meaning)
 
-        assertEquals(meaning, uiMeanings[0])
+        assertThat(uiMeanings[0]).isEqualTo(meaning)
     }
 
     @Test
@@ -197,30 +193,25 @@ class AddWordViewModelTest {
         }
 
         types.zipForEach(uiMeanings) { type, uiMeaning ->
-            assertEquals(type, uiMeaning.type)
-            assertEquals(sampleContent, uiMeaning.content)
+            assertThat(uiMeaning.type).isEqualTo(type)
+            assertThat(uiMeaning.content).isEqualTo(sampleContent)
         }
     }
 
     @Test
     fun onMeaningUpdate_IndexOutOfBoundsException() {
-        var exceptionOccur = false
-        try {
+        assertThrows<IndexOutOfBoundsException> {
             viewModel.onMeaningUpdate(0, MeaningImpl())
-        } catch (e: IndexOutOfBoundsException) {
-            exceptionOccur = true
         }
-        assert(exceptionOccur)
     }
 
-    //    - onMeaningDelete
     @Test
     fun onMeaningDelete_DeleteOneMeaning() {
         val nounType = WordClassImpl.NOUN
         viewModel.onMeaningAdd(nounType)
-
         viewModel.onMeaningDelete(0)
-        assert(uiMeanings.isEmpty())
+
+        assertThat(uiMeanings).isEmpty()
     }
 
     @Test
@@ -234,19 +225,16 @@ class AddWordViewModelTest {
             viewModel.onMeaningDelete(it)
         }
 
-        uiMeanings.forEach { uiMeaning ->
-            assertEquals(WordClassImpl.VERB, uiMeaning.type)
-        }
+        assertThat(uiMeanings).allMatch { it.type == WordClassImpl.VERB }
     }
 
-    // Meaning 사용 복합
     @Test
     fun onMeaning_AddUpdateDelete() {
         val meanings = addMeaningsForTest()
 
-        assertEquals(meanings.size, uiMeanings.size)
+        assertThat(uiMeanings.size).isEqualTo(meanings.size)
         meanings.zipForEach(uiMeanings) { meaning, uiMeaning ->
-            assertEquals(meaning, uiMeaning)
+            assertThat(uiMeaning).isEqualTo(meaning)
         }
     }
 
@@ -278,14 +266,11 @@ class AddWordViewModelTest {
     fun onMemoUpdate() {
         val newMemo = "some memo"
         viewModel.onMemoUpdate(newMemo)
-
-        assertEquals(newMemo, uiState.memo)
+        assertThat(uiState.memo).isEqualTo(newMemo)
     }
 
-    //    - onAddWord
-
     @Test
-    fun onAddWord_Update() = runBlocking {
+    fun onAddWord_Update(): Unit = runBlocking {
         val sampleWord = TestSampleData.getSampleVoca()
         vocaPersistence.insertVocabulary(listOf(sampleWord))
 
@@ -297,14 +282,14 @@ class AddWordViewModelTest {
         onAddWordThenDelay()
 
         val queryResult = vocaPersistence.getVocabulary(VocabularyQuery(word = newEng))
-        assert(queryResult.isNotEmpty())
+        assertThat(queryResult).isNotEmpty
 
         val wordInPersistence = queryResult[0]
-        assertEquals(newEng, wordInPersistence.eng)
+        assertThat(wordInPersistence.eng).isEqualTo(newEng)
     }
 
     @Test
-    fun onAddWord_Insert() = runBlocking {
+    fun onAddWord_Insert(): Unit = runBlocking {
         val eng = "some word"
         val meanings = addMeaningsForTest().map { it.toMeaning() }
         val memo = "some memo"
@@ -315,17 +300,17 @@ class AddWordViewModelTest {
         onAddWordThenDelay()
 
         val queryResult = vocaPersistence.getVocabulary(VocabularyQuery(word = eng))
-        assert(queryResult.isNotEmpty())
+        assertThat(queryResult).isNotEmpty
 
-        val wordInPersistence = queryResult[0]
-        assertEquals(eng, wordInPersistence.eng)
-        assertEquals(meanings, wordInPersistence.meaning)
-        assertEquals(memo, wordInPersistence.memo)
+        queryResult[0].apply {
+            assertThat(this.eng).isEqualTo(eng)
+            assertThat(this.meaning).isEqualTo(meanings)
+            assertThat(this.memo).isEqualTo(memo)
+        }
     }
 
     private suspend fun onAddWordThenDelay() = delayAfter {
         viewModel.onAddWord()
     }
-
 
 }

@@ -1,6 +1,5 @@
 package hsk.practice.myvoca.room.persistence
 
-import com.hsk.data.Vocabulary
 import com.hsk.data.VocabularyQuery
 import com.hsk.domain.VocaPersistence
 import com.hsk.domain.VocaPersistenceException
@@ -11,9 +10,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 
 
@@ -34,28 +34,25 @@ class FakeVocaPersistenceTest {
 
     @Test
     fun testVocabularyIsInserted() = runTest {
-        val expected = getSampleVoca()
-        persistence.insertVocabulary(listOf(expected))
-        val actual = persistence.getVocabularyById(expected.id)
-        assertEquals(expected, actual)
+        val samples = getSampleVoca()
+        persistence.insertVocabulary(listOf(samples))
+        assertThat(persistence.getVocabularyById(samples.id)).isEqualTo(samples)
     }
 
     @Test
     fun testVocabulariesIsInserted() = runTest {
-        val expected = getSampleVocabularies()
-        persistence.insertVocabulary(expected)
-        val actual = getFirstAllVocabulary()
-        assertEquals(expected, actual)
+        val samples = getSampleVocabularies()
+        persistence.insertVocabulary(samples)
+        assertThat(getFirstAllVocabulary()).isEqualTo(samples)
     }
 
     @Test
     fun testVocabularySizeIsCorrect() = runTest {
-        val vocabularies = getSampleVocabularies()
-        persistence.insertVocabulary(vocabularies)
+        val samples = getSampleVocabularies()
+        persistence.insertVocabulary(samples)
 
-        val expected = vocabularies.size
         val actual = persistence.getVocabularySize().first()
-        assertEquals(expected, actual)
+        assertThat(actual).isEqualTo(samples.size)
     }
 
     private suspend fun getFirstAllVocabulary() = persistence.getAllVocabulary().first()
@@ -63,40 +60,33 @@ class FakeVocaPersistenceTest {
     @Test
     fun testTryToFindVocabularyNotExists() = runTest {
         val voca = getSampleVoca()
-        try {
+        assertThrows<VocaPersistenceException> {
             persistence.getVocabularyById(voca.id)
-        } catch (e: VocaPersistenceException) {
-            assertEquals("id 3 doesn't exist", e.message)
         }
     }
 
     @Test
     fun testTryToUpdateVocabularyNotExists() = runTest {
         val voca = getSampleVoca()
-        try {
+        assertThrows<VocaPersistenceException> {
             persistence.updateVocabulary(listOf(voca))
-        } catch (e: VocaPersistenceException) {
-            assertEquals("id 3 doesn't exist", e.message)
         }
     }
 
     @Test
     fun testVocabularyQuery_notExists() = runTest {
-        val expected = listOf<Vocabulary>()
-        val actual = persistence.getVocabulary(VocabularyQuery(word = "empty"))
-        assertEquals(expected, actual)
+        val result = persistence.getVocabulary(VocabularyQuery(word = "empty"))
+        assertThat(result).isEmpty()
     }
 
     @Test
     fun testVocabularyQuery_insertThenQuery() = runTest {
         val voca = getSampleVoca()
-        val expected = listOf(voca)
-
-        persistence.insertVocabulary(expected)
+        persistence.insertVocabulary(listOf(voca))
 
         val query = VocabularyQuery(word = voca.eng)
-        val actual = persistence.getVocabulary(query)
-        assertEquals(expected, actual)
+        val result = persistence.getVocabulary(query)
+        assertThat(result).containsOnly(voca)
     }
 
     @Test
@@ -105,26 +95,20 @@ class FakeVocaPersistenceTest {
         persistence.insertVocabulary(listOf(voca))
 
         val newVoca = voca.copy(eng = "android")
-        val expected = listOf(newVoca)
-        persistence.updateVocabulary(expected)
+        persistence.updateVocabulary(listOf(newVoca))
 
-        val query = VocabularyQuery(word = newVoca.eng)
-        val actual = persistence.getVocabulary(query = query)
-        assertEquals(expected, actual)
+        val result = persistence.getVocabulary(VocabularyQuery(word = newVoca.eng))
+        assertThat(result).containsOnly(newVoca)
     }
 
     @Test
     fun testDeleteVocabulary() = runTest {
-        val voca = getSampleVoca()
+        val sample = getSampleVoca()
+        persistence.insertVocabulary(listOf(sample))
+        persistence.deleteVocabulary(listOf(sample))
 
-        persistence.insertVocabulary(listOf(voca))
-        persistence.deleteVocabulary(listOf(voca))
-
-        val query = VocabularyQuery(word = voca.eng)
-        val actual = persistence.getVocabulary(query = query)
-
-        val expected = listOf<Vocabulary>()
-        assertEquals(expected, actual)
+        val result = persistence.getVocabulary(VocabularyQuery(word = sample.eng))
+        assertThat(result).isEmpty()
     }
 
 }

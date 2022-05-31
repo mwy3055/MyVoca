@@ -19,7 +19,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -69,23 +69,23 @@ class HomeViewModelTest {
     @Test
     fun showTodayWordHelp_TurnOn() {
         viewModel.showTodayWordHelp(true)
-        assert(uiData.showTodayWordHelp)
+        assertThat(uiData.showTodayWordHelp).isTrue
     }
 
     @Test
     fun showTodayWordHelp_Toggle() {
         viewModel.showTodayWordHelp(true)
         viewModel.showTodayWordHelp(false)
-        assertFalse(uiData.showTodayWordHelp)
+        assertThat(uiData.showTodayWordHelp).isFalse
     }
 
-    // TODO: 코루틴 이슈로 테스트 실패하는 문제 해결하기
     @Test
     fun onRefreshTodayWord_CheckIfWorkCreated() = runTest {
+        workManager.cancelAllWork()
         viewModel.onRefreshTodayWord().join()
 
         val workInfo = workManager.getWorkInfosByTag(createTodayWordWorkerTag).await()
-        assertEquals(1, workInfo.size)
+        assertThat(workInfo.size).isEqualTo(1)
     }
 
     @Test
@@ -103,14 +103,14 @@ class HomeViewModelTest {
 
         val todayWords = todayWordPersistence.loadTodayWords().first()
         val insertedTodayWord = todayWords.find { it.todayId == todayWord.todayId }
-        assertNotNull(insertedTodayWord)
-        assertNotSame(todayWord.checked, insertedTodayWord!!.checked)
+        assertThat(insertedTodayWord).isNotNull
+        assertThat(insertedTodayWord!!.checked).isNotEqualTo(todayWord.checked)
     }
 
     @Test
     fun onCloseAlertDialog_NormalCase() {
         viewModel.showTodayWordHelp(true)
         viewModel.onCloseAlertDialog()
-        assertFalse(uiData.showTodayWordHelp)
+        assertThat(uiData.showTodayWordHelp).isFalse
     }
 }

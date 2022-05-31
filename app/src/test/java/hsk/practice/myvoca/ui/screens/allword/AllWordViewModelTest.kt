@@ -6,12 +6,11 @@ import hsk.practice.myvoca.TestSampleData
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.data.toWordClass
 import hsk.practice.myvoca.room.persistence.FakeVocaPersistence
-import hsk.practice.myvoca.room.vocabulary.toVocabularyImpl
 import hsk.practice.myvoca.ui.state.UiState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -49,10 +48,9 @@ class AllWordViewModelTest {
         viewModel.onQueryTextChanged("")
         viewModel.onQueryTextChanged(notEmpty)
 
-        assertNotNull(uiState.data)
-
-        assertNotNull(uiData.queryState)
-        assertEquals(notEmpty, uiData.queryState.word)
+        assertThat(uiState.data).isNotNull
+        assertThat(uiData.queryState).isNotNull
+        assertThat(uiData.queryState.word).isEqualTo(notEmpty)
     }
 
     @Test
@@ -61,7 +59,7 @@ class AllWordViewModelTest {
         val nounClass = WordClassImpl.NOUN.toWordClass()
         viewModel.onQueryWordClassToggled(nounName)
 
-        assert(uiData.queryState.wordClass.contains(nounClass))
+        assertThat(uiData.queryState.wordClass).containsOnly(nounClass)
     }
 
     @Test
@@ -71,7 +69,8 @@ class AllWordViewModelTest {
         viewModel.onQueryWordClassToggled(nounName)
         viewModel.onQueryWordClassToggled(nounName)
 
-        assertFalse(uiData.queryState.wordClass.contains(nounClass))
+        assertThat(uiData.queryState.wordClass).doesNotContain(nounClass)
+            .isEmpty()
     }
 
     @Test
@@ -84,26 +83,26 @@ class AllWordViewModelTest {
         }
 
         classObjects.forEach { classObject ->
-            assert(uiData.queryState.wordClass.contains(classObject))
+            assertThat(uiData.queryState.wordClass).contains(classObject)
         }
     }
 
     @Test
     fun onSortStateClicked_Alphabet() {
-        val alphabetState = SortState.Alphabet
-        viewModel.onSortStateClicked(alphabetState)
-        assertEquals(alphabetState, uiData.sortState)
+        val sortAlphabet = SortState.Alphabet
+        viewModel.onSortStateClicked(sortAlphabet)
+        assertThat(uiData.sortState).isEqualTo(sortAlphabet)
 
-        val sortedList = uiData.currentWordState.sortedBy { it.eng }
-        assertEquals(sortedList, uiData.currentWordState)
+        val sortedWords = uiData.currentWordState.sortedBy { it.eng }
+        assertThat(uiData.currentWordState).isEqualTo(sortedWords)
     }
 
     @Test
     fun onSortStateClicked_Random() {
-        val randomState = SortState.Random
-        viewModel.onSortStateClicked(randomState)
+        val sortRandom = SortState.Random
+        viewModel.onSortStateClicked(sortRandom)
 
-        assertEquals(randomState, uiData.sortState)
+        assertThat(uiData.sortState).isEqualTo(sortRandom)
     }
 
     @Test
@@ -111,21 +110,18 @@ class AllWordViewModelTest {
         viewModel.onSortStateClicked(SortState.Latest)
         viewModel.onQueryTextChanged("some query")
         viewModel.onQueryWordClassToggled(WordClassImpl.NOUN.korean)
-
         viewModel.onClearOption()
 
-        assertEquals(SortState.defaultValue, uiData.sortState)
-        assert(uiData.queryState.word.isEmpty())
-        assert(uiData.queryState.wordClass.isEmpty())
+        assertThat(uiData.sortState).isEqualTo(SortState.defaultValue)
+        assertThat(uiData.queryState.word).isEmpty()
+        assertThat(uiData.queryState.wordClass).isEmpty()
     }
 
     @Test
     fun onWordDelete() = runTest {
-        val sampleWord = TestSampleData.getSampleVoca()
-        viewModel.onWordDelete(sampleWord.toVocabularyImpl()).join()
+        val sample = TestSampleData.getSampleVocaImpl()
+        viewModel.onWordDelete(sample).join()
 
-        assertFalse(uiData.currentWordState.contains(sampleWord.toVocabularyImpl()))
+        assertThat(uiData.currentWordState).doesNotContain(sample)
     }
-
-
 }

@@ -5,7 +5,7 @@ import com.hsk.data.WordClass
 import com.hsk.data.matchesWithQuery
 import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.room.vocabulary.toVocabulary
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class VocabularyQueryTest {
@@ -13,34 +13,31 @@ class VocabularyQueryTest {
     private val data = fakeData.map { it.toVocabulary() }
 
     @Test
-    fun emptyQueryTest() {
+    fun emptyQuery() {
         val query = VocabularyQuery()
-        val queryResult = data.filter { it.matchesWithQuery(query) }
-        assertEquals(data, queryResult)
+        val actual = data.filter { it.matchesWithQuery(query) }
+        assertThat(actual).isEqualTo(data)
     }
 
     @Test
-    fun wordQueryTest() {
+    fun wordQuery() {
         val query = VocabularyQuery(word = "3")
         val expected = data.filter { it.eng.contains("3") }
         val actual = data.filter { it.matchesWithQuery(query) }
-        assertEquals(expected, actual)
+        assertThat(actual).isEqualTo(expected)
     }
 
     @Test
-    fun wordClassSingleQueryTest() {
-        val sample = data[1]
+    fun wordClassSingleQuery() {
         val query = VocabularyQuery(wordClass = setOf(WordClass.NOUN))
-        println(sample)
-        assert(sample.matchesWithQuery(query))
+        assertThat(data[1].matchesWithQuery(query)).isTrue
     }
 
     @Test
-    fun wordClassQueryTest() {
+    fun wordClassQuery() {
         val query = VocabularyQuery(wordClass = setOf(WordClass.NOUN))
         val expected = data.filter { it.meaning.any { meaning -> meaning.type == WordClass.NOUN } }
         val actual = data.filter { it.matchesWithQuery(query) }
-        assertEquals(expected, actual)
+        assertThat(actual).isEqualTo(expected)
     }
-
 }
