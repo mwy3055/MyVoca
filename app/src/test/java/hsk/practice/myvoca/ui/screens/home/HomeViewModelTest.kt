@@ -81,7 +81,7 @@ class HomeViewModelTest {
 
     @Test
     fun onRefreshTodayWord_CheckIfWorkCreated() = runTest {
-        workManager.cancelAllWork()
+        workManager.cancelAllWork().await()
         viewModel.onRefreshTodayWord().join()
 
         val workInfo = workManager.getWorkInfosByTag(createTodayWordWorkerTag).await()
