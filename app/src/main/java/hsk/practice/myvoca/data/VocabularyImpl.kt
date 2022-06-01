@@ -2,7 +2,7 @@ package hsk.practice.myvoca.data
 
 import com.hsk.data.Meaning
 import com.hsk.data.WordClass
-import hsk.practice.myvoca.util.removed
+import com.hsk.ktx.removed
 
 data class VocabularyImpl(
     val id: Int = 0,

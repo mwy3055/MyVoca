@@ -122,6 +122,9 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    // mwy3055 library
+    implementation 'com.github.mwy3055.hsk-ktx:hsk-ktx:1.0-beta03'
+
     // Android core
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.6.1'
