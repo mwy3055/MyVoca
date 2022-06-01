@@ -10,11 +10,6 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import kotlin.math.abs
 
-fun String?.containsOnlyAlphabet(): Boolean {
-    if (isNullOrEmpty()) return false
-    return all { it.isLowerCase() || it.isUpperCase() || it == '%' }
-}
-
 fun <T> Array<T>.removed(value: T) = this.filter { it != value }
 
 fun setNightMode(value: Boolean) {

@@ -1,7 +1,7 @@
 package hsk.practice.myvoca.ui.state
 
-import org.junit.Assert.assertFalse
-import org.junit.Test
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
 
 class UiStateTest {
 
@@ -11,7 +11,7 @@ class UiStateTest {
             loading = false,
             exception = IllegalStateException()
         )
-        assert(state.hasError)
+        assertThat(state.hasError).isTrue
     }
 
     @Test
@@ -21,7 +21,7 @@ class UiStateTest {
             exception = null,
             data = 3
         )
-        assertFalse(state.hasError)
+        assertThat(state.hasError).isFalse
     }
 
     @Test
@@ -31,7 +31,7 @@ class UiStateTest {
             exception = null,
             data = null
         )
-        assert(state.initialLoading)
+        assertThat(state.initialLoading).isTrue
     }
 
     @Test
@@ -41,7 +41,7 @@ class UiStateTest {
             exception = IndexOutOfBoundsException(),
             data = null
         )
-        assertFalse(state.initialLoading)
+        assertThat(state.initialLoading).isFalse
     }
 
     @Test
@@ -51,7 +51,7 @@ class UiStateTest {
             exception = null,
             data = 3
         )
-        assertFalse(state.initialLoading)
+        assertThat(state.initialLoading).isFalse
     }
 
     @Test
@@ -61,7 +61,7 @@ class UiStateTest {
             exception = null,
             data = 3
         )
-        assertFalse(state.initialLoading)
+        assertThat(state.initialLoading).isFalse
     }
 
     private fun createState(

@@ -2,30 +2,30 @@ package hsk.practice.myvoca.room.todayword
 
 import hsk.practice.myvoca.TestSampleData.getSampleRoomTodayWord
 import hsk.practice.myvoca.TestSampleData.getSampleTodayWord
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
 
 
 class ExtensionsTest {
 
     @Test
     fun testTodayWordToRoomTodayWord() {
-        val todayWord = getSampleTodayWord()
-        val roomTodayWord = todayWord.toRoomTodayWord()
-
-        assertEquals(roomTodayWord.todayWordId, todayWord.todayId)
-        assertEquals(roomTodayWord.vocabularyId, todayWord.wordId)
-        assertEquals(roomTodayWord.checked, todayWord.checked)
+        val sample = getSampleTodayWord()
+        sample.toRoomTodayWord().apply {
+            assertThat(this.todayWordId).isEqualTo(sample.todayId)
+            assertThat(this.vocabularyId).isEqualTo(sample.wordId)
+            assertThat(this.checked).isEqualTo(sample.checked)
+        }
     }
 
     @Test
     fun testRoomTodayWordToTodayWord() {
-        val roomTodayWord = getSampleRoomTodayWord()
-        val todayWord = roomTodayWord.toTodayWord()
-
-        assertEquals(todayWord.todayId, roomTodayWord.todayWordId)
-        assertEquals(todayWord.wordId, roomTodayWord.vocabularyId)
-        assertEquals(todayWord.checked, roomTodayWord.checked)
+        val roomSample = getSampleRoomTodayWord()
+        roomSample.toTodayWord().apply {
+            assertThat(this.todayId).isEqualTo(roomSample.todayWordId)
+            assertThat(this.wordId).isEqualTo(roomSample.vocabularyId)
+            assertThat(this.checked).isEqualTo(roomSample.checked)
+        }
     }
 
 }

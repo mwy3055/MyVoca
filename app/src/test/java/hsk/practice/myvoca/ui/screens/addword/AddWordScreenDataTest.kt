@@ -1,8 +1,8 @@
 package hsk.practice.myvoca.ui.screens.addword
 
 import hsk.practice.myvoca.data.MeaningImpl
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
 
 class AddWordScreenDataTest {
 
@@ -69,7 +69,7 @@ class AddWordScreenDataTest {
             wordExistStatus = wordExistStatus,
             meanings = meanings
         )
-        assertEquals(expected, data.canStoreWord)
+        assertThat(data.canStoreWord).isEqualTo(expected)
     }
 
 }
