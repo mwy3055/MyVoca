@@ -10,10 +10,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-// TODO: Measure when AGP version is updated to 7.3.0 or above (7.2.0 has a bug related to Baseline Profile)
-
-// TODO: 이거 측정하고 앱 버전 2.0.3으로 업데이트하기
-
 @RunWith(AndroidJUnit4::class)
 class BaselineProfileBenchmark {
 
