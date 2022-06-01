@@ -2,13 +2,13 @@ package hsk.practice.myvoca.ui.screens.addword
 
 import com.hsk.data.VocabularyQuery
 import com.hsk.domain.VocaPersistence
+import com.hsk.ktx.zipForEach
 import hsk.practice.myvoca.MainCoroutineExtension
 import hsk.practice.myvoca.TestSampleData
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.data.toMeaning
 import hsk.practice.myvoca.room.persistence.FakeVocaPersistence
-import hsk.practice.myvoca.util.zipForEach
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -144,8 +144,8 @@ class AddWordViewModelTest {
 
     @Test
     fun onMeaningAdd_AddManyTypes() {
-        val types = WordClassImpl.actualValues().take(5).also {
-            it.forEach { type -> viewModel.onMeaningAdd(type) }
+        val types = WordClassImpl.actualValues().take(5).onEach { type ->
+            viewModel.onMeaningAdd(type)
         }
 
         assertThat(uiMeanings.size).isEqualTo(types.size)

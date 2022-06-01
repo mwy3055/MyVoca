@@ -1,12 +1,12 @@
 package hsk.practice.myvoca.room.vocabulary
 
 import com.hsk.data.Meaning
+import com.hsk.ktx.zipForEach
 import hsk.practice.myvoca.TestSampleData.getSampleRoomVocabularies
 import hsk.practice.myvoca.TestSampleData.getSampleVoca
 import hsk.practice.myvoca.TestSampleData.getSampleVocaImpls
 import hsk.practice.myvoca.TestSampleData.getSampleVocabularies
 import hsk.practice.myvoca.data.MeaningImpl
-import hsk.practice.myvoca.util.zipForEach
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.Assertions.assertEquals
