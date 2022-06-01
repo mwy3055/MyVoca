@@ -3,7 +3,6 @@ package hsk.practice.myvoca.ui.screens.home
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.WorkManager
-import androidx.work.await
 import com.hsk.domain.TodayWordPersistence
 import com.hsk.domain.VocaPersistence
 import hsk.practice.myvoca.MainCoroutineRule
@@ -14,7 +13,6 @@ import hsk.practice.myvoca.room.persistence.FakeTodayWordPersistence
 import hsk.practice.myvoca.room.persistence.FakeVocaPersistence
 import hsk.practice.myvoca.util.PreferencesDataStore
 import hsk.practice.myvoca.withDelay
-import hsk.practice.myvoca.work.createTodayWordWorkerTag
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -77,15 +75,6 @@ class HomeViewModelTest {
         viewModel.showTodayWordHelp(true)
         viewModel.showTodayWordHelp(false)
         assertThat(uiData.showTodayWordHelp).isFalse
-    }
-
-    @Test
-    fun onRefreshTodayWord_CheckIfWorkCreated() = runTest {
-        workManager.cancelAllWork().await()
-        viewModel.onRefreshTodayWord().join()
-
-        val workInfo = workManager.getWorkInfosByTag(createTodayWordWorkerTag).await()
-        assertThat(workInfo.size).isEqualTo(1)
     }
 
     @Test

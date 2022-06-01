@@ -86,7 +86,7 @@ class ExtensionsTest {
         val vocaArray = roomVocaArray.toVocabularyArray()
 
         roomVocaArray.zipForEach(vocaArray) { roomVoca, voca ->
-            assertThat(voca).isEqualTo(roomVoca.toVocabularyImpl())
+            assertThat(voca).isEqualTo(roomVoca.toVocabulary())
         }
     }
 
