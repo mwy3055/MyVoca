@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hsk.data.VocabularyQuery
 import com.hsk.domain.VocaPersistence
+import com.hsk.ktx.xor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
@@ -18,7 +19,6 @@ import hsk.practice.myvoca.room.vocabulary.toVocabularyImplList
 import hsk.practice.myvoca.room.vocabulary.toVocabularyList
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.state.UiState
-import hsk.practice.myvoca.util.xor
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

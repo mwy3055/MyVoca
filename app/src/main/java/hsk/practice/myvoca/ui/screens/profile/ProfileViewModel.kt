@@ -13,12 +13,12 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseUser
+import com.hsk.ktx.equalsDelta
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import hsk.practice.myvoca.firebase.MyFirebaseAuth
 import hsk.practice.myvoca.firebase.MyFirestore
 import hsk.practice.myvoca.firebase.UserImpl
-import hsk.practice.myvoca.util.equalsDelta
 import hsk.practice.myvoca.work.FirestoreUploadWordsWork
 import hsk.practice.myvoca.work.setFirestoreDownloadWork
 import hsk.practice.myvoca.work.setFirestoreUploadWork

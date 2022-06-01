@@ -14,6 +14,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.hsk.ktx.distinctRandoms
+import com.hsk.ktx.truncate
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.ui.components.LoadingIndicator
@@ -23,8 +25,6 @@ import hsk.practice.myvoca.ui.components.versus.VersusView
 import hsk.practice.myvoca.ui.components.versus.rememberVersusViewState
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
-import hsk.practice.myvoca.util.distinctRandoms
-import hsk.practice.myvoca.util.truncate
 
 @Composable
 fun QuizScreen(viewModel: QuizViewModel) {
