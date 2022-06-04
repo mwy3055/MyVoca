@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hsk.data.Vocabulary
 import com.hsk.domain.VocaPersistence
+import com.hsk.ktx.randoms
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.module.ComputingDispatcher
@@ -13,7 +14,6 @@ import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImplList
 import hsk.practice.myvoca.util.MyVocaPreferencesKey
 import hsk.practice.myvoca.util.PreferencesDataStore
-import hsk.practice.myvoca.util.randoms
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

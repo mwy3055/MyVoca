@@ -1,28 +1,32 @@
 package hsk.practice.myvoca.room.vocabulary
 
 import com.hsk.data.Meaning
+import com.hsk.ktx.zipForEach
 import hsk.practice.myvoca.TestSampleData.getSampleRoomVocabularies
 import hsk.practice.myvoca.TestSampleData.getSampleVoca
 import hsk.practice.myvoca.TestSampleData.getSampleVocaImpls
 import hsk.practice.myvoca.TestSampleData.getSampleVocabularies
 import hsk.practice.myvoca.data.MeaningImpl
-import hsk.practice.myvoca.util.zipForEach
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.SoftAssertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 class ExtensionsTest {
 
     @Test
-    fun testVocabularyToVocabularyImpl() {
+    fun vocabulary_ToVocabularyImpl() {
         val voca = getSampleVoca()
         val vocaImpl = voca.toVocabularyImpl()
 
-        assertEquals(voca.id, vocaImpl.id)
-        assertEquals(voca.eng, vocaImpl.eng)
-        assertMeaningsEqual(voca.meaning, vocaImpl.meaning)
-        assertEquals(voca.addedTime, vocaImpl.addedTime)
-        assertEquals(voca.lastEditedTime, vocaImpl.lastEditedTime)
-        assertEquals(voca.memo, vocaImpl.memo)
+        SoftAssertions().apply {
+            assertThat(vocaImpl.id).isEqualTo(voca.id)
+            assertThat(vocaImpl.eng).isEqualTo(voca.eng)
+            assertMeaningsEqual(voca.meaning, vocaImpl.meaning)
+            assertThat(vocaImpl.addedTime).isEqualTo(voca.addedTime)
+            assertThat(vocaImpl.lastEditedTime).isEqualTo(voca.lastEditedTime)
+            assertThat(vocaImpl.memo).isEqualTo(voca.memo)
+        }.assertAll()
     }
 
     private fun assertMeaningsEqual(meanings: List<Meaning>, meaningImpls: List<MeaningImpl>) {
@@ -32,12 +36,12 @@ class ExtensionsTest {
     }
 
     private fun assertMeaningEquals(meaning: Meaning, meaningImpl: MeaningImpl) {
-        assertEquals(meaning.type.ordinal, meaningImpl.type.ordinal)
-        assertEquals(meaning.content, meaningImpl.content)
+        assertThat(meaningImpl.type.ordinal).isEqualTo(meaning.type.ordinal)
+        assertThat(meaningImpl.content).isEqualTo(meaning.content)
     }
 
     @Test
-    fun testVocabularyListToRoomVocabularyMutableList() {
+    fun vocabularyList_ToRoomVocabularyMutableList() {
         val vocaList = getSampleVocabularies()
         val roomVocaList = vocaList.toRoomVocabularyMutableList()
 
@@ -47,7 +51,7 @@ class ExtensionsTest {
     }
 
     @Test
-    fun testVocabularyListToVocabularyImplList() {
+    fun vocabularyList_ToVocabularyImplList() {
         val vocaList = getSampleVocabularies()
         val vocaImplList = vocaList.toVocabularyImplList()
 
@@ -57,7 +61,7 @@ class ExtensionsTest {
     }
 
     @Test
-    fun testVocabularyArrayToRoomVocabularyArray() {
+    fun vocabularyArray_ToRoomVocabularyArray() {
         val vocaArray = getSampleVocabularies().toTypedArray()
         val roomVocaArray = vocaArray.toRoomVocabularyArray()
 
@@ -67,22 +71,22 @@ class ExtensionsTest {
     }
 
     @Test
-    fun testRoomVocabularyListToVocabularyImplList() {
+    fun roomVocabularyList_ToVocabularyImplList() {
         val roomVocaArray = getSampleVocabularies().toRoomVocabularyList()
         val vocaImplArray = roomVocaArray.vocabularyImplList()
 
-        roomVocaArray.zipForEach(vocaImplArray) { roomVocabulary, vocabularyImpl ->
-            assertEquals(roomVocabulary.toVocabularyImpl(), vocabularyImpl)
+        roomVocaArray.zipForEach(vocaImplArray) { roomVoca, vocaImpl ->
+            assertThat(vocaImpl).isEqualTo(roomVoca.toVocabularyImpl())
         }
     }
 
     @Test
-    fun testRoomVocabularyArrayToVocabularyArray() {
+    fun roomVocabularyArray_ToVocabularyArray() {
         val roomVocaArray = getSampleRoomVocabularies().toTypedArray()
         val vocaArray = roomVocaArray.toVocabularyArray()
 
-        roomVocaArray.zipForEach(vocaArray) { roomVocabulary, vocabulary ->
-            assertEquals(roomVocabulary.toVocabulary(), vocabulary)
+        roomVocaArray.zipForEach(vocaArray) { roomVoca, voca ->
+            assertThat(voca).isEqualTo(roomVoca.toVocabulary())
         }
     }
 
@@ -91,8 +95,8 @@ class ExtensionsTest {
         val vocaImplList = getSampleVocaImpls()
         val roomVocaList = vocaImplList.toRoomVocabularyList()
 
-        vocaImplList.zipForEach(roomVocaList) { vocabularyImpl, roomVocabulary ->
-            assertEquals(vocabularyImpl.toRoomVocabulary(), roomVocabulary)
+        vocaImplList.zipForEach(roomVocaList) { vocaImpl, roomVoca ->
+            assertEquals(vocaImpl.toRoomVocabulary(), roomVoca)
         }
     }
 }

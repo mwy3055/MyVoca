@@ -1,110 +1,87 @@
 package hsk.practice.myvoca.room.persistence
 
-import com.hsk.data.TodayWord
 import com.hsk.domain.TodayWordPersistence
-import hsk.practice.myvoca.MainCoroutineRule
+import hsk.practice.myvoca.MainCoroutineExtension
 import hsk.practice.myvoca.TestSampleData.getSampleTodayWord
 import hsk.practice.myvoca.TestSampleData.getSampleTodayWords
-import hsk.practice.myvoca.room.todayword.RoomTodayWord
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.RegisterExtension
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TodayWordPersistenceTest {
 
     private val dispatcher = StandardTestDispatcher()
 
-    @get:Rule
-    val rule = MainCoroutineRule(dispatcher)
+    @RegisterExtension
+    val coroutineExtension = MainCoroutineExtension(dispatcher)
 
     // Any subclass of TodayWordPersistence
     private val persistence: TodayWordPersistence = FakeTodayWordPersistence()
 
-    @Before
+    @BeforeEach
     fun initTest() = runTest {
         persistence.clearTodayWords()
     }
 
     @Test
     fun loadTodayWords_EmptyAtFirst() = runTest {
-        val actual = persistence.loadTodayWords().first()
-        val expected = emptyList<RoomTodayWord>()
-        assertEquals(expected, actual)
+        assertThat(persistence.loadTodayWords().first()).isEmpty()
     }
 
     @Test
     fun insertTodayWord_NormalCase() = runTest {
-        val voca = getSampleTodayWord()
-        persistence.insertTodayWord(voca)
-
-        val actual = loadTodayWordsFlowFirst()
-        val expected = listOf(voca)
-        assertEquals(expected, actual)
+        val sample = getSampleTodayWord()
+        persistence.insertTodayWord(sample)
+        assertThat(loadTodayWordsFlowFirst()).containsOnly(sample)
     }
 
     @Test
     fun insertTodayWords_NormalCase() = runTest {
-        val actual = getSampleTodayWords()
-        persistence.insertTodayWords(actual)
-
-        val expected = loadTodayWordsFlowFirst()
-        assertEquals(expected, actual)
+        val samples = getSampleTodayWords()
+        persistence.insertTodayWords(samples)
+        assertThat(loadTodayWordsFlowFirst()).isEqualTo(samples)
     }
 
     @Test
     fun updateTodayWord_UpdateNotExistingObject() = runTest {
-        val todayWord = getSampleTodayWord()
-
-        var exceptionOccur = false
-        try {
-            persistence.updateTodayWord(todayWord)
-        } catch (e: NoSuchElementException) {
-            exceptionOccur = true
+        val sample = getSampleTodayWord()
+        assertThrows<NoSuchElementException> {
+            persistence.updateTodayWord(sample)
         }
-        assert(exceptionOccur)
     }
 
     @Test
     fun updateTodayWord_UpdateExistingObjects() = runTest {
-        val todayWords = getSampleTodayWords()
-        persistence.insertTodayWords(todayWords)
+        val samples = getSampleTodayWords()
+        persistence.insertTodayWords(samples)
 
-        val expected = todayWords.map { todayWord -> todayWord.copy(checked = true) }
-        expected.forEach { persistence.updateTodayWord(it) }
-
-        val actual = loadTodayWordsFlowFirst()
-        assertEquals(expected, actual)
+        val checkedSamples = samples.map { todayWord -> todayWord.copy(checked = true) }
+            .onEach { sample -> persistence.updateTodayWord(sample) }
+        assertThat(loadTodayWordsFlowFirst()).isEqualTo(checkedSamples)
     }
 
     @Test
     fun deleteTodayWord_DeleteExistingObject() = runTest {
-        val todayWord = getSampleTodayWord()
-        persistence.insertTodayWord(todayWord)
+        val sample = getSampleTodayWord()
+        persistence.insertTodayWord(sample)
+        persistence.deleteTodayWord(sample)
 
-        persistence.deleteTodayWord(todayWord)
-
-        val expected = emptyList<TodayWord>()
-        val actual = loadTodayWordsFlowFirst()
-        assertEquals(expected, actual)
+        assertThat(loadTodayWordsFlowFirst()).isEmpty()
     }
 
     @Test
     fun deleteTodayWord_DeleteNotExistingObject() = runTest {
-        val todayWord = getSampleTodayWord()
-
-        var exceptionOccur = false
-        try {
-            persistence.deleteTodayWord(todayWord)
-        } catch (e: NoSuchElementException) {
-            exceptionOccur = true
+        val sample = getSampleTodayWord()
+        assertThrows<NoSuchElementException> {
+            persistence.deleteTodayWord(sample)
         }
-        assert(exceptionOccur)
     }
 
     private suspend fun loadTodayWordsFlowFirst() = persistence.loadTodayWords().first()

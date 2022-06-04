@@ -3,6 +3,7 @@ package hsk.practice.myvoca.work
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
+import com.hsk.ktx.distinctRandoms
 import com.orhanobut.logger.Logger
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -10,7 +11,10 @@ import hsk.practice.myvoca.room.RoomVocaDatabase
 import hsk.practice.myvoca.room.todayword.RoomTodayWord
 import hsk.practice.myvoca.room.todayword.TodayWordDao
 import hsk.practice.myvoca.room.vocabulary.VocaDao
-import hsk.practice.myvoca.util.*
+import hsk.practice.myvoca.util.MyVocaPreferencesKey
+import hsk.practice.myvoca.util.PreferencesDataStore
+import hsk.practice.myvoca.util.getSecondsLeftOfDay
+import hsk.practice.myvoca.util.writeLogToFile
 import kotlinx.coroutines.flow.first
 import java.time.LocalDateTime
 import java.time.ZoneOffset
