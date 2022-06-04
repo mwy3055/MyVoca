@@ -48,7 +48,7 @@ android {
         minSdkVersion 27
         targetSdkVersion 32
         versionCode 4
-        versionName '2.0.2'
+        versionName '2.0.3'
         testInstrumentationRunner 'hsk.practice.myvoca.CustomTestRunner'
         signingConfig signingConfigs.debug
         javaCompileOptions {
