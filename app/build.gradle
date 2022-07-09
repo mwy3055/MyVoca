@@ -84,6 +84,8 @@ android {
         }
         debug {
             testCoverageEnabled true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'proguard-rules-debug.pro'
         }
         benchmark {
             initWith buildTypes.release
