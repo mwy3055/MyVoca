@@ -86,6 +86,7 @@ android {
             testCoverageEnabled true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'proguard-rules-debug.pro'
+            debuggable true
         }
         benchmark {
             initWith buildTypes.release
@@ -99,7 +100,7 @@ android {
     }
     packagingOptions {
         resources {
-            excludes += ['/META-INF/{AL2.0,LGPL2.1}', 'META-INF/AL2.0', 'META-INF/LGPL2.1']
+            excludes += ['/META-INF/{AL2.0,LGPL2.1}', 'META-INF/AL2.0', 'META-INF/LGPL2.1', 'win32-x86-64/attach_hotspot_windows.dll']
         }
     }
     compileOptions {
@@ -235,7 +236,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.2.0'
 
     // Firebase
-    implementation platform('com.google.firebase:firebase-bom:30.2.0')
+    implementation platform('com.google.firebase:firebase-bom:30.3.0')
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-firestore-ktx'
     implementation 'com.google.firebase:firebase-analytics-ktx'
