@@ -14,8 +14,10 @@ import hsk.practice.myvoca.room.persistence.FakeVocaPersistence
 import hsk.practice.myvoca.util.PreferencesDataStore
 import hsk.practice.myvoca.withDelay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -31,6 +33,7 @@ import org.robolectric.annotation.Config
 class HomeViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
+    private val testScope = TestScope(testDispatcher + Job())
     private val vocaPersistence: VocaPersistence = FakeVocaPersistence()
     private val todayWordPersistence: TodayWordPersistence = FakeTodayWordPersistence()
     private val workManager: WorkManager
@@ -53,7 +56,6 @@ class HomeViewModelTest {
     fun setUp() = runTest {
         vocaPersistence.clearVocabulary()
         todayWordPersistence.clearTodayWords()
-
         viewModel = HomeViewModel(
             workManager = workManager,
             vocaPersistence = vocaPersistence,
@@ -78,10 +80,10 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun onTodayWordCheckboxChange_CheckPersistence() = runTest {
+    fun onTodayWordCheckboxChange_CheckPersistence() = testScope.runTest {
         val todayWord = TestSampleData.getSampleTodayWord()
         todayWordPersistence.insertTodayWord(todayWord)
-        withDelay(testDispatcher) {
+        withDelay(coroutineContext) {
             viewModel.onTodayWordCheckboxChange(
                 HomeTodayWord(
                     todayWord.toTodayWordImpl(),
