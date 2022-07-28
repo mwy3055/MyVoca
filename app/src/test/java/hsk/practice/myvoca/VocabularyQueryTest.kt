@@ -5,6 +5,7 @@ import com.hsk.data.WordClass
 import com.hsk.data.matchesWithQuery
 import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.room.vocabulary.toVocabulary
+import kotlinx.collections.immutable.persistentSetOf
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -29,13 +30,13 @@ class VocabularyQueryTest {
 
     @Test
     fun wordClassSingleQuery() {
-        val query = VocabularyQuery(wordClass = setOf(WordClass.NOUN))
+        val query = VocabularyQuery(wordClass = persistentSetOf(WordClass.NOUN))
         assertThat(data[1].matchesWithQuery(query)).isTrue
     }
 
     @Test
     fun wordClassQuery() {
-        val query = VocabularyQuery(wordClass = setOf(WordClass.NOUN))
+        val query = VocabularyQuery(wordClass = persistentSetOf(WordClass.NOUN))
         val expected = data.filter { it.meaning.any { meaning -> meaning.type == WordClass.NOUN } }
         val actual = data.filter { it.matchesWithQuery(query) }
         assertThat(actual).isEqualTo(expected)
