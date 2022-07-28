@@ -1,6 +1,7 @@
 package hsk.practice.myvoca.ui.screens.addword
 
 import hsk.practice.myvoca.data.MeaningImpl
+import kotlinx.collections.immutable.toImmutableList
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -67,7 +68,7 @@ class AddWordScreenDataTest {
         val data = AddWordScreenData(
             word = word,
             wordExistStatus = wordExistStatus,
-            meanings = meanings
+            meanings = meanings.toImmutableList()
         )
         assertThat(data.canStoreWord).isEqualTo(expected)
     }

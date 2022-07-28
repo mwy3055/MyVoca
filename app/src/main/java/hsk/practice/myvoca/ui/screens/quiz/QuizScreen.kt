@@ -25,6 +25,7 @@ import hsk.practice.myvoca.ui.components.versus.VersusView
 import hsk.practice.myvoca.ui.components.versus.rememberVersusViewState
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
@@ -154,7 +155,7 @@ private fun QuizTitle(answer: VocabularyImpl) {
 @Composable
 private fun QuizOptions(
     modifier: Modifier = Modifier,
-    options: List<VocabularyImpl>,
+    options: ImmutableList<VocabularyImpl>,
     onOptionClick: (Int) -> Unit
 ) {
     Column(
@@ -184,9 +185,7 @@ private fun QuizOption(
             .padding(4.dp),
     ) {
         CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.h6) {
-            WordMeanings(
-                meanings = option.meaning.truncate(2),
-            )
+            WordMeanings(meanings = option.meaning.truncate(2).toImmutableList())
         }
     }
 }

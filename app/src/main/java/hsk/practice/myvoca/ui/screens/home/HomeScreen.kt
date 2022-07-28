@@ -27,6 +27,7 @@ import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import hsk.practice.myvoca.util.getTimeDiffString
 import hsk.practice.myvoca.work.setPeriodicTodayWordWork
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -105,7 +106,7 @@ private fun Content(
 
 @Composable
 private fun TodayWords(
-    todayWords: List<HomeTodayWord>,
+    todayWords: ImmutableList<HomeTodayWord>,
     lastUpdatedTime: Long,
     enableRefresh: Boolean,
     showTodayWordHelp: (Boolean) -> Unit,
@@ -126,7 +127,7 @@ private fun TodayWords(
 
 @Composable
 private fun TodayWordItems(
-    todayWords: List<HomeTodayWord>,
+    todayWords: ImmutableList<HomeTodayWord>,
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
 ) {
     LazyColumn(

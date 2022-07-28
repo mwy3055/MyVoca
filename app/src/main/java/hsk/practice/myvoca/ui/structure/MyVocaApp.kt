@@ -27,6 +27,7 @@ import hsk.practice.myvoca.ui.screens.profile.ProfileViewModel
 import hsk.practice.myvoca.ui.screens.quiz.QuizScreen
 import hsk.practice.myvoca.ui.screens.quiz.QuizViewModel
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
@@ -40,7 +41,7 @@ fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
             )
         }
 
-        val allScreens = MyVocaScreen.values().toList()
+        val allScreens = MyVocaScreen.values().toList().toImmutableList()
         val navController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentScreen = MyVocaScreen.fromRoute(backStackEntry?.destination?.route)

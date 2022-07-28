@@ -41,6 +41,8 @@ import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.state.UiState
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
@@ -376,7 +378,7 @@ private fun QueryWord(
 
 @Composable
 private fun QueryWordClass(
-    selectedWordClass: Set<WordClass>,
+    selectedWordClass: ImmutableSet<WordClass>,
     onOptionWordClassClick: (String) -> Unit
 ) {
     LazyRow(modifier = Modifier.padding(8.dp)) {
@@ -484,7 +486,7 @@ private fun SortStateChip(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun WordItems(
-    words: List<VocabularyImpl>,
+    words: ImmutableList<VocabularyImpl>,
     onWordUpdate: (VocabularyImpl, Context) -> Unit,
     onWordDelete: (VocabularyImpl) -> Unit
 ) {
@@ -601,7 +603,7 @@ private fun ContentsPreview() {
 private fun WordItemsPreview() {
     MyVocaTheme {
         WordItems(
-            words = fakeData,
+            words = fakeData.toImmutableList(),
             onWordUpdate = { _, _ -> },
             onWordDelete = {}
         )

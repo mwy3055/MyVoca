@@ -1,6 +1,5 @@
 package hsk.practice.myvoca.ui.components
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -27,6 +26,7 @@ import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
@@ -94,7 +94,7 @@ fun WordTitle(
 
 @Composable
 fun WordMeanings(
-    meanings: List<MeaningImpl>,
+    meanings: ImmutableList<MeaningImpl>,
     modifier: Modifier = Modifier,
     showExpandButton: Boolean = true,
     expanded: Boolean = false,
@@ -178,7 +178,6 @@ fun WordMeaning(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Preview
 @Composable
 fun WordContentPreview() {
