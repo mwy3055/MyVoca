@@ -41,6 +41,10 @@ import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.state.UiState
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -374,7 +378,7 @@ private fun QueryWord(
 
 @Composable
 private fun QueryWordClass(
-    selectedWordClass: Set<WordClass>,
+    selectedWordClass: ImmutableSet<WordClass>,
     onOptionWordClassClick: (String) -> Unit
 ) {
     LazyRow(modifier = Modifier.padding(8.dp)) {
@@ -395,7 +399,6 @@ private fun QueryWordClass(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun WordClassChip(
     className: String,
@@ -483,7 +486,7 @@ private fun SortStateChip(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun WordItems(
-    words: List<VocabularyImpl>,
+    words: ImmutableList<VocabularyImpl>,
     onWordUpdate: (VocabularyImpl, Context) -> Unit,
     onWordDelete: (VocabularyImpl) -> Unit
 ) {
@@ -572,7 +575,7 @@ private fun ContentsPreview() {
     MyVocaTheme {
         Content(
             data = AllWordData(
-                currentWordState = fakeData,
+                currentWordState = fakeData.toImmutableList(),
                 queryState = VocabularyQuery(word = word)
             ),
             onOptionButtonClicked = { },
@@ -600,7 +603,7 @@ private fun ContentsPreview() {
 private fun WordItemsPreview() {
     MyVocaTheme {
         WordItems(
-            words = fakeData,
+            words = fakeData.toImmutableList(),
             onWordUpdate = { _, _ -> },
             onWordDelete = {}
         )
@@ -611,7 +614,7 @@ private fun WordItemsPreview() {
 @Composable
 private fun QueryOptionsPreview() {
     var word = "test text"
-    val wordClassSet = mutableSetOf<WordClass>()
+    val wordClassSet = persistentSetOf<WordClass>()
 
     MyVocaTheme {
         QueryOptions(
@@ -644,7 +647,7 @@ private fun QueryOptionsPreview() {
 @Composable
 private fun QueryOptionsPreview_DarkMode() {
     var word = "test text"
-    val wordClassSet = mutableSetOf<WordClass>()
+    val wordClassSet = persistentSetOf<WordClass>()
 
     MyVocaTheme {
         QueryOptions(

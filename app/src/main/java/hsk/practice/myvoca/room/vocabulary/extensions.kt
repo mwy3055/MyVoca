@@ -9,6 +9,7 @@ import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.toMeaning
 import hsk.practice.myvoca.data.toMeaningImpl
+import kotlinx.collections.immutable.toImmutableList
 import java.lang.reflect.Type
 
 internal inline fun <reified T> getTypeTokenType(): Type = object : TypeToken<T>() {}.type
@@ -31,7 +32,7 @@ fun Vocabulary.toRoomVocabulary(): RoomVocabulary {
 }
 
 fun Vocabulary.toVocabularyImpl() = VocabularyImpl(
-    id, eng, meaning.map { it.toMeaningImpl() }, addedTime, lastEditedTime, memo
+    id, eng, meaning.map { it.toMeaningImpl() }.toImmutableList(), addedTime, lastEditedTime, memo
 )
 
 @JvmName("toRoomVocabularyListVocabulary")
@@ -52,8 +53,8 @@ fun RoomVocabulary.toVocabulary(): Vocabulary {
 }
 
 fun RoomVocabulary.toVocabularyImpl(): VocabularyImpl {
-    val meaningList =
-        kor?.let { Gson().fromJson<List<MeaningImpl>>(it) } ?: return VocabularyImpl.nullVocabulary
+    val meaningList = kor?.let { Gson().fromJson<List<MeaningImpl>>(it) }?.toImmutableList()
+        ?: return VocabularyImpl.nullVocabulary
     return VocabularyImpl(id, eng, meaningList, addedTime, lastEditedTime, memo)
 }
 

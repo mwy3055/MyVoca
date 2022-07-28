@@ -1,6 +1,5 @@
 package hsk.practice.myvoca.ui.screens.quiz
 
-import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hsk.data.Vocabulary
@@ -14,6 +13,9 @@ import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImplList
 import hsk.practice.myvoca.util.MyVocaPreferencesKey
 import hsk.practice.myvoca.util.PreferencesDataStore
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -95,12 +97,12 @@ class QuizViewModel @Inject constructor(
         correct: Int,
         wrong: Int
     ): QuizScreenData {
-        val quizList = allVocabulary.randoms(quizSize).toVocabularyImplList()
+        val quizList = allVocabulary.randoms(quizSize).toVocabularyImplList().toImmutableList()
         val answerIndex = (0 until quizSize).random()
         return QuizScreenData(
             quizState = QuizAvailable,
             numberVocabularyNeed = vocabularyRequired - allVocabulary.size,
-            quiz = Quiz(quizList = quizList, answerIndex = answerIndex),
+            quiz = Quiz(quizWords = quizList, answerIndex = answerIndex),
             quizStat = QuizStat(correct, wrong)
         )
     }
@@ -142,22 +144,18 @@ sealed class QuizResult
 object QuizCorrect : QuizResult()
 object QuizWrong : QuizResult()
 
-@Immutable
 data class QuizResultData(val result: QuizResult, val answer: VocabularyImpl)
 
-@Immutable
 data class Quiz(
-    val quizList: List<VocabularyImpl> = emptyList(),
+    val quizWords: ImmutableList<VocabularyImpl> = persistentListOf(),
     val answerIndex: Int = 0
 ) {
     val answer: VocabularyImpl
-        get() = quizList[answerIndex]
+        get() = quizWords[answerIndex]
 }
 
-@Immutable
 data class QuizStat(val correct: Int = 0, val wrong: Int = 0)
 
-@Immutable
 data class QuizScreenData(
     val quizState: QuizState = QuizInit,
     val numberVocabularyNeed: Int = 0,

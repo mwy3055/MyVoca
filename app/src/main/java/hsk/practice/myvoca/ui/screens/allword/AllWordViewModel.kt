@@ -2,7 +2,6 @@ package hsk.practice.myvoca.ui.screens.allword
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hsk.data.VocabularyQuery
@@ -19,6 +18,10 @@ import hsk.practice.myvoca.room.vocabulary.toVocabularyImplList
 import hsk.practice.myvoca.room.vocabulary.toVocabularyList
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.state.UiState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,7 +65,7 @@ class AllWordViewModel @Inject constructor(
             val result = loadWords(data.queryState).sortedBy(data.sortState)
             _allWordUiState.value = allWordUiState.value.copy(
                 loading = false,
-                data = data.copy(currentWordState = result)
+                data = data.copy(currentWordState = result.toImmutableList())
             )
         }
     }
@@ -95,8 +98,8 @@ class AllWordViewModel @Inject constructor(
                 emptySet()
             } else {
                 val wordClass = WordClassImpl.findByKorean(koreanName)?.toWordClass() ?: return
-                current.xor(wordClass).toSet()
-            }
+                current.xor(wordClass)
+            }.toImmutableSet()
             onQueryChanged(queryState.copy(wordClass = new))
         }
     }
@@ -158,18 +161,17 @@ private fun MutableStateFlow<UiState<AllWordData>>.copyData(
         val newData = data.copy(
             sortState = sortState ?: data.sortState,
             queryState = queryState ?: data.queryState,
-            currentWordState = currentWordState ?: data.currentWordState,
+            currentWordState = currentWordState?.toImmutableList() ?: data.currentWordState,
             deletedWord = deletedWord ?: data.deletedWord
         )
         this.value = this.value.copy(data = newData)
     }
 }
 
-@Immutable
 data class AllWordData(
     val sortState: SortState = SortState.defaultValue,
     val queryState: VocabularyQuery = VocabularyQuery(),
-    val currentWordState: List<VocabularyImpl> = emptyList(),
+    val currentWordState: ImmutableList<VocabularyImpl> = persistentListOf(),
     val deletedWord: VocabularyImpl? = null
 )
 
