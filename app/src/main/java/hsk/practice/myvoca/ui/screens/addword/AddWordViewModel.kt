@@ -12,6 +12,9 @@ import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImpl
 import hsk.practice.myvoca.room.vocabulary.toVocabularyList
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -99,9 +102,9 @@ class AddWordViewModel @Inject constructor(
         updateUiState(meanings = newMeanings)
     }
 
-    private fun applyToMeanings(block: MutableList<MeaningImpl>.() -> Unit): List<MeaningImpl> {
+    private fun applyToMeanings(block: MutableList<MeaningImpl>.() -> Unit): ImmutableList<MeaningImpl> {
         val meanings = uiStateFlow.value.meanings.toMutableList()
-        return meanings.apply { block() }
+        return meanings.apply { block() }.toImmutableList()
     }
 
     fun onMemoUpdate(memo: String) {
@@ -134,7 +137,7 @@ class AddWordViewModel @Inject constructor(
         screenType: ScreenType = uiStateFlow.value.screenType,
         word: String = uiStateFlow.value.word,
         wordExistStatus: WordExistStatus = uiStateFlow.value.wordExistStatus,
-        meanings: List<MeaningImpl> = uiStateFlow.value.meanings,
+        meanings: ImmutableList<MeaningImpl> = uiStateFlow.value.meanings,
         memo: String = uiStateFlow.value.memo
     ) {
         _uiStateFlow.value = AddWordScreenData(
@@ -164,14 +167,14 @@ data class AddWordScreenData(
     val screenType: ScreenType = AddWord,
     val word: String = "",
     val wordExistStatus: WordExistStatus = WordExistStatus.WORD_EMPTY,
-    val meanings: List<MeaningImpl> = emptyList(),
+    val meanings: ImmutableList<MeaningImpl> = persistentListOf(),
     val memo: String = "",
 ) {
     fun toVocabularyImpl(): VocabularyImpl {
         val current = System.currentTimeMillis()
         return VocabularyImpl(
             eng = word,
-            meaning = meanings,
+            meaning = meanings.toImmutableList(),
             addedTime = current,
             lastEditedTime = current,
             memo = memo

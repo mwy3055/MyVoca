@@ -41,6 +41,8 @@ import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.state.UiState
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -395,7 +397,6 @@ private fun QueryWordClass(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun WordClassChip(
     className: String,
@@ -572,7 +573,7 @@ private fun ContentsPreview() {
     MyVocaTheme {
         Content(
             data = AllWordData(
-                currentWordState = fakeData,
+                currentWordState = fakeData.toImmutableList(),
                 queryState = VocabularyQuery(word = word)
             ),
             onOptionButtonClicked = { },
@@ -611,7 +612,7 @@ private fun WordItemsPreview() {
 @Composable
 private fun QueryOptionsPreview() {
     var word = "test text"
-    val wordClassSet = mutableSetOf<WordClass>()
+    val wordClassSet = persistentSetOf<WordClass>()
 
     MyVocaTheme {
         QueryOptions(
@@ -644,7 +645,7 @@ private fun QueryOptionsPreview() {
 @Composable
 private fun QueryOptionsPreview_DarkMode() {
     var word = "test text"
-    val wordClassSet = mutableSetOf<WordClass>()
+    val wordClassSet = persistentSetOf<WordClass>()
 
     MyVocaTheme {
         QueryOptions(

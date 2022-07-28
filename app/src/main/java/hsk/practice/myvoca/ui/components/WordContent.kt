@@ -27,6 +27,7 @@ import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun WordContent(
@@ -189,7 +190,7 @@ fun WordContentPreview() {
             MeaningImpl(WordClassImpl.NOUN, "(지식 등을 알아보기 위한) 시험"),
             MeaningImpl(WordClassImpl.NOUN, "(의료적인) 검사"),
             MeaningImpl(WordClassImpl.VERB, "시험하다"),
-        ),
+        ).toImmutableList(),
         addedTime = currentTime,
         lastEditedTime = currentTime,
         memo = ""

@@ -25,6 +25,7 @@ import hsk.practice.myvoca.ui.components.versus.VersusView
 import hsk.practice.myvoca.ui.components.versus.rememberVersusViewState
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun QuizScreen(viewModel: QuizViewModel) {
@@ -118,7 +119,7 @@ private fun QuizContent(
         Spacer(modifier = Modifier.weight(1f))
         QuizOptions(
             modifier = Modifier.weight(8f),
-            options = quiz.quizList,
+            options = quiz.quizWords,
             onOptionClick = onOptionClick
         )
         VersusView(
@@ -230,7 +231,10 @@ private fun QuizNotAvailablePreview() {
 @Preview(showBackground = true)
 @Composable
 private fun QuizScreenPreview() {
-    val quiz = Quiz(fakeData.distinctRandoms(quizSize), answerIndex = (0 until quizSize).random())
+    val quiz = Quiz(
+        quizWords = fakeData.distinctRandoms(quizSize).toImmutableList(),
+        answerIndex = (0 until quizSize).random()
+    )
     val quizStat = QuizStat(10, 5)
 
     var text by remember { mutableStateOf("dtd") }

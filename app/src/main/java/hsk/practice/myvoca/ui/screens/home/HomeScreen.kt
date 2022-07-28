@@ -27,6 +27,7 @@ import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import hsk.practice.myvoca.util.getTimeDiffString
 import hsk.practice.myvoca.work.setPeriodicTodayWordWork
+import kotlinx.collections.immutable.toImmutableList
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -302,7 +303,7 @@ private fun ContentPreview() {
         totalWordCount = fakeData.size,
         todayWords = fakeData.subList(0, 5).map { voca ->
             HomeTodayWord(TodayWordImpl(wordId = voca.id), voca)
-        },
+        }.toImmutableList(),
         todayWordsLastUpdatedTime = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
     )
     MyVocaTheme {
