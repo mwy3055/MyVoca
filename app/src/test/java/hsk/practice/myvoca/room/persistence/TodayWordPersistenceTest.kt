@@ -23,7 +23,7 @@ class TodayWordPersistenceTest {
     val coroutineExtension = MainCoroutineExtension(dispatcher)
 
     // Any subclass of TodayWordPersistence
-    private val persistence: TodayWordPersistence = FakeTodayWordPersistence()
+    private val persistence: TodayWordPersistence = FakeTodayWordPersistence(FakeVocaPersistence())
 
     @BeforeEach
     fun initTest() = runTest {
