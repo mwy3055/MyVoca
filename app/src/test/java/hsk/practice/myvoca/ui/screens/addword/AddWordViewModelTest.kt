@@ -54,6 +54,7 @@ class AddWordViewModelTest {
         assertThat(uiState.word).isEqualTo(sample.eng)
     }
 
+    // TODO: fix exception
     @Test
     fun injectUpdateWord_InjectNotExistWord() = runBlocking {
         injectUpdateWordThenDelay(1)
