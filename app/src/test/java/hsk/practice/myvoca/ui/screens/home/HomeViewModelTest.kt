@@ -13,12 +13,8 @@ import hsk.practice.myvoca.room.persistence.FakeTodayWordPersistence
 import hsk.practice.myvoca.room.persistence.FakeVocaPersistence
 import hsk.practice.myvoca.util.PreferencesDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -35,7 +31,6 @@ import org.robolectric.annotation.Config
 class HomeViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
-    private val testScope = TestScope(testDispatcher + Job())
     private val vocaPersistence: VocaPersistence = FakeVocaPersistence()
     private val todayWordPersistence: TodayWordPersistence =
         FakeTodayWordPersistence(vocaPersistence)
@@ -56,7 +51,7 @@ class HomeViewModelTest {
     }
 
     @Before
-    fun setUp() = runBlocking {
+    fun setUp() = runTest {
         vocaPersistence.clearVocabulary()
         todayWordPersistence.clearTodayWords()
         viewModel = HomeViewModel(
@@ -83,7 +78,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun onTodayWordCheckboxChange_CheckPersistence() = testScope.runTest {
+    fun onTodayWordCheckboxChange_CheckPersistence() = runTest {
         vocaPersistence.insertVocabulary(TestSampleData.getSampleVocabularies())
         val sample = TestSampleData.getSampleTodayWord()
         todayWordPersistence.insertTodayWord(sample)
@@ -92,9 +87,9 @@ class HomeViewModelTest {
                 sample.toTodayWordImpl(),
                 TestSampleData.getSampleVocaImpl()
             )
-        ).join()
+        )
         assertDoesNotThrow {
-            todayWordPersistence.loadTodayWords().take(2).first { candidate ->
+            todayWordPersistence.loadTodayWords().first { candidate ->
                 candidate.any { it.todayId == sample.todayId && it.checked != sample.checked }
             }
         }
