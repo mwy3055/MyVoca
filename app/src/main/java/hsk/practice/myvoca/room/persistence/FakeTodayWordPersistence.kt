@@ -27,12 +27,12 @@ class FakeTodayWordPersistence @Inject constructor() : TodayWordPersistence {
         }
     }
 
-    override suspend fun insertTodayWord(todayWord: TodayWord) {
-        todayWords.add(todayWord)
+    override suspend fun insertTodayWord(newTodayWord: TodayWord) {
+        todayWords.add(newTodayWord)
     }
 
-    override suspend fun insertTodayWords(todayWords: List<TodayWord>) {
-        todayWords.forEach { insertTodayWord(it) }
+    override suspend fun insertTodayWords(newTodayWords: List<TodayWord>) {
+        todayWords.addAll(newTodayWords)
     }
 
     override suspend fun updateTodayWord(todayWord: TodayWord) {

@@ -75,12 +75,12 @@ class TodayWordPersistenceRoom @Inject constructor(@ApplicationContext context: 
     override fun loadActualTodayWords(): Flow<List<Vocabulary>> =
         vocaDao.getTodayWords().distinctUntilChanged().map { it.toVocabularyList() }
 
-    override suspend fun insertTodayWord(todayWord: TodayWord) {
-        todayWordDao.insertTodayWord(todayWord.toRoomTodayWord())
+    override suspend fun insertTodayWord(newTodayWord: TodayWord) {
+        todayWordDao.insertTodayWord(newTodayWord.toRoomTodayWord())
     }
 
-    override suspend fun insertTodayWords(todayWords: List<TodayWord>) {
-        todayWordDao.insertTodayWord(todayWords.map { it.toRoomTodayWord() })
+    override suspend fun insertTodayWords(newTodayWords: List<TodayWord>) {
+        todayWordDao.insertTodayWord(newTodayWords.map { it.toRoomTodayWord() })
     }
 
     override suspend fun updateTodayWord(todayWord: TodayWord) {
