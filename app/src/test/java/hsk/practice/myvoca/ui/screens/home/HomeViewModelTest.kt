@@ -12,10 +12,11 @@ import hsk.practice.myvoca.data.toTodayWordImpl
 import hsk.practice.myvoca.room.persistence.FakeTodayWordPersistence
 import hsk.practice.myvoca.room.persistence.FakeVocaPersistence
 import hsk.practice.myvoca.util.PreferencesDataStore
-import hsk.practice.myvoca.withDelay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -23,6 +24,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
@@ -35,7 +37,8 @@ class HomeViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher + Job())
     private val vocaPersistence: VocaPersistence = FakeVocaPersistence()
-    private val todayWordPersistence: TodayWordPersistence = FakeTodayWordPersistence()
+    private val todayWordPersistence: TodayWordPersistence =
+        FakeTodayWordPersistence(vocaPersistence)
     private val workManager: WorkManager
     private val dataStore: PreferencesDataStore
 
@@ -53,7 +56,7 @@ class HomeViewModelTest {
     }
 
     @Before
-    fun setUp() = runTest {
+    fun setUp() = runBlocking {
         vocaPersistence.clearVocabulary()
         todayWordPersistence.clearTodayWords()
         viewModel = HomeViewModel(
@@ -81,21 +84,20 @@ class HomeViewModelTest {
 
     @Test
     fun onTodayWordCheckboxChange_CheckPersistence() = testScope.runTest {
-        val todayWord = TestSampleData.getSampleTodayWord()
-        todayWordPersistence.insertTodayWord(todayWord)
-        withDelay(coroutineContext) {
-            viewModel.onTodayWordCheckboxChange(
-                HomeTodayWord(
-                    todayWord.toTodayWordImpl(),
-                    TestSampleData.getSampleVocaImpl()
-                )
+        vocaPersistence.insertVocabulary(TestSampleData.getSampleVocabularies())
+        val sample = TestSampleData.getSampleTodayWord()
+        todayWordPersistence.insertTodayWord(sample)
+        viewModel.onTodayWordCheckboxChange(
+            HomeTodayWord(
+                sample.toTodayWordImpl(),
+                TestSampleData.getSampleVocaImpl()
             )
+        ).join()
+        assertDoesNotThrow {
+            todayWordPersistence.loadTodayWords().take(2).first { candidate ->
+                candidate.any { it.todayId == sample.todayId && it.checked != sample.checked }
+            }
         }
-
-        val todayWords = todayWordPersistence.loadTodayWords().first()
-        val insertedTodayWord = todayWords.find { it.todayId == todayWord.todayId }
-        assertThat(insertedTodayWord).isNotNull
-        assertThat(insertedTodayWord!!.checked).isNotEqualTo(todayWord.checked)
     }
 
     @Test
