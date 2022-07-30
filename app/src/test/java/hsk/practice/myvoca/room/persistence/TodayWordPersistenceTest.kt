@@ -39,14 +39,14 @@ class TodayWordPersistenceTest {
     fun insertTodayWord_NormalCase() = runTest {
         val sample = getSampleTodayWord()
         persistence.insertTodayWord(sample)
-        assertThat(loadTodayWordsFlowFirst()).containsOnly(sample)
+        assertThat(getTodayWord()).containsOnly(sample)
     }
 
     @Test
     fun insertTodayWords_NormalCase() = runTest {
         val samples = getSampleTodayWords()
         persistence.insertTodayWords(samples)
-        assertThat(loadTodayWordsFlowFirst()).isEqualTo(samples)
+        assertThat(getTodayWord()).isEqualTo(samples)
     }
 
     @Test
@@ -64,7 +64,7 @@ class TodayWordPersistenceTest {
 
         val checkedSamples = samples.map { todayWord -> todayWord.copy(checked = true) }
             .onEach { sample -> persistence.updateTodayWord(sample) }
-        assertThat(loadTodayWordsFlowFirst()).isEqualTo(checkedSamples)
+        assertThat(getTodayWord()).isEqualTo(checkedSamples)
     }
 
     @Test
@@ -73,7 +73,7 @@ class TodayWordPersistenceTest {
         persistence.insertTodayWord(sample)
         persistence.deleteTodayWord(sample)
 
-        assertThat(loadTodayWordsFlowFirst()).isEmpty()
+        assertThat(getTodayWord()).isEmpty()
     }
 
     @Test
@@ -84,6 +84,6 @@ class TodayWordPersistenceTest {
         }
     }
 
-    private suspend fun loadTodayWordsFlowFirst() = persistence.loadTodayWords().first()
+    private suspend fun getTodayWord() = persistence.loadTodayWords().first()
 
 }
