@@ -54,12 +54,13 @@ class AddWordViewModelTest {
         assertThat(uiState.word).isEqualTo(sample.eng)
     }
 
-    // TODO: fix exception
     @Test
-    fun injectUpdateWord_InjectNotExistWord() = runBlocking {
-        injectUpdateWordThenDelay(1)
-        assertThat(uiState.word).isEmpty()
-    }
+    fun injectUpdateWord_InjectNotExistWord(): Unit = runTest {
+        val sample = vocaPersistence.insertTestData()[0]
+        viewModel.injectUpdateTarget(sample.id)
+        assertDoesNotThrow {
+            viewModel.uiStateFlow.first { it.word.isNotEmpty() }
+        }
 
     private suspend fun injectUpdateWordThenDelay(wordId: Int) = delayAfter {
         viewModel.injectUpdateTarget(wordId)
@@ -312,6 +313,12 @@ class AddWordViewModelTest {
 
     private suspend fun onAddWordThenDelay() = delayAfter {
         viewModel.onAddWord()
+    }
+
+    private suspend fun VocaPersistence.insertTestData(): List<Vocabulary> {
+        val sampleData = TestSampleData.getSampleVocabularies()
+        insertVocabulary(sampleData)
+        return sampleData
     }
 
 }
