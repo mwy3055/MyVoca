@@ -1,5 +1,6 @@
 package hsk.practice.myvoca.ui.screens.addword
 
+import com.hsk.data.Vocabulary
 import com.hsk.data.VocabularyQuery
 import com.hsk.domain.VocaPersistence
 import com.hsk.ktx.zipForEach
@@ -11,12 +12,15 @@ import hsk.practice.myvoca.data.toMeaning
 import hsk.practice.myvoca.room.persistence.FakeVocaPersistence
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 
@@ -39,19 +43,18 @@ class AddWordViewModelTest {
 
     @BeforeEach
     fun initTest() = runBlocking {
-        delayAfter {
-            vocaPersistence.clearVocabulary()
-            viewModel = AddWordViewModel(vocaPersistence)
-        }
+        vocaPersistence.clearVocabulary()
+        viewModel = AddWordViewModel(vocaPersistence)
     }
 
     @Test
     fun injectUpdateWord_InjectExistWord(): Unit = runBlocking {
-        val sample = TestSampleData.getSampleVoca()
-        vocaPersistence.insertVocabulary(listOf(sample))
+        val sample = vocaPersistence.insertTestData()[0]
 
-        injectUpdateWordThenDelay(sample.id)
-        assertThat(uiState.word).isEqualTo(sample.eng)
+        viewModel.injectUpdateTarget(sample.id)
+        assertDoesNotThrow {
+            viewModel.uiStateFlow.first { it.word == sample.eng }
+        }
     }
 
     @Test
@@ -61,9 +64,6 @@ class AddWordViewModelTest {
         assertDoesNotThrow {
             viewModel.uiStateFlow.first { it.word.isNotEmpty() }
         }
-
-    private suspend fun injectUpdateWordThenDelay(wordId: Int) = delayAfter {
-        viewModel.injectUpdateTarget(wordId)
     }
 
     private suspend fun delayAfter(block: suspend () -> Unit) {
@@ -112,24 +112,24 @@ class AddWordViewModelTest {
 
     @Test
     fun loadStatus_NewWordIsSame(): Unit = runBlocking {
-        val sample = TestSampleData.getSampleVoca()
-        vocaPersistence.insertVocabulary(listOf(sample))
-
-        injectUpdateWordThenDelay(sample.id)
-
+        val sample = vocaPersistence.insertTestData()[0]
+        viewModel.injectUpdateTarget(sample.id)
         viewModel.loadStatus(sample.eng)
-        assertThat(uiState.wordExistStatus).isEqualTo(WordExistStatus.NOT_EXISTS)
+
+        assertDoesNotThrow {
+            viewModel.uiStateFlow.first { it.wordExistStatus == WordExistStatus.DUPLICATE }
+        }
     }
 
     @Test
     fun loadStatus_newWordIsDifferent(): Unit = runBlocking {
-        val sample = TestSampleData.getSampleVoca()
-        vocaPersistence.insertVocabulary(listOf(sample))
-
-        injectUpdateWordThenDelay(sample.id)
-
+        val sample = vocaPersistence.insertTestData()[0]
+        viewModel.injectUpdateTarget(sample.id)
         viewModel.loadStatus(sample.eng.dropLast(1))
-        assertThat(uiState.wordExistStatus).isEqualTo(WordExistStatus.NOT_EXISTS)
+
+        assertDoesNotThrow {
+            viewModel.uiStateFlow.first { it.wordExistStatus == WordExistStatus.NOT_EXISTS }
+        }
     }
 
     @Test
@@ -273,15 +273,15 @@ class AddWordViewModelTest {
 
     @Test
     fun onAddWord_Update(): Unit = runBlocking {
-        val sampleWord = TestSampleData.getSampleVoca()
-        vocaPersistence.insertVocabulary(listOf(sampleWord))
-
-        injectUpdateWordThenDelay(sampleWord.id)
+        val sample = vocaPersistence.insertTestData()[0]
+        viewModel.injectUpdateTarget(sample.id)
+        viewModel.uiStateFlow.first { it.word == sample.eng }
 
         val newEng = "some new word"
         viewModel.onWordUpdate(newEng)
 
-        onAddWordThenDelay()
+        viewModel.onAddWord()
+        vocaPersistence.waitNewVocabularies()
 
         val queryResult = vocaPersistence.getVocabulary(VocabularyQuery(word = newEng))
         assertThat(queryResult).isNotEmpty
@@ -299,7 +299,8 @@ class AddWordViewModelTest {
         viewModel.onWordUpdate(newWord = eng)
         viewModel.onMemoUpdate(memo = memo)
 
-        onAddWordThenDelay()
+        viewModel.onAddWord()
+        vocaPersistence.waitNewVocabularies()
 
         val queryResult = vocaPersistence.getVocabulary(VocabularyQuery(word = eng))
         assertThat(queryResult).isNotEmpty
@@ -311,8 +312,9 @@ class AddWordViewModelTest {
         }
     }
 
-    private suspend fun onAddWordThenDelay() = delayAfter {
-        viewModel.onAddWord()
+    private suspend fun VocaPersistence.waitNewVocabularies() {
+        // Do not remove println: it passes all the test
+        println("wait: ${getAllVocabulary().first()}")
     }
 
     private suspend fun VocaPersistence.insertTestData(): List<Vocabulary> {
