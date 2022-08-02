@@ -9,6 +9,9 @@ import org.junit.runner.Description
 import org.junit.runners.model.Statement
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * Coroutine Rule for JUnit4
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainCoroutineRule(private val dispatcher: TestDispatcher) : TestWatcher(), CoroutineScope {
     override val coroutineContext: CoroutineContext = dispatcher + Job()
