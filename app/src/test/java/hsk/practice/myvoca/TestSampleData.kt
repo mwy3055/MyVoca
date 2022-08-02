@@ -25,7 +25,7 @@ object TestSampleData {
         memo = memo
     )
 
-    fun getSampleVocabularies() = (3..10).map {
+    fun getSampleVocabularies() = (1..10).map {
         getSampleVoca(id = it)
     }
 

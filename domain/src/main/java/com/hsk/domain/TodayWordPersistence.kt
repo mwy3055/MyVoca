@@ -10,9 +10,9 @@ interface TodayWordPersistence {
 
     fun loadActualTodayWords(): Flow<List<Vocabulary>>
 
-    suspend fun insertTodayWord(todayWord: TodayWord)
+    suspend fun insertTodayWord(newTodayWord: TodayWord)
 
-    suspend fun insertTodayWords(todayWords: List<TodayWord>)
+    suspend fun insertTodayWords(newTodayWords: List<TodayWord>)
 
     suspend fun updateTodayWord(todayWord: TodayWord)
 

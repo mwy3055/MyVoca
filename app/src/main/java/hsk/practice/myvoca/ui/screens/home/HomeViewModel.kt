@@ -24,7 +24,6 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -98,10 +97,10 @@ class HomeViewModel @Inject constructor(
         setOneTimeTodayWordWork(workManager)
     }
 
-    fun onTodayWordCheckboxChange(homeTodayWord: HomeTodayWord): Job {
+    fun onTodayWordCheckboxChange(homeTodayWord: HomeTodayWord) {
         val checked = homeTodayWord.todayWord.checked
         val copy = homeTodayWord.todayWord.copy(checked = !checked)
-        return viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch(ioDispatcher) {
             todayWordPersistence.updateTodayWord(copy.toTodayWord())
         }
     }
