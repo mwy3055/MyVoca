@@ -6,10 +6,16 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
+import org.junit.runners.model.Statement
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * Coroutine Rule for JUnit4
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
-class MainCoroutineRule(private val dispatcher: TestDispatcher) : TestWatcher() {
+class MainCoroutineRule(private val dispatcher: TestDispatcher) : TestWatcher(), CoroutineScope {
+    override val coroutineContext: CoroutineContext = dispatcher + Job()
+
     override fun starting(description: Description?) {
         super.starting(description)
         Dispatchers.setMain(dispatcher)
@@ -17,17 +23,13 @@ class MainCoroutineRule(private val dispatcher: TestDispatcher) : TestWatcher() 
 
     override fun finished(description: Description?) {
         super.finished(description)
-        dispatcher.cancel()
         Dispatchers.resetMain()
+        dispatcher.cancel()
     }
-}
 
-suspend fun <T> withDelay(
-    context: CoroutineContext,
-    delayMilli: Long = 50L,
-    block: suspend CoroutineScope.() -> T
-): T = withContext(context) {
-    val result = block()
-    delay(delayMilli)
-    return@withContext result
+    override fun apply(base: Statement?, description: Description?) = object : Statement() {
+        override fun evaluate() {
+            this@MainCoroutineRule.cancel()
+        }
+    }
 }

@@ -9,8 +9,6 @@ import hsk.practice.myvoca.room.AndroidTestSampleData.getSampleVoca
 import hsk.practice.myvoca.room.AndroidTestSampleData.getSampleVocabularies
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -52,11 +50,9 @@ class VocaPersistenceRoomTest {
         val expected = getSampleVocabularies()
         persistence.insertVocabulary(expected)
 
-        val actual = getSecondAllVocabulary()
+        val actual = persistence.getVocabulary(VocabularyQuery(word = expected[0].eng))
         assertEquals(expected, actual)
     }
-
-    private suspend fun getSecondAllVocabulary() = persistence.getAllVocabulary().take(2).last()
 
     @Test
     fun testVocabularySizeIsCorrect() = runTest {

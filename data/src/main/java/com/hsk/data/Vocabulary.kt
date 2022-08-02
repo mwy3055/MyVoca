@@ -1,5 +1,7 @@
 package com.hsk.data
 
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentSetOf
 import java.io.Serializable
 
 data class Vocabulary(
@@ -64,5 +66,5 @@ enum class WordClass {
 
 data class VocabularyQuery(
     val word: String = "",
-    val wordClass: Set<WordClass> = emptySet()
+    val wordClass: ImmutableSet<WordClass> = persistentSetOf()
 )

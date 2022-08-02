@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import hsk.practice.myvoca.ui.structure.MyVocaScreen
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import java.util.*
 
 private val TabHeight = 56.dp
@@ -35,7 +37,7 @@ private const val TabFadeOutDuration = 100
 
 @Composable
 fun MyVocaBottomAppBar(
-    allScreens: List<MyVocaScreen>,
+    allScreens: ImmutableList<MyVocaScreen>,
     onTabSelected: (MyVocaScreen) -> Unit,
     currentScreen: MyVocaScreen
 ) {
@@ -114,7 +116,7 @@ private fun MyVocaTab(
 fun MyVocaBottomAppBarPreview() {
     MyVocaTheme {
         MyVocaBottomAppBar(
-            allScreens = MyVocaScreen.values().toList(),
+            allScreens = MyVocaScreen.values().toList().toImmutableList(),
             onTabSelected = { },
             currentScreen = MyVocaScreen.Home
         )

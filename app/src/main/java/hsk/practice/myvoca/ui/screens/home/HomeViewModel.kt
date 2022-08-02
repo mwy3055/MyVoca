@@ -1,6 +1,5 @@
 package hsk.practice.myvoca.ui.screens.home
 
-import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
@@ -21,8 +20,10 @@ import hsk.practice.myvoca.room.vocabulary.toVocabularyImpl
 import hsk.practice.myvoca.util.MyVocaPreferencesKey
 import hsk.practice.myvoca.util.PreferencesDataStore
 import hsk.practice.myvoca.work.setOneTimeTodayWordWork
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -65,6 +66,7 @@ class HomeViewModel @Inject constructor(
 
                 val todayWordList =
                     createHomeTodayWords(todayWords, actualTodayWords).sortTodayWords()
+                        .toImmutableList()
                 data.copy(
                     loading = false,
                     totalWordCount = size,
@@ -95,10 +97,10 @@ class HomeViewModel @Inject constructor(
         setOneTimeTodayWordWork(workManager)
     }
 
-    fun onTodayWordCheckboxChange(homeTodayWord: HomeTodayWord): Job {
+    fun onTodayWordCheckboxChange(homeTodayWord: HomeTodayWord) {
         val checked = homeTodayWord.todayWord.checked
         val copy = homeTodayWord.todayWord.copy(checked = !checked)
-        return viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch(ioDispatcher) {
             todayWordPersistence.updateTodayWord(copy.toTodayWord())
         }
     }
@@ -116,7 +118,7 @@ class HomeViewModel @Inject constructor(
 private fun MutableStateFlow<HomeScreenData>.copyData(
     loading: Boolean = value.loading,
     totalWordCount: Int = value.totalWordCount,
-    todayWords: List<HomeTodayWord> = value.todayWords,
+    todayWords: ImmutableList<HomeTodayWord> = value.todayWords,
     todayWordsLastUpdatedTime: Long = value.todayWordsLastUpdatedTime,
     showTodayWordHelp: Boolean = value.showTodayWordHelp
 ) {
@@ -131,17 +133,15 @@ private fun MutableStateFlow<HomeScreenData>.copyData(
     }
 }
 
-@Immutable
 data class HomeTodayWord(
     val todayWord: TodayWordImpl,
     val vocabulary: VocabularyImpl
 )
 
-@Immutable
 data class HomeScreenData(
     val loading: Boolean = false,
     val totalWordCount: Int = 0,
-    val todayWords: List<HomeTodayWord> = emptyList(),
+    val todayWords: ImmutableList<HomeTodayWord> = persistentListOf(),
     val todayWordsLastUpdatedTime: Long = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
     val showTodayWordHelp: Boolean = false
 )

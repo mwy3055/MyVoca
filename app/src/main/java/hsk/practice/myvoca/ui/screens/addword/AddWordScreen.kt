@@ -30,6 +30,7 @@ import hsk.practice.myvoca.ui.components.InsetAwareTopAppBar
 import hsk.practice.myvoca.ui.components.StaggeredGrid
 import hsk.practice.myvoca.ui.components.SystemBarColor
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun AddWordScreen(
@@ -240,7 +241,7 @@ private fun Word(
 
 @Composable
 private fun Meanings(
-    meanings: List<MeaningImpl>,
+    meanings: ImmutableList<MeaningImpl>,
     onMeaningAdd: (WordClassImpl) -> Unit,
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
     onMeaningDelete: (Int) -> Unit
@@ -353,7 +354,7 @@ private fun MeaningsEmptyIndicator() {
 
 @Composable
 private fun MeaningsContent(
-    meanings: List<MeaningImpl>,
+    meanings: ImmutableList<MeaningImpl>,
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
     onMeaningDelete: (Int) -> Unit
 ) {

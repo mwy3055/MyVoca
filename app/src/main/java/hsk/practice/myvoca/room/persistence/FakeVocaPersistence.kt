@@ -35,7 +35,7 @@ class FakeVocaPersistence @Inject constructor() : VocaPersistence, CoroutineScop
         return try {
             data.first { it.id == id }
         } catch (e: NoSuchElementException) {
-            throw VocaPersistenceException("id $id doesn't exist")
+            throw VocaPersistenceException("id $id doesn't exist. All: $data")
         }
     }
 

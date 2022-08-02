@@ -3,11 +3,14 @@ package hsk.practice.myvoca.data
 import com.hsk.data.Meaning
 import com.hsk.data.WordClass
 import com.hsk.ktx.removed
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 data class VocabularyImpl(
     val id: Int = 0,
     val eng: String = "",
-    val meaning: List<MeaningImpl> = emptyList(),
+    val meaning: ImmutableList<MeaningImpl> = persistentListOf(),
     val addedTime: Long = 0L,
     val lastEditedTime: Long = 0L,
     val memo: String? = ""
@@ -19,7 +22,7 @@ data class VocabularyImpl(
         val nullVocabulary = VocabularyImpl(
             id = 0,
             eng = "null",
-            meaning = emptyList(),
+            meaning = persistentListOf(),
             addedTime = System.currentTimeMillis(),
             lastEditedTime = System.currentTimeMillis(),
             memo = ""
@@ -37,7 +40,7 @@ val fakeData: List<VocabularyImpl> = (1..20).map { index ->
                 if (it % 2 == 0) WordClassImpl.NOUN else WordClassImpl.VERB,
                 "테스트$index"
             )
-        },
+        }.toImmutableList(),
         addedTime = currentTime,
         lastEditedTime = currentTime,
         memo = ""

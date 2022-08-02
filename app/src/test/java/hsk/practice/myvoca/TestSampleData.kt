@@ -10,6 +10,7 @@ import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.room.todayword.RoomTodayWord
 import hsk.practice.myvoca.room.vocabulary.RoomVocabulary
 import hsk.practice.myvoca.room.vocabulary.toJson
+import kotlinx.collections.immutable.toImmutableList
 
 object TestSampleData {
     fun getSampleVoca(
@@ -24,7 +25,7 @@ object TestSampleData {
         memo = memo
     )
 
-    fun getSampleVocabularies() = (3..10).map {
+    fun getSampleVocabularies() = (1..10).map {
         getSampleVoca(id = it)
     }
 
@@ -59,7 +60,7 @@ object TestSampleData {
         return VocabularyImpl(
             id = id,
             eng = eng,
-            meaning = meaning,
+            meaning = meaning.toImmutableList(),
             addedTime = currentTime,
             lastEditedTime = currentTime,
             memo = memo

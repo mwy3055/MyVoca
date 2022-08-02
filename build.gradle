@@ -2,28 +2,31 @@
 
 buildscript {
     ext {
-        kotlin_version = '1.6.10'
-        lifecycle_version = '2.4.1'
+        kotlin_version = '1.7.0'
+        lifecycle_version = '2.5.0'
         lifecycle_extension_version = '2.2.0'
-        room_version = '2.4.2'
-        hilt_version = '2.42'
+        room_version = '2.4.3'
+        hilt_version = '2.43.1'
         datastore_version = '1.0.0'
-        compose_version = '1.1.1'
+        compose_version = '1.2.0'
         accompanist_version = '0.23.1'
         paging_version = '2.1.2'
         work_version = '2.7.1'
         jacoco_version = '0.8.7'
+        jupiter_version = '5.9.0'
+        navigation_version = '2.5.0'
+        coroutines_version = '1.6.4'
     }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.0-beta01'
+        classpath 'com.android.tools.build:gradle:7.3.0-beta05'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
         // Firebase integration
-        classpath 'com.google.gms:google-services:4.3.10'
+        classpath 'com.google.gms:google-services:4.3.13'
         classpath 'org.jacoco:org.jacoco.core:0.8.7'
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -36,6 +39,27 @@ allprojects {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+    }
+}
+
+subprojects {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            if (project.findProperty("composeCompilerReports") == "true") {
+                freeCompilerArgs += [
+                        "-P",
+                        "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
+                                project.buildDir.absolutePath + "/compose_compiler"
+                ]
+            }
+            if (project.findProperty("composeCompilerMetrics") == "true") {
+                freeCompilerArgs += [
+                        "-P",
+                        "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
+                                project.buildDir.absolutePath + "/compose_compiler"
+                ]
+            }
+        }
     }
 }
 
