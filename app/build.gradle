@@ -48,7 +48,7 @@ android {
         minSdkVersion 27
         targetSdkVersion 32
         versionCode 4
-        versionName '2.0.4'
+        versionName '2.0.5-beta01'
         testInstrumentationRunner "hsk.practice.myvoca.CustomTestRunner"
         signingConfig signingConfigs.debug
         javaCompileOptions {
@@ -158,7 +158,7 @@ dependencies {
     implementation "androidx.compose.material:material-icons-core:$compose_version"
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
     // Integration with activities
-    implementation 'androidx.activity:activity-compose:1.5.0'
+    implementation 'androidx.activity:activity-compose:1.5.1'
     // Integration with ViewModels
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0-alpha01'
     // Integration with observables
@@ -182,7 +182,7 @@ dependencies {
 
     // KTX libraries
     implementation 'androidx.core:core-ktx:1.8.0'
-    implementation 'androidx.fragment:fragment-ktx:1.5.0'
+    implementation 'androidx.fragment:fragment-ktx:1.5.1'
     implementation 'androidx.collection:collection-ktx:1.2.0'
     implementation "androidx.palette:palette-ktx:1.0.0"
 
@@ -216,7 +216,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-    implementation 'androidx.lifecycle:lifecycle-reactivestreams-ktx:2.5.0'
+    implementation 'androidx.lifecycle:lifecycle-reactivestreams-ktx:2.5.1'
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_extension_version"
     // alternately - if using Java8, use the following instead of lifecycle-compiler
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
@@ -236,7 +236,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.2.0'
 
     // Firebase
-    implementation platform('com.google.firebase:firebase-bom:30.3.1')
+    implementation platform('com.google.firebase:firebase-bom:30.3.2')
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-firestore-ktx'
     implementation 'com.google.firebase:firebase-analytics-ktx'
