@@ -117,12 +117,12 @@ private fun ProfileImage(
     } else {
         Image(
             modifier = modifierWithSize,
-            painter = rememberImagePainter(
-                data = imageUrl,
-                builder = {
-                    size(imageSize)
-                    transformations(CircleCropTransformation())
-                }
+            painter = rememberAsyncImagePainter(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageUrl)
+                    .size(imageSize)
+                    .transformations(CircleCropTransformation())
+                    .build()
             ),
             contentDescription = "프로필 이미지",
         )
