@@ -9,7 +9,12 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,6 +28,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -30,6 +36,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hsk.data.VocabularyQuery
 import com.hsk.data.WordClass
@@ -491,37 +498,39 @@ private fun WordItems(
     onWordDelete: (VocabularyImpl) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val listState = rememberLazyListState()
+    val listState = rememberLazyGridState()
     val context = LocalContext.current
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     Box {
-        LazyColumn(
+        LazyVerticalGrid(
+            modifier = Modifier.background(color = MaterialTheme.colors.background),
             state = listState,
+            columns = GridCells.Adaptive(minSize = min(screenWidth, 330.dp)),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.background(color = MaterialTheme.colors.background)
         ) {
             items(
-                items = words,
-                key = { it.id }
-            ) { word ->
+                count = words.size,
+                key = { words[it].id },
+            ) {
                 WordContent(
                     modifier = Modifier.animateItemPlacement(
                         tween(
-                            durationMillis = 1500,
+                            durationMillis = 500,
                             easing = CubicBezierEasing(0.7f, 0.1f, 0.3f, 0.9f)
                         )
                     ),
-                    word = word
+                    word = words[it]
                 ) {
-                    IconButton(onClick = { onWordUpdate(word, context) }) {
+                    IconButton(onClick = { onWordUpdate(words[it], context) }) {
                         Icon(
                             imageVector = Icons.Outlined.Edit,
-                            contentDescription = "단어 ${word.eng}를 수정합니다."
+                            contentDescription = "단어 ${words[it].eng}를 수정합니다."
                         )
                     }
-                    IconButton(onClick = { onWordDelete(word) }) {
+                    IconButton(onClick = { onWordDelete(words[it]) }) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
-                            contentDescription = "단어 ${word.eng}를 삭제합니다."
+                            contentDescription = "단어 ${words[it].eng}를 삭제합니다."
                         )
                     }
                 }
@@ -539,7 +548,7 @@ private fun WordItems(
 
 @Composable
 private fun ScrollTopButton(
-    listState: LazyListState,
+    listState: LazyGridState,
     coroutineScope: CoroutineScope,
     modifier: Modifier = Modifier
 ) {
