@@ -1,5 +1,8 @@
 package hsk.practice.myvoca.ui.components.versus
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.LocalContentColor
@@ -21,7 +24,7 @@ fun VersusViewState(
     rightValue: Int = 0
 ): VersusViewState = VersusViewStateImpl(leftValue, rightValue)
 
-private val VersusViewStateSaver = listSaver<VersusViewState, Int>(
+private val VersusViewStateSaver = listSaver(
     save = { listOf(it.leftValue, it.rightValue) },
     restore = { VersusViewState(it[0], it[1]) }
 )
@@ -102,7 +105,15 @@ fun VersusElement(
     value: Int,
 ) {
     val background = LocalContentColor.current
-    Box(modifier = modifier.background(background)) {
+    Box(
+        modifier = modifier
+            .background(background)
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioHighBouncy,
+                )
+            )
+    ) {
         Text(
             text = value.toString(),
             modifier = Modifier
