@@ -87,6 +87,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'proguard-rules-debug.pro'
             debuggable true
+            applicationIdSuffix ".debug"
         }
         benchmark {
             initWith buildTypes.release
