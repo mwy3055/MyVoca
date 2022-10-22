@@ -31,8 +31,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.annotation.ExperimentalCoilApi
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import hsk.practice.myvoca.firebase.UserImpl
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
@@ -95,11 +95,9 @@ private fun Content(
             uploadActionData = data.uploadActionData,
             downloadActionData = data.downloadActionData,
         )
-        Spacer(modifier = Modifier.weight(3f))
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
 private fun ProfileImage(
     modifier: Modifier = Modifier,
@@ -117,12 +115,12 @@ private fun ProfileImage(
     } else {
         Image(
             modifier = modifierWithSize,
-            painter = rememberImagePainter(
-                data = imageUrl,
-                builder = {
-                    size(imageSize)
-                    transformations(CircleCropTransformation())
-                }
+            painter = rememberAsyncImagePainter(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageUrl)
+                    .size(imageSize)
+                    .transformations(CircleCropTransformation())
+                    .build()
             ),
             contentDescription = "프로필 이미지",
         )
@@ -195,7 +193,7 @@ private fun UserActions(
     downloadActionData: DownloadActionData,
 ) {
     val clickable = user != null
-    LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = modifier) {
+    LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 100.dp), modifier = modifier) {
         item {
             UserActionUploadWords(
                 data = uploadActionData,

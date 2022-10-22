@@ -2,6 +2,7 @@ package hsk.practice.myvoca.ui.screens.allword
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hsk.data.VocabularyQuery
@@ -63,6 +64,8 @@ class AllWordViewModel @Inject constructor(
 
             val data = _allWordUiState.value.data ?: AllWordData()
             val result = loadWords(data.queryState).sortedBy(data.sortState)
+
+            Log.d("AllWordViewModel", "$data, $result")
             _allWordUiState.value = allWordUiState.value.copy(
                 loading = false,
                 data = data.copy(currentWordState = result.toImmutableList())
