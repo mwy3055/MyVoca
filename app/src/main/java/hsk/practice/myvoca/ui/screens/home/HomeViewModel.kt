@@ -1,5 +1,6 @@
 package hsk.practice.myvoca.ui.screens.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
@@ -81,11 +82,12 @@ class HomeViewModel @Inject constructor(
         todayWords: List<TodayWord>,
         actualList: List<Vocabulary>
     ): List<HomeTodayWord> {
+        Log.d("HomeViewModel", "$todayWords, $actualList")
         return todayWords.map { today ->
             val actual = actualList.find { it.id == today.wordId }
-                ?: throw NoSuchElementException("$today doesn't exist in vocabulary database")
+                ?: return@map null
             HomeTodayWord(today.toTodayWordImpl(), actual.toVocabularyImpl())
-        }
+        }.mapNotNull { it }
     }
 
     // Click listeners for UI

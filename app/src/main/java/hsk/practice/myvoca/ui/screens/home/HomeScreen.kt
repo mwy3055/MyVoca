@@ -61,11 +61,7 @@ private fun Loading(
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         if (data.loading) {
-            LoadingIndicator(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .fillMaxSize()
-            )
+            LoadingIndicator()
         }
         if (data.showTodayWordHelp) {
             TodayWordHelp(onClose = onHelpClose)
