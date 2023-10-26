@@ -81,12 +81,15 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            manifestPlaceholders = [appName: "@string/app_name"]
         }
         debug {
             testCoverageEnabled true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'proguard-rules-debug.pro'
             debuggable true
+            applicationIdSuffix ".debug"
+            manifestPlaceholders = [appName: "@string/app_name_debug"]
         }
         benchmark {
             initWith buildTypes.release
