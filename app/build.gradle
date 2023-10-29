@@ -24,7 +24,7 @@ tasks.withType(Test.class).configureEach {
 }
 
 tasks.register('jacocoTestReport', JacocoReport) {
-    dependsOn['testDebugUnitTest', 'createDebugCoverageReport']
+    dependsOn('testDebugUnitTest', 'createDebugCoverageReport')
 
     reports {
         html.required = true
