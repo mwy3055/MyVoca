@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -27,7 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.hsk.ktx.gcd
-import hsk.practice.myvoca.ui.theme.Paybooc
+import hsk.practice.myvoca.ui.components.MyVocaText
 
 fun VersusViewState(
     leftValue: Int = 0,
@@ -124,9 +123,8 @@ fun VersusElement(
                 )
             )
     ) {
-        Text(
+        MyVocaText(
             text = value.toString(),
-            fontFamily = Paybooc,
             modifier = Modifier
                 .padding(horizontal = 4.dp)
                 .align(align),

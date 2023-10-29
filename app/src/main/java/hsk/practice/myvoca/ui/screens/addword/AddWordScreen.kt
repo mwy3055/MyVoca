@@ -27,7 +27,6 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -44,10 +43,10 @@ import androidx.compose.ui.unit.dp
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.ui.components.InsetAwareTopAppBar
+import hsk.practice.myvoca.ui.components.MyVocaText
 import hsk.practice.myvoca.ui.components.StaggeredGrid
 import hsk.practice.myvoca.ui.components.SystemBarColor
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
-import hsk.practice.myvoca.ui.theme.Paybooc
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
@@ -125,10 +124,7 @@ private fun TopBarTitle(screenType: ScreenType) {
         AddWord -> "단어 추가"
         UpdateWord -> "단어 수정"
     }
-    Text(
-        text = title,
-        fontFamily = Paybooc
-    )
+    MyVocaText(text = title)
 }
 
 @Composable
@@ -157,7 +153,7 @@ private fun TopBarSaveButton(
         },
         enabled = addButtonEnabled
     ) {
-        Text(
+        MyVocaText(
             text = "저장",
             color = textColor
         )
@@ -199,18 +195,16 @@ private fun Content(
 
 @Composable
 private fun EssentialTitle() {
-    Text(
+    MyVocaText(
         text = "필수 입력사항",
-        fontFamily = Paybooc,
         style = MaterialTheme.typography.headlineSmall
     )
 }
 
 @Composable
 private fun OptionalTitle() {
-    Text(
+    MyVocaText(
         text = "선택 입력사항",
-        fontFamily = Paybooc,
         style = MaterialTheme.typography.headlineSmall
     )
 }
@@ -242,7 +236,7 @@ private fun Word(
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = word,
-            label = { Text("단어") },
+            label = { MyVocaText(text = "단어") },
             onValueChange = onWordUpdate,
             colors = textFieldColors,
             trailingIcon = {
@@ -265,7 +259,7 @@ private fun Word(
                 durationMillis = 300,
             )
         )
-        Text(
+        MyVocaText(
             text = "이미 등록된 단어입니다.",
             style = MaterialTheme.typography.bodySmall,
             color = duplicateTextColor
@@ -356,7 +350,7 @@ private fun WordClassChipIcon(
 
 @Composable
 private fun WordClassChipText(wordClass: WordClassImpl) {
-    Text(
+    MyVocaText(
         text = wordClass.korean,
         modifier = Modifier.padding(end = 4.dp)
     )
@@ -378,7 +372,7 @@ private fun MeaningsEmptyIndicator() {
                 imageVector = Icons.Outlined.Add,
                 contentDescription = null
             )
-            Text(
+            MyVocaText(
                 text = "뜻을 추가해 보세요",
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
             )
@@ -432,7 +426,7 @@ private fun Meaning(
             modifier = Modifier.weight(1f),
             value = meaning.content,
             label = {
-                Text(text = "${index + 1}. ${meaning.type.korean}")
+                MyVocaText(text = "${index + 1}. ${meaning.type.korean}")
             },
             colors = textFieldColors,
             onValueChange = {
@@ -468,10 +462,7 @@ private fun Memo(
         modifier = Modifier.fillMaxWidth(),
         value = memo,
         label = {
-            Text(
-                text = "메모",
-                fontFamily = Paybooc
-            )
+            MyVocaText(text = "메모")
         },
         colors = textFieldColors,
         onValueChange = onMemoUpdate,

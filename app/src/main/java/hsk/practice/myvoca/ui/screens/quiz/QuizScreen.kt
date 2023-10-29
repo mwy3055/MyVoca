@@ -13,7 +13,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,13 +26,13 @@ import com.hsk.ktx.truncate
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.ui.components.LoadingIndicator
+import hsk.practice.myvoca.ui.components.MyVocaText
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.components.WordMeanings
 import hsk.practice.myvoca.ui.components.versus.VersusView
 import hsk.practice.myvoca.ui.components.versus.rememberVersusViewState
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
-import hsk.practice.myvoca.ui.theme.Paybooc
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -91,9 +90,8 @@ private fun QuizNotAvailable(need: Int) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
+        MyVocaText(
             text = "${need}개의 단어가 더 필요합니다.",
-            fontFamily = Paybooc,
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center
         )
@@ -106,10 +104,7 @@ private fun QuizNotAvailable(need: Int) {
                 imageVector = Icons.Outlined.Add,
                 contentDescription = "클릭하여 단어를 추가합니다."
             )
-            Text(
-                text = "단어 추가하러 가기",
-                fontFamily = Paybooc,
-            )
+            MyVocaText(text = "단어 추가하러 가기")
         }
     }
 }
@@ -151,7 +146,7 @@ private fun QuizTitle(answer: VocabularyImpl) {
     val textStyleTitle3 = MaterialTheme.typography.displaySmall
     val (textStyle, updateTextStyle) = remember { mutableStateOf(textStyleTitle3) }
     Box(modifier = Modifier.fillMaxWidth()) {
-        Text(
+        MyVocaText(
             text = answer.eng,
             style = textStyle,
             maxLines = 1,
@@ -211,7 +206,7 @@ private fun Result(
     val title = if (resultData.result is QuizCorrect) "맞았습니다!!" else "틀렸습니다"
     AlertDialog(
         title = {
-            Text(text = title)
+            MyVocaText(text = title)
         },
         text = {
             WordContent(resultData.answer)
@@ -224,7 +219,7 @@ private fun Result(
                 contentAlignment = Alignment.CenterEnd
             ) {
                 TextButton(onClick = { onCloseDialog(resultData) }) {
-                    Text("확인")
+                    MyVocaText(text = "확인")
                 }
             }
         },
@@ -253,7 +248,7 @@ private fun QuizScreenPreview() {
 
     MyVocaTheme {
         Column {
-            Text(text = text)
+            MyVocaText(text = text)
             QuizContent(
                 quiz = quiz,
                 quizStat = quizStat,

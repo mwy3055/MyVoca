@@ -37,7 +37,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.*
@@ -61,6 +60,7 @@ import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.data.toWordClass
 import hsk.practice.myvoca.ui.components.LoadingIndicator
+import hsk.practice.myvoca.ui.components.MyVocaText
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.state.UiState
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
@@ -242,7 +242,7 @@ private fun SearchOptionClearButton(
                 imageVector = Icons.Filled.Refresh,
                 contentDescription = "검색 옵션을 초기화합니다."
             )
-            Text(text = "초기화")
+            MyVocaText(text = "초기화")
         }
     }
 }
@@ -254,7 +254,7 @@ private fun ShowSearchOptionButton(onButtonClicked: () -> Unit) {
             imageVector = Icons.Filled.ManageSearch,
             contentDescription = "특정 조건에 맞는 단어를 검색합니다."
         )
-        Text(text = "검색 옵션")
+        MyVocaText(text = "검색 옵션")
     }
 }
 
@@ -263,7 +263,7 @@ private fun HeaderText(
     vocabularySize: Int,
     modifier: Modifier = Modifier
 ) {
-    Text(
+    MyVocaText(
         text = "검색 결과: ${vocabularySize}개",
         modifier = modifier
     )
@@ -350,7 +350,7 @@ private fun CloseQueryButton(
         },
         modifier = modifier
     ) {
-        Text("닫기")
+        MyVocaText(text = "닫기")
     }
 }
 
@@ -367,7 +367,7 @@ private fun SubmitQueryButton(
         },
         modifier = modifier
     ) {
-        Text("검색")
+        MyVocaText(text = "검색")
     }
 }
 
@@ -380,7 +380,7 @@ private fun QueryWord(
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         value = text,
-        label = { Text(text = "단어") },
+        label = { MyVocaText(text = "단어") },
         trailingIcon = {
             if (text.isNotEmpty()) {
                 IconButton(onClick = { onTextChanged("") }) {
@@ -447,7 +447,7 @@ private fun WordClassChip(
                 tint = textColor
             )
         }
-        Text(
+        MyVocaText(
             text = className,
             modifier = Modifier.padding(6.dp),
             color = textColor
@@ -498,7 +498,7 @@ private fun SortStateChip(
             .clickable { onClick(sortState) },
         contentAlignment = Alignment.Center,
     ) {
-        Text(
+        MyVocaText(
             text = sortState.korean,
             color = textColor,
             textAlign = TextAlign.Center,

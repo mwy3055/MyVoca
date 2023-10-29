@@ -11,7 +11,17 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
@@ -20,7 +30,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -39,6 +48,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import hsk.practice.myvoca.firebase.UserImpl
+import hsk.practice.myvoca.ui.components.MyVocaText
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 
 @Composable
@@ -152,13 +162,13 @@ private fun UserInfo(
 @Composable
 private fun LogOutButton(onLogout: () -> Unit) {
     TextButton(onClick = onLogout) {
-        Text(text = "로그아웃")
+        MyVocaText(text = "로그아웃")
     }
 }
 
 @Composable
 private fun UserEmail(email: String) {
-    Text(
+    MyVocaText(
         text = email,
         style = MaterialTheme.typography.displayLarge
     )
@@ -166,7 +176,7 @@ private fun UserEmail(email: String) {
 
 @Composable
 private fun Username(username: String) {
-    Text(
+    MyVocaText(
         text = username,
         style = MaterialTheme.typography.headlineSmall
     )
@@ -184,7 +194,7 @@ private fun Login(
 
     val context = LocalContext.current
     TextButton(onClick = { onLoginButtonClick(context, googleLoginLauncher) }) {
-        Text(text = "로그인하기")
+        MyVocaText(text = "로그인하기")
     }
 }
 
@@ -251,7 +261,7 @@ private fun UserActionUploadWords(
                 )
             }
         }
-        Text(text = actionData.text)
+        MyVocaText(text = actionData.text)
     }
 
     if (data.showUploadDialog) {
@@ -278,7 +288,7 @@ private fun UserActionDownloadWords(data: DownloadActionData) {
             contentDescription = actionData.text,
             modifier = Modifier.fillMaxSize(fraction = actionIconFraction)
         )
-        Text(text = actionData.text)
+        MyVocaText(text = actionData.text)
     }
 
     if (data.showDownloadDialog) {
@@ -292,21 +302,21 @@ private fun UploadDialog(
     onDismiss: () -> Unit
 ) {
     AlertDialog(
-        title = { Text(text = "단어 백업하기") },
+        title = { MyVocaText(text = "단어 백업하기") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = "단어를 백업하시겠습니까?")
-                Text(text = "단어는 클라우드에 백업되며, 언제든지 앱으로 가져올 수 있습니다.")
+                MyVocaText(text = "단어를 백업하시겠습니까?")
+                MyVocaText(text = "단어는 클라우드에 백업되며, 언제든지 앱으로 가져올 수 있습니다.")
             }
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(text = "확인")
+                MyVocaText(text = "확인")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "취소")
+                MyVocaText(text = "취소")
             }
         },
         onDismissRequest = onDismiss
@@ -319,21 +329,21 @@ private fun DownloadDialog(
     onDismiss: () -> Unit
 ) {
     AlertDialog(
-        title = { Text(text = "단어 복원하기") },
+        title = { MyVocaText(text = "단어 복원하기") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = "단어를 복원하시겠습니까?")
-                Text(text = "클라우드의 데이터를 기기로 복원합니다.")
+                MyVocaText(text = "단어를 복원하시겠습니까?")
+                MyVocaText(text = "클라우드의 데이터를 기기로 복원합니다.")
             }
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(text = "확인")
+                MyVocaText(text = "확인")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "취소")
+                MyVocaText(text = "취소")
             }
         },
         onDismissRequest = onDismiss

@@ -23,7 +23,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,9 +38,9 @@ import androidx.work.WorkManager
 import hsk.practice.myvoca.data.TodayWordImpl
 import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.ui.components.LoadingIndicator
+import hsk.practice.myvoca.ui.components.MyVocaText
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
-import hsk.practice.myvoca.ui.theme.Paybooc
 import hsk.practice.myvoca.util.getTimeDiffString
 import hsk.practice.myvoca.work.setPeriodicTodayWordWork
 import kotlinx.collections.immutable.ImmutableList
@@ -168,7 +167,7 @@ private fun TodayWordItems(
 @Composable
 private fun TodayWordEmptyIndicator() {
     Box(modifier = Modifier.fillMaxSize()) {
-        Text(
+        MyVocaText(
             text = "아직 아무것도 없습니다.",
             modifier = Modifier.align(Alignment.Center)
         )
@@ -213,7 +212,7 @@ private fun RefreshIcon(onRefreshTodayWord: () -> Unit, enableRefresh: Boolean) 
 
 @Composable
 private fun LastUpdateTimeText(lastUpdatedTimeString: String) {
-    Text(
+    MyVocaText(
         text = "마지막 업데이트: $lastUpdatedTimeString",
         style = MaterialTheme.typography.bodySmall
     )
@@ -233,7 +232,7 @@ private fun HelpIcon(showTodayWordHelp: (Boolean) -> Unit) {
 
 @Composable
 private fun HeaderTitle() {
-    Text(
+    MyVocaText(
         text = "오늘의 단어",
         style = MaterialTheme.typography.titleLarge
     )
@@ -271,7 +270,7 @@ private fun TodayWordContent(
 @Composable
 private fun Title(size: Int = 0) {
     val titleText = if (size == 0) "등록된 단어가\n없습니다" else "${size}개의 단어가\n등록되어 있어요"
-    Text(
+    MyVocaText(
         text = titleText,
         maxLines = 2,
         style = MaterialTheme.typography.headlineMedium,
@@ -285,21 +284,12 @@ private fun TodayWordHelp(
 ) {
     AlertDialog(
         title = {
-            Text(
-                text = "오늘의 단어란?",
-                fontFamily = Paybooc
-            )
+            MyVocaText(text = "오늘의 단어란?",)
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = "매일매일 새로운 단어를 외워 보세요. 단어는 하루마다 갱신됩니다.",
-                    fontFamily = Paybooc
-                )
-                Text(
-                    text = "외운 단어는 체크 표시로 구분할 수 있습니다.",
-                    fontFamily = Paybooc
-                )
+                MyVocaText(text = "매일매일 새로운 단어를 외워 보세요. 단어는 하루마다 갱신됩니다.",)
+                MyVocaText(text = "외운 단어는 체크 표시로 구분할 수 있습니다.")
             }
         },
         confirmButton = {
@@ -310,10 +300,7 @@ private fun TodayWordHelp(
                 contentAlignment = Alignment.CenterEnd
             ) {
                 TextButton(onClick = onClose) {
-                    Text(
-                        text = "확인",
-                        fontFamily = Paybooc
-                    )
+                    MyVocaText(text = "확인")
                 }
             }
         },
