@@ -7,10 +7,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -72,7 +72,7 @@ private fun MyVocaTab(
     modifier: Modifier = Modifier,
 ) {
     val color =
-        if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface.copy(alpha = InactiveTabOpacity)
+        if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = InactiveTabOpacity)
     val durationMillis = if (selected) TabFadeInDuration else TabFadeOutDuration
     val animationSpec = remember(durationMillis) {
         tween<Color>(

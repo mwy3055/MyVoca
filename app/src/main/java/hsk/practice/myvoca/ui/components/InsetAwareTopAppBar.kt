@@ -1,7 +1,14 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package hsk.practice.myvoca.ui.components
 
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,22 +29,28 @@ fun InsetAwareTopAppBar(
     modifier: Modifier = Modifier,
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
-    backgroundColor: Color = MaterialTheme.colors.primarySurface,
+    // backgroundColor: Color = MaterialTheme.colorScheme.primarySurface,
+    backgroundColor: Color = MaterialTheme.colorScheme.primary,
+    // backgroundColor: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = contentColorFor(backgroundColor),
     elevation: Dp = 4.dp
 ) {
     Surface(
         color = backgroundColor,
-        elevation = elevation,
+        shadowElevation = elevation,
+        // tonalElevation = elevation,
         modifier = modifier
     ) {
         TopAppBar(
             title = title,
-            navigationIcon = navigationIcon,
+            navigationIcon = navigationIcon ?: {},
             actions = actions,
-            backgroundColor = Color.Transparent,
-            contentColor = contentColor,
-            elevation = 0.dp,
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.Transparent,
+                navigationIconContentColor = contentColor,
+                titleContentColor = contentColor,
+                actionIconContentColor = contentColor
+            ),
             modifier = Modifier
                 .statusBarsPadding()
                 .navigationBarsPadding(bottom = false),
