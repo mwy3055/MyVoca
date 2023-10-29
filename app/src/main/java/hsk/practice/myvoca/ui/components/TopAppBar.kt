@@ -1,11 +1,19 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package hsk.practice.myvoca.ui.components
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
@@ -15,6 +23,7 @@ import hsk.practice.myvoca.R
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.structure.MyVocaScreen
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import hsk.practice.myvoca.ui.theme.Paybooc
 import kotlinx.coroutines.launch
 
 @Composable
@@ -36,8 +45,9 @@ fun MyVocaTopAppBar(currentScreen: MyVocaScreen) {
 private fun MyVocaTopTitle() {
     Text(
         text = stringResource(R.string.app_name),
-        color = MaterialTheme.colors.onSurface,
-        style = MaterialTheme.typography.h5,
+        fontFamily = Paybooc,
+        color = MaterialTheme.colorScheme.onSurface,
+        style = MaterialTheme.typography.headlineSmall,
     )
 }
 
@@ -47,7 +57,7 @@ private fun MyVocaTopNavigationIcon() {
         Icon(
             imageVector = Icons.Filled.ContentPaste,
             contentDescription = null,
-            tint = MaterialTheme.colors.onSurface
+            tint = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -67,7 +77,7 @@ private fun MyVocaTopActions(currentScreen: MyVocaScreen) {
             Icon(
                 imageVector = Icons.Outlined.Add,
                 contentDescription = "새로운 단어를 추가할 수 있습니다.",
-                tint = contentColorFor(MaterialTheme.colors.surface)
+                tint = contentColorFor(MaterialTheme.colorScheme.surface)
             )
         }
     }

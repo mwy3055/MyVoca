@@ -1,9 +1,8 @@
 package hsk.practice.myvoca.ui.structure
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.primarySurface
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,7 +32,9 @@ import kotlinx.collections.immutable.toImmutableList
 fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
     MyVocaTheme {
         val systemUiController = rememberSystemUiController()
-        val systemBarColor = MaterialTheme.colors.primarySurface
+        // val systemBarColor = MaterialTheme.colorScheme.primarySurface
+        val systemBarColor = MaterialTheme.colorScheme.primary
+        // val systemBarColor = MaterialTheme.colorScheme.surface
         LaunchedEffect(key1 = true) {
             onLaunch()
             systemUiController.setStatusBarColor(

@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -77,7 +77,7 @@ private fun SplashScreen(
 
 @Composable
 private fun Background() {
-    val lineColor = MaterialTheme.colors.primary
+    val lineColor = MaterialTheme.colorScheme.primary
     Canvas(modifier = Modifier.fillMaxSize()) {
         val canvasWidth = size.width
         val canvasHeight = size.height
@@ -107,13 +107,13 @@ private fun Logo() {
     ) {
         Text(
             text = "나만의 단어장",
-            style = MaterialTheme.typography.h4,
-            color = MaterialTheme.colors.onBackground
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onBackground
         )
         Text(
             text = "MyVoca",
-            style = MaterialTheme.typography.h4,
-            color = MaterialTheme.colors.onBackground
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }

@@ -1,7 +1,8 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package hsk.practice.myvoca.ui.screens.addword
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -11,9 +12,25 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.HighlightOff
+import androidx.compose.material.icons.outlined.HourglassFull
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +47,7 @@ import hsk.practice.myvoca.ui.components.InsetAwareTopAppBar
 import hsk.practice.myvoca.ui.components.StaggeredGrid
 import hsk.practice.myvoca.ui.components.SystemBarColor
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import hsk.practice.myvoca.ui.theme.Paybooc
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
@@ -39,15 +57,13 @@ fun AddWordScreen(
     updateWordId: Int,
     onClose: () -> Unit = {}
 ) {
-    SystemBarColor(systemBarColor = MaterialTheme.colors.primaryVariant)
+    SystemBarColor(systemBarColor = MaterialTheme.colorScheme.secondary)
     LaunchedEffect(key1 = true) {
         if (updateWordId != -1) viewModel.injectUpdateTarget(updateWordId)
     }
 
     val uiState by viewModel.uiStateFlow.collectAsState()
-    val scaffoldState = rememberScaffoldState()
     Scaffold(
-        scaffoldState = scaffoldState,
         modifier = modifier,
         topBar = {
             TopBar(
@@ -57,8 +73,12 @@ fun AddWordScreen(
                 onClose = onClose
             )
         }
-    ) {
-        Box(modifier = Modifier.padding(8.dp)) {
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(8.dp)
+        ) {
             Content(
                 data = uiState,
                 loadStatus = viewModel::loadStatus,
@@ -87,7 +107,7 @@ private fun TopBar(
         navigationIcon = {
             TopBarCloseButton(onClose = onClose)
         },
-        backgroundColor = MaterialTheme.colors.primaryVariant,
+        backgroundColor = MaterialTheme.colorScheme.secondary,
         actions = {
             TopBarSaveButton(
                 onAddWord = onAddWord,
@@ -105,7 +125,10 @@ private fun TopBarTitle(screenType: ScreenType) {
         AddWord -> "단어 추가"
         UpdateWord -> "단어 수정"
     }
-    Text(text = title)
+    Text(
+        text = title,
+        fontFamily = Paybooc
+    )
 }
 
 @Composable
@@ -176,12 +199,20 @@ private fun Content(
 
 @Composable
 private fun EssentialTitle() {
-    Text(text = "필수 입력사항", style = MaterialTheme.typography.h5)
+    Text(
+        text = "필수 입력사항",
+        fontFamily = Paybooc,
+        style = MaterialTheme.typography.headlineSmall
+    )
 }
 
 @Composable
 private fun OptionalTitle() {
-    Text(text = "선택 입력사항", style = MaterialTheme.typography.h5)
+    Text(
+        text = "선택 입력사항",
+        fontFamily = Paybooc,
+        style = MaterialTheme.typography.headlineSmall
+    )
 }
 
 @Composable
@@ -196,8 +227,12 @@ private fun Word(
         loadStatus(word)
     }
 
-    val textFieldColors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
-
+    val textFieldColors = TextFieldDefaults.colors(
+        focusedContainerColor = Color.Transparent,
+        unfocusedContainerColor = Color.Transparent,
+        disabledContainerColor = Color.Transparent,
+        errorContainerColor = Color.Transparent
+    )
     val statusIcon = getWordStatusIcon(status)
     val iconColor = getWordStatusIconColor(status)
 
@@ -205,8 +240,7 @@ private fun Word(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         TextField(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             value = word,
             label = { Text("단어") },
             onValueChange = onWordUpdate,
@@ -233,7 +267,7 @@ private fun Word(
         )
         Text(
             text = "이미 등록된 단어입니다.",
-            style = MaterialTheme.typography.caption,
+            style = MaterialTheme.typography.bodySmall,
             color = duplicateTextColor
         )
     }
@@ -283,8 +317,8 @@ private fun WordClassChip(
             .clickable { onMeaningAdd(wordClass) }
             .padding(4.dp),
         shape = RoundedCornerShape(50),
-        color = MaterialTheme.colors.secondary.copy(alpha = 0.7f),
-        border = BorderStroke(2.dp, MaterialTheme.colors.secondary)
+        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -346,7 +380,7 @@ private fun MeaningsEmptyIndicator() {
             )
             Text(
                 text = "뜻을 추가해 보세요",
-                color = MaterialTheme.colors.onSurface.copy(alpha = 0.8f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
             )
         }
     }
@@ -376,7 +410,6 @@ private fun MeaningsContent(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun Meaning(
     index: Int,
@@ -385,7 +418,12 @@ private fun Meaning(
     onMeaningDelete: (Int) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    val textFieldColors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
+    val textFieldColors = TextFieldDefaults.colors(
+        focusedContainerColor = Color.Transparent,
+        unfocusedContainerColor = Color.Transparent,
+        disabledContainerColor = Color.Transparent,
+        errorContainerColor = Color.Transparent
+    )
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -413,20 +451,27 @@ private fun Meaning(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun Memo(
     memo: String,
     onMemoUpdate: (String) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    val textFieldColors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
+    val textFieldColors = TextFieldDefaults.colors(
+        focusedContainerColor = Color.Transparent,
+        unfocusedContainerColor = Color.Transparent,
+        disabledContainerColor = Color.Transparent,
+        errorContainerColor = Color.Transparent
+    )
 
     TextField(
         modifier = Modifier.fillMaxWidth(),
         value = memo,
         label = {
-            Text("메모")
+            Text(
+                text = "메모",
+                fontFamily = Paybooc
+            )
         },
         colors = textFieldColors,
         onValueChange = onMemoUpdate,
@@ -458,8 +503,8 @@ private fun getWordStatusIcon(status: WordExistStatus): ImageVector? {
 @Composable
 private fun getWordStatusIconColor(status: WordExistStatus): Color {
     return when (status) {
-        WordExistStatus.NOT_EXISTS -> MaterialTheme.colors.primary
-        WordExistStatus.DUPLICATE -> MaterialTheme.colors.error
+        WordExistStatus.NOT_EXISTS -> MaterialTheme.colorScheme.primary
+        WordExistStatus.DUPLICATE -> MaterialTheme.colorScheme.error
         else -> LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
     }
 }
