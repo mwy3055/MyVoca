@@ -4,20 +4,30 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.contentColorFor
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.hsk.ktx.gcd
+import hsk.practice.myvoca.ui.theme.Paybooc
 
 fun VersusViewState(
     leftValue: Int = 0,
@@ -64,8 +74,8 @@ private class VersusViewStateImpl(
 fun VersusView(
     modifier: Modifier = Modifier,
     versusViewState: VersusViewState = rememberVersusViewState(),
-    leftColor: Color = MaterialTheme.colors.primary,
-    rightColor: Color = MaterialTheme.colors.primaryVariant
+    leftColor: Color = MaterialTheme.colorScheme.primary,
+    rightColor: Color = MaterialTheme.colorScheme.secondary
 ) {
     val leftValue = versusViewState.leftValue
     val rightValue = versusViewState.rightValue
@@ -116,6 +126,7 @@ fun VersusElement(
     ) {
         Text(
             text = value.toString(),
+            fontFamily = Paybooc,
             modifier = Modifier
                 .padding(horizontal = 4.dp)
                 .align(align),

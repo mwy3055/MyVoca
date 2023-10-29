@@ -5,13 +5,13 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -26,6 +26,7 @@ import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import hsk.practice.myvoca.ui.theme.Paybooc
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -58,7 +59,7 @@ fun WordContent(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = MaterialTheme.colors.surface)
+            .background(color = MaterialTheme.colorScheme.surface)
             .padding(padding),
         verticalArrangement = Arrangement.spacedBy(padding)
     ) {
@@ -88,7 +89,8 @@ fun WordTitle(
     Text(
         modifier = modifier,
         text = title,
-        style = MaterialTheme.typography.h5,
+        fontFamily = Paybooc,
+        style = MaterialTheme.typography.headlineSmall,
     )
 }
 
@@ -164,16 +166,18 @@ fun WordMeaning(
             text = buildAnnotatedString {
                 withStyle(
                     style = SpanStyle(
-                        background = MaterialTheme.colors.primary,
-                        color = MaterialTheme.colors.onPrimary
+                        background = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
                     append(meaning.type.korean.first())
                 }
-            }
+            },
+            fontFamily = Paybooc
         )
         Text(
-            text = meaning.content
+            text = meaning.content,
+            fontFamily = Paybooc
         )
     }
 }

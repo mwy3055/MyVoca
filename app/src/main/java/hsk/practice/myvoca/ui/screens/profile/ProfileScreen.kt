@@ -9,15 +9,19 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -110,7 +114,7 @@ private fun ProfileImage(
             modifier = modifierWithSize,
             painter = rememberVectorPainter(image = Icons.Outlined.HelpOutline),
             contentDescription = "아직 로그인되지 않았습니다.",
-            tint = MaterialTheme.colors.onBackground,
+            tint = MaterialTheme.colorScheme.onBackground,
         )
     } else {
         Image(
@@ -156,7 +160,7 @@ private fun LogOutButton(onLogout: () -> Unit) {
 private fun UserEmail(email: String) {
     Text(
         text = email,
-        style = MaterialTheme.typography.body1
+        style = MaterialTheme.typography.displayLarge
     )
 }
 
@@ -164,7 +168,7 @@ private fun UserEmail(email: String) {
 private fun Username(username: String) {
     Text(
         text = username,
-        style = MaterialTheme.typography.h5
+        style = MaterialTheme.typography.headlineSmall
     )
 }
 
@@ -184,7 +188,6 @@ private fun Login(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun UserActions(
     modifier: Modifier = Modifier,
@@ -219,8 +222,8 @@ private fun UserActionUploadWords(
     val color by animateColorAsState(
         targetValue = when {
             data.finished -> Color.Green
-            data.uploading -> MaterialTheme.colors.primary
-            else -> MaterialTheme.colors.onBackground
+            data.uploading -> MaterialTheme.colorScheme.primary
+            else -> MaterialTheme.colorScheme.onBackground
         }
     )
     val actionData = data.actionData

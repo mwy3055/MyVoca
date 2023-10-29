@@ -2,13 +2,29 @@ package hsk.practice.myvoca.ui.screens.home
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Autorenew
 import androidx.compose.material.icons.outlined.Help
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,6 +41,7 @@ import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import hsk.practice.myvoca.ui.theme.Paybooc
 import hsk.practice.myvoca.util.getTimeDiffString
 import hsk.practice.myvoca.work.setPeriodicTodayWordWork
 import kotlinx.collections.immutable.ImmutableList
@@ -198,7 +215,7 @@ private fun RefreshIcon(onRefreshTodayWord: () -> Unit, enableRefresh: Boolean) 
 private fun LastUpdateTimeText(lastUpdatedTimeString: String) {
     Text(
         text = "마지막 업데이트: $lastUpdatedTimeString",
-        style = MaterialTheme.typography.caption
+        style = MaterialTheme.typography.bodySmall
     )
 }
 
@@ -218,7 +235,7 @@ private fun HelpIcon(showTodayWordHelp: (Boolean) -> Unit) {
 private fun HeaderTitle() {
     Text(
         text = "오늘의 단어",
-        style = MaterialTheme.typography.h6
+        style = MaterialTheme.typography.titleLarge
     )
 }
 
@@ -230,7 +247,7 @@ private fun TodayWordContent(
     val alpha by animateFloatAsState(targetValue = if (todayWord.todayWord.checked) 0.6f else 1f)
     val elevation by animateDpAsState(targetValue = if (todayWord.todayWord.checked) 0.dp else 6.dp)
     Card(
-        elevation = elevation,
+        elevation = CardDefaults.cardElevation(defaultElevation = elevation),
         modifier = Modifier.alpha(alpha)
     ) {
         Box {
@@ -257,7 +274,7 @@ private fun Title(size: Int = 0) {
     Text(
         text = titleText,
         maxLines = 2,
-        style = MaterialTheme.typography.h4,
+        style = MaterialTheme.typography.headlineMedium,
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -268,12 +285,21 @@ private fun TodayWordHelp(
 ) {
     AlertDialog(
         title = {
-            Text(text = "오늘의 단어란?")
+            Text(
+                text = "오늘의 단어란?",
+                fontFamily = Paybooc
+            )
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = "매일매일 새로운 단어를 외워 보세요. 단어는 하루마다 갱신됩니다.")
-                Text(text = "외운 단어는 체크 표시로 구분할 수 있습니다.")
+                Text(
+                    text = "매일매일 새로운 단어를 외워 보세요. 단어는 하루마다 갱신됩니다.",
+                    fontFamily = Paybooc
+                )
+                Text(
+                    text = "외운 단어는 체크 표시로 구분할 수 있습니다.",
+                    fontFamily = Paybooc
+                )
             }
         },
         confirmButton = {
@@ -284,7 +310,10 @@ private fun TodayWordHelp(
                 contentAlignment = Alignment.CenterEnd
             ) {
                 TextButton(onClick = onClose) {
-                    Text("확인")
+                    Text(
+                        text = "확인",
+                        fontFamily = Paybooc
+                    )
                 }
             }
         },

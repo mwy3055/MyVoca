@@ -1,12 +1,20 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package hsk.practice.myvoca.ui.screens.quiz
 
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +33,7 @@ import hsk.practice.myvoca.ui.components.versus.VersusView
 import hsk.practice.myvoca.ui.components.versus.rememberVersusViewState
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
+import hsk.practice.myvoca.ui.theme.Paybooc
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -45,7 +54,7 @@ private fun Loading(
     onOptionClick: (Int) -> Unit,
     onCloseDialog: (QuizResultData) -> Unit
 ) {
-    Box(modifier = Modifier.background(MaterialTheme.colors.surface)) {
+    Box(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
         when (quizScreenData.quizState) {
             is QuizAvailable -> {
                 QuizContent(
@@ -84,7 +93,8 @@ private fun QuizNotAvailable(need: Int) {
     ) {
         Text(
             text = "${need}개의 단어가 더 필요합니다.",
-            style = MaterialTheme.typography.h5,
+            fontFamily = Paybooc,
+            style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center
         )
         TextButton(onClick = {
@@ -96,7 +106,10 @@ private fun QuizNotAvailable(need: Int) {
                 imageVector = Icons.Outlined.Add,
                 contentDescription = "클릭하여 단어를 추가합니다."
             )
-            Text(text = "단어 추가하러 가기")
+            Text(
+                text = "단어 추가하러 가기",
+                fontFamily = Paybooc,
+            )
         }
     }
 }
@@ -135,7 +148,7 @@ private fun QuizContent(
 @Composable
 private fun QuizTitle(answer: VocabularyImpl) {
     // Reduce text size when overflow
-    val textStyleTitle3 = MaterialTheme.typography.h3
+    val textStyleTitle3 = MaterialTheme.typography.displaySmall
     val (textStyle, updateTextStyle) = remember { mutableStateOf(textStyleTitle3) }
     Box(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -184,7 +197,7 @@ private fun QuizOption(
             .clickable(onClick = { onOptionClick(index) })
             .padding(4.dp),
     ) {
-        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.h6) {
+        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.titleLarge) {
             WordMeanings(meanings = option.meaning.truncate(2).toImmutableList())
         }
     }
@@ -203,7 +216,7 @@ private fun Result(
         text = {
             WordContent(resultData.answer)
         },
-        buttons = {
+        confirmButton = {
             Box(
                 modifier = Modifier
                     .padding(8.dp)

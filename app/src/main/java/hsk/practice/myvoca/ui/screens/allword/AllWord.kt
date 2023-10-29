@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package hsk.practice.myvoca.ui.screens.allword
 
 import android.content.Context
@@ -18,12 +20,26 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.BackdropScaffold
+import androidx.compose.material.BackdropScaffoldDefaults
+import androidx.compose.material.BackdropValue
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ManageSearch
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.rememberBackdropScaffoldState
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -160,7 +176,7 @@ private fun Content(
                 onSortStateClick = onSortStateClick
             )
         },
-        backLayerBackgroundColor = MaterialTheme.colors.surface,
+        backLayerBackgroundColor = MaterialTheme.colorScheme.surface,
         frontLayerContent = {
             Column {
                 Header(
@@ -198,7 +214,7 @@ private fun Header(
 ) {
     Row(
         modifier = Modifier
-            .background(MaterialTheme.colors.surface)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -375,7 +391,7 @@ private fun QueryWord(
                 }
             }
         },
-        textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colors.onBackground),
+        textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onBackground),
         singleLine = true,
         onValueChange = onTextChanged,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -412,9 +428,9 @@ private fun WordClassChip(
     selected: Boolean,
     onClick: (String) -> Unit,
 ) {
-    val background = MaterialTheme.colors.surface
+    val background = MaterialTheme.colorScheme.surface
     val textColor by animateColorAsState(
-        targetValue = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
+        targetValue = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
     )
 
     Row(
@@ -469,7 +485,7 @@ private fun SortStateChip(
     onClick: (SortState) -> Unit
 ) {
     val background by animateColorAsState(
-        targetValue = if (selected) MaterialTheme.colors.primary else MaterialTheme.colors.surface
+        targetValue = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
     )
     val textColor by animateColorAsState(
         targetValue = contentColorFor(background)
@@ -503,7 +519,7 @@ private fun WordItems(
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     Box {
         LazyVerticalGrid(
-            modifier = Modifier.background(color = MaterialTheme.colors.background),
+            modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
             state = listState,
             columns = GridCells.Adaptive(minSize = min(screenWidth, 330.dp)),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -563,7 +579,7 @@ private fun ScrollTopButton(
         IconButton(
             onClick = { coroutineScope.launch { listState.animateScrollToItem(0) } },
             modifier = Modifier.background(
-                color = MaterialTheme.colors.secondary,
+                color = MaterialTheme.colorScheme.secondary,
                 shape = CircleShape
             )
         ) {
@@ -628,7 +644,7 @@ private fun QueryOptionsPreview() {
     MyVocaTheme {
         QueryOptions(
             modifier = Modifier
-                .background(MaterialTheme.colors.surface)
+                .background(MaterialTheme.colorScheme.surface)
                 .padding(8.dp),
             query = VocabularyQuery(
                 word = word,
@@ -661,7 +677,7 @@ private fun QueryOptionsPreview_DarkMode() {
     MyVocaTheme {
         QueryOptions(
             modifier = Modifier
-                .background(MaterialTheme.colors.surface)
+                .background(MaterialTheme.colorScheme.surface)
                 .padding(8.dp),
             query = VocabularyQuery(
                 word = word,

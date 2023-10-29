@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="AppTheme" parent="Theme.Material3.DayNight">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
@@ -12,9 +12,9 @@
         <item name="colorOnSecondary">@color/secondaryTextColor</item>
     </style>
 
-    <style name="AppTheme.ActionBar" parent="Widget.MaterialComponents.Toolbar.PrimarySurface" />
+    <style name="AppTheme.ActionBar" parent="Widget.Material3.Toolbar" />
 
-    <style name="SplashTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="SplashTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
 
