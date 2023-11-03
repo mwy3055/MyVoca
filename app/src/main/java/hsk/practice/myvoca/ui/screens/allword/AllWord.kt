@@ -52,6 +52,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hsk.data.VocabularyQuery
 import com.hsk.data.WordClass
@@ -75,7 +76,7 @@ import kotlinx.coroutines.launch
 fun AllWordScreen(
     viewModel: AllWordViewModel = viewModel()
 ) {
-    val uiState by viewModel.allWordUiState.collectAsState()
+    val uiState by viewModel.allWordUiState.collectAsStateWithLifecycle()
 
     Loading(
         uiState = uiState,

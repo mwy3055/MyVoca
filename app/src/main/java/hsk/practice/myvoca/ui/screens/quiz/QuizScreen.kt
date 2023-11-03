@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hsk.ktx.distinctRandoms
 import com.hsk.ktx.truncate
 import hsk.practice.myvoca.data.VocabularyImpl
@@ -38,7 +39,7 @@ import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun QuizScreen(viewModel: QuizViewModel) {
-    val quizScreenData by viewModel.quizScreenData.collectAsState()
+    val quizScreenData by viewModel.quizScreenData.collectAsStateWithLifecycle()
 
     Loading(
         quizScreenData = quizScreenData,

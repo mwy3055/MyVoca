@@ -165,7 +165,9 @@ dependencies {
     // Integration with activities
     implementation 'androidx.activity:activity-compose:1.8.0'
     // Integration with ViewModels
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0-alpha03'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0-beta01'
+    // Integration with Runtime
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.7.0-beta01'
     // Integration with Hilt
     implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
     // UI Tests
@@ -272,7 +274,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5"
 
     // Accompanist WebView
-    implementation "com.google.accompanist:accompanist-webview:0.31.3-beta"    
+    implementation "com.google.accompanist:accompanist-webview:0.31.3-beta"
 
     implementation project(':data')
     implementation project(':domain')
