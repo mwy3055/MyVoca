@@ -23,6 +23,7 @@ import androidx.compose.material.icons.outlined.HourglassFull
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -40,6 +41,9 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.web.AccompanistWebChromeClient
+import com.google.accompanist.web.LoadingState
+import com.google.accompanist.web.WebView
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.ui.components.InsetAwareTopAppBar
@@ -62,6 +66,18 @@ fun AddWordScreen(
     }
 
     val uiState by viewModel.uiStateFlow.collectAsState()
+    val webViewState = viewModel.webViewState
+    val webViewNavigator = viewModel.webViewNavigator
+    val webChromeClient = AccompanistWebChromeClient()
+    val webViewLoadingState = webViewState.loadingState
+
+    if (webViewLoadingState is LoadingState.Loading) {
+        LinearProgressIndicator(
+            progress = webViewLoadingState.progress,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -75,6 +91,7 @@ fun AddWordScreen(
     ) { innerPadding ->
         Box(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(innerPadding)
                 .padding(8.dp)
         ) {
@@ -85,8 +102,28 @@ fun AddWordScreen(
                 onWordUpdate = viewModel::onWordUpdate,
                 onMeaningUpdate = viewModel::onMeaningUpdate,
                 onMeaningDelete = viewModel::onMeaningDelete,
-                onMemoUpdate = viewModel::onMemoUpdate
+                onMemoUpdate = viewModel::onMemoUpdate,
+                onWordUrlUpdate = viewModel::updateWordUrl
             )
+
+            if (uiState.showWebView) {
+                WebView(
+                    state = webViewState,
+                    navigator = webViewNavigator,
+                    onCreated = { webView ->
+                        with(webView) {
+                            settings.run {
+                                javaScriptEnabled = true
+                            }
+                        }
+                    },
+                    chromeClient = webChromeClient,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .fillMaxHeight(0.5f)
+                        .fillMaxWidth()
+                )
+            }
         }
     }
 }
@@ -168,9 +205,16 @@ private fun Content(
     onMeaningAdd: (WordClassImpl) -> Unit,
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
     onMeaningDelete: (Int) -> Unit,
-    onMemoUpdate: (String) -> Unit
+    onMemoUpdate: (String) -> Unit,
+    onWordUrlUpdate: (String) -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxHeight(if (data.showWebView) 0.5f else 1f)
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         EssentialTitle()
         Word(
             word = data.word,
@@ -500,23 +544,24 @@ private fun getWordStatusIconColor(status: WordExistStatus): Color {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun AddWordScreenPreview() {
-    val data = AddWordScreenData()
-    MyVocaTheme {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Content(data = data,
-                loadStatus = {},
-                onWordUpdate = {},
-                onMeaningAdd = {},
-                onMeaningUpdate = { _, _ -> },
-                onMeaningDelete = {},
-                onMemoUpdate = {}
-            )
-        }
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun AddWordScreenPreview() {
+//    val data = AddWordScreenData()
+//    MyVocaTheme {
+//        Box(modifier = Modifier.fillMaxWidth()) {
+//            Content(data = data,
+//                loadStatus = {},
+//                onWordUpdate = {},
+//                onMeaningAdd = {},
+//                onMeaningUpdate = { _, _ -> },
+//                onMeaningDelete = {},
+//                onMemoUpdate = {},
+//                onWordUrlUpdate = {}
+//            )
+//        }
+//    }
+//}
 
 @Preview(showBackground = true)
 @Composable
