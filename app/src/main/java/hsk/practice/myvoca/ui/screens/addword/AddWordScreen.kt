@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Close
@@ -23,9 +24,9 @@ import androidx.compose.material.icons.outlined.HourglassFull
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextButton
@@ -41,8 +42,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.web.AccompanistWebChromeClient
-import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.WordClassImpl
@@ -66,17 +65,6 @@ fun AddWordScreen(
     }
 
     val uiState by viewModel.uiStateFlow.collectAsState()
-    val webViewState = viewModel.webViewState
-    val webViewNavigator = viewModel.webViewNavigator
-    val webChromeClient = AccompanistWebChromeClient()
-    val webViewLoadingState = webViewState.loadingState
-
-    if (webViewLoadingState is LoadingState.Loading) {
-        LinearProgressIndicator(
-            progress = webViewLoadingState.progress,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
 
     Scaffold(
         modifier = modifier,
@@ -103,21 +91,22 @@ fun AddWordScreen(
                 onMeaningUpdate = viewModel::onMeaningUpdate,
                 onMeaningDelete = viewModel::onMeaningDelete,
                 onMemoUpdate = viewModel::onMemoUpdate,
-                onWordUrlUpdate = viewModel::updateWordUrl
+                onShowWebView = viewModel::onShowWordSearchWebView,
+                onUpdateWordSearchWebViewUrl = viewModel::onUpdateWordSearchWebViewUrl
             )
 
             if (uiState.showWebView) {
                 WebView(
-                    state = webViewState,
-                    navigator = webViewNavigator,
+                    state = viewModel.webViewState.value,
                     onCreated = { webView ->
                         with(webView) {
                             settings.run {
                                 javaScriptEnabled = true
+                                domStorageEnabled = true
+                                javaScriptCanOpenWindowsAutomatically = false
                             }
                         }
                     },
-                    chromeClient = webChromeClient,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .fillMaxHeight(0.5f)
@@ -206,7 +195,8 @@ private fun Content(
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
     onMeaningDelete: (Int) -> Unit,
     onMemoUpdate: (String) -> Unit,
-    onWordUrlUpdate: (String) -> Unit,
+    onShowWebView: () -> Unit,
+    onUpdateWordSearchWebViewUrl: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -220,7 +210,9 @@ private fun Content(
             word = data.word,
             status = data.wordExistStatus,
             loadStatus = loadStatus,
-            onWordUpdate = onWordUpdate
+            onWordUpdate = onWordUpdate,
+            onShowWebView = onShowWebView,
+            onUpdateWordSearchWebViewUrl = onUpdateWordSearchWebViewUrl
         )
         Meanings(
             meanings = data.meanings,
@@ -259,6 +251,8 @@ private fun Word(
     status: WordExistStatus,
     loadStatus: suspend (String) -> Unit,
     onWordUpdate: (String) -> Unit,
+    onShowWebView: () -> Unit,
+    onUpdateWordSearchWebViewUrl: () -> Unit,
     focusManager: FocusManager = LocalFocusManager.current
 ) {
     LaunchedEffect(word) {
@@ -277,37 +271,56 @@ private fun Word(
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = word,
-            label = { MyVocaText(text = "단어") },
-            onValueChange = onWordUpdate,
-            colors = textFieldColors,
-            trailingIcon = {
-                statusIcon?.let {
-                    Icon(
-                        imageVector = statusIcon,
-                        contentDescription = null,
-                        tint = iconColor
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = word,
+                    label = { MyVocaText(text = "단어") },
+                    onValueChange = onWordUpdate,
+                    colors = textFieldColors,
+                    trailingIcon = {
+                        statusIcon?.let {
+                            Icon(
+                                imageVector = statusIcon,
+                                contentDescription = null,
+                                tint = iconColor
+                            )
+                        }
+                    },
+                    singleLine = true,
+                    isError = (status == WordExistStatus.DUPLICATE),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
+                )
+                val duplicateTextColor by animateColorAsState(
+                    targetValue = if (status == WordExistStatus.DUPLICATE) iconColor else Color.Transparent,
+                    animationSpec = tween(
+                        durationMillis = 300,
                     )
+                )
+                MyVocaText(
+                    text = "이미 등록된 단어입니다.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = duplicateTextColor
+                )
+            }
+            IconButton(
+                onClick = {
+                    onShowWebView()
+                    onUpdateWordSearchWebViewUrl()
                 }
-            },
-            singleLine = true,
-            isError = (status == WordExistStatus.DUPLICATE),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
-        )
-        val duplicateTextColor by animateColorAsState(
-            targetValue = if (status == WordExistStatus.DUPLICATE) iconColor else Color.Transparent,
-            animationSpec = tween(
-                durationMillis = 300,
-            )
-        )
-        MyVocaText(
-            text = "이미 등록된 단어입니다.",
-            style = MaterialTheme.typography.bodySmall,
-            color = duplicateTextColor
-        )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search Icon",
+                )
+            }
+        }
     }
 }
 
@@ -544,24 +557,25 @@ private fun getWordStatusIconColor(status: WordExistStatus): Color {
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//private fun AddWordScreenPreview() {
-//    val data = AddWordScreenData()
-//    MyVocaTheme {
-//        Box(modifier = Modifier.fillMaxWidth()) {
-//            Content(data = data,
-//                loadStatus = {},
-//                onWordUpdate = {},
-//                onMeaningAdd = {},
-//                onMeaningUpdate = { _, _ -> },
-//                onMeaningDelete = {},
-//                onMemoUpdate = {},
-//                onWordUrlUpdate = {}
-//            )
-//        }
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+private fun AddWordScreenPreview() {
+    val data = AddWordScreenData()
+    MyVocaTheme {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Content(data = data,
+                loadStatus = {},
+                onWordUpdate = {},
+                onMeaningAdd = {},
+                onMeaningUpdate = { _, _ -> },
+                onMeaningDelete = {},
+                onMemoUpdate = {},
+                onShowWebView = {},
+                onUpdateWordSearchWebViewUrl = {}
+            )
+        }
+    }
+}
 
 @Preview(showBackground = true)
 @Composable

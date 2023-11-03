@@ -1,9 +1,11 @@
 package hsk.practice.myvoca.ui.screens.addword
 
+import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.accompanist.web.WebContent
-import com.google.accompanist.web.WebViewNavigator
 import com.google.accompanist.web.WebViewState
 import com.hsk.data.Vocabulary
 import com.hsk.data.VocabularyQuery
@@ -33,8 +35,10 @@ class AddWordViewModel @Inject constructor(
     val uiStateFlow: StateFlow<AddWordScreenData>
         get() = _uiStateFlow
 
-    val webViewState = WebViewState(WebContent.Url(url = _uiStateFlow.value.wordUrl))
-    val webViewNavigator = WebViewNavigator(viewModelScope)
+    private val _webViewState = mutableStateOf(WebViewState(WebContent.Url("")))
+
+    val webViewState: State<WebViewState>
+        get() = _webViewState
 
     /**
      * 단어 수정 화면이라면 [injectUpdateTarget] 함수를 이용하여 [updateTarget]를 초기화해야 한다.
@@ -139,8 +143,16 @@ class AddWordViewModel @Inject constructor(
         }
     }
 
-    fun updateWordUrl(wordUrl: String) {
-        updateUiState(wordUrl = wordUrl)
+    fun onShowWordSearchWebView() {
+        if (uiStateFlow.value.word.isNotEmpty()) {
+            updateUiState(showWebView = true)
+        }
+    }
+
+    fun onUpdateWordSearchWebViewUrl() {
+        Log.d("AddWordViewModel", uiStateFlow.value.word)
+        _webViewState.value =
+            WebViewState(WebContent.Url("https://dict.naver.com/dict.search?query=${uiStateFlow.value.word}"))
     }
 
     private fun updateUiState(
@@ -149,7 +161,8 @@ class AddWordViewModel @Inject constructor(
         wordExistStatus: WordExistStatus = uiStateFlow.value.wordExistStatus,
         meanings: ImmutableList<MeaningImpl> = uiStateFlow.value.meanings,
         memo: String = uiStateFlow.value.memo,
-        wordUrl: String = uiStateFlow.value.wordUrl
+        // wordUrl: String = uiStateFlow.value.wordUrl,
+        showWebView: Boolean = uiStateFlow.value.showWebView
     ) {
         _uiStateFlow.value = AddWordScreenData(
             screenType = screenType,
@@ -157,7 +170,7 @@ class AddWordViewModel @Inject constructor(
             wordExistStatus = wordExistStatus,
             meanings = meanings,
             memo = memo,
-            wordUrl = wordUrl,
+            showWebView = showWebView
         )
     }
 }
@@ -180,8 +193,7 @@ data class AddWordScreenData(
     val wordExistStatus: WordExistStatus = WordExistStatus.WORD_EMPTY,
     val meanings: ImmutableList<MeaningImpl> = persistentListOf(),
     val memo: String = "",
-    val wordUrl: String = "https://m.naver.com",
-    val showWebView: Boolean = true,
+    val showWebView: Boolean = false,
 ) {
     fun toVocabularyImpl(): VocabularyImpl {
         val current = System.currentTimeMillis()
