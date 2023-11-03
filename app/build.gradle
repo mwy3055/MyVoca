@@ -271,6 +271,9 @@ dependencies {
     // kotlin immutable collections
     implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5"
 
+    // Accompanist WebView
+    implementation "com.google.accompanist:accompanist-webview:0.31.3-beta"    
+
     implementation project(':data')
     implementation project(':domain')
 }
