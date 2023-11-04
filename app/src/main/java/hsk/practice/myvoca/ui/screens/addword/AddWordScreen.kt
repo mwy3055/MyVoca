@@ -80,6 +80,8 @@ fun AddWordScreen(
                 screenType = uiState.screenType,
                 addButtonEnabled = uiState.canStoreWord,
                 onAddWord = viewModel::onAddWord,
+                showWebView = uiState.showWebView,
+                onHideWebView = viewModel::onHideWebView,
                 onClose = onClose
             )
         }
@@ -98,7 +100,7 @@ fun AddWordScreen(
                 onMeaningUpdate = viewModel::onMeaningUpdate,
                 onMeaningDelete = viewModel::onMeaningDelete,
                 onMemoUpdate = viewModel::onMemoUpdate,
-                onShowWebView = viewModel::onShowWordSearchWebView,
+                onShowWebView = viewModel::onShowWebView,
                 onUpdateWebViewUrl = viewModel::onUpdateWebViewUrl
             )
 
@@ -130,6 +132,8 @@ private fun TopBar(
     screenType: ScreenType,
     addButtonEnabled: Boolean,
     onAddWord: () -> Unit,
+    showWebView: Boolean,
+    onHideWebView: () -> Unit,
     onClose: () -> Unit
 ) {
     val textAlpha by animateFloatAsState(targetValue = if (addButtonEnabled) 1f else 0.6f)
@@ -142,12 +146,19 @@ private fun TopBar(
         },
         backgroundColor = MaterialTheme.colorScheme.secondary,
         actions = {
-            TopBarSaveButton(
-                onAddWord = onAddWord,
-                onClose = onClose,
-                addButtonEnabled = addButtonEnabled,
-                textColor = Color.White.copy(alpha = textAlpha)
-            )
+            if (showWebView) {
+                TopBarCompleteButton(
+                    textColor = Color.White,
+                    onHideWebView = onHideWebView
+                )
+            } else {
+                TopBarSaveButton(
+                    onAddWord = onAddWord,
+                    onClose = onClose,
+                    addButtonEnabled = addButtonEnabled,
+                    textColor = Color.White.copy(alpha = textAlpha)
+                )
+            }
         }
     )
 }
@@ -189,6 +200,25 @@ private fun TopBarSaveButton(
     ) {
         MyVocaText(
             text = "저장",
+            color = textColor
+        )
+    }
+}
+
+@Composable
+private fun TopBarCompleteButton(
+    textColor: Color,
+    onHideWebView: () -> Unit,
+    focusManager: FocusManager = LocalFocusManager.current,
+) {
+    TextButton(
+        onClick = {
+            focusManager.clearFocus()
+            onHideWebView()
+        },
+    ) {
+        MyVocaText(
+            text = "완료",
             color = textColor
         )
     }
@@ -608,6 +638,8 @@ private fun TopBarPreview() {
             screenType = AddWord,
             addButtonEnabled = buttonEnabled,
             onAddWord = { buttonEnabled = !buttonEnabled },
+            showWebView = false,
+            onHideWebView = {},
             onClose = {}
         )
     }

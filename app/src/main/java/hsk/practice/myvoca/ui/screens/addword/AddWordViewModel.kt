@@ -139,10 +139,14 @@ class AddWordViewModel @Inject constructor(
         }
     }
 
-    fun onShowWordSearchWebView() {
+    fun onShowWebView() {
         if (uiStateFlow.value.word.isNotEmpty()) {
             updateUiState(showWebView = true)
         }
+    }
+
+    fun onHideWebView() {
+        updateUiState(showWebView = false)
     }
 
     fun onUpdateWebViewUrl() {
