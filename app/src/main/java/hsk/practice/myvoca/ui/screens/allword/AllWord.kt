@@ -20,22 +20,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.BackdropScaffold
-import androidx.compose.material.BackdropScaffoldDefaults
-import androidx.compose.material.BackdropValue
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ManageSearch
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -125,7 +121,6 @@ private fun Loading(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Content(
     data: AllWordData,
@@ -140,24 +135,53 @@ private fun Content(
     onWordDelete: (VocabularyImpl) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed)
 
-    val revealBackdrop = {
-        scope.launch { scaffoldState.reveal() }
+    Column {
+        WordItems(
+            words = data.currentWordState,
+            onWordUpdate = onWordUpdate,
+            onWordDelete = onWordDelete
+        )
     }
-    val concealBackdrop = {
-        scope.launch { scaffoldState.conceal() }
+    data.deletedWord?.let { deletedWord ->
+        scope.launch {
+
+        }
     }
 
-    BackdropScaffold(
-        appBar = {
-            QueryHeader(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(BackdropScaffoldDefaults.HeaderHeight)
+    WordSearchBottomSheet(
+        data = data,
+        onOptionButtonClicked = onOptionButtonClicked,
+        onClearOption = onClearOption,
+        onSubmitButtonClicked = onSubmitButtonClicked,
+        onCloseButtonClicked = onCloseButtonClicked,
+        onQueryWordChanged = onQueryWordChanged,
+        onOptionWordClassClick = onOptionWordClassClick,
+        onSortStateClick = onSortStateClick
+    )
+}
+
+@Composable
+private fun WordSearchBottomSheet(
+    data: AllWordData,
+    onOptionButtonClicked: () -> Unit,
+    onClearOption: () -> Unit,
+    onSubmitButtonClicked: () -> Unit,
+    onCloseButtonClicked: () -> Unit,
+    onQueryWordChanged: (String) -> Unit,
+    onOptionWordClassClick: (String) -> Unit,
+    onSortStateClick: (SortState) -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = {}
+    ) {
+        Column {
+            Header(
+                vocabularySize = data.currentWordState.size,
+                showOptionClearButton = data.queryState != VocabularyQuery(),
+                onOptionButtonClicked = onOptionButtonClicked,
+                onClearOption = onClearOption
             )
-        },
-        backLayerContent = {
             QueryOptions(
                 modifier = Modifier
                     .padding(8.dp),
@@ -165,44 +189,16 @@ private fun Content(
                 sortState = data.sortState,
                 onSubmitButtonClicked = {
                     onSubmitButtonClicked()
-                    concealBackdrop()
                 },
                 onCloseButtonClicked = {
                     onCloseButtonClicked()
-                    concealBackdrop()
                 },
                 onQueryWordChanged = onQueryWordChanged,
                 onOptionWordClassClick = onOptionWordClassClick,
                 onSortStateClick = onSortStateClick
             )
-        },
-        backLayerBackgroundColor = MaterialTheme.colorScheme.surface,
-        frontLayerContent = {
-            Column {
-                Header(
-                    vocabularySize = data.currentWordState.size,
-                    showOptionClearButton = data.queryState != VocabularyQuery(),
-                    onOptionButtonClicked = {
-                        onOptionButtonClicked()
-                        revealBackdrop()
-                    },
-                    onClearOption = onClearOption
-                )
-                WordItems(
-                    words = data.currentWordState,
-                    onWordUpdate = onWordUpdate,
-                    onWordDelete = onWordDelete
-                )
-            }
-            data.deletedWord?.let { deletedWord ->
-                scope.launch {
-                    scaffoldState.snackbarHostState.showSnackbar(message = "${deletedWord.eng}이(가) 삭제되었습니다.")
-                }
-            }
-        },
-        frontLayerElevation = 16.dp,
-        scaffoldState = scaffoldState,
-    )
+        }
+    }
 }
 
 @Composable
@@ -267,19 +263,6 @@ private fun HeaderText(
         text = "검색 결과: ${vocabularySize}개",
         modifier = modifier
     )
-}
-
-@Composable
-private fun QueryHeader(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = Icons.Outlined.Search,
-            contentDescription = "검색 옵션을 설정합니다."
-        )
-    }
 }
 
 @Composable
