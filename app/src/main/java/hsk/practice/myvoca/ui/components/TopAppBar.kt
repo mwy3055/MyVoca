@@ -16,9 +16,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.structure.MyVocaScreen
@@ -38,6 +41,7 @@ fun MyVocaTopAppBar(currentScreen: MyVocaScreen) {
         actions = {
             MyVocaTopActions(currentScreen = currentScreen)
         },
+        modifier = Modifier.shadow(elevation = 12.dp)
     )
 }
 
