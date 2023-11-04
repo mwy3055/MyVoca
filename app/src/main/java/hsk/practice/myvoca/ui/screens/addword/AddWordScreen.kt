@@ -66,6 +66,12 @@ fun AddWordScreen(
     }
 
     val uiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+    val webViewState = viewModel.webViewState
+    val webViewNavigator = viewModel.webViewNavigator
+
+    LaunchedEffect(key1 = uiState.webViewUrl) {
+        webViewNavigator.loadUrl(uiState.webViewUrl)
+    }
 
     Scaffold(
         modifier = modifier,
@@ -93,12 +99,13 @@ fun AddWordScreen(
                 onMeaningDelete = viewModel::onMeaningDelete,
                 onMemoUpdate = viewModel::onMemoUpdate,
                 onShowWebView = viewModel::onShowWordSearchWebView,
-                onUpdateWordSearchWebViewUrl = viewModel::onUpdateWordSearchWebViewUrl
+                onUpdateWebViewUrl = viewModel::onUpdateWebViewUrl
             )
 
             if (uiState.showWebView) {
                 WebView(
-                    state = viewModel.webViewState.value,
+                    state = webViewState,
+                    navigator = webViewNavigator,
                     onCreated = { webView ->
                         with(webView) {
                             settings.run {
@@ -197,7 +204,7 @@ private fun Content(
     onMeaningDelete: (Int) -> Unit,
     onMemoUpdate: (String) -> Unit,
     onShowWebView: () -> Unit,
-    onUpdateWordSearchWebViewUrl: () -> Unit,
+    onUpdateWebViewUrl: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -213,7 +220,7 @@ private fun Content(
             loadStatus = loadStatus,
             onWordUpdate = onWordUpdate,
             onShowWebView = onShowWebView,
-            onUpdateWordSearchWebViewUrl = onUpdateWordSearchWebViewUrl
+            onUpdateWebViewUrl = onUpdateWebViewUrl
         )
         Meanings(
             meanings = data.meanings,
@@ -253,7 +260,7 @@ private fun Word(
     loadStatus: suspend (String) -> Unit,
     onWordUpdate: (String) -> Unit,
     onShowWebView: () -> Unit,
-    onUpdateWordSearchWebViewUrl: () -> Unit,
+    onUpdateWebViewUrl: () -> Unit,
     focusManager: FocusManager = LocalFocusManager.current
 ) {
     LaunchedEffect(word) {
@@ -313,7 +320,7 @@ private fun Word(
             IconButton(
                 onClick = {
                     onShowWebView()
-                    onUpdateWordSearchWebViewUrl()
+                    onUpdateWebViewUrl()
                 }
             ) {
                 Icon(
@@ -572,7 +579,7 @@ private fun AddWordScreenPreview() {
                 onMeaningDelete = {},
                 onMemoUpdate = {},
                 onShowWebView = {},
-                onUpdateWordSearchWebViewUrl = {}
+                onUpdateWebViewUrl = {}
             )
         }
     }
