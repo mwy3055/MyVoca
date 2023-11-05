@@ -73,7 +73,6 @@ class AllWordViewModel @Inject constructor(
         }
     }
 
-
     /**
      * Event listeners for composable
      */

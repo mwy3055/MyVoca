@@ -250,7 +250,7 @@ private fun UserActionUploadWords(
         Box(contentAlignment = Alignment.Center) {
             Icon(
                 imageVector = actionData.icon,
-                contentDescription = actionData.text,
+                contentDescription = actionData.text.asString(),
                 modifier = Modifier.fillMaxSize(fraction = actionIconFraction),
                 tint = color
             )
@@ -263,7 +263,7 @@ private fun UserActionUploadWords(
                 )
             }
         }
-        MyVocaText(text = actionData.text)
+        MyVocaText(text = actionData.text.asString())
     }
 
     if (data.showUploadDialog) {
@@ -287,10 +287,10 @@ private fun UserActionDownloadWords(data: DownloadActionData) {
     ) {
         Icon(
             imageVector = actionData.icon,
-            contentDescription = actionData.text,
+            contentDescription = actionData.text.asString(),
             modifier = Modifier.fillMaxSize(fraction = actionIconFraction)
         )
-        MyVocaText(text = actionData.text)
+        MyVocaText(text = actionData.text.asString())
     }
 
     if (data.showDownloadDialog) {

@@ -169,6 +169,7 @@
     <string name="close_the_screen">화면을 닫습니다.</string>
     <string name="search_for_word">단어를 검색합니다.</string>
     <string name="index_meaning_type_korean">%1$s. %2$s</string>
+    <string name="web_view_url">https://dict.naver.com/dict.search?query=%1$s</string>
 
     <!--    for profile screen-->
     <string name="unknown_name">알 수 없는 이름입니다.</string>
@@ -184,6 +185,8 @@
     <string name="restore_words">단어 복원하기</string>
     <string name="would_you_like_to_restore_the_word">단어를 복원하시겠습니까?</string>
     <string name="restore_data_from_the_cloud_to_your_device">클라우드의 데이터를 기기로 복원합니다.</string>
+    <string name="back_up_word">단어 백업하기</string>
+    <string name="restore_word">단어 복원하기</string>
 
     <!--    for quiz screen-->
     <string name="need_more_words">%1$s개의 단어가 더 필요합니다.</string>
@@ -192,4 +195,7 @@
     <string name="correct">맞았습니다!!</string>
     <string name="incorrect">틀렸습니다</string>
     <string name="search_results_count">검색 결과: %1$s개</string>
+
+    <!-- for top bar -->
+    <string name="you_can_add_new_word">새로운 단어를 추가할 수 있습니다.</string>
 </resources>
