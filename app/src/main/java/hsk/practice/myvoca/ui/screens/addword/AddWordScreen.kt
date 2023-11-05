@@ -349,6 +349,7 @@ private fun Word(
             }
             IconButton(
                 onClick = {
+                    focusManager.clearFocus()
                     onShowWebView()
                     onUpdateWebViewUrl()
                 }
