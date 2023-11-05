@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.BackdropScaffold
-import androidx.compose.material.BackdropScaffoldDefaults
 import androidx.compose.material.BackdropValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SnackbarResult
@@ -152,13 +151,7 @@ private fun Content(
     }
 
     BackdropScaffold(
-        appBar = {
-            QueryHeader(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(BackdropScaffoldDefaults.HeaderHeight)
-            )
-        },
+        appBar = {},
         backLayerContent = {
             WordItems(
                 words = data.currentWordState,
