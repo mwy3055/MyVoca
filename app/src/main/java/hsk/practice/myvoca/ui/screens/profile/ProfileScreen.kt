@@ -40,6 +40,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
+import hsk.practice.myvoca.R
 import hsk.practice.myvoca.firebase.UserImpl
 import hsk.practice.myvoca.ui.components.MyVocaText
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
@@ -93,8 +95,8 @@ private fun Content(
                 )
             } else {
                 UserInfo(
-                    username = user.username ?: "알 수 없는 이름입니다.",
-                    email = user.email ?: "알 수 없는 이메일입니다.",
+                    username = user.username ?: stringResource(R.string.unknown_name),
+                    email = user.email ?: stringResource(R.string.unknown_email),
                     onLogout = onLogout
                 )
             }
@@ -123,7 +125,7 @@ private fun ProfileImage(
         Icon(
             modifier = modifierWithSize,
             painter = rememberVectorPainter(image = Icons.Outlined.HelpOutline),
-            contentDescription = "아직 로그인되지 않았습니다.",
+            contentDescription = stringResource(R.string.you_are_not_logged_in_yet),
             tint = MaterialTheme.colorScheme.onBackground,
         )
     } else {
@@ -136,7 +138,7 @@ private fun ProfileImage(
                     .transformations(CircleCropTransformation())
                     .build()
             ),
-            contentDescription = "프로필 이미지",
+            contentDescription = stringResource(R.string.profile_image),
         )
     }
 }
@@ -162,7 +164,7 @@ private fun UserInfo(
 @Composable
 private fun LogOutButton(onLogout: () -> Unit) {
     TextButton(onClick = onLogout) {
-        MyVocaText(text = "로그아웃")
+        MyVocaText(text = stringResource(R.string.logout))
     }
 }
 
@@ -194,7 +196,7 @@ private fun Login(
 
     val context = LocalContext.current
     TextButton(onClick = { onLoginButtonClick(context, googleLoginLauncher) }) {
-        MyVocaText(text = "로그인하기")
+        MyVocaText(text = stringResource(R.string.login))
     }
 }
 
@@ -302,21 +304,21 @@ private fun UploadDialog(
     onDismiss: () -> Unit
 ) {
     AlertDialog(
-        title = { MyVocaText(text = "단어 백업하기") },
+        title = { MyVocaText(text = stringResource(R.string.back_up_your_words)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                MyVocaText(text = "단어를 백업하시겠습니까?")
-                MyVocaText(text = "단어는 클라우드에 백업되며, 언제든지 앱으로 가져올 수 있습니다.")
+                MyVocaText(text = stringResource(R.string.do_you_warnt_to_back_up_the_words))
+                MyVocaText(text = stringResource(R.string.words_are_backed_up_to_the_cloud_and_can_be_imported_into_the_app_at_any_time))
             }
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                MyVocaText(text = "확인")
+                MyVocaText(text = stringResource(id = R.string.check))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                MyVocaText(text = "취소")
+                MyVocaText(text = stringResource(R.string.cancellation))
             }
         },
         onDismissRequest = onDismiss
@@ -329,21 +331,21 @@ private fun DownloadDialog(
     onDismiss: () -> Unit
 ) {
     AlertDialog(
-        title = { MyVocaText(text = "단어 복원하기") },
+        title = { MyVocaText(text = stringResource(R.string.restore_words)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                MyVocaText(text = "단어를 복원하시겠습니까?")
-                MyVocaText(text = "클라우드의 데이터를 기기로 복원합니다.")
+                MyVocaText(text = stringResource(R.string.would_you_like_to_restore_the_word))
+                MyVocaText(text = stringResource(R.string.restore_data_from_the_cloud_to_your_device))
             }
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                MyVocaText(text = "확인")
+                MyVocaText(text = stringResource(id = R.string.check))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                MyVocaText(text = "취소")
+                MyVocaText(text = stringResource(id = R.string.cancellation))
             }
         },
         onDismissRequest = onDismiss

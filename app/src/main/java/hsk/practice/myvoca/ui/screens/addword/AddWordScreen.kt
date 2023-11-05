@@ -39,11 +39,13 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.web.WebView
+import hsk.practice.myvoca.R
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.ui.components.InsetAwareTopAppBar
@@ -166,8 +168,8 @@ private fun TopBar(
 @Composable
 private fun TopBarTitle(screenType: ScreenType) {
     val title = when (screenType) {
-        AddWord -> "단어 추가"
-        UpdateWord -> "단어 수정"
+        AddWord -> stringResource(R.string.add_word)
+        UpdateWord -> stringResource(R.string.update_word)
     }
     MyVocaText(text = title)
 }
@@ -177,7 +179,7 @@ private fun TopBarCloseButton(onClose: () -> Unit) {
     IconButton(onClick = onClose) {
         Icon(
             imageVector = Icons.Outlined.Close,
-            contentDescription = "화면을 닫습니다."
+            contentDescription = stringResource(R.string.close_the_screen)
         )
     }
 }
@@ -199,7 +201,7 @@ private fun TopBarSaveButton(
         enabled = addButtonEnabled
     ) {
         MyVocaText(
-            text = "저장",
+            text = stringResource(R.string.save),
             color = textColor
         )
     }
@@ -218,7 +220,7 @@ private fun TopBarCompleteButton(
         },
     ) {
         MyVocaText(
-            text = "완료",
+            text = stringResource(R.string.complete),
             color = textColor
         )
     }
@@ -270,7 +272,7 @@ private fun Content(
 @Composable
 private fun EssentialTitle() {
     MyVocaText(
-        text = "필수 입력사항",
+        text = stringResource(R.string.required_inputs),
         style = MaterialTheme.typography.headlineSmall
     )
 }
@@ -278,7 +280,7 @@ private fun EssentialTitle() {
 @Composable
 private fun OptionalTitle() {
     MyVocaText(
-        text = "선택 입력사항",
+        text = stringResource(R.string.selective_inputs),
         style = MaterialTheme.typography.headlineSmall
     )
 }
@@ -318,7 +320,7 @@ private fun Word(
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = word,
-                    label = { MyVocaText(text = "단어") },
+                    label = { MyVocaText(text = stringResource(R.string.word)) },
                     onValueChange = onWordUpdate,
                     colors = textFieldColors,
                     trailingIcon = {
@@ -342,7 +344,7 @@ private fun Word(
                     )
                 )
                 MyVocaText(
-                    text = "이미 등록된 단어입니다.",
+                    text = stringResource(R.string.this_word_has_already_been_registerd),
                     style = MaterialTheme.typography.bodySmall,
                     color = duplicateTextColor
                 )
@@ -356,7 +358,7 @@ private fun Word(
             ) {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = "Search Icon",
+                    contentDescription = stringResource(R.string.search_for_word),
                 )
             }
         }
@@ -439,7 +441,7 @@ private fun WordClassChipIcon(
     ) {
         Icon(
             imageVector = Icons.Outlined.Add,
-            contentDescription = "$wordClass 뜻을 추가합니다."
+            contentDescription = stringResource(R.string.add_meaning, wordClass)
         )
     }
 }
@@ -469,7 +471,7 @@ private fun MeaningsEmptyIndicator() {
                 contentDescription = null
             )
             MyVocaText(
-                text = "뜻을 추가해 보세요",
+                text = stringResource(R.string.please_add_a_meaning),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
             )
         }
@@ -522,7 +524,11 @@ private fun Meaning(
             modifier = Modifier.weight(1f),
             value = meaning.content,
             label = {
-                MyVocaText(text = "${index + 1}. ${meaning.type.korean}")
+                MyVocaText(text = stringResource(
+                    R.string.index_meaning_type_korean,
+                    index + 1,
+                    meaning.type.korean
+                ))
             },
             colors = textFieldColors,
             onValueChange = {
@@ -535,7 +541,7 @@ private fun Meaning(
         IconButton(onClick = { onMeaningDelete(index) }) {
             Icon(
                 imageVector = Icons.Outlined.Close,
-                contentDescription = "${meaning.content} 뜻을 삭제합니다."
+                contentDescription = stringResource(R.string.delete_the_meaning, meaning.content)
             )
         }
     }
@@ -558,7 +564,7 @@ private fun Memo(
         modifier = Modifier.fillMaxWidth(),
         value = memo,
         label = {
-            MyVocaText(text = "메모")
+            MyVocaText(text = stringResource(R.string.memo))
         },
         colors = textFieldColors,
         onValueChange = onMemoUpdate,
@@ -567,7 +573,7 @@ private fun Memo(
                 IconButton(onClick = { onMemoUpdate("") }) {
                     Icon(
                         imageVector = Icons.Outlined.HighlightOff,
-                        contentDescription = "영어 텍스트를 지웁니다."
+                        contentDescription = stringResource(R.string.clear_english_text)
                     )
                 }
             }

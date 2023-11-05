@@ -126,6 +126,70 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_add_word">AddWordActivity</string>
     <string name="login_activity">LoginActivity</string>
-
     <string name="web_client_id">711192236974-vbjufot9iln0ttfnu44l7ai69l0dlljp.apps.googleusercontent.com</string>
+
+    <!--    for home screen-->
+    <string name="nothing_yet">아직 아무것도 없습니다.</string>
+    <string name="refresh_today_word">오늘의 단어 새로고침하기</string>
+    <string name="last_updated">마지막 업데이트: %1$s</string>
+    <string name="what_is_today_word">오늘의 단어란?</string>
+    <string name="today_word">오늘의 단어</string>
+    <string name="no_registerd_word">등록된 단어가\n없습니다</string>
+    <string name="words_are_registed">%1$s개의 단어가\n등록되어 있어요</string>
+    <string name="memorize_new_words_everyday_words_are_updated_everyday">매일매일 새로운 단어를 외워 보세요. 단어는 하루마다 갱신됩니다.</string>
+    <string name="memorized_words_can_be_separated_by_a_check_mark">외운 단어는 체크 표시로 구분할 수 있습니다.</string>
+    <string name="check">확인</string>
+
+    <!--    for all word screen-->
+    <string name="has_been_deleted">%1$s이(가) 삭제되었습니다.</string>
+    <string name="initialize_search_options">검색 옵션을 초기화합니다.</string>
+    <string name="initialization">초기화</string>
+    <string name="search_for_word_that_matchs_particular_condition">특정 조건에 맞는 단어를 검색합니다.</string>
+    <string name="search_options">검색 옵션</string>
+    <string name="set_search_options">검색 옵션을 설정합니다.</string>
+    <string name="search">검색</string>
+    <string name="selected">%1$s 선택됨</string>
+    <string name="update_the_word">단어 %1$s를 수정합니다.</string>
+    <string name="delete_the_word">단어 %1$s를 삭제합니다.</string>
+    <string name="go_to_the_top_of_the_list">목록의 맨 위로 이동합니다.</string>
+
+    <!--    for add word screen-->
+    <string name="add_word">단어 추가</string>
+    <string name="update_word">단어 수정</string>
+    <string name="save">저장</string>
+    <string name="required_inputs">필수 입력사항</string>
+    <string name="selective_inputs">선택 입력사항</string>
+    <string name="word">단어</string>
+    <string name="this_word_has_already_been_registerd">이미 등록된 단어입니다.</string>
+    <string name="add_meaning">%1$s 뜻을 추가합니다.</string>
+    <string name="please_add_a_meaning">뜻을 추가해 보세요</string>
+    <string name="delete_the_meaning">%1$s 뜻을 삭제합니다.</string>
+    <string name="memo">메모</string>
+    <string name="clear_english_text">영어 텍스트를 지웁니다.</string>
+    <string name="close_the_screen">화면을 닫습니다.</string>
+    <string name="search_for_word">단어를 검색합니다.</string>
+    <string name="index_meaning_type_korean">%1$s. %2$s</string>
+
+    <!--    for profile screen-->
+    <string name="unknown_name">알 수 없는 이름입니다.</string>
+    <string name="unknown_email">알 수 없는 이메일입니다.</string>
+    <string name="you_are_not_logged_in_yet">아직 로그인되지 않았습니다.</string>
+    <string name="profile_image">프로필 이미지</string>
+    <string name="logout">로그아웃</string>
+    <string name="login">로그인하기</string>
+    <string name="back_up_your_words">단어 백업하기</string>
+    <string name="do_you_warnt_to_back_up_the_words">단어를 백업하시겠습니까?</string>
+    <string name="words_are_backed_up_to_the_cloud_and_can_be_imported_into_the_app_at_any_time">단어는 클라우드에 백업되며, 언제든지 앱으로 가져올 수 있습니다.</string>
+    <string name="cancellation">취소</string>
+    <string name="restore_words">단어 복원하기</string>
+    <string name="would_you_like_to_restore_the_word">단어를 복원하시겠습니까?</string>
+    <string name="restore_data_from_the_cloud_to_your_device">클라우드의 데이터를 기기로 복원합니다.</string>
+
+    <!--    for quiz screen-->
+    <string name="need_more_words">%1$s개의 단어가 더 필요합니다.</string>
+    <string name="click_to_add_word">클릭하여 단어를 추가합니다.</string>
+    <string name="go_to_add_word">단어 추가하러 가기</string>
+    <string name="correct">맞았습니다!!</string>
+    <string name="incorrect">틀렸습니다</string>
+    <string name="search_results_count">검색 결과: %1$s개</string>
 </resources>
