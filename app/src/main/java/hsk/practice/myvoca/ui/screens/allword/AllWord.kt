@@ -45,6 +45,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -215,6 +216,7 @@ private fun Content(
             }
         },
         frontLayerElevation = 16.dp,
+        frontLayerScrimColor = Color.Unspecified,
         scaffoldState = scaffoldState,
     )
 }
