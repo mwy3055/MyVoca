@@ -86,10 +86,9 @@ fun WordTitle(
     title: String,
     modifier: Modifier = Modifier
 ) {
-    Text(
+    MyVocaText(
         modifier = modifier,
         text = title,
-        fontFamily = Paybooc,
         style = MaterialTheme.typography.headlineSmall,
     )
 }
@@ -175,10 +174,7 @@ fun WordMeaning(
             },
             fontFamily = Paybooc
         )
-        Text(
-            text = meaning.content,
-            fontFamily = Paybooc
-        )
+        MyVocaText(text = meaning.content)
     }
 }
 

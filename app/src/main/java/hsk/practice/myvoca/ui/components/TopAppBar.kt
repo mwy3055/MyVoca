@@ -11,7 +11,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
@@ -23,7 +22,6 @@ import hsk.practice.myvoca.R
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.structure.MyVocaScreen
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
-import hsk.practice.myvoca.ui.theme.Paybooc
 import kotlinx.coroutines.launch
 
 @Composable
@@ -43,9 +41,8 @@ fun MyVocaTopAppBar(currentScreen: MyVocaScreen) {
 
 @Composable
 private fun MyVocaTopTitle() {
-    Text(
+    MyVocaText(
         text = stringResource(R.string.app_name),
-        fontFamily = Paybooc,
         color = MaterialTheme.colorScheme.onSurface,
         style = MaterialTheme.typography.headlineSmall,
     )
