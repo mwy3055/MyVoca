@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Close
@@ -25,9 +26,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -41,13 +42,15 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.web.WebView
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.ui.components.InsetAwareTopAppBar
+import hsk.practice.myvoca.ui.components.MyVocaText
 import hsk.practice.myvoca.ui.components.StaggeredGrid
 import hsk.practice.myvoca.ui.components.SystemBarColor
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
-import hsk.practice.myvoca.ui.theme.Paybooc
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
@@ -62,7 +65,14 @@ fun AddWordScreen(
         if (updateWordId != -1) viewModel.injectUpdateTarget(updateWordId)
     }
 
-    val uiState by viewModel.uiStateFlow.collectAsState()
+    val uiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+    val webViewState = viewModel.webViewState
+    val webViewNavigator = viewModel.webViewNavigator
+
+    LaunchedEffect(key1 = uiState.webViewUrl) {
+        webViewNavigator.loadUrl(uiState.webViewUrl)
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -70,12 +80,15 @@ fun AddWordScreen(
                 screenType = uiState.screenType,
                 addButtonEnabled = uiState.canStoreWord,
                 onAddWord = viewModel::onAddWord,
+                showWebView = uiState.showWebView,
+                onHideWebView = viewModel::onHideWebView,
                 onClose = onClose
             )
         }
     ) { innerPadding ->
         Box(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(innerPadding)
                 .padding(8.dp)
         ) {
@@ -86,8 +99,30 @@ fun AddWordScreen(
                 onWordUpdate = viewModel::onWordUpdate,
                 onMeaningUpdate = viewModel::onMeaningUpdate,
                 onMeaningDelete = viewModel::onMeaningDelete,
-                onMemoUpdate = viewModel::onMemoUpdate
+                onMemoUpdate = viewModel::onMemoUpdate,
+                onShowWebView = viewModel::onShowWebView,
+                onUpdateWebViewUrl = viewModel::onUpdateWebViewUrl
             )
+
+            if (uiState.showWebView) {
+                WebView(
+                    state = webViewState,
+                    navigator = webViewNavigator,
+                    onCreated = { webView ->
+                        with(webView) {
+                            settings.run {
+                                javaScriptEnabled = true
+                                domStorageEnabled = true
+                                javaScriptCanOpenWindowsAutomatically = false
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .fillMaxHeight(0.5f)
+                        .fillMaxWidth()
+                )
+            }
         }
     }
 }
@@ -97,6 +132,8 @@ private fun TopBar(
     screenType: ScreenType,
     addButtonEnabled: Boolean,
     onAddWord: () -> Unit,
+    showWebView: Boolean,
+    onHideWebView: () -> Unit,
     onClose: () -> Unit
 ) {
     val textAlpha by animateFloatAsState(targetValue = if (addButtonEnabled) 1f else 0.6f)
@@ -109,12 +146,19 @@ private fun TopBar(
         },
         backgroundColor = MaterialTheme.colorScheme.secondary,
         actions = {
-            TopBarSaveButton(
-                onAddWord = onAddWord,
-                onClose = onClose,
-                addButtonEnabled = addButtonEnabled,
-                textColor = Color.White.copy(alpha = textAlpha)
-            )
+            if (showWebView) {
+                TopBarCompleteButton(
+                    textColor = Color.White,
+                    onHideWebView = onHideWebView
+                )
+            } else {
+                TopBarSaveButton(
+                    onAddWord = onAddWord,
+                    onClose = onClose,
+                    addButtonEnabled = addButtonEnabled,
+                    textColor = Color.White.copy(alpha = textAlpha)
+                )
+            }
         }
     )
 }
@@ -125,10 +169,7 @@ private fun TopBarTitle(screenType: ScreenType) {
         AddWord -> "단어 추가"
         UpdateWord -> "단어 수정"
     }
-    Text(
-        text = title,
-        fontFamily = Paybooc
-    )
+    MyVocaText(text = title)
 }
 
 @Composable
@@ -157,8 +198,27 @@ private fun TopBarSaveButton(
         },
         enabled = addButtonEnabled
     ) {
-        Text(
+        MyVocaText(
             text = "저장",
+            color = textColor
+        )
+    }
+}
+
+@Composable
+private fun TopBarCompleteButton(
+    textColor: Color,
+    onHideWebView: () -> Unit,
+    focusManager: FocusManager = LocalFocusManager.current,
+) {
+    TextButton(
+        onClick = {
+            focusManager.clearFocus()
+            onHideWebView()
+        },
+    ) {
+        MyVocaText(
+            text = "완료",
             color = textColor
         )
     }
@@ -172,15 +232,25 @@ private fun Content(
     onMeaningAdd: (WordClassImpl) -> Unit,
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
     onMeaningDelete: (Int) -> Unit,
-    onMemoUpdate: (String) -> Unit
+    onMemoUpdate: (String) -> Unit,
+    onShowWebView: () -> Unit,
+    onUpdateWebViewUrl: () -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxHeight(if (data.showWebView) 0.5f else 1f)
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         EssentialTitle()
         Word(
             word = data.word,
             status = data.wordExistStatus,
             loadStatus = loadStatus,
-            onWordUpdate = onWordUpdate
+            onWordUpdate = onWordUpdate,
+            onShowWebView = onShowWebView,
+            onUpdateWebViewUrl = onUpdateWebViewUrl
         )
         Meanings(
             meanings = data.meanings,
@@ -199,18 +269,16 @@ private fun Content(
 
 @Composable
 private fun EssentialTitle() {
-    Text(
+    MyVocaText(
         text = "필수 입력사항",
-        fontFamily = Paybooc,
         style = MaterialTheme.typography.headlineSmall
     )
 }
 
 @Composable
 private fun OptionalTitle() {
-    Text(
+    MyVocaText(
         text = "선택 입력사항",
-        fontFamily = Paybooc,
         style = MaterialTheme.typography.headlineSmall
     )
 }
@@ -221,6 +289,8 @@ private fun Word(
     status: WordExistStatus,
     loadStatus: suspend (String) -> Unit,
     onWordUpdate: (String) -> Unit,
+    onShowWebView: () -> Unit,
+    onUpdateWebViewUrl: () -> Unit,
     focusManager: FocusManager = LocalFocusManager.current
 ) {
     LaunchedEffect(word) {
@@ -239,37 +309,57 @@ private fun Word(
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = word,
-            label = { Text("단어") },
-            onValueChange = onWordUpdate,
-            colors = textFieldColors,
-            trailingIcon = {
-                statusIcon?.let {
-                    Icon(
-                        imageVector = statusIcon,
-                        contentDescription = null,
-                        tint = iconColor
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = word,
+                    label = { MyVocaText(text = "단어") },
+                    onValueChange = onWordUpdate,
+                    colors = textFieldColors,
+                    trailingIcon = {
+                        statusIcon?.let {
+                            Icon(
+                                imageVector = statusIcon,
+                                contentDescription = null,
+                                tint = iconColor
+                            )
+                        }
+                    },
+                    singleLine = true,
+                    isError = (status == WordExistStatus.DUPLICATE),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
+                )
+                val duplicateTextColor by animateColorAsState(
+                    targetValue = if (status == WordExistStatus.DUPLICATE) iconColor else Color.Transparent,
+                    animationSpec = tween(
+                        durationMillis = 300,
                     )
+                )
+                MyVocaText(
+                    text = "이미 등록된 단어입니다.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = duplicateTextColor
+                )
+            }
+            IconButton(
+                onClick = {
+                    focusManager.clearFocus()
+                    onShowWebView()
+                    onUpdateWebViewUrl()
                 }
-            },
-            singleLine = true,
-            isError = (status == WordExistStatus.DUPLICATE),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
-        )
-        val duplicateTextColor by animateColorAsState(
-            targetValue = if (status == WordExistStatus.DUPLICATE) iconColor else Color.Transparent,
-            animationSpec = tween(
-                durationMillis = 300,
-            )
-        )
-        Text(
-            text = "이미 등록된 단어입니다.",
-            style = MaterialTheme.typography.bodySmall,
-            color = duplicateTextColor
-        )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search Icon",
+                )
+            }
+        }
     }
 }
 
@@ -356,7 +446,7 @@ private fun WordClassChipIcon(
 
 @Composable
 private fun WordClassChipText(wordClass: WordClassImpl) {
-    Text(
+    MyVocaText(
         text = wordClass.korean,
         modifier = Modifier.padding(end = 4.dp)
     )
@@ -378,7 +468,7 @@ private fun MeaningsEmptyIndicator() {
                 imageVector = Icons.Outlined.Add,
                 contentDescription = null
             )
-            Text(
+            MyVocaText(
                 text = "뜻을 추가해 보세요",
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
             )
@@ -432,7 +522,7 @@ private fun Meaning(
             modifier = Modifier.weight(1f),
             value = meaning.content,
             label = {
-                Text(text = "${index + 1}. ${meaning.type.korean}")
+                MyVocaText(text = "${index + 1}. ${meaning.type.korean}")
             },
             colors = textFieldColors,
             onValueChange = {
@@ -468,10 +558,7 @@ private fun Memo(
         modifier = Modifier.fillMaxWidth(),
         value = memo,
         label = {
-            Text(
-                text = "메모",
-                fontFamily = Paybooc
-            )
+            MyVocaText(text = "메모")
         },
         colors = textFieldColors,
         onValueChange = onMemoUpdate,
@@ -521,7 +608,9 @@ private fun AddWordScreenPreview() {
                 onMeaningAdd = {},
                 onMeaningUpdate = { _, _ -> },
                 onMeaningDelete = {},
-                onMemoUpdate = {}
+                onMemoUpdate = {},
+                onShowWebView = {},
+                onUpdateWebViewUrl = {}
             )
         }
     }
@@ -550,6 +639,8 @@ private fun TopBarPreview() {
             screenType = AddWord,
             addButtonEnabled = buttonEnabled,
             onAddWord = { buttonEnabled = !buttonEnabled },
+            showWebView = false,
+            onHideWebView = {},
             onClose = {}
         )
     }

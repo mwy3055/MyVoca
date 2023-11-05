@@ -2,6 +2,9 @@ package hsk.practice.myvoca.ui.screens.addword
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.accompanist.web.WebContent
+import com.google.accompanist.web.WebViewNavigator
+import com.google.accompanist.web.WebViewState
 import com.hsk.data.Vocabulary
 import com.hsk.data.VocabularyQuery
 import com.hsk.domain.VocaPersistence
@@ -29,6 +32,9 @@ class AddWordViewModel @Inject constructor(
     private val _uiStateFlow = MutableStateFlow(AddWordScreenData())
     val uiStateFlow: StateFlow<AddWordScreenData>
         get() = _uiStateFlow
+
+    val webViewState = WebViewState(WebContent.Url(url = ""))
+    val webViewNavigator = WebViewNavigator(viewModelScope)
 
     /**
      * 단어 수정 화면이라면 [injectUpdateTarget] 함수를 이용하여 [updateTarget]를 초기화해야 한다.
@@ -133,22 +139,39 @@ class AddWordViewModel @Inject constructor(
         }
     }
 
+    fun onShowWebView() {
+        if (uiStateFlow.value.word.isNotEmpty()) {
+            updateUiState(showWebView = true)
+        }
+    }
+
+    fun onHideWebView() {
+        updateUiState(showWebView = false)
+    }
+
+    fun onUpdateWebViewUrl() {
+        updateUiState(webViewUrl = "https://dict.naver.com/dict.search?query=${uiStateFlow.value.word}")
+    }
+
     private fun updateUiState(
         screenType: ScreenType = uiStateFlow.value.screenType,
         word: String = uiStateFlow.value.word,
         wordExistStatus: WordExistStatus = uiStateFlow.value.wordExistStatus,
         meanings: ImmutableList<MeaningImpl> = uiStateFlow.value.meanings,
-        memo: String = uiStateFlow.value.memo
+        memo: String = uiStateFlow.value.memo,
+        showWebView: Boolean = uiStateFlow.value.showWebView,
+        webViewUrl: String = uiStateFlow.value.webViewUrl
     ) {
         _uiStateFlow.value = AddWordScreenData(
             screenType = screenType,
             word = word,
             wordExistStatus = wordExistStatus,
             meanings = meanings,
-            memo = memo
+            memo = memo,
+            showWebView = showWebView,
+            webViewUrl = webViewUrl
         )
     }
-
 }
 
 sealed class ScreenType
@@ -169,6 +192,8 @@ data class AddWordScreenData(
     val wordExistStatus: WordExistStatus = WordExistStatus.WORD_EMPTY,
     val meanings: ImmutableList<MeaningImpl> = persistentListOf(),
     val memo: String = "",
+    val showWebView: Boolean = false,
+    val webViewUrl: String = "",
 ) {
     fun toVocabularyImpl(): VocabularyImpl {
         val current = System.currentTimeMillis()
