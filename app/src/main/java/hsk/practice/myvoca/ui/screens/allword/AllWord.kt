@@ -21,8 +21,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ManageSearch
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.ManageSearch
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.BottomSheetScaffold
@@ -249,7 +249,7 @@ private fun SearchOptionClearButton(
 private fun ShowSearchOptionButton(onButtonClicked: () -> Unit) {
     TextButton(onClick = onButtonClicked) {
         Icon(
-            imageVector = Icons.Filled.ManageSearch,
+            imageVector = Icons.AutoMirrored.Filled.ManageSearch,
             contentDescription = "특정 조건에 맞는 단어를 검색합니다."
         )
         MyVocaText(text = "검색 옵션")
