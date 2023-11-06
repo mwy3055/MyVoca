@@ -20,16 +20,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.BackdropScaffold
-import androidx.compose.material.BackdropValue
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.SnackbarResult
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ManageSearch
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material.rememberBackdropScaffoldState
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,13 +33,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -127,7 +124,6 @@ private fun Loading(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Content(
     data: AllWordData,
@@ -142,26 +138,11 @@ private fun Content(
     onWordDelete: (VocabularyImpl) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed)
+    val scaffoldState = rememberBottomSheetScaffoldState()
 
-    val revealBackdrop = {
-        scope.launch { scaffoldState.reveal() }
-    }
-    val concealBackdrop = {
-        scope.launch { scaffoldState.conceal() }
-    }
-
-    BackdropScaffold(
-        appBar = {},
-        backLayerContent = {
-            WordItems(
-                words = data.currentWordState,
-                onWordUpdate = onWordUpdate,
-                onWordDelete = onWordDelete
-            )
-        },
-        backLayerBackgroundColor = MaterialTheme.colorScheme.surface,
-        frontLayerContent = {
+    BottomSheetScaffold(
+        scaffoldState = rememberBottomSheetScaffoldState(),
+        sheetContent = {
             Box {
                 Column {
                     Header(
@@ -169,7 +150,6 @@ private fun Content(
                         showOptionClearButton = data.queryState != VocabularyQuery(),
                         onOptionButtonClicked = {
                             onOptionButtonClicked()
-                            revealBackdrop()
                         },
                         onClearOption = onClearOption
                     )
@@ -180,11 +160,9 @@ private fun Content(
                         sortState = data.sortState,
                         onSubmitButtonClicked = {
                             onSubmitButtonClicked()
-                            concealBackdrop()
                         },
                         onCloseButtonClicked = {
                             onCloseButtonClicked()
-                            concealBackdrop()
                         },
                         onQueryWordChanged = onQueryWordChanged,
                         onOptionWordClassClick = onOptionWordClassClick,
@@ -192,27 +170,31 @@ private fun Content(
                     )
                 }
             }
-            data.deletedWord?.let { deletedWord ->
-                scope.launch {
-                    val result = scaffoldState.snackbarHostState
-                        .showSnackbar(
-                            message = "${deletedWord.eng}이(가) 삭제되었습니다.",
-                            actionLabel = "실행 취소"
-                        )
-                    when (result) {
-                        SnackbarResult.ActionPerformed -> {
+        }
+    ) { innerPadding ->
+        WordItems(
+            modifier = Modifier.padding(innerPadding),
+            words = data.currentWordState,
+            onWordUpdate = onWordUpdate,
+            onWordDelete = onWordDelete
+        )
+        data.deletedWord?.let { deletedWord ->
+            scope.launch {
+                val result = scaffoldState.snackbarHostState
+                    .showSnackbar(
+                        message = "${deletedWord.eng}이(가) 삭제되었습니다.",
+                        actionLabel = "실행 취소"
+                    )
+                when (result) {
+                    SnackbarResult.ActionPerformed -> {
 
-                        }
-
-                        SnackbarResult.Dismissed -> Unit
                     }
+
+                    SnackbarResult.Dismissed -> Unit
                 }
             }
-        },
-        frontLayerElevation = 16.dp,
-        frontLayerScrimColor = Color.Unspecified,
-        scaffoldState = scaffoldState,
-    )
+        }
+    }
 }
 
 @Composable
@@ -519,6 +501,7 @@ private fun SortStateChip(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun WordItems(
+    modifier: Modifier = Modifier,
     words: ImmutableList<VocabularyImpl>,
     onWordUpdate: (VocabularyImpl, Context) -> Unit,
     onWordDelete: (VocabularyImpl) -> Unit
@@ -529,7 +512,7 @@ private fun WordItems(
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     Box {
         LazyVerticalGrid(
-            modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
+            modifier = modifier.background(color = MaterialTheme.colorScheme.background),
             state = listState,
             columns = GridCells.Adaptive(minSize = min(screenWidth, 330.dp)),
             verticalArrangement = Arrangement.spacedBy(8.dp),
