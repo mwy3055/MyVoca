@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hsk.ktx.distinctRandoms
 import com.hsk.ktx.truncate
+import hsk.practice.myvoca.R
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.ui.components.LoadingIndicator
@@ -97,7 +99,7 @@ private fun QuizNotAvailable(need: Int) {
         verticalArrangement = Arrangement.Center
     ) {
         MyVocaText(
-            text = "${need}개의 단어가 더 필요합니다.",
+            text = stringResource(R.string.need_more_words, need),
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center
         )
@@ -108,9 +110,9 @@ private fun QuizNotAvailable(need: Int) {
         }) {
             Icon(
                 imageVector = Icons.Outlined.Add,
-                contentDescription = "클릭하여 단어를 추가합니다."
+                contentDescription = stringResource(R.string.click_to_add_word)
             )
-            MyVocaText(text = "단어 추가하러 가기")
+            MyVocaText(text = stringResource(R.string.go_to_add_word))
         }
     }
 }
@@ -209,7 +211,9 @@ private fun Result(
     resultData: QuizResultData,
     onCloseDialog: (QuizResultData) -> Unit
 ) {
-    val title = if (resultData.result is QuizCorrect) "맞았습니다!!" else "틀렸습니다"
+    val title = if (resultData.result is QuizCorrect) stringResource(R.string.correct) else stringResource(
+        R.string.incorrect
+    )
     AlertDialog(
         title = {
             MyVocaText(text = title)
@@ -225,7 +229,7 @@ private fun Result(
                 contentAlignment = Alignment.CenterEnd
             ) {
                 TextButton(onClick = { onCloseDialog(resultData) }) {
-                    MyVocaText(text = "확인")
+                    MyVocaText(text = stringResource(id = R.string.check))
                 }
             }
         },

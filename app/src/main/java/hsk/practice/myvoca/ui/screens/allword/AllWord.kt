@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hsk.data.VocabularyQuery
 import com.hsk.data.WordClass
+import hsk.practice.myvoca.R
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.data.fakeData
@@ -238,9 +240,9 @@ private fun SearchOptionClearButton(
         TextButton(onClick = onClearOption) {
             Icon(
                 imageVector = Icons.Filled.Refresh,
-                contentDescription = "검색 옵션을 초기화합니다."
+                contentDescription = stringResource(R.string.initialize_search_options)
             )
-            MyVocaText(text = "초기화")
+            MyVocaText(text = stringResource(R.string.initialization))
         }
     }
 }
@@ -250,9 +252,9 @@ private fun ShowSearchOptionButton(onButtonClicked: () -> Unit) {
     TextButton(onClick = onButtonClicked) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ManageSearch,
-            contentDescription = "특정 조건에 맞는 단어를 검색합니다."
+            contentDescription = stringResource(R.string.search_for_word_that_matchs_particular_condition)
         )
-        MyVocaText(text = "검색 옵션")
+        MyVocaText(text = stringResource(R.string.search_options))
     }
 }
 
@@ -262,7 +264,7 @@ private fun HeaderText(
     modifier: Modifier = Modifier
 ) {
     MyVocaText(
-        text = "검색 결과: ${vocabularySize}개",
+        text = stringResource(R.string.search_results_count, vocabularySize),
         modifier = modifier
     )
 }
@@ -275,7 +277,7 @@ private fun QueryHeader(modifier: Modifier = Modifier) {
     ) {
         Icon(
             imageVector = Icons.Outlined.Search,
-            contentDescription = "검색 옵션을 설정합니다."
+            contentDescription = stringResource(R.string.set_search_options)
         )
     }
 }
@@ -348,7 +350,7 @@ private fun CloseQueryButton(
         },
         modifier = modifier
     ) {
-        MyVocaText(text = "닫기")
+        MyVocaText(text = stringResource(id = R.string.close))
     }
 }
 
@@ -365,7 +367,7 @@ private fun SubmitQueryButton(
         },
         modifier = modifier
     ) {
-        MyVocaText(text = "검색")
+        MyVocaText(text = stringResource(R.string.search))
     }
 }
 
@@ -378,7 +380,7 @@ private fun QueryWord(
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         value = text,
-        label = { MyVocaText(text = "단어") },
+        label = { MyVocaText(text = stringResource(id = R.string.word)) },
         trailingIcon = {
             if (text.isNotEmpty()) {
                 IconButton(onClick = { onTextChanged("") }) {
@@ -441,7 +443,7 @@ private fun WordClassChip(
         AnimatedVisibility(selected) {
             Icon(
                 imageVector = Icons.Filled.Check,
-                contentDescription = "$className 선택됨",
+                contentDescription = stringResource(R.string.selected, className),
                 tint = textColor
             )
         }
@@ -539,13 +541,19 @@ private fun WordItems(
                     IconButton(onClick = { onWordUpdate(words[it], context) }) {
                         Icon(
                             imageVector = Icons.Outlined.Edit,
-                            contentDescription = "단어 ${words[it].eng}를 수정합니다."
+                            contentDescription = stringResource(
+                                R.string.update_the_word,
+                                words[it].eng
+                            )
                         )
                     }
                     IconButton(onClick = { onWordDelete(words[it]) }) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
-                            contentDescription = "단어 ${words[it].eng}를 삭제합니다."
+                            contentDescription = stringResource(
+                                R.string.delete_the_word,
+                                words[it].eng
+                            )
                         )
                     }
                 }
@@ -584,7 +592,7 @@ private fun ScrollTopButton(
         ) {
             Icon(
                 imageVector = Icons.Outlined.ArrowUpward,
-                contentDescription = "목록의 맨 위로 이동합니다."
+                contentDescription = stringResource(R.string.go_to_the_top_of_the_list)
             )
         }
     }
