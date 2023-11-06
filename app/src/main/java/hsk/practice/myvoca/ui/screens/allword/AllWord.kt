@@ -33,6 +33,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
@@ -50,8 +51,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hsk.data.VocabularyQuery
 import com.hsk.data.WordClass
 import hsk.practice.myvoca.data.VocabularyImpl
@@ -72,7 +73,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AllWordScreen(
-    viewModel: AllWordViewModel = viewModel()
+    viewModel: AllWordViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.allWordUiState.collectAsStateWithLifecycle()
 
@@ -84,7 +85,8 @@ fun AllWordScreen(
         onSortStateClick = viewModel::onSortStateClicked,
         onClearOption = viewModel::onClearOption,
         onWordUpdate = viewModel::onWordUpdate,
-        onWordDelete = viewModel::onWordDelete
+        onWordDelete = viewModel::onWordDelete,
+        onWordRestore = viewModel::onWordRestore
     )
 }
 
@@ -99,7 +101,8 @@ private fun Loading(
     onSortStateClick: (SortState) -> Unit = {},
     onClearOption: () -> Unit = {},
     onWordUpdate: (VocabularyImpl, Context) -> Unit,
-    onWordDelete: (VocabularyImpl) -> Unit = {}
+    onWordDelete: (VocabularyImpl) -> Unit = {},
+    onWordRestore: (VocabularyImpl) -> Unit = {}
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -118,7 +121,8 @@ private fun Loading(
                 onSortStateClick = onSortStateClick,
                 onClearOption = onClearOption,
                 onWordUpdate = onWordUpdate,
-                onWordDelete = onWordDelete
+                onWordDelete = onWordDelete,
+                onWordRestore = onWordRestore,
             )
         }
     }
@@ -135,13 +139,31 @@ private fun Content(
     onSortStateClick: (SortState) -> Unit,
     onClearOption: () -> Unit,
     onWordUpdate: (VocabularyImpl, Context) -> Unit,
-    onWordDelete: (VocabularyImpl) -> Unit
+    onWordDelete: (VocabularyImpl) -> Unit,
+    onWordRestore: (VocabularyImpl) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
     val scaffoldState = rememberBottomSheetScaffoldState()
 
+    LaunchedEffect(key1 = data.deletedWord) {
+        data.deletedWord?.let {
+            val snackbarResult = scaffoldState.snackbarHostState
+                .showSnackbar(
+                    message = "${data.deletedWord.eng}이(가) 삭제되었습니다.",
+                    actionLabel = "실행 취소",
+                    duration = SnackbarDuration.Short
+                )
+            when (snackbarResult) {
+                SnackbarResult.ActionPerformed -> {
+                    onWordRestore(data.deletedWord)
+                }
+
+                SnackbarResult.Dismissed -> Unit
+            }
+        }
+    }
+
     BottomSheetScaffold(
-        scaffoldState = rememberBottomSheetScaffoldState(),
+        scaffoldState = scaffoldState,
         sheetContent = {
             Box {
                 Column {
@@ -178,22 +200,6 @@ private fun Content(
             onWordUpdate = onWordUpdate,
             onWordDelete = onWordDelete
         )
-        data.deletedWord?.let { deletedWord ->
-            scope.launch {
-                val result = scaffoldState.snackbarHostState
-                    .showSnackbar(
-                        message = "${deletedWord.eng}이(가) 삭제되었습니다.",
-                        actionLabel = "실행 취소"
-                    )
-                when (result) {
-                    SnackbarResult.ActionPerformed -> {
-
-                    }
-
-                    SnackbarResult.Dismissed -> Unit
-                }
-            }
-        }
     }
 }
 
@@ -612,7 +618,9 @@ private fun ContentsPreview() {
             onSortStateClick = {},
             onClearOption = {},
             onWordUpdate = { _, _ -> },
-            onWordDelete = {})
+            onWordDelete = {},
+            onWordRestore = {}
+        )
     }
 }
 
