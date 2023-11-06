@@ -144,14 +144,18 @@ private fun Content(
     onWordDelete: (VocabularyImpl) -> Unit,
     onWordRestore: (VocabularyImpl) -> Unit,
 ) {
+    val context = LocalContext.current
     val scaffoldState = rememberBottomSheetScaffoldState()
 
     LaunchedEffect(key1 = data.deletedWord) {
         data.deletedWord?.let {
             val snackbarResult = scaffoldState.snackbarHostState
                 .showSnackbar(
-                    message = "${data.deletedWord.eng}이(가) 삭제되었습니다.",
-                    actionLabel = "실행 취소",
+                    message = context.getString(
+                        R.string.has_been_deleted,
+                        it.eng
+                    ),
+                    actionLabel = context.getString(R.string.undo),
                     duration = SnackbarDuration.Short
                 )
             when (snackbarResult) {
