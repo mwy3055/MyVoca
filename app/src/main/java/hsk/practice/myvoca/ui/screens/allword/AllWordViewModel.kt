@@ -137,6 +137,13 @@ class AllWordViewModel @Inject constructor(
         delay(50L)
         _allWordUiState.copyData(deletedWord = null)
     }
+
+    fun onWordRestore(word: VocabularyImpl) = viewModelScope.launch(ioDispatcher) {
+        persistence.insertVocabulary(listOf(word).toVocabularyList())
+        _allWordUiState.copyData(restoreWord = word)
+        delay(50L)
+        _allWordUiState.copyData(restoreWord = null)
+    }
 }
 
 private fun Collection<VocabularyImpl>.sortedBy(selector: SortState): List<VocabularyImpl> {
@@ -157,7 +164,8 @@ private fun MutableStateFlow<UiState<AllWordData>>.copyData(
     sortState: SortState? = null,
     queryState: VocabularyQuery? = null,
     currentWordState: List<VocabularyImpl>? = null,
-    deletedWord: VocabularyImpl? = null
+    deletedWord: VocabularyImpl? = null,
+    restoreWord: VocabularyImpl? = null,
 ) {
     synchronized(this) {
         val data = value.data ?: AllWordData()
@@ -165,7 +173,8 @@ private fun MutableStateFlow<UiState<AllWordData>>.copyData(
             sortState = sortState ?: data.sortState,
             queryState = queryState ?: data.queryState,
             currentWordState = currentWordState?.toImmutableList() ?: data.currentWordState,
-            deletedWord = deletedWord ?: data.deletedWord
+            deletedWord = deletedWord ?: data.deletedWord,
+            restoreWord = restoreWord ?: data.restoreWord
         )
         this.value = this.value.copy(data = newData)
     }
@@ -175,7 +184,8 @@ data class AllWordData(
     val sortState: SortState = SortState.defaultValue,
     val queryState: VocabularyQuery = VocabularyQuery(),
     val currentWordState: ImmutableList<VocabularyImpl> = persistentListOf(),
-    val deletedWord: VocabularyImpl? = null
+    val deletedWord: VocabularyImpl? = null,
+    val restoreWord: VocabularyImpl? = null
 )
 
 enum class SortState(val korean: String) {
