@@ -9,12 +9,14 @@ import com.hsk.data.Vocabulary
 import com.hsk.data.VocabularyQuery
 import com.hsk.domain.VocaPersistence
 import dagger.hilt.android.lifecycle.HiltViewModel
+import hsk.practice.myvoca.R
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImpl
 import hsk.practice.myvoca.room.vocabulary.toVocabularyList
+import hsk.practice.myvoca.util.UiText
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -150,7 +152,12 @@ class AddWordViewModel @Inject constructor(
     }
 
     fun onUpdateWebViewUrl() {
-        updateUiState(webViewUrl = "https://dict.naver.com/dict.search?query=${uiStateFlow.value.word}")
+        updateUiState(
+            webViewUrl = UiText.StringResource(
+                resId = R.string.web_view_url,
+                uiStateFlow.value.word
+            )
+        )
     }
 
     private fun updateUiState(
@@ -160,7 +167,7 @@ class AddWordViewModel @Inject constructor(
         meanings: ImmutableList<MeaningImpl> = uiStateFlow.value.meanings,
         memo: String = uiStateFlow.value.memo,
         showWebView: Boolean = uiStateFlow.value.showWebView,
-        webViewUrl: String = uiStateFlow.value.webViewUrl
+        webViewUrl: UiText = uiStateFlow.value.webViewUrl
     ) {
         _uiStateFlow.value = AddWordScreenData(
             screenType = screenType,
@@ -193,7 +200,7 @@ data class AddWordScreenData(
     val meanings: ImmutableList<MeaningImpl> = persistentListOf(),
     val memo: String = "",
     val showWebView: Boolean = false,
-    val webViewUrl: String = "",
+    val webViewUrl: UiText = UiText.DirectString(""),
 ) {
     fun toVocabularyImpl(): VocabularyImpl {
         val current = System.currentTimeMillis()

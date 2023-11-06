@@ -16,9 +16,11 @@ import com.google.firebase.auth.FirebaseUser
 import com.hsk.ktx.equalsDelta
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import hsk.practice.myvoca.R
 import hsk.practice.myvoca.firebase.MyFirebaseAuth
 import hsk.practice.myvoca.firebase.MyFirestore
 import hsk.practice.myvoca.firebase.UserImpl
+import hsk.practice.myvoca.util.UiText
 import hsk.practice.myvoca.work.FirestoreUploadWordsWork
 import hsk.practice.myvoca.work.setFirestoreDownloadWork
 import hsk.practice.myvoca.work.setFirestoreUploadWork
@@ -195,7 +197,7 @@ data class ProfileScreenData(
 
 data class ProfileAction(
     val icon: ImageVector,
-    val text: String,
+    val text: UiText
 )
 
 data class UploadActionData(
@@ -207,7 +209,7 @@ data class UploadActionData(
 ) {
     val actionData: ProfileAction = ProfileAction(
         icon = Icons.Outlined.FileUpload,
-        text = "단어 백업하기"
+        text = UiText.StringResource(R.string.back_up_word)
     )
 
     val uploading: Boolean
@@ -225,6 +227,6 @@ data class DownloadActionData(
 ) {
     val actionData: ProfileAction = ProfileAction(
         icon = Icons.Outlined.FileDownload,
-        text = "단어 복원하기",
+        text = UiText.StringResource(R.string.restore_word),
     )
 }

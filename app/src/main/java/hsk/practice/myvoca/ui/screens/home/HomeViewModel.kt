@@ -114,7 +114,6 @@ class HomeViewModel @Inject constructor(
     private fun List<HomeTodayWord>.sortTodayWords(): List<HomeTodayWord> {
         return this.sortedBy { it.todayWord.id }
     }
-
 }
 
 private fun MutableStateFlow<HomeScreenData>.copyData(

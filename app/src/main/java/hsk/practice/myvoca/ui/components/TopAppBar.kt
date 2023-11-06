@@ -73,7 +73,7 @@ private fun MyVocaTopActions(currentScreen: MyVocaScreen) {
         ) {
             Icon(
                 imageVector = Icons.Outlined.Add,
-                contentDescription = "새로운 단어를 추가할 수 있습니다.",
+                contentDescription = stringResource(R.string.you_can_add_new_word),
                 tint = contentColorFor(MaterialTheme.colorScheme.surface)
             )
         }
