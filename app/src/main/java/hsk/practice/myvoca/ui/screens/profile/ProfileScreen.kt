@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -52,7 +52,9 @@ import hsk.practice.myvoca.ui.components.MyVocaText
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 
 @Composable
-fun ProfileScreen(viewModel: ProfileViewModel = hiltViewModel()) {
+fun ProfileScreen(
+    viewModel: ProfileViewModel = hiltViewModel()
+) {
     val data by viewModel.profileScreenData.collectAsStateWithLifecycle()
 
     Content(
@@ -122,7 +124,7 @@ private fun ProfileImage(
     if (imageUrl == null) {
         Icon(
             modifier = modifierWithSize,
-            painter = rememberVectorPainter(image = Icons.Outlined.HelpOutline),
+            painter = rememberVectorPainter(image = Icons.AutoMirrored.Outlined.HelpOutline),
             contentDescription = "아직 로그인되지 않았습니다.",
             tint = MaterialTheme.colorScheme.onBackground,
         )
@@ -254,10 +256,10 @@ private fun UserActionUploadWords(
             )
             if (data.uploadProgress != null) {
                 CircularProgressIndicator(
+                    progress = { data.uploadProgress },
                     modifier = Modifier.scale(1.75f),
-                    progress = data.uploadProgress,
                     color = color,
-                    strokeWidth = 3.dp
+                    strokeWidth = 3.dp,
                 )
             }
         }

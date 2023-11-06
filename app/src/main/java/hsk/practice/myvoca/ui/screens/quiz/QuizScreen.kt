@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hsk.ktx.distinctRandoms
 import com.hsk.ktx.truncate
@@ -38,7 +39,9 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
-fun QuizScreen(viewModel: QuizViewModel) {
+fun QuizScreen(
+    viewModel: QuizViewModel = hiltViewModel()
+) {
     val quizScreenData by viewModel.quizScreenData.collectAsStateWithLifecycle()
 
     Loading(
@@ -63,9 +66,11 @@ private fun Loading(
                     onOptionClick = onOptionClick
                 )
             }
+
             is QuizNotAvailable -> {
                 QuizNotAvailable(need = quizScreenData.numberVocabularyNeed)
             }
+
             else -> {
                 LoadingIndicator(
                     modifier = Modifier
