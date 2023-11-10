@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.web.WebView
 import hsk.practice.myvoca.R
@@ -59,7 +60,7 @@ import kotlinx.collections.immutable.ImmutableList
 @Composable
 fun AddWordScreen(
     modifier: Modifier = Modifier,
-    viewModel: AddWordViewModel,
+    viewModel: AddWordViewModel = hiltViewModel(),
     updateWordId: Int,
     onClose: () -> Unit = {}
 ) {
@@ -602,6 +603,7 @@ private fun getWordStatusIconColor(status: WordExistStatus): Color {
     return when (status) {
         WordExistStatus.NOT_EXISTS -> MaterialTheme.colorScheme.primary
         WordExistStatus.DUPLICATE -> MaterialTheme.colorScheme.error
+        // TODO M3 migration
         else -> LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
     }
 }

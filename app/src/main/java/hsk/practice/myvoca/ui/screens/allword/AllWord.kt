@@ -20,16 +20,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.BackdropScaffold
-import androidx.compose.material.BackdropScaffoldDefaults
-import androidx.compose.material.BackdropValue
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ManageSearch
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.ManageSearch
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material.rememberBackdropScaffoldState
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,8 +33,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,8 +52,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hsk.data.VocabularyQuery
 import com.hsk.data.WordClass
 import hsk.practice.myvoca.R
@@ -76,7 +75,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AllWordScreen(
-    viewModel: AllWordViewModel = viewModel()
+    viewModel: AllWordViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.allWordUiState.collectAsStateWithLifecycle()
 
@@ -88,7 +87,8 @@ fun AllWordScreen(
         onSortStateClick = viewModel::onSortStateClicked,
         onClearOption = viewModel::onClearOption,
         onWordUpdate = viewModel::onWordUpdate,
-        onWordDelete = viewModel::onWordDelete
+        onWordDelete = viewModel::onWordDelete,
+        onWordRestore = viewModel::onWordRestore
     )
 }
 
@@ -103,7 +103,8 @@ private fun Loading(
     onSortStateClick: (SortState) -> Unit = {},
     onClearOption: () -> Unit = {},
     onWordUpdate: (VocabularyImpl, Context) -> Unit,
-    onWordDelete: (VocabularyImpl) -> Unit = {}
+    onWordDelete: (VocabularyImpl) -> Unit = {},
+    onWordRestore: (VocabularyImpl) -> Unit = {}
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -122,13 +123,13 @@ private fun Loading(
                 onSortStateClick = onSortStateClick,
                 onClearOption = onClearOption,
                 onWordUpdate = onWordUpdate,
-                onWordDelete = onWordDelete
+                onWordDelete = onWordDelete,
+                onWordRestore = onWordRestore,
             )
         }
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Content(
     data: AllWordData,
@@ -140,76 +141,72 @@ private fun Content(
     onSortStateClick: (SortState) -> Unit,
     onClearOption: () -> Unit,
     onWordUpdate: (VocabularyImpl, Context) -> Unit,
-    onWordDelete: (VocabularyImpl) -> Unit
+    onWordDelete: (VocabularyImpl) -> Unit,
+    onWordRestore: (VocabularyImpl) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
-    val scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed)
     val context = LocalContext.current
+    val scaffoldState = rememberBottomSheetScaffoldState()
 
-    val revealBackdrop = {
-        scope.launch { scaffoldState.reveal() }
-    }
-    val concealBackdrop = {
-        scope.launch { scaffoldState.conceal() }
-    }
-
-    BackdropScaffold(
-        appBar = {
-            QueryHeader(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(BackdropScaffoldDefaults.HeaderHeight)
-            )
-        },
-        backLayerContent = {
-            QueryOptions(
-                modifier = Modifier
-                    .padding(8.dp),
-                query = data.queryState,
-                sortState = data.sortState,
-                onSubmitButtonClicked = {
-                    onSubmitButtonClicked()
-                    concealBackdrop()
-                },
-                onCloseButtonClicked = {
-                    onCloseButtonClicked()
-                    concealBackdrop()
-                },
-                onQueryWordChanged = onQueryWordChanged,
-                onOptionWordClassClick = onOptionWordClassClick,
-                onSortStateClick = onSortStateClick
-            )
-        },
-        backLayerBackgroundColor = MaterialTheme.colorScheme.surface,
-        frontLayerContent = {
-            Column {
-                Header(
-                    vocabularySize = data.currentWordState.size,
-                    showOptionClearButton = data.queryState != VocabularyQuery(),
-                    onOptionButtonClicked = {
-                        onOptionButtonClicked()
-                        revealBackdrop()
-                    },
-                    onClearOption = onClearOption
-                )
-                WordItems(
-                    words = data.currentWordState,
-                    onWordUpdate = onWordUpdate,
-                    onWordDelete = onWordDelete
-                )
-            }
-            data.deletedWord?.let { deletedWord ->
-                scope.launch {
-                    scaffoldState.snackbarHostState.showSnackbar(message = context.getString(
+    LaunchedEffect(key1 = data.deletedWord) {
+        data.deletedWord?.let {
+            val snackbarResult = scaffoldState.snackbarHostState
+                .showSnackbar(
+                    message = context.getString(
                         R.string.has_been_deleted,
-                        deletedWord.eng
-                    ))
+                        it.eng
+                    ),
+                    actionLabel = context.getString(R.string.undo),
+                    duration = SnackbarDuration.Short
+                )
+            when (snackbarResult) {
+                SnackbarResult.ActionPerformed -> {
+                    onWordRestore(data.deletedWord)
+                }
+
+                SnackbarResult.Dismissed -> Unit
+            }
+        }
+    }
+
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetContent = {
+            Box {
+                Column {
+                    Header(
+                        vocabularySize = data.currentWordState.size,
+                        showOptionClearButton = data.queryState != VocabularyQuery(),
+                        onOptionButtonClicked = {
+                            onOptionButtonClicked()
+                        },
+                        onClearOption = onClearOption
+                    )
+                    QueryOptions(
+                        modifier = Modifier
+                            .padding(8.dp),
+                        query = data.queryState,
+                        sortState = data.sortState,
+                        onSubmitButtonClicked = {
+                            onSubmitButtonClicked()
+                        },
+                        onCloseButtonClicked = {
+                            onCloseButtonClicked()
+                        },
+                        onQueryWordChanged = onQueryWordChanged,
+                        onOptionWordClassClick = onOptionWordClassClick,
+                        onSortStateClick = onSortStateClick
+                    )
                 }
             }
-        },
-        frontLayerElevation = 16.dp,
-        scaffoldState = scaffoldState,
-    )
+        }
+    ) { innerPadding ->
+        WordItems(
+            modifier = Modifier.padding(innerPadding),
+            words = data.currentWordState,
+            onWordUpdate = onWordUpdate,
+            onWordDelete = onWordDelete
+        )
+    }
 }
 
 @Composable
@@ -258,7 +255,7 @@ private fun SearchOptionClearButton(
 private fun ShowSearchOptionButton(onButtonClicked: () -> Unit) {
     TextButton(onClick = onButtonClicked) {
         Icon(
-            imageVector = Icons.Filled.ManageSearch,
+            imageVector = Icons.AutoMirrored.Filled.ManageSearch,
             contentDescription = stringResource(R.string.search_for_word_that_matchs_particular_condition)
         )
         MyVocaText(text = stringResource(R.string.search_options))
@@ -516,6 +513,7 @@ private fun SortStateChip(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun WordItems(
+    modifier: Modifier = Modifier,
     words: ImmutableList<VocabularyImpl>,
     onWordUpdate: (VocabularyImpl, Context) -> Unit,
     onWordDelete: (VocabularyImpl) -> Unit
@@ -526,7 +524,7 @@ private fun WordItems(
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     Box {
         LazyVerticalGrid(
-            modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
+            modifier = modifier.background(color = MaterialTheme.colorScheme.background),
             state = listState,
             columns = GridCells.Adaptive(minSize = min(screenWidth, 330.dp)),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -632,7 +630,9 @@ private fun ContentsPreview() {
             onSortStateClick = {},
             onClearOption = {},
             onWordUpdate = { _, _ -> },
-            onWordDelete = {})
+            onWordDelete = {},
+            onWordRestore = {}
+        )
     }
 }
 

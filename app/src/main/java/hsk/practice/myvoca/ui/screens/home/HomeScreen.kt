@@ -14,8 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Help
 import androidx.compose.material.icons.outlined.Autorenew
-import androidx.compose.material.icons.outlined.Help
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.work.WorkManager
 import hsk.practice.myvoca.R
@@ -51,7 +52,9 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel) {
+fun HomeScreen(
+    viewModel: HomeViewModel = hiltViewModel()
+) {
     val homeScreenData by viewModel.homeScreenData.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
@@ -226,7 +229,7 @@ private fun HelpIcon(showTodayWordHelp: (Boolean) -> Unit) {
         onClick = { showTodayWordHelp(true) }
     ) {
         Icon(
-            imageVector = Icons.Outlined.Help,
+            imageVector = Icons.AutoMirrored.Outlined.Help,
             contentDescription = stringResource(R.string.what_is_today_word)
         )
     }

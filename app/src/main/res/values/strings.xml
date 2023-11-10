@@ -152,6 +152,7 @@
     <string name="update_the_word">단어 %1$s를 수정합니다.</string>
     <string name="delete_the_word">단어 %1$s를 삭제합니다.</string>
     <string name="go_to_the_top_of_the_list">목록의 맨 위로 이동합니다.</string>
+    <string name="undo">실행 취소</string>
 
     <!--    for add word screen-->
     <string name="add_word">단어 추가</string>

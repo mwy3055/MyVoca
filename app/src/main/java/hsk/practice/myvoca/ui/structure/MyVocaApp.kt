@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
@@ -18,13 +17,9 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import hsk.practice.myvoca.ui.components.MyVocaBottomAppBar
 import hsk.practice.myvoca.ui.components.MyVocaTopAppBar
 import hsk.practice.myvoca.ui.screens.allword.AllWordScreen
-import hsk.practice.myvoca.ui.screens.allword.AllWordViewModel
 import hsk.practice.myvoca.ui.screens.home.HomeScreen
-import hsk.practice.myvoca.ui.screens.home.HomeViewModel
 import hsk.practice.myvoca.ui.screens.profile.ProfileScreen
-import hsk.practice.myvoca.ui.screens.profile.ProfileViewModel
 import hsk.practice.myvoca.ui.screens.quiz.QuizScreen
-import hsk.practice.myvoca.ui.screens.quiz.QuizViewModel
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import kotlinx.collections.immutable.toImmutableList
 
@@ -35,6 +30,7 @@ fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
         // val systemBarColor = MaterialTheme.colorScheme.primarySurface
         val systemBarColor = MaterialTheme.colorScheme.primary
         // val systemBarColor = MaterialTheme.colorScheme.surface
+
         LaunchedEffect(key1 = true) {
             onLaunch()
             systemUiController.setStatusBarColor(
@@ -46,6 +42,7 @@ fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
         val navController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentScreen = MyVocaScreen.fromRoute(backStackEntry?.destination?.route)
+
         Scaffold(
             topBar = {
                 MyVocaTopAppBar(currentScreen = currentScreen)
@@ -60,11 +57,11 @@ fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
                     },
                     currentScreen = currentScreen
                 )
-            },
+            }
         ) { innerPadding ->
             MyVocaNavGraph(
                 modifier = Modifier.padding(innerPadding),
-                navController = navController,
+                navController = navController
             )
         }
     }
@@ -88,11 +85,7 @@ private fun NavOptionsBuilder.clearPopUpStack() {
 @Composable
 fun MyVocaNavGraph(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController(),
-    homeViewModel: HomeViewModel = hiltViewModel(),
-    allWordViewModel: AllWordViewModel = hiltViewModel(),
-    quizViewModel: QuizViewModel = hiltViewModel(),
-    profileViewModel: ProfileViewModel = hiltViewModel(),
+    navController: NavHostController = rememberNavController()
 ) {
     // NavHost 밖에서 만들면 화면 전환에 상관없이 유지된다.
     NavHost(
@@ -102,16 +95,16 @@ fun MyVocaNavGraph(
     ) {
         // NavHost 안에서 만들면 매번 새로운 객체가 생성된다.
         composable(MyVocaScreen.Home.name) {
-            HomeScreen(homeViewModel)
+            HomeScreen()
         }
         composable(MyVocaScreen.AllWord.name) {
-            AllWordScreen(allWordViewModel)
+            AllWordScreen()
         }
         composable(MyVocaScreen.Quiz.name) {
-            QuizScreen(quizViewModel)
+            QuizScreen()
         }
         composable(MyVocaScreen.Profile.name) {
-            ProfileScreen(profileViewModel)
+            ProfileScreen()
         }
     }
 }
