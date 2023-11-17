@@ -14,7 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
-import hsk.practice.myvoca.ui.theme.Paybooc
+import hsk.practice.myvoca.ui.theme.NanumSquareRound
 
 @Composable
 fun MyVocaText(
@@ -24,7 +24,7 @@ fun MyVocaText(
     fontSize: TextUnit = TextUnit.Unspecified,
     fontStyle: FontStyle? = null,
     fontWeight: FontWeight? = null,
-    fontFamily: FontFamily = Paybooc,
+    fontFamily: FontFamily = NanumSquareRound,
     letterSpacing: TextUnit = TextUnit.Unspecified,
     textDecoration: TextDecoration? = null,
     textAlign: TextAlign? = null,

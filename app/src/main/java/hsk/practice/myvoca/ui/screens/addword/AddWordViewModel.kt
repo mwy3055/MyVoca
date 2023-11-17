@@ -70,6 +70,10 @@ class AddWordViewModel @Inject constructor(
         updateUiState(word = newWord)
     }
 
+    fun onWordClear() {
+        updateUiState(word = "")
+    }
+
     suspend fun loadStatus(newWord: String) {
         if (newWord.isEmpty()) {
             updateUiState(wordExistStatus = WordExistStatus.WORD_EMPTY)

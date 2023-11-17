@@ -8,29 +8,28 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.Error
 import androidx.compose.material.icons.outlined.HighlightOff
 import androidx.compose.material.icons.outlined.HourglassFull
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,9 +39,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -52,7 +54,6 @@ import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.ui.components.InsetAwareTopAppBar
 import hsk.practice.myvoca.ui.components.MyVocaText
-import hsk.practice.myvoca.ui.components.StaggeredGrid
 import hsk.practice.myvoca.ui.components.SystemBarColor
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import kotlinx.collections.immutable.ImmutableList
@@ -64,7 +65,7 @@ fun AddWordScreen(
     updateWordId: Int,
     onClose: () -> Unit = {}
 ) {
-    SystemBarColor(systemBarColor = MaterialTheme.colorScheme.secondary)
+    SystemBarColor(systemBarColor = MaterialTheme.colorScheme.surface)
     LaunchedEffect(key1 = true) {
         if (updateWordId != -1) viewModel.injectUpdateTarget(updateWordId)
     }
@@ -81,7 +82,6 @@ fun AddWordScreen(
     }
 
     Scaffold(
-        modifier = modifier,
         topBar = {
             TopBar(
                 screenType = uiState.screenType,
@@ -89,21 +89,23 @@ fun AddWordScreen(
                 onAddWord = viewModel::onAddWord,
                 showWebView = uiState.showWebView,
                 onHideWebView = viewModel::onHideWebView,
-                onClose = onClose
+                onClose = onClose,
+                elevation = 16.dp
             )
         }
     ) { innerPadding ->
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(8.dp)
+                .padding(16.dp)
         ) {
             Content(
                 data = uiState,
                 loadStatus = viewModel::loadStatus,
                 onMeaningAdd = viewModel::onMeaningAdd,
                 onWordUpdate = viewModel::onWordUpdate,
+                onWordClear = viewModel::onWordClear,
                 onMeaningUpdate = viewModel::onMeaningUpdate,
                 onMeaningDelete = viewModel::onMeaningDelete,
                 onMemoUpdate = viewModel::onMemoUpdate,
@@ -141,9 +143,11 @@ private fun TopBar(
     onAddWord: () -> Unit,
     showWebView: Boolean,
     onHideWebView: () -> Unit,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    elevation: Dp,
 ) {
     val textAlpha by animateFloatAsState(targetValue = if (addButtonEnabled) 1f else 0.6f)
+
     InsetAwareTopAppBar(
         title = {
             TopBarTitle(screenType)
@@ -151,11 +155,10 @@ private fun TopBar(
         navigationIcon = {
             TopBarCloseButton(onClose = onClose)
         },
-        backgroundColor = MaterialTheme.colorScheme.secondary,
         actions = {
             if (showWebView) {
                 TopBarCompleteButton(
-                    textColor = Color.White,
+                    textColor = MaterialTheme.colorScheme.onSurface,
                     onHideWebView = onHideWebView
                 )
             } else {
@@ -163,10 +166,11 @@ private fun TopBar(
                     onAddWord = onAddWord,
                     onClose = onClose,
                     addButtonEnabled = addButtonEnabled,
-                    textColor = Color.White.copy(alpha = textAlpha)
+                    textColor = MaterialTheme.colorScheme.onSurface.copy(alpha = textAlpha)
                 )
             }
-        }
+        },
+        elevation = elevation
     )
 }
 
@@ -176,7 +180,10 @@ private fun TopBarTitle(screenType: ScreenType) {
         AddWord -> stringResource(R.string.add_word)
         UpdateWord -> stringResource(R.string.update_word)
     }
-    MyVocaText(text = title)
+    MyVocaText(
+        text = title,
+        color = MaterialTheme.colorScheme.onSurface
+    )
 }
 
 @Composable
@@ -233,18 +240,20 @@ private fun TopBarCompleteButton(
 
 @Composable
 private fun Content(
+    modifier: Modifier = Modifier,
     data: AddWordScreenData,
     loadStatus: suspend (String) -> Unit,
     onWordUpdate: (String) -> Unit,
+    onWordClear: () -> Unit,
     onMeaningAdd: (WordClassImpl) -> Unit,
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
     onMeaningDelete: (Int) -> Unit,
     onMemoUpdate: (String) -> Unit,
     onShowWebView: () -> Unit,
-    onUpdateWebViewUrl: () -> Unit,
+    onUpdateWebViewUrl: () -> Unit
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxHeight(if (data.showWebView) 0.5f else 1f)
             .fillMaxWidth()
             .verticalScroll(rememberScrollState()),
@@ -256,6 +265,7 @@ private fun Content(
             status = data.wordExistStatus,
             loadStatus = loadStatus,
             onWordUpdate = onWordUpdate,
+            onWordClear = onWordClear,
             onShowWebView = onShowWebView,
             onUpdateWebViewUrl = onUpdateWebViewUrl
         )
@@ -296,6 +306,7 @@ private fun Word(
     status: WordExistStatus,
     loadStatus: suspend (String) -> Unit,
     onWordUpdate: (String) -> Unit,
+    onWordClear: () -> Unit,
     onShowWebView: () -> Unit,
     onUpdateWebViewUrl: () -> Unit,
     focusManager: FocusManager = LocalFocusManager.current
@@ -308,7 +319,7 @@ private fun Word(
         focusedContainerColor = Color.Transparent,
         unfocusedContainerColor = Color.Transparent,
         disabledContainerColor = Color.Transparent,
-        errorContainerColor = Color.Transparent
+        errorContainerColor = Color.Transparent,
     )
     val statusIcon = getWordStatusIcon(status)
     val iconColor = getWordStatusIconColor(status)
@@ -325,16 +336,23 @@ private fun Word(
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = word,
-                    label = { MyVocaText(text = stringResource(R.string.word)) },
+                    label = { MyVocaText(text = stringResource(R.string.input_title)) },
                     onValueChange = onWordUpdate,
                     colors = textFieldColors,
                     trailingIcon = {
                         statusIcon?.let {
-                            Icon(
-                                imageVector = statusIcon,
-                                contentDescription = null,
-                                tint = iconColor
-                            )
+                            IconButton(
+                                onClick = {
+                                    if (statusIcon == Icons.Outlined.Cancel)
+                                        onWordClear()
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = statusIcon,
+                                    contentDescription = stringResource(R.string.status_icon_description),
+                                    tint = iconColor
+                                )
+                            }
                         }
                     },
                     singleLine = true,
@@ -350,6 +368,7 @@ private fun Word(
                 )
                 MyVocaText(
                     text = stringResource(R.string.this_word_has_already_been_registerd),
+                    modifier = Modifier.padding(start = 16.dp, top = 4.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = duplicateTextColor
                 )
@@ -378,9 +397,16 @@ private fun Meanings(
     onMeaningDelete: (Int) -> Unit
 ) {
     Column {
-        MeaningChips(onMeaningAdd = onMeaningAdd)
+        MeaningChips(
+            onMeaningAdd = onMeaningAdd
+        )
         if (meanings.isEmpty()) {
-            MeaningsEmptyIndicator()
+            MeaningsEmptyIndicator(
+                modifier = Modifier
+                    .height(meaningHeight)
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+            )
         } else {
             MeaningsContent(
                 meanings = meanings,
@@ -397,29 +423,36 @@ private val meaningHeight = 210.dp
 private fun MeaningChips(
     onMeaningAdd: (WordClassImpl) -> Unit
 ) {
-    StaggeredGrid {
-        WordClassImpl.actualValues().forEach { wordClass ->
-            WordClassChip(wordClass = wordClass, onMeaningAdd = onMeaningAdd)
+    LazyRow {
+        items(
+            items = WordClassImpl.actualValues(),
+            key = { it.korean },
+        ) {
+            WordClassChip(
+                wordClass = it,
+                onMeaningAdd = onMeaningAdd
+            )
         }
     }
 }
 
 @Composable
 private fun WordClassChip(
+    modifier: Modifier = Modifier,
     wordClass: WordClassImpl,
     onMeaningAdd: (WordClassImpl) -> Unit
 ) {
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .clickable { onMeaningAdd(wordClass) }
             .padding(4.dp),
-        shape = RoundedCornerShape(50),
-        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary)
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.primaryContainer,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimaryContainer)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(end = 10.dp)
+            modifier = Modifier.padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)
         ) {
             WordClassChipIcon(
                 onMeaningAdd = onMeaningAdd,
@@ -432,12 +465,13 @@ private fun WordClassChip(
 
 @Composable
 private fun WordClassChipIcon(
+    modifier: Modifier = Modifier,
     onMeaningAdd: (WordClassImpl) -> Unit,
     wordClass: WordClassImpl
 ) {
     IconButton(
         onClick = { onMeaningAdd(wordClass) },
-        modifier = Modifier
+        modifier = modifier
             .size(30.dp)
             .background(
                 color = Color.Transparent,
@@ -452,32 +486,32 @@ private fun WordClassChipIcon(
 }
 
 @Composable
-private fun WordClassChipText(wordClass: WordClassImpl) {
+private fun WordClassChipText(
+    modifier: Modifier = Modifier,
+    wordClass: WordClassImpl
+) {
     MyVocaText(
         text = wordClass.korean,
-        modifier = Modifier.padding(end = 4.dp)
+        modifier = modifier.padding(end = 4.dp)
     )
 }
 
 @Composable
-private fun MeaningsEmptyIndicator() {
-    Box(
-        modifier = Modifier
-            .height(meaningHeight)
-            .fillMaxWidth()
-    ) {
+private fun MeaningsEmptyIndicator(
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier) {
         Row(
-            modifier = Modifier.align(Alignment.Center),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 16.dp),
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Add,
-                contentDescription = null
-            )
             MyVocaText(
                 text = stringResource(R.string.please_add_a_meaning),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -525,15 +559,17 @@ private fun Meaning(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextField(
+        OutlinedTextField(
             modifier = Modifier.weight(1f),
             value = meaning.content,
             label = {
-                MyVocaText(text = stringResource(
-                    R.string.index_meaning_type_korean,
-                    index + 1,
-                    meaning.type.korean
-                ))
+                MyVocaText(
+                    text = stringResource(
+                        R.string.index_meaning_type_korean,
+                        index + 1,
+                        meaning.type.korean
+                    )
+                )
             },
             colors = textFieldColors,
             onValueChange = {
@@ -544,8 +580,8 @@ private fun Meaning(
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
         )
         IconButton(onClick = { onMeaningDelete(index) }) {
-            Icon(
-                imageVector = Icons.Outlined.Close,
+            Image(
+                painter = painterResource(R.drawable.baseline_delete_outline_24),
                 contentDescription = stringResource(R.string.delete_the_meaning, meaning.content)
             )
         }
@@ -565,7 +601,7 @@ private fun Memo(
         errorContainerColor = Color.Transparent
     )
 
-    TextField(
+    OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         value = memo,
         label = {
@@ -591,8 +627,8 @@ private fun Memo(
 @Composable
 private fun getWordStatusIcon(status: WordExistStatus): ImageVector? {
     return when (status) {
-        WordExistStatus.NOT_EXISTS -> Icons.Outlined.CheckCircle
-        WordExistStatus.DUPLICATE -> Icons.Outlined.ErrorOutline
+        WordExistStatus.NOT_EXISTS -> Icons.Outlined.Cancel
+        WordExistStatus.DUPLICATE -> Icons.Outlined.Error
         WordExistStatus.LOADING -> Icons.Outlined.HourglassFull
         WordExistStatus.WORD_EMPTY -> null
     }
@@ -601,10 +637,9 @@ private fun getWordStatusIcon(status: WordExistStatus): ImageVector? {
 @Composable
 private fun getWordStatusIconColor(status: WordExistStatus): Color {
     return when (status) {
-        WordExistStatus.NOT_EXISTS -> MaterialTheme.colorScheme.primary
+        WordExistStatus.NOT_EXISTS -> MaterialTheme.colorScheme.onSurfaceVariant
         WordExistStatus.DUPLICATE -> MaterialTheme.colorScheme.error
-        // TODO M3 migration
-        else -> LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+        else -> Color.Transparent
     }
 }
 
@@ -617,6 +652,7 @@ private fun AddWordScreenPreview() {
             Content(data = data,
                 loadStatus = {},
                 onWordUpdate = {},
+                onWordClear = {},
                 onMeaningAdd = {},
                 onMeaningUpdate = { _, _ -> },
                 onMeaningDelete = {},
@@ -653,7 +689,8 @@ private fun TopBarPreview() {
             onAddWord = { buttonEnabled = !buttonEnabled },
             showWebView = false,
             onHideWebView = {},
-            onClose = {}
+            onClose = {},
+            elevation = 16.dp
         )
     }
 }
