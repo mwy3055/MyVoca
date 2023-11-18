@@ -61,10 +61,10 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun AddWordScreen(
+    updateWordId: Int,
+    onClose: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AddWordViewModel = hiltViewModel(),
-    updateWordId: Int,
-    onClose: () -> Unit = {}
 ) {
     SystemBarColor(systemBarColor = MaterialTheme.colorScheme.surface)
     LaunchedEffect(key1 = true) {
@@ -83,6 +83,7 @@ fun AddWordScreen(
     }
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopBar(
                 screenType = uiState.screenType,
@@ -96,7 +97,7 @@ fun AddWordScreen(
         }
     ) { innerPadding ->
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
@@ -241,7 +242,6 @@ private fun TopBarCompleteButton(
 
 @Composable
 private fun Content(
-    modifier: Modifier = Modifier,
     data: AddWordScreenData,
     loadStatus: suspend (String) -> Unit,
     onWordUpdate: (String) -> Unit,
@@ -252,7 +252,8 @@ private fun Content(
     onMeaningDelete: (Int) -> Unit,
     onMemoUpdate: (String) -> Unit,
     onShowWebView: () -> Unit,
-    onUpdateWebViewUrl: () -> Unit
+    onUpdateWebViewUrl: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
@@ -309,7 +310,6 @@ private fun OptionalTitle() {
 
 @Composable
 private fun Word(
-    modifier: Modifier = Modifier,
     word: String,
     status: WordExistStatus,
     loadStatus: suspend (String) -> Unit,
@@ -317,6 +317,7 @@ private fun Word(
     onWordClear: () -> Unit,
     onShowWebView: () -> Unit,
     onUpdateWebViewUrl: () -> Unit,
+    modifier: Modifier = Modifier,
     focusManager: FocusManager = LocalFocusManager.current
 ) {
     LaunchedEffect(word) {
@@ -333,13 +334,14 @@ private fun Word(
     val iconColor = getWordStatusIconColor(status)
 
     Column(
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
-                modifier = modifier.weight(1f)
+                modifier = Modifier.weight(1f)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -459,9 +461,9 @@ private fun MeaningChips(
 
 @Composable
 private fun WordClassChip(
-    modifier: Modifier = Modifier,
     wordClass: WordClassImpl,
-    onMeaningAdd: (WordClassImpl) -> Unit
+    onMeaningAdd: (WordClassImpl) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier = modifier.padding(4.dp),
@@ -490,9 +492,9 @@ private fun WordClassChip(
 
 @Composable
 private fun WordClassChipIcon(
-    modifier: Modifier = Modifier,
     onMeaningAdd: (WordClassImpl) -> Unit,
-    wordClass: WordClassImpl
+    wordClass: WordClassImpl,
+    modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = { onMeaningAdd(wordClass) },
@@ -512,8 +514,8 @@ private fun WordClassChipIcon(
 
 @Composable
 private fun WordClassChipText(
+    wordClass: WordClassImpl,
     modifier: Modifier = Modifier,
-    wordClass: WordClassImpl
 ) {
     MyVocaText(
         text = wordClass.korean,
@@ -544,12 +546,12 @@ private fun MeaningsEmptyIndicator(
 
 @Composable
 private fun MeaningsContent(
-    modifier: Modifier = Modifier,
     meanings: ImmutableList<MeaningImpl>,
     statusList: ImmutableList<MeaningExistStatus>,
     onMeaningCheck: (Int, MeaningImpl) -> Unit,
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
-    onMeaningDelete: (Int) -> Unit
+    onMeaningDelete: (Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
     Column(
@@ -573,13 +575,13 @@ private fun MeaningsContent(
 
 @Composable
 private fun Meaning(
-    modifier: Modifier = Modifier,
     index: Int,
     meaning: MeaningImpl,
     statusList: ImmutableList<MeaningExistStatus>,
     onMeaningCheck: (Int, MeaningImpl) -> Unit,
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
-    onMeaningDelete: (Int) -> Unit
+    onMeaningDelete: (Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     LaunchedEffect(meaning) {
         onMeaningCheck(index, meaning)
