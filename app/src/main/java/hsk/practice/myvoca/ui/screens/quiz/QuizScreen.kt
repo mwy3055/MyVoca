@@ -3,12 +3,19 @@
 package hsk.practice.myvoca.ui.screens.quiz
 
 import android.content.Intent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
@@ -17,11 +24,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hsk.ktx.distinctRandoms
@@ -40,6 +50,7 @@ import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
+// TODO 중복으로 선택지가 나오는 경우를 제거 해야 함
 @Composable
 fun QuizScreen(
     viewModel: QuizViewModel = hiltViewModel()
@@ -59,7 +70,9 @@ private fun Loading(
     onOptionClick: (Int) -> Unit,
     onCloseDialog: (QuizResultData) -> Unit
 ) {
-    Box(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
+    Box(
+        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+    ) {
         when (quizScreenData.quizState) {
             is QuizAvailable -> {
                 QuizContent(
@@ -100,19 +113,34 @@ private fun QuizNotAvailable(need: Int) {
     ) {
         MyVocaText(
             text = stringResource(R.string.need_more_words, need),
+            color = Color.Black,
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center
         )
-        TextButton(onClick = {
-            context.startActivity(
-                Intent(context, AddWordActivity::class.java)
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = {
+                context.startActivity(
+                    Intent(context, AddWordActivity::class.java)
+                )
+            },
+            border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline),
+            colors = ButtonColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary,
+                disabledContainerColor = MaterialTheme.colorScheme.surface,
+                disabledContentColor = MaterialTheme.colorScheme.primary
             )
-        }) {
+        ) {
             Icon(
                 imageVector = Icons.Outlined.Add,
                 contentDescription = stringResource(R.string.click_to_add_word)
             )
-            MyVocaText(text = stringResource(R.string.go_to_add_word))
+            MyVocaText(
+                text = stringResource(R.string.go_to_add_word),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
@@ -127,11 +155,11 @@ private fun QuizContent(
         rememberVersusViewState(leftValue = quizStat.correct, rightValue = quizStat.wrong)
     Column(
         modifier = Modifier
-            .padding(16.dp)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .padding(start = 16.dp, end = 16.dp, bottom = 32.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Spacer(modifier = Modifier.weight(2f))
+        Spacer(modifier = Modifier.weight(1f))
         QuizTitle(quiz.answer)
         Spacer(modifier = Modifier.weight(1f))
         QuizOptions(
@@ -142,7 +170,7 @@ private fun QuizContent(
         VersusView(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .height(50.dp),
             versusViewState = versusViewState
         )
     }
@@ -195,13 +223,25 @@ private fun QuizOption(
     option: VocabularyImpl,
     onOptionClick: (Int) -> Unit
 ) {
-    Box(
+    Card(
         modifier = modifier
-            .clickable(onClick = { onOptionClick(index) })
-            .padding(4.dp),
-    ) {
+            .clickable(onClick = { onOptionClick(index) }),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer
+        ),
+        elevation = CardDefaults.cardElevation(4.dp),
+
+        ) {
         CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.titleLarge) {
-            WordMeanings(meanings = option.meaning.truncate(2).toImmutableList())
+            Box(
+                modifier = modifier.padding(vertical = 12.dp, horizontal = 16.dp),
+            ) {
+                WordMeanings(meanings = option.meaning.truncate(2).toImmutableList())
+            }
         }
     }
 }
@@ -211,9 +251,9 @@ private fun Result(
     resultData: QuizResultData,
     onCloseDialog: (QuizResultData) -> Unit
 ) {
-    val title = if (resultData.result is QuizCorrect) stringResource(R.string.correct) else stringResource(
-        R.string.incorrect
-    )
+    val title = if (resultData.result is QuizCorrect) stringResource(R.string.correct)
+    else stringResource(R.string.incorrect)
+
     AlertDialog(
         title = {
             MyVocaText(text = title)
@@ -228,12 +268,19 @@ private fun Result(
                     .fillMaxWidth(),
                 contentAlignment = Alignment.CenterEnd
             ) {
-                TextButton(onClick = { onCloseDialog(resultData) }) {
-                    MyVocaText(text = stringResource(id = R.string.check))
+                TextButton(
+                    onClick = { onCloseDialog(resultData) }
+                ) {
+                    MyVocaText(
+                        text = stringResource(id = R.string.check),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 16.sp
+                    )
                 }
             }
         },
-        onDismissRequest = { onCloseDialog(resultData) }
+        onDismissRequest = { onCloseDialog(resultData) },
+        containerColor = MaterialTheme.colorScheme.primaryContainer
     )
 }
 
