@@ -93,30 +93,74 @@ class AddWordViewModel @Inject constructor(
         updateUiState(wordExistStatus = exists)
     }
 
+    fun onMeaningCheck(index: Int, newMeaning: MeaningImpl) {
+        val currentMeanings = uiStateFlow.value.meanings
+        val currentStatusList = applyToMeaningStatuses {
+            if (index != -1) {
+                if (newMeaning.content.isEmpty()) {
+                    this[index] = MeaningExistStatus.MEANING_EMPTY
+                } else {
+                    val exists = if (currentMeanings.subList(0, index).contains(newMeaning)) {
+                        MeaningExistStatus.DUPLICATE
+                    } else {
+                        MeaningExistStatus.NOT_EXISTS
+                    }
+                    this[index] = exists
+                }
+            }
+        }
+        updateUiState(meaningExistStatuses = currentStatusList)
+    }
+
     fun onMeaningAdd(type: WordClassImpl) {
         val newMeanings = applyToMeanings {
             add(MeaningImpl(type, ""))
         }
-        updateUiState(meanings = newMeanings)
+        val newStatusList = applyToMeaningStatuses {
+            add(MeaningExistStatus.NOT_EXISTS)
+        }
+        updateUiState(
+            meanings = newMeanings,
+            meaningExistStatuses = newStatusList
+        )
     }
 
     fun onMeaningUpdate(index: Int, meaning: MeaningImpl) {
         val newMeanings = applyToMeanings {
             this[index] = meaning
         }
-        updateUiState(meanings = newMeanings)
+        val newStatusList = applyToMeaningStatuses {
+            this[index] = if (meaning.content.isEmpty()) MeaningExistStatus.MEANING_EMPTY
+            else MeaningExistStatus.NOT_EXISTS
+        }
+
+        updateUiState(
+            meanings = newMeanings,
+            meaningExistStatuses = newStatusList
+        )
     }
 
     fun onMeaningDelete(index: Int) {
         val newMeanings = applyToMeanings {
             removeAt(index)
         }
-        updateUiState(meanings = newMeanings)
+        val newStatuses = applyToMeaningStatuses {
+            removeAt(index)
+        }
+        updateUiState(
+            meanings = newMeanings,
+            meaningExistStatuses = newStatuses
+        )
     }
 
     private fun applyToMeanings(block: MutableList<MeaningImpl>.() -> Unit): ImmutableList<MeaningImpl> {
         val meanings = uiStateFlow.value.meanings.toMutableList()
         return meanings.apply { block() }.toImmutableList()
+    }
+
+    private fun applyToMeaningStatuses(block: MutableList<MeaningExistStatus>.() -> Unit): ImmutableList<MeaningExistStatus> {
+        val meaningExistStatuses = uiStateFlow.value.meaningExistStatuses.toMutableList()
+        return meaningExistStatuses.apply { block() }.toImmutableList()
     }
 
     fun onMemoUpdate(memo: String) {
@@ -169,6 +213,7 @@ class AddWordViewModel @Inject constructor(
         word: String = uiStateFlow.value.word,
         wordExistStatus: WordExistStatus = uiStateFlow.value.wordExistStatus,
         meanings: ImmutableList<MeaningImpl> = uiStateFlow.value.meanings,
+        meaningExistStatuses: ImmutableList<MeaningExistStatus> = uiStateFlow.value.meaningExistStatuses,
         memo: String = uiStateFlow.value.memo,
         showWebView: Boolean = uiStateFlow.value.showWebView,
         webViewUrl: UiText = uiStateFlow.value.webViewUrl
@@ -178,6 +223,7 @@ class AddWordViewModel @Inject constructor(
             word = word,
             wordExistStatus = wordExistStatus,
             meanings = meanings,
+            meaningExistStatuses = meaningExistStatuses,
             memo = memo,
             showWebView = showWebView,
             webViewUrl = webViewUrl
@@ -197,11 +243,19 @@ enum class WordExistStatus {
     WORD_EMPTY
 }
 
+enum class MeaningExistStatus {
+    NOT_EXISTS,
+    DUPLICATE,
+    LOADING,
+    MEANING_EMPTY
+}
+
 data class AddWordScreenData(
     val screenType: ScreenType = AddWord,
     val word: String = "",
     val wordExistStatus: WordExistStatus = WordExistStatus.WORD_EMPTY,
     val meanings: ImmutableList<MeaningImpl> = persistentListOf(),
+    val meaningExistStatuses: ImmutableList<MeaningExistStatus> = persistentListOf(),
     val memo: String = "",
     val showWebView: Boolean = false,
     val webViewUrl: UiText = UiText.DirectString(""),
@@ -221,5 +275,6 @@ data class AddWordScreenData(
         get() = word.isNotEmpty() &&
                 meanings.isNotEmpty() &&
                 meanings.all { it.content.isNotEmpty() } &&
-                wordExistStatus == WordExistStatus.NOT_EXISTS
+                wordExistStatus == WordExistStatus.NOT_EXISTS &&
+                meaningExistStatuses.all { it == MeaningExistStatus.NOT_EXISTS }
 }

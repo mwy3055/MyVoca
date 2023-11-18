@@ -166,11 +166,12 @@
     <string name="add_meaning">%1$s 뜻을 추가합니다.</string>
     <string name="please_add_a_meaning">뜻을 추가해 보세요</string>
     <string name="delete_the_meaning">%1$s 뜻을 삭제합니다.</string>
+    <string name="this_meaning_has_already_been_registerd">중복된 뜻이 있습니다.</string>
     <string name="memo">메모</string>
     <string name="clear_english_text">영어 텍스트를 지웁니다.</string>
     <string name="close_the_screen">화면을 닫습니다.</string>
     <string name="search_for_word">단어를 검색합니다.</string>
-    <string name="index_meaning_type_korean">%1$s. %2$s</string>
+    <string name="index_meaning_type_korean">%1$s %2$s</string>
     <string name="web_view_url">https://dict.naver.com/dict.search?query=%1$s</string>
     <string name="status_icon_description">Status Icon Description</string>
 

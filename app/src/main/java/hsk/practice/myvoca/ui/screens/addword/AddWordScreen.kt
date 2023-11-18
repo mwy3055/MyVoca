@@ -57,6 +57,7 @@ import hsk.practice.myvoca.ui.components.MyVocaText
 import hsk.practice.myvoca.ui.components.SystemBarColor
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun AddWordScreen(
@@ -106,6 +107,7 @@ fun AddWordScreen(
                 onMeaningAdd = viewModel::onMeaningAdd,
                 onWordUpdate = viewModel::onWordUpdate,
                 onWordClear = viewModel::onWordClear,
+                onMeaningCheck = viewModel::onMeaningCheck,
                 onMeaningUpdate = viewModel::onMeaningUpdate,
                 onMeaningDelete = viewModel::onMeaningDelete,
                 onMemoUpdate = viewModel::onMemoUpdate,
@@ -245,6 +247,7 @@ private fun Content(
     loadStatus: suspend (String) -> Unit,
     onWordUpdate: (String) -> Unit,
     onWordClear: () -> Unit,
+    onMeaningCheck: (Int, MeaningImpl) -> Unit,
     onMeaningAdd: (WordClassImpl) -> Unit,
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
     onMeaningDelete: (Int) -> Unit,
@@ -271,6 +274,8 @@ private fun Content(
         )
         Meanings(
             meanings = data.meanings,
+            statusList = data.meaningExistStatuses,
+            onMeaningCheck = onMeaningCheck,
             onMeaningAdd = onMeaningAdd,
             onMeaningUpdate = onMeaningUpdate,
             onMeaningDelete = onMeaningDelete
@@ -302,6 +307,7 @@ private fun OptionalTitle() {
 
 @Composable
 private fun Word(
+    modifier: Modifier = Modifier,
     word: String,
     status: WordExistStatus,
     loadStatus: suspend (String) -> Unit,
@@ -331,7 +337,7 @@ private fun Word(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = modifier.weight(1f)
             ) {
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
@@ -391,7 +397,10 @@ private fun Word(
 
 @Composable
 private fun Meanings(
+    modifier: Modifier = Modifier,
     meanings: ImmutableList<MeaningImpl>,
+    statusList: ImmutableList<MeaningExistStatus>,
+    onMeaningCheck: (Int, MeaningImpl) -> Unit,
     onMeaningAdd: (WordClassImpl) -> Unit,
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
     onMeaningDelete: (Int) -> Unit
@@ -400,16 +409,18 @@ private fun Meanings(
         MeaningChips(
             onMeaningAdd = onMeaningAdd
         )
+        Spacer(modifier = Modifier.height(16.dp))
         if (meanings.isEmpty()) {
             MeaningsEmptyIndicator(
-                modifier = Modifier
+                modifier = modifier
                     .height(meaningHeight)
                     .fillMaxWidth()
-                    .padding(top = 16.dp)
             )
         } else {
             MeaningsContent(
                 meanings = meanings,
+                statusList = statusList,
+                onMeaningCheck = onMeaningCheck,
                 onMeaningUpdate = onMeaningUpdate,
                 onMeaningDelete = onMeaningDelete
             )
@@ -519,13 +530,16 @@ private fun MeaningsEmptyIndicator(
 
 @Composable
 private fun MeaningsContent(
+    modifier: Modifier = Modifier,
     meanings: ImmutableList<MeaningImpl>,
+    statusList: ImmutableList<MeaningExistStatus>,
+    onMeaningCheck: (Int, MeaningImpl) -> Unit,
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
     onMeaningDelete: (Int) -> Unit
 ) {
     val scrollState = rememberScrollState()
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(meaningHeight)
             .verticalScroll(scrollState)
@@ -534,6 +548,8 @@ private fun MeaningsContent(
             Meaning(
                 index = index,
                 meaning = meaning,
+                statusList = statusList,
+                onMeaningCheck = onMeaningCheck,
                 onMeaningUpdate = onMeaningUpdate,
                 onMeaningDelete = onMeaningDelete
             )
@@ -543,11 +559,18 @@ private fun MeaningsContent(
 
 @Composable
 private fun Meaning(
+    modifier: Modifier = Modifier,
     index: Int,
     meaning: MeaningImpl,
+    statusList: ImmutableList<MeaningExistStatus>,
+    onMeaningCheck: (Int, MeaningImpl) -> Unit,
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
     onMeaningDelete: (Int) -> Unit
 ) {
+    LaunchedEffect(meaning) {
+        onMeaningCheck(index, meaning)
+    }
+
     val focusManager = LocalFocusManager.current
     val textFieldColors = TextFieldDefaults.colors(
         focusedContainerColor = Color.Transparent,
@@ -555,30 +578,71 @@ private fun Meaning(
         disabledContainerColor = Color.Transparent,
         errorContainerColor = Color.Transparent
     )
+    val statusIcon = getMeaningStatusIcon(statusList[index])
+    val iconColor = getMeaningStatusIconColor(statusList[index])
+
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        OutlinedTextField(
-            modifier = Modifier.weight(1f),
-            value = meaning.content,
-            label = {
-                MyVocaText(
-                    text = stringResource(
-                        R.string.index_meaning_type_korean,
-                        index + 1,
-                        meaning.type.korean
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .height(84.dp)
+        ) {
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                value = meaning.content,
+                label = {
+                    MyVocaText(
+                        text = stringResource(
+                            R.string.index_meaning_type_korean,
+                            index + 1,
+                            meaning.type.korean
+                        )
                     )
+                },
+                trailingIcon = {
+                    statusIcon?.let {
+                        IconButton(
+                            onClick = {
+                                if (statusIcon == Icons.Outlined.Cancel)
+                                    onMeaningUpdate(index, meaning.copy(content = ""))
+                            }
+                        ) {
+                            Icon(
+                                imageVector = statusIcon,
+                                contentDescription = stringResource(R.string.status_icon_description),
+                                tint = iconColor
+                            )
+                        }
+                    }
+                },
+                colors = textFieldColors,
+                onValueChange = {
+                    onMeaningUpdate(index, meaning.copy(content = it))
+                },
+                singleLine = true,
+                isError = (statusList[index] == MeaningExistStatus.DUPLICATE),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }
                 )
-            },
-            colors = textFieldColors,
-            onValueChange = {
-                onMeaningUpdate(index, meaning.copy(content = it))
-            },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
-        )
+            )
+            val duplicateTextColor by animateColorAsState(
+                targetValue = if (statusList[index] == MeaningExistStatus.DUPLICATE) iconColor else Color.Transparent,
+                animationSpec = tween(
+                    durationMillis = 300,
+                )
+            )
+            MyVocaText(
+                text = stringResource(R.string.this_meaning_has_already_been_registerd),
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp),
+                style = MaterialTheme.typography.bodySmall,
+                color = duplicateTextColor
+            )
+        }
         IconButton(onClick = { onMeaningDelete(index) }) {
             Image(
                 painter = painterResource(R.drawable.baseline_delete_outline_24),
@@ -590,6 +654,7 @@ private fun Meaning(
 
 @Composable
 private fun Memo(
+    modifier: Modifier = Modifier,
     memo: String,
     onMemoUpdate: (String) -> Unit
 ) {
@@ -602,7 +667,7 @@ private fun Memo(
     )
 
     OutlinedTextField(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         value = memo,
         label = {
             MyVocaText(text = stringResource(R.string.memo))
@@ -643,6 +708,25 @@ private fun getWordStatusIconColor(status: WordExistStatus): Color {
     }
 }
 
+@Composable
+private fun getMeaningStatusIcon(status: MeaningExistStatus): ImageVector? {
+    return when (status) {
+        MeaningExistStatus.NOT_EXISTS -> Icons.Outlined.Cancel
+        MeaningExistStatus.DUPLICATE -> Icons.Outlined.Error
+        MeaningExistStatus.LOADING -> Icons.Outlined.HourglassFull
+        MeaningExistStatus.MEANING_EMPTY -> null
+    }
+}
+
+@Composable
+private fun getMeaningStatusIconColor(status: MeaningExistStatus): Color {
+    return when (status) {
+        MeaningExistStatus.NOT_EXISTS -> MaterialTheme.colorScheme.onSurfaceVariant
+        MeaningExistStatus.DUPLICATE -> MaterialTheme.colorScheme.error
+        else -> Color.Transparent
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun AddWordScreenPreview() {
@@ -653,6 +737,7 @@ private fun AddWordScreenPreview() {
                 loadStatus = {},
                 onWordUpdate = {},
                 onWordClear = {},
+                onMeaningCheck = { _, _ -> },
                 onMeaningAdd = {},
                 onMeaningUpdate = { _, _ -> },
                 onMeaningDelete = {},
@@ -672,6 +757,8 @@ private fun MeaningPreview() {
         Meaning(
             index = 0,
             meaning = meaning,
+            statusList = persistentListOf(),
+            onMeaningCheck = { _, _ -> },
             onMeaningUpdate = { _, _ -> },
             onMeaningDelete = {}
         )
