@@ -99,7 +99,6 @@ fun AddWordScreen(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
         ) {
             Content(
                 data = uiState,
@@ -259,8 +258,8 @@ private fun Content(
         modifier = modifier
             .fillMaxHeight(if (data.showWebView) 0.5f else 1f)
             .fillMaxWidth()
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .verticalScroll(rememberScrollState())
+            .padding(top = 16.dp, start = 16.dp)
     ) {
         EssentialTitle()
         Word(
@@ -284,7 +283,10 @@ private fun Content(
         OptionalTitle()
         Memo(
             memo = data.memo,
-            onMemoUpdate = onMemoUpdate
+            onMemoUpdate = onMemoUpdate,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 16.dp)
         )
     }
 }
@@ -339,33 +341,50 @@ private fun Word(
             Column(
                 modifier = modifier.weight(1f)
             ) {
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = word,
-                    label = { MyVocaText(text = stringResource(R.string.input_title)) },
-                    onValueChange = onWordUpdate,
-                    colors = textFieldColors,
-                    trailingIcon = {
-                        statusIcon?.let {
-                            IconButton(
-                                onClick = {
-                                    if (statusIcon == Icons.Outlined.Cancel)
-                                        onWordClear()
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier.weight(1f),
+                        value = word,
+                        label = { MyVocaText(text = stringResource(R.string.input_title)) },
+                        onValueChange = onWordUpdate,
+                        colors = textFieldColors,
+                        trailingIcon = {
+                            statusIcon?.let {
+                                IconButton(
+                                    onClick = {
+                                        if (statusIcon == Icons.Outlined.Cancel)
+                                            onWordClear()
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = statusIcon,
+                                        contentDescription = stringResource(R.string.status_icon_description),
+                                        tint = iconColor
+                                    )
                                 }
-                            ) {
-                                Icon(
-                                    imageVector = statusIcon,
-                                    contentDescription = stringResource(R.string.status_icon_description),
-                                    tint = iconColor
-                                )
                             }
-                        }
-                    },
-                    singleLine = true,
-                    isError = (status == WordExistStatus.DUPLICATE),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
-                )
+                        },
+                        singleLine = true,
+                        isError = (status == WordExistStatus.DUPLICATE),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
+                    )
+                    IconButton(
+                        onClick = {
+                            focusManager.clearFocus()
+                            onShowWebView()
+                            onUpdateWebViewUrl()
+                        },
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = stringResource(R.string.search_for_word),
+                        )
+                    }
+                }
                 val duplicateTextColor by animateColorAsState(
                     targetValue = if (status == WordExistStatus.DUPLICATE) iconColor else Color.Transparent,
                     animationSpec = tween(
@@ -379,42 +398,33 @@ private fun Word(
                     color = duplicateTextColor
                 )
             }
-            IconButton(
-                onClick = {
-                    focusManager.clearFocus()
-                    onShowWebView()
-                    onUpdateWebViewUrl()
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = stringResource(R.string.search_for_word),
-                )
-            }
         }
     }
 }
 
 @Composable
 private fun Meanings(
-    modifier: Modifier = Modifier,
     meanings: ImmutableList<MeaningImpl>,
     statusList: ImmutableList<MeaningExistStatus>,
     onMeaningCheck: (Int, MeaningImpl) -> Unit,
     onMeaningAdd: (WordClassImpl) -> Unit,
     onMeaningUpdate: (Int, MeaningImpl) -> Unit,
-    onMeaningDelete: (Int) -> Unit
+    onMeaningDelete: (Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         MeaningChips(
             onMeaningAdd = onMeaningAdd
         )
         Spacer(modifier = Modifier.height(16.dp))
         if (meanings.isEmpty()) {
             MeaningsEmptyIndicator(
-                modifier = modifier
+                modifier = Modifier
                     .height(meaningHeight)
                     .fillMaxWidth()
+                    .padding(end = 16.dp)
             )
         } else {
             MeaningsContent(
@@ -454,22 +464,26 @@ private fun WordClassChip(
     onMeaningAdd: (WordClassImpl) -> Unit
 ) {
     Surface(
-        modifier = modifier
-            .clickable { onMeaningAdd(wordClass) }
-            .padding(4.dp),
+        modifier = modifier.padding(4.dp),
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.primaryContainer,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimaryContainer)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable { onMeaningAdd(wordClass) }
         ) {
-            WordClassChipIcon(
-                onMeaningAdd = onMeaningAdd,
-                wordClass = wordClass
-            )
-            WordClassChipText(wordClass = wordClass)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Add,
+                    contentDescription = stringResource(R.string.add_icon_description)
+                )
+                WordClassChipText(wordClass = wordClass)
+            }
         }
     }
 }
@@ -491,7 +505,7 @@ private fun WordClassChipIcon(
     ) {
         Icon(
             imageVector = Icons.Outlined.Add,
-            contentDescription = stringResource(R.string.add_meaning, wordClass)
+            contentDescription = stringResource(R.string.add_icon_description, wordClass)
         )
     }
 }
@@ -590,46 +604,62 @@ private fun Meaning(
                 .weight(1f)
                 .height(84.dp)
         ) {
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                value = meaning.content,
-                label = {
-                    MyVocaText(
-                        text = stringResource(
-                            R.string.index_meaning_type_korean,
-                            index + 1,
-                            meaning.type.korean
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    value = meaning.content,
+                    label = {
+                        MyVocaText(
+                            text = stringResource(
+                                R.string.index_meaning_type_korean,
+                                index + 1,
+                                meaning.type.korean
+                            )
+                        )
+                    },
+                    trailingIcon = {
+                        statusIcon?.let {
+                            IconButton(
+                                onClick = {
+                                    if (statusIcon == Icons.Outlined.Cancel)
+                                        onMeaningUpdate(index, meaning.copy(content = ""))
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = statusIcon,
+                                    contentDescription = stringResource(R.string.status_icon_description),
+                                    tint = iconColor
+                                )
+                            }
+                        }
+                    },
+                    colors = textFieldColors,
+                    onValueChange = {
+                        onMeaningUpdate(index, meaning.copy(content = it))
+                    },
+                    singleLine = true,
+                    isError = (statusList[index] == MeaningExistStatus.DUPLICATE),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }
+                    )
+                )
+                IconButton(
+                    onClick = { onMeaningDelete(index) },
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.baseline_delete_outline_24),
+                        contentDescription = stringResource(
+                            R.string.delete_the_meaning,
+                            meaning.content
                         )
                     )
-                },
-                trailingIcon = {
-                    statusIcon?.let {
-                        IconButton(
-                            onClick = {
-                                if (statusIcon == Icons.Outlined.Cancel)
-                                    onMeaningUpdate(index, meaning.copy(content = ""))
-                            }
-                        ) {
-                            Icon(
-                                imageVector = statusIcon,
-                                contentDescription = stringResource(R.string.status_icon_description),
-                                tint = iconColor
-                            )
-                        }
-                    }
-                },
-                colors = textFieldColors,
-                onValueChange = {
-                    onMeaningUpdate(index, meaning.copy(content = it))
-                },
-                singleLine = true,
-                isError = (statusList[index] == MeaningExistStatus.DUPLICATE),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }
-                )
-            )
+                }
+            }
             val duplicateTextColor by animateColorAsState(
                 targetValue = if (statusList[index] == MeaningExistStatus.DUPLICATE) iconColor else Color.Transparent,
                 animationSpec = tween(
@@ -643,20 +673,15 @@ private fun Meaning(
                 color = duplicateTextColor
             )
         }
-        IconButton(onClick = { onMeaningDelete(index) }) {
-            Image(
-                painter = painterResource(R.drawable.baseline_delete_outline_24),
-                contentDescription = stringResource(R.string.delete_the_meaning, meaning.content)
-            )
-        }
+
     }
 }
 
 @Composable
 private fun Memo(
-    modifier: Modifier = Modifier,
     memo: String,
-    onMemoUpdate: (String) -> Unit
+    onMemoUpdate: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
     val textFieldColors = TextFieldDefaults.colors(
@@ -667,7 +692,7 @@ private fun Memo(
     )
 
     OutlinedTextField(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         value = memo,
         label = {
             MyVocaText(text = stringResource(R.string.memo))
