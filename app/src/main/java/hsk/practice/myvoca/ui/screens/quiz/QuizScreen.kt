@@ -52,6 +52,7 @@ import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun QuizScreen(
+    modifier: Modifier = Modifier,
     viewModel: QuizViewModel = hiltViewModel()
 ) {
     val quizScreenData by viewModel.quizScreenData.collectAsStateWithLifecycle()
@@ -59,7 +60,8 @@ fun QuizScreen(
     Loading(
         quizScreenData = quizScreenData,
         onOptionClick = viewModel::onQuizOptionSelected,
-        onCloseDialog = viewModel::onResultDialogClose
+        onCloseDialog = viewModel::onResultDialogClose,
+        modifier = modifier
     )
 }
 
@@ -67,10 +69,11 @@ fun QuizScreen(
 private fun Loading(
     quizScreenData: QuizScreenData,
     onOptionClick: (Int) -> Unit,
-    onCloseDialog: (QuizResultData) -> Unit
+    onCloseDialog: (QuizResultData) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+        modifier = modifier.background(MaterialTheme.colorScheme.surface)
     ) {
         when (quizScreenData.quizState) {
             is QuizAvailable -> {
@@ -103,10 +106,13 @@ private fun Loading(
 }
 
 @Composable
-private fun QuizNotAvailable(need: Int) {
+private fun QuizNotAvailable(
+    need: Int,
+    modifier: Modifier = Modifier,
+) {
     val context = LocalContext.current
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -148,12 +154,13 @@ private fun QuizNotAvailable(need: Int) {
 private fun QuizContent(
     quiz: Quiz,
     quizStat: QuizStat,
-    onOptionClick: (Int) -> Unit
+    onOptionClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val versusViewState =
         rememberVersusViewState(leftValue = quizStat.correct, rightValue = quizStat.wrong)
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(start = 16.dp, end = 16.dp, bottom = 32.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -176,11 +183,14 @@ private fun QuizContent(
 }
 
 @Composable
-private fun QuizTitle(answer: VocabularyImpl) {
+private fun QuizTitle(
+    answer: VocabularyImpl,
+    modifier: Modifier = Modifier,
+) {
     // Reduce text size when overflow
     val textStyleTitle3 = MaterialTheme.typography.displaySmall
     val (textStyle, updateTextStyle) = remember { mutableStateOf(textStyleTitle3) }
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = modifier.fillMaxWidth()) {
         MyVocaText(
             text = answer.eng,
             style = textStyle,
@@ -197,9 +207,9 @@ private fun QuizTitle(answer: VocabularyImpl) {
 
 @Composable
 private fun QuizOptions(
-    modifier: Modifier = Modifier,
     options: ImmutableList<VocabularyImpl>,
-    onOptionClick: (Int) -> Unit
+    onOptionClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -217,10 +227,10 @@ private fun QuizOptions(
 
 @Composable
 private fun QuizOption(
-    modifier: Modifier = Modifier,
     index: Int,
     option: VocabularyImpl,
-    onOptionClick: (Int) -> Unit
+    onOptionClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier
@@ -248,18 +258,14 @@ private fun QuizOption(
 @Composable
 private fun Result(
     resultData: QuizResultData,
-    onCloseDialog: (QuizResultData) -> Unit
+    onCloseDialog: (QuizResultData) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val title = if (resultData.result is QuizCorrect) stringResource(R.string.correct)
     else stringResource(R.string.incorrect)
 
     AlertDialog(
-        title = {
-            MyVocaText(text = title)
-        },
-        text = {
-            WordContent(resultData.answer)
-        },
+        onDismissRequest = { onCloseDialog(resultData) },
         confirmButton = {
             Box(
                 modifier = Modifier
@@ -278,7 +284,13 @@ private fun Result(
                 }
             }
         },
-        onDismissRequest = { onCloseDialog(resultData) },
+        modifier = modifier,
+        title = {
+            MyVocaText(text = title)
+        },
+        text = {
+            WordContent(resultData.answer)
+        },
         containerColor = MaterialTheme.colorScheme.primaryContainer
     )
 }
