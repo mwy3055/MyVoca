@@ -204,6 +204,7 @@ private fun TopBarSaveButton(
     onClose: () -> Unit,
     addButtonEnabled: Boolean,
     textColor: Color,
+    modifier: Modifier = Modifier,
     focusManager: FocusManager = LocalFocusManager.current,
 ) {
     TextButton(
@@ -225,6 +226,7 @@ private fun TopBarSaveButton(
 private fun TopBarCompleteButton(
     textColor: Color,
     onHideWebView: () -> Unit,
+    modifier: Modifier = Modifier,
     focusManager: FocusManager = LocalFocusManager.current,
 ) {
     TextButton(
@@ -293,7 +295,9 @@ private fun Content(
 }
 
 @Composable
-private fun EssentialTitle() {
+private fun EssentialTitle(
+    modifier: Modifier = Modifier,
+) {
     MyVocaText(
         text = stringResource(R.string.required_inputs),
         style = MaterialTheme.typography.headlineSmall
@@ -301,7 +305,9 @@ private fun EssentialTitle() {
 }
 
 @Composable
-private fun OptionalTitle() {
+private fun OptionalTitle(
+    modifier: Modifier = Modifier,
+) {
     MyVocaText(
         text = stringResource(R.string.selective_inputs),
         style = MaterialTheme.typography.headlineSmall
@@ -444,7 +450,8 @@ private val meaningHeight = 210.dp
 
 @Composable
 private fun MeaningChips(
-    onMeaningAdd: (WordClassImpl) -> Unit
+    onMeaningAdd: (WordClassImpl) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     LazyRow {
         items(
