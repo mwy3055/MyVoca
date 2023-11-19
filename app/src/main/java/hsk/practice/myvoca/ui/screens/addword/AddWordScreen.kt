@@ -385,7 +385,7 @@ private fun Word(
                             onShowWebView()
                             onUpdateWebViewUrl()
                         },
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -658,7 +658,7 @@ private fun Meaning(
                 )
                 IconButton(
                     onClick = { onMeaningDelete(index) },
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
                 ) {
                     Image(
                         painter = painterResource(R.drawable.baseline_delete_outline_24),
