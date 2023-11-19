@@ -364,7 +364,8 @@ private fun Word(
                                     onClick = {
                                         if (statusIcon == Icons.Outlined.Cancel)
                                             onWordClear()
-                                    }
+                                    },
+                                    enabled = (statusIcon == Icons.Outlined.Cancel),
                                 ) {
                                     Icon(
                                         imageVector = statusIcon,
@@ -636,7 +637,8 @@ private fun Meaning(
                                 onClick = {
                                     if (statusIcon == Icons.Outlined.Cancel)
                                         onMeaningUpdate(index, meaning.copy(content = ""))
-                                }
+                                },
+                                enabled = (statusIcon == Icons.Outlined.Cancel),
                             ) {
                                 Icon(
                                     imageVector = statusIcon,
