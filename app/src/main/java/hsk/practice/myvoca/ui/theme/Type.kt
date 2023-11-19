@@ -15,6 +15,13 @@ val Paybooc = FontFamily(
     Font(R.font.paybooc_extrabold, FontWeight.ExtraBold)
 )
 
+val NanumSquareRound = FontFamily(
+    Font(R.font.nanum_square_r),
+    Font(R.font.nanum_square_l),
+    Font(R.font.nanum_square_round_l),
+    Font(R.font.nanum_square_round_r)
+)
+
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(
