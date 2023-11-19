@@ -75,7 +75,6 @@ private class VersusViewStateImpl(
         }
 }
 
-// TODO 비율에 맞게 길이가 조정되도록 변경
 @Composable
 fun VersusView(
     modifier: Modifier = Modifier,
@@ -103,24 +102,26 @@ fun VersusView(
 
             }
         }
-        Canvas(
-            modifier = Modifier.size(50.dp)
-        ) {
-            val leftPath = Path().apply {
-                moveTo(0f, 0f)
-                lineTo(size.width, 0f)
-                lineTo(0f, size.height)
-                close()
-            }
-            drawPath(leftPath, color = leftColor)
+        if (leftValue > 0 && rightValue > 0) {
+            Canvas(
+                modifier = Modifier.size(50.dp)
+            ) {
+                val leftPath = Path().apply {
+                    moveTo(0f, 0f)
+                    lineTo(size.width, 0f)
+                    lineTo(0f, size.height)
+                    close()
+                }
+                drawPath(leftPath, color = leftColor)
 
-            val rightPath = Path().apply {
-                moveTo(0f, size.height)
-                lineTo(size.width, 0f)
-                lineTo(size.width, size.height)
-                close()
+                val rightPath = Path().apply {
+                    moveTo(0f, size.height)
+                    lineTo(size.width, 0f)
+                    lineTo(size.width, size.height)
+                    close()
+                }
+                drawPath(rightPath, color = rightColor)
             }
-            drawPath(rightPath, color = rightColor)
         }
         CompositionLocalProvider(LocalContentColor provides rightColor) {
             if (rightValue > 0) {
