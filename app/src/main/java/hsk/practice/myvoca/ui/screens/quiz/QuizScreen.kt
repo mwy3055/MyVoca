@@ -50,7 +50,6 @@ import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
-// TODO 중복으로 선택지가 나오는 경우를 제거 해야 함
 @Composable
 fun QuizScreen(
     viewModel: QuizViewModel = hiltViewModel()
