@@ -29,16 +29,13 @@ fun InsetAwareTopAppBar(
     modifier: Modifier = Modifier,
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
-    // backgroundColor: Color = MaterialTheme.colorScheme.primarySurface,
-    backgroundColor: Color = MaterialTheme.colorScheme.primary,
-    // backgroundColor: Color = MaterialTheme.colorScheme.surface,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = contentColorFor(backgroundColor),
     elevation: Dp = 4.dp
 ) {
     Surface(
         color = backgroundColor,
         shadowElevation = elevation,
-        // tonalElevation = elevation,
         modifier = modifier
     ) {
         TopAppBar(
