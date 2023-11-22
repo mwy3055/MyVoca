@@ -4,29 +4,39 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hsk.practice.myvoca.data.MeaningImpl
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
-import hsk.practice.myvoca.ui.theme.Paybooc
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -59,7 +69,7 @@ fun WordContent(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.surface)
+            .background(color = MaterialTheme.colorScheme.primaryContainer)
             .padding(padding),
         verticalArrangement = Arrangement.spacedBy(padding)
     ) {
@@ -101,13 +111,14 @@ fun WordMeanings(
     expanded: Boolean = false,
     onClick: (Boolean) -> Unit = {}
 ) {
+    val textStyle = LocalTextStyle.current
     val meaningsTruncated = meanings.size >= 3
     val canExpand = showExpandButton and meaningsTruncated
 
     val (firstMeanings, lastMeanings) = getTruncatedMeanings(meaningsTruncated, meanings)
     Row(
-        modifier = if (canExpand) modifier.clickable { onClick(expanded) } else modifier
-            .fillMaxWidth()
+        modifier = if (canExpand) modifier.clickable { onClick(expanded) }
+        else modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
@@ -116,11 +127,17 @@ fun WordMeanings(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             firstMeanings.forEach { meaning ->
-                WordMeaning(meaning = meaning)
+                WordMeaning(
+                    meaning = meaning,
+                    textStyle = textStyle
+                )
             }
             if (expanded) {
                 lastMeanings.forEach { meaning ->
-                    WordMeaning(meaning = meaning)
+                    WordMeaning(
+                        meaning = meaning,
+                        textStyle = textStyle
+                    )
                 }
             }
         }
@@ -155,26 +172,32 @@ private fun getTruncatedMeanings(meaningsTruncated: Boolean, meanings: List<Mean
 @Composable
 fun WordMeaning(
     meaning: MeaningImpl,
+    textStyle: TextStyle,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = buildAnnotatedString {
-                withStyle(
-                    style = SpanStyle(
-                        background = MaterialTheme.colorScheme.primary,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    append(meaning.type.korean.first())
-                }
-            },
-            fontFamily = Paybooc
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(4.dp))
+                .background(MaterialTheme.colorScheme.secondary)
+                .padding(horizontal = 4.dp, vertical = 2.dp)
+        ) {
+            MyVocaText(
+                text = meaning.type.korean.first().toString(),
+                color = MaterialTheme.colorScheme.onSecondary,
+                style = textStyle
+            )
+        }
+        MyVocaText(
+            text = meaning.content,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+            style = textStyle,
         )
-        MyVocaText(text = meaning.content)
     }
 }
 

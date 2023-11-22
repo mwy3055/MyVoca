@@ -18,7 +18,8 @@ class MainActivity : ComponentActivity() {
             MyVocaTheme {
                 Splash(
                     loadApp = { delay(1000L) },
-                    onLaunch = { WindowCompat.setDecorFitsSystemWindows(window, true) })
+                    onLaunch = { WindowCompat.setDecorFitsSystemWindows(window, true) }
+                )
             }
         }
     }

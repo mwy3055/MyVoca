@@ -1,5 +1,7 @@
 package hsk.practice.myvoca.ui.structure
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -7,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
@@ -27,9 +30,7 @@ import kotlinx.collections.immutable.toImmutableList
 fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
     MyVocaTheme {
         val systemUiController = rememberSystemUiController()
-        // val systemBarColor = MaterialTheme.colorScheme.primarySurface
-        val systemBarColor = MaterialTheme.colorScheme.primary
-        // val systemBarColor = MaterialTheme.colorScheme.surface
+        val systemBarColor = MaterialTheme.colorScheme.surface
 
         LaunchedEffect(key1 = true) {
             onLaunch()
@@ -49,6 +50,9 @@ fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
             },
             bottomBar = {
                 MyVocaBottomAppBar(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp),
                     allScreens = allScreens,
                     onTabSelected = { screen ->
                         if (screen != currentScreen) {

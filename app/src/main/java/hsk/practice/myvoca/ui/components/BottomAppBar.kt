@@ -39,16 +39,17 @@ private const val TabFadeOutDuration = 100
 fun MyVocaBottomAppBar(
     allScreens: ImmutableList<MyVocaScreen>,
     onTabSelected: (MyVocaScreen) -> Unit,
-    currentScreen: MyVocaScreen
+    currentScreen: MyVocaScreen,
+    modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = Modifier
-            .wrapContentHeight()
-            .fillMaxWidth()
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.secondaryContainer
     ) {
         Row(
             modifier = Modifier.selectableGroup(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             allScreens.forEach { screen ->
                 MyVocaTab(
@@ -72,7 +73,8 @@ private fun MyVocaTab(
     modifier: Modifier = Modifier,
 ) {
     val color =
-        if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = InactiveTabOpacity)
+        if (selected) MaterialTheme.colorScheme.onPrimaryContainer
+        else MaterialTheme.colorScheme.outline
     val durationMillis = if (selected) TabFadeInDuration else TabFadeOutDuration
     val animationSpec = remember(durationMillis) {
         tween<Color>(
@@ -105,7 +107,8 @@ private fun MyVocaTab(
         Icon(
             imageVector = icon,
             contentDescription = text,
-            tint = tabTintColor,
+            modifier = Modifier.size(32.dp),
+            tint = tabTintColor
         )
     }
 }

@@ -3,12 +3,15 @@ package hsk.practice.myvoca.ui.components.versus
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.contentColorFor
@@ -22,7 +25,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.hsk.ktx.gcd
@@ -73,8 +78,8 @@ private class VersusViewStateImpl(
 fun VersusView(
     modifier: Modifier = Modifier,
     versusViewState: VersusViewState = rememberVersusViewState(),
-    leftColor: Color = MaterialTheme.colorScheme.primary,
-    rightColor: Color = MaterialTheme.colorScheme.secondary
+    leftColor: Color = MaterialTheme.colorScheme.tertiaryContainer,
+    rightColor: Color = MaterialTheme.colorScheme.errorContainer
 ) {
     val leftValue = versusViewState.leftValue
     val rightValue = versusViewState.rightValue
@@ -83,6 +88,7 @@ fun VersusView(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
     ) {
         CompositionLocalProvider(LocalContentColor provides leftColor) {
             if (leftValue > 0) {
@@ -92,6 +98,27 @@ fun VersusView(
                     align = Alignment.CenterStart,
                     value = leftValue
                 )
+            }
+        }
+        if (leftValue > 0 && rightValue > 0) {
+            Canvas(
+                modifier = Modifier.size(50.dp)
+            ) {
+                val leftPath = Path().apply {
+                    moveTo(0f, 0f)
+                    lineTo(size.width, 0f)
+                    lineTo(0f, size.height)
+                    close()
+                }
+                drawPath(leftPath, color = leftColor)
+
+                val rightPath = Path().apply {
+                    moveTo(0f, size.height)
+                    lineTo(size.width, 0f)
+                    lineTo(size.width, size.height)
+                    close()
+                }
+                drawPath(rightPath, color = rightColor)
             }
         }
         CompositionLocalProvider(LocalContentColor provides rightColor) {
@@ -126,9 +153,10 @@ fun VersusElement(
         MyVocaText(
             text = value.toString(),
             modifier = Modifier
-                .padding(horizontal = 4.dp)
+                .padding(vertical = 12.dp, horizontal = 16.dp)
                 .align(align),
-            color = contentColorFor(backgroundColor = background)
+            color = contentColorFor(backgroundColor = background),
+            style = MaterialTheme.typography.titleLarge
         )
     }
 }

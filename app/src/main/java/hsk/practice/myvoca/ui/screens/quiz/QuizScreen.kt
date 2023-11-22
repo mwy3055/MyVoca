@@ -3,12 +3,19 @@
 package hsk.practice.myvoca.ui.screens.quiz
 
 import android.content.Intent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
@@ -17,8 +24,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,6 +51,7 @@ import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun QuizScreen(
+    modifier: Modifier = Modifier,
     viewModel: QuizViewModel = hiltViewModel()
 ) {
     val quizScreenData by viewModel.quizScreenData.collectAsStateWithLifecycle()
@@ -49,7 +59,8 @@ fun QuizScreen(
     Loading(
         quizScreenData = quizScreenData,
         onOptionClick = viewModel::onQuizOptionSelected,
-        onCloseDialog = viewModel::onResultDialogClose
+        onCloseDialog = viewModel::onResultDialogClose,
+        modifier = modifier
     )
 }
 
@@ -57,9 +68,12 @@ fun QuizScreen(
 private fun Loading(
     quizScreenData: QuizScreenData,
     onOptionClick: (Int) -> Unit,
-    onCloseDialog: (QuizResultData) -> Unit
+    onCloseDialog: (QuizResultData) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Box(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
+    Box(
+        modifier = modifier.background(MaterialTheme.colorScheme.surface)
+    ) {
         when (quizScreenData.quizState) {
             is QuizAvailable -> {
                 QuizContent(
@@ -84,35 +98,53 @@ private fun Loading(
         if (quizScreenData.quizResult != null) {
             Result(
                 resultData = quizScreenData.quizResult,
-                onCloseDialog = onCloseDialog
+                onCloseDialog = onCloseDialog,
             )
         }
     }
 }
 
 @Composable
-private fun QuizNotAvailable(need: Int) {
+private fun QuizNotAvailable(
+    need: Int,
+    modifier: Modifier = Modifier,
+) {
     val context = LocalContext.current
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         MyVocaText(
             text = stringResource(R.string.need_more_words, need),
+            color = Color.Black,
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center
         )
-        TextButton(onClick = {
-            context.startActivity(
-                Intent(context, AddWordActivity::class.java)
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = {
+                context.startActivity(
+                    Intent(context, AddWordActivity::class.java)
+                )
+            },
+            border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outline),
+            colors = ButtonColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary,
+                disabledContainerColor = MaterialTheme.colorScheme.surface,
+                disabledContentColor = MaterialTheme.colorScheme.primary
             )
-        }) {
+        ) {
             Icon(
                 imageVector = Icons.Outlined.Add,
                 contentDescription = stringResource(R.string.click_to_add_word)
             )
-            MyVocaText(text = stringResource(R.string.go_to_add_word))
+            MyVocaText(
+                text = stringResource(R.string.go_to_add_word),
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
@@ -121,17 +153,18 @@ private fun QuizNotAvailable(need: Int) {
 private fun QuizContent(
     quiz: Quiz,
     quizStat: QuizStat,
-    onOptionClick: (Int) -> Unit
+    onOptionClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val versusViewState =
         rememberVersusViewState(leftValue = quizStat.correct, rightValue = quizStat.wrong)
     Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(start = 16.dp, end = 16.dp, bottom = 32.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Spacer(modifier = Modifier.weight(2f))
+        Spacer(modifier = Modifier.weight(1f))
         QuizTitle(quiz.answer)
         Spacer(modifier = Modifier.weight(1f))
         QuizOptions(
@@ -142,18 +175,21 @@ private fun QuizContent(
         VersusView(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .height(50.dp),
             versusViewState = versusViewState
         )
     }
 }
 
 @Composable
-private fun QuizTitle(answer: VocabularyImpl) {
+private fun QuizTitle(
+    answer: VocabularyImpl,
+    modifier: Modifier = Modifier,
+) {
     // Reduce text size when overflow
     val textStyleTitle3 = MaterialTheme.typography.displaySmall
     val (textStyle, updateTextStyle) = remember { mutableStateOf(textStyleTitle3) }
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = modifier.fillMaxWidth()) {
         MyVocaText(
             text = answer.eng,
             style = textStyle,
@@ -170,9 +206,9 @@ private fun QuizTitle(answer: VocabularyImpl) {
 
 @Composable
 private fun QuizOptions(
-    modifier: Modifier = Modifier,
     options: ImmutableList<VocabularyImpl>,
-    onOptionClick: (Int) -> Unit
+    onOptionClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -190,18 +226,30 @@ private fun QuizOptions(
 
 @Composable
 private fun QuizOption(
-    modifier: Modifier = Modifier,
     index: Int,
     option: VocabularyImpl,
-    onOptionClick: (Int) -> Unit
+    onOptionClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Box(
+    Card(
         modifier = modifier
-            .clickable(onClick = { onOptionClick(index) })
-            .padding(4.dp),
-    ) {
-        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.titleLarge) {
-            WordMeanings(meanings = option.meaning.truncate(2).toImmutableList())
+            .clickable(onClick = { onOptionClick(index) }),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer
+        ),
+        elevation = CardDefaults.cardElevation(4.dp),
+
+        ) {
+        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyLarge) {
+            Box(
+                modifier = modifier.padding(vertical = 12.dp, horizontal = 16.dp),
+            ) {
+                WordMeanings(meanings = option.meaning.truncate(2).toImmutableList())
+            }
         }
     }
 }
@@ -209,18 +257,14 @@ private fun QuizOption(
 @Composable
 private fun Result(
     resultData: QuizResultData,
-    onCloseDialog: (QuizResultData) -> Unit
+    onCloseDialog: (QuizResultData) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    val title = if (resultData.result is QuizCorrect) stringResource(R.string.correct) else stringResource(
-        R.string.incorrect
-    )
+    val title = if (resultData.result is QuizCorrect) stringResource(R.string.correct)
+    else stringResource(R.string.incorrect)
+
     AlertDialog(
-        title = {
-            MyVocaText(text = title)
-        },
-        text = {
-            WordContent(resultData.answer)
-        },
+        onDismissRequest = { onCloseDialog(resultData) },
         confirmButton = {
             Box(
                 modifier = Modifier
@@ -228,12 +272,25 @@ private fun Result(
                     .fillMaxWidth(),
                 contentAlignment = Alignment.CenterEnd
             ) {
-                TextButton(onClick = { onCloseDialog(resultData) }) {
-                    MyVocaText(text = stringResource(id = R.string.check))
+                TextButton(
+                    onClick = { onCloseDialog(resultData) }
+                ) {
+                    MyVocaText(
+                        text = stringResource(id = R.string.check),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
         },
-        onDismissRequest = { onCloseDialog(resultData) }
+        modifier = modifier,
+        title = {
+            MyVocaText(text = title)
+        },
+        text = {
+            WordContent(resultData.answer)
+        },
+        containerColor = MaterialTheme.colorScheme.primaryContainer
     )
 }
 

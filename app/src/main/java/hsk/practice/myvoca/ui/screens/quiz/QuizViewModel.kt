@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hsk.data.Vocabulary
 import com.hsk.domain.VocaPersistence
-import com.hsk.ktx.randoms
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hsk.practice.myvoca.data.VocabularyImpl
 import hsk.practice.myvoca.module.ComputingDispatcher
@@ -54,7 +53,7 @@ class QuizViewModel @Inject constructor(
                 val onlyResultChanged = quizResultData != null
 
                 return@combine when {
-                    // 결과값이 있는 경우 결과만 반환
+                    // 결과 값이 있는 경우 결과만 반환
                     onlyResultChanged -> {
                         quizAvailable = true
                         value.copy(quizResult = quizResultData)
@@ -76,6 +75,7 @@ class QuizViewModel @Inject constructor(
                             makeNewQuizData(allVocabulary, correct, wrong)
                         }
                     }
+
                     else -> {
                         // 퀴즈를 로드할 수 없는 경우
                         quizAvailable = false
@@ -97,7 +97,12 @@ class QuizViewModel @Inject constructor(
         correct: Int,
         wrong: Int
     ): QuizScreenData {
-        val quizList = allVocabulary.randoms(quizSize).toVocabularyImplList().toImmutableList()
+        val quizList = allVocabulary
+            .distinct()
+            .shuffled()
+            .take(quizSize)
+            .toVocabularyImplList()
+            .toImmutableList()
         val answerIndex = (0 until quizSize).random()
         return QuizScreenData(
             quizState = QuizAvailable,

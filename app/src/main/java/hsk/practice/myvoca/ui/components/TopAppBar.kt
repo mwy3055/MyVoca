@@ -31,10 +31,7 @@ import kotlinx.coroutines.launch
 fun MyVocaTopAppBar(currentScreen: MyVocaScreen) {
     TopAppBar(
         title = {
-            MyVocaTopTitle()
-        },
-        navigationIcon = {
-            MyVocaTopNavigationIcon()
+            MyVocaTopTitle(currentScreen)
         },
         actions = {
             MyVocaTopActions(currentScreen = currentScreen)
@@ -44,9 +41,10 @@ fun MyVocaTopAppBar(currentScreen: MyVocaScreen) {
 }
 
 @Composable
-private fun MyVocaTopTitle() {
+private fun MyVocaTopTitle(currentScreen: MyVocaScreen) {
     MyVocaText(
-        text = stringResource(R.string.app_name),
+        text = if (currentScreen == MyVocaScreen.Quiz) stringResource(R.string.quiz_screen_title)
+        else stringResource(R.string.app_name),
         color = MaterialTheme.colorScheme.onSurface,
         style = MaterialTheme.typography.headlineSmall,
     )
