@@ -20,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,28 +66,30 @@ fun WordContent(
     showExpandButton: Boolean = true,
     iconContent: @Composable RowScope.() -> Unit = {}
 ) {
-    val padding = 8.dp
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.primaryContainer)
-            .padding(padding),
-        verticalArrangement = Arrangement.spacedBy(padding)
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         if (word.id != 0) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 WordTitle(
                     title = word.eng,
                     modifier = Modifier.weight(1f)
                 )
                 iconContent()
             }
-            WordMeanings(
-                meanings = word.meaning,
-                showExpandButton = showExpandButton,
-                expanded = expanded,
-                onClick = onExpanded
-            )
+            CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyLarge) {
+                WordMeanings(
+                    meanings = word.meaning,
+                    showExpandButton = showExpandButton,
+                    expanded = expanded,
+                    onClick = onExpanded
+                )
+            }
         }
     }
 }
@@ -148,8 +151,7 @@ fun WordMeanings(
             )
             IconButton(
                 onClick = { onClick(expanded) },
-                modifier = Modifier
-                    .align(Alignment.Bottom)
+                modifier = Modifier.align(Alignment.Bottom)
             ) {
                 Icon(
                     imageVector = Icons.Filled.ExpandMore,

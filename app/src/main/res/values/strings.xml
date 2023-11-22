@@ -130,15 +130,15 @@
     <string name="web_client_id">711192236974-vbjufot9iln0ttfnu44l7ai69l0dlljp.apps.googleusercontent.com</string>
 
     <!--    for home screen-->
-    <string name="nothing_yet">아직 아무것도 없습니다.</string>
+    <string name="please_register_the_word_first">먼저 단어를 등록해 주세요.</string>
     <string name="refresh_today_word">오늘의 단어 새로고침하기</string>
-    <string name="last_updated">마지막 업데이트: %1$s</string>
+    <string name="last_updated">%1$s</string>
     <string name="what_is_today_word">오늘의 단어란?</string>
     <string name="today_word">오늘의 단어</string>
-    <string name="no_registerd_word">등록된 단어가\n없습니다</string>
+    <string name="no_registerd_word">아직 등록된\n단어가 없어요</string>
     <string name="words_are_registed">%1$s개의 단어가\n등록되어 있어요</string>
-    <string name="memorize_new_words_everyday_words_are_updated_everyday">매일매일 새로운 단어를 외워 보세요. 단어는 하루마다 갱신됩니다.</string>
-    <string name="memorized_words_can_be_separated_by_a_check_mark">외운 단어는 체크 표시로 구분할 수 있습니다.</string>
+    <string name="memorize_new_word_everyday_and_check_memorized_word">매일 새로운 단어를 외우고, 외운 단어는 체크표시해 보세요.</string>
+    <string name="words_are_update_everyday">단어는 하루마다 갱신됩니다.</string>
     <string name="check">확인</string>
 
     <!--    for all word screen-->
