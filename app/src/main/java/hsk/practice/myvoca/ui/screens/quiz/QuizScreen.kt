@@ -31,7 +31,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hsk.ktx.distinctRandoms
@@ -99,7 +98,7 @@ private fun Loading(
         if (quizScreenData.quizResult != null) {
             Result(
                 resultData = quizScreenData.quizResult,
-                onCloseDialog = onCloseDialog
+                onCloseDialog = onCloseDialog,
             )
         }
     }
@@ -143,8 +142,8 @@ private fun QuizNotAvailable(
             )
             MyVocaText(
                 text = stringResource(R.string.go_to_add_word),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -245,7 +244,7 @@ private fun QuizOption(
         elevation = CardDefaults.cardElevation(4.dp),
 
         ) {
-        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.titleLarge) {
+        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyLarge) {
             Box(
                 modifier = modifier.padding(vertical = 12.dp, horizontal = 16.dp),
             ) {
@@ -279,7 +278,7 @@ private fun Result(
                     MyVocaText(
                         text = stringResource(id = R.string.check),
                         color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 16.sp
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }

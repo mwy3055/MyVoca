@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -109,6 +111,7 @@ fun WordMeanings(
     expanded: Boolean = false,
     onClick: (Boolean) -> Unit = {}
 ) {
+    val textStyle = LocalTextStyle.current
     val meaningsTruncated = meanings.size >= 3
     val canExpand = showExpandButton and meaningsTruncated
 
@@ -124,11 +127,17 @@ fun WordMeanings(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             firstMeanings.forEach { meaning ->
-                WordMeaning(meaning = meaning)
+                WordMeaning(
+                    meaning = meaning,
+                    textStyle = textStyle
+                )
             }
             if (expanded) {
                 lastMeanings.forEach { meaning ->
-                    WordMeaning(meaning = meaning)
+                    WordMeaning(
+                        meaning = meaning,
+                        textStyle = textStyle
+                    )
                 }
             }
         }
@@ -163,6 +172,7 @@ private fun getTruncatedMeanings(meaningsTruncated: Boolean, meanings: List<Mean
 @Composable
 fun WordMeaning(
     meaning: MeaningImpl,
+    textStyle: TextStyle,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -178,13 +188,15 @@ fun WordMeaning(
         ) {
             MyVocaText(
                 text = meaning.type.korean.first().toString(),
-                color = MaterialTheme.colorScheme.onSecondary
+                color = MaterialTheme.colorScheme.onSecondary,
+                style = textStyle
             )
         }
         MyVocaText(
             text = meaning.content,
+            overflow = TextOverflow.Ellipsis,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            style = textStyle,
         )
     }
 }

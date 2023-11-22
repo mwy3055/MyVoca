@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.hsk.ktx.gcd
 import hsk.practice.myvoca.ui.components.MyVocaText
 
@@ -99,7 +98,6 @@ fun VersusView(
                     align = Alignment.CenterStart,
                     value = leftValue
                 )
-
             }
         }
         if (leftValue > 0 && rightValue > 0) {
@@ -158,7 +156,7 @@ fun VersusElement(
                 .padding(vertical = 12.dp, horizontal = 16.dp)
                 .align(align),
             color = contentColorFor(backgroundColor = background),
-            fontSize = 22.sp
+            style = MaterialTheme.typography.titleLarge
         )
     }
 }
