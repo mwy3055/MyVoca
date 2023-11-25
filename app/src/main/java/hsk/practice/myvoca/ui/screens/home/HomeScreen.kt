@@ -120,11 +120,11 @@ private fun Content(
             .fillMaxSize()
             .padding(horizontal = 16.dp),
     ) {
-        if (data.todayWords.isEmpty()) {
-            TodayWordTitle(
-                modifier = modifier.padding(top = 16.dp)
-            )
-        }
+        TodayWordTitle(
+            titleText = if (data.todayWords.isEmpty()) stringResource(R.string.no_registerd_word)
+            else stringResource(R.string.words_are_registed, data.totalWordCount),
+            modifier = modifier.padding(top = 16.dp)
+        )
         TodayWords(
             todayWords = data.todayWords,
             lastUpdatedTime = data.todayWordsLastUpdatedTime,
@@ -153,10 +153,9 @@ private fun TodayWords(
         showTodayWordHelp = showTodayWordHelp,
         enableRefresh = enableRefresh,
         onRefreshTodayWord = onRefreshTodayWord,
-        modifier = if (todayWords.isEmpty()) modifier.padding(top = 21.dp)
-        else modifier.padding(top = 31.dp)
+        modifier = modifier.padding(top = 21.dp)
     )
-    Spacer(modifier.height(15.dp))
+    Spacer(modifier.height(21.dp))
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -241,14 +240,14 @@ private fun TodayWordHeader(
     ) {
         HeaderTitle(titleTextStyle = titleTextStyle)
         HelpIcon(showTodayWordHelp = showTodayWordHelp)
+        Spacer(modifier = Modifier.weight(1f))
         if (showUpdateInfo) {
-            Spacer(modifier = Modifier.weight(1f))
             LastUpdateTimeText(lastUpdatedTimeString = lastUpdatedTimeString)
-            RefreshIcon(
-                onRefreshTodayWord = onRefreshTodayWord,
-                enableRefresh = enableRefresh
-            )
         }
+        RefreshIcon(
+            onRefreshTodayWord = onRefreshTodayWord,
+            enableRefresh = enableRefresh
+        )
     }
 }
 
@@ -266,7 +265,8 @@ private fun RefreshIcon(
         Icon(
             imageVector = Icons.Outlined.Refresh,
             contentDescription = stringResource(R.string.refresh_today_word),
-            tint = MaterialTheme.colorScheme.onSurface
+            tint = if (enableRefresh) MaterialTheme.colorScheme.onSurface
+            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
         )
     }
 }
@@ -323,7 +323,6 @@ private fun TodayWordContent(
     val elevation by animateDpAsState(targetValue = if (todayWord.todayWord.checked) 0.dp else 6.dp)
 
     Card(
-        modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = elevation),
         colors = CardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -335,10 +334,10 @@ private fun TodayWordContent(
         Box {
             WordContent(
                 word = todayWord.vocabulary,
-                modifier = Modifier.alpha(alpha),
                 showExpandButton = false,
                 expanded = true,
-                onExpanded = {}
+                onExpanded = {},
+                modifier = modifier.alpha(alpha),
             )
             Checkbox(
                 checked = todayWord.todayWord.checked,
@@ -351,13 +350,14 @@ private fun TodayWordContent(
 
 @Composable
 private fun TodayWordTitle(
+    titleText: String,
     modifier: Modifier = Modifier
 ) {
     MyVocaText(
-        text = stringResource(R.string.no_registerd_word),
+        text = titleText,
         modifier = modifier,
         maxLines = 2,
-        style = MaterialTheme.typography.headlineMedium,
+        style = MaterialTheme.typography.headlineLarge,
     )
 }
 
