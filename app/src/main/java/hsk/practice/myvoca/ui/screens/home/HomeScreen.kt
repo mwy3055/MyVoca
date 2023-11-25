@@ -16,7 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Help
-import androidx.compose.material.icons.outlined.Autorenew
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
@@ -147,8 +147,7 @@ private fun TodayWords(
     modifier: Modifier = Modifier,
 ) {
     TodayWordHeader(
-        titleTextStyle = if (todayWords.isEmpty()) MaterialTheme.typography.titleLarge
-        else MaterialTheme.typography.headlineLarge,
+        titleTextStyle = MaterialTheme.typography.titleLarge,
         showUpdateInfo = !todayWords.isEmpty(),
         lastUpdatedTime = lastUpdatedTime,
         showTodayWordHelp = showTodayWordHelp,
@@ -212,6 +211,7 @@ private fun TodayWordEmptyIndicator(
                 text = stringResource(R.string.please_register_the_word_first),
                 style = MaterialTheme.typography.headlineMedium
             )
+            Spacer(modifier = Modifier.height(16.dp))
             AddWordButton(
                 onClick = {
                     context.startActivity(
@@ -264,7 +264,7 @@ private fun RefreshIcon(
         enabled = enableRefresh
     ) {
         Icon(
-            imageVector = Icons.Outlined.Autorenew,
+            imageVector = Icons.Outlined.Refresh,
             contentDescription = stringResource(R.string.refresh_today_word),
             tint = MaterialTheme.colorScheme.onSurface
         )
