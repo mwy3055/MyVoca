@@ -147,7 +147,7 @@
     <string name="initialize_search_options">검색 옵션을 초기화합니다.</string>
     <string name="initialization">초기화</string>
     <string name="search_for_word_that_matchs_particular_condition">특정 조건에 맞는 단어를 검색합니다.</string>
-    <string name="search_options">검색 옵션</string>
+    <string name="search_options">검색</string>
     <string name="set_search_options">검색 옵션을 설정합니다.</string>
     <string name="search">검색</string>
     <string name="selected">%1$s 선택됨</string>
@@ -199,6 +199,7 @@
     <string name="go_to_add_word">단어 등록하기</string>
     <string name="correct">맞았습니다!!</string>
     <string name="incorrect">틀렸습니다</string>
+    <string name="total_words_count">총 단어: %1$s개</string>
     <string name="search_results_count">검색 결과: %1$s개</string>
 
     <!-- for top bar -->

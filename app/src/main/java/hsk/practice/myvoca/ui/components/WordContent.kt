@@ -15,6 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -47,13 +49,18 @@ fun WordContent(
     iconContent: @Composable RowScope.() -> Unit = {}
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
-    WordContent(
-        modifier = modifier,
-        word = word,
-        expanded = expanded,
-        onExpanded = { expanded = !it },
-        iconContent = iconContent
-    )
+
+    Card(
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    ) {
+        WordContent(
+            modifier = modifier,
+            word = word,
+            expanded = expanded,
+            onExpanded = { expanded = !it },
+            iconContent = iconContent
+        )
+    }
 }
 
 @Composable
@@ -65,13 +72,11 @@ fun WordContent(
     showExpandButton: Boolean = true,
     iconContent: @Composable RowScope.() -> Unit = {}
 ) {
-    val padding = 8.dp
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.primaryContainer)
-            .padding(padding),
-        verticalArrangement = Arrangement.spacedBy(padding)
+            .padding(start = 12.dp, bottom = 6.dp),
     ) {
         if (word.id != 0) {
             Row(verticalAlignment = Alignment.CenterVertically) {
