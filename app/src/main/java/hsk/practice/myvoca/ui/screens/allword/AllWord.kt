@@ -212,7 +212,7 @@ private fun Content(
                 )
                 Header(
                     vocabularySize = data.currentWordState.size,
-                    isQueryState = data.queryState != VocabularyQuery(),
+                    queryState = data.queryState,
                     submitState = data.submitState,
                     onClearButtonClicked = onClearButtonClicked,
                     onSubmitButtonClicked = onSubmitButtonClicked,
@@ -236,7 +236,7 @@ private fun Content(
 @Composable
 private fun Header(
     vocabularySize: Int,
-    isQueryState: Boolean,
+    queryState: VocabularyQuery,
     submitState: Boolean,
     onClearButtonClicked: () -> Unit,
     onSubmitButtonClicked: () -> Unit,
@@ -255,7 +255,7 @@ private fun Header(
         )
         Spacer(modifier = Modifier.weight(1f))
         SearchOptionClearButton(
-            isQueryState = isQueryState,
+            queryState = queryState,
             onButtonClicked = onClearButtonClicked
         )
         ShowSearchOptionButton(
@@ -266,11 +266,11 @@ private fun Header(
 
 @Composable
 private fun SearchOptionClearButton(
-    isQueryState: Boolean,
+    queryState: VocabularyQuery,
     onButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    if (isQueryState) {
+    if (queryState != VocabularyQuery()) {
         TextButton(
             onClick = onButtonClicked,
             modifier = modifier
