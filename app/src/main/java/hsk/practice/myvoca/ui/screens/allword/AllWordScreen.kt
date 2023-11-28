@@ -37,6 +37,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TextButton
@@ -70,6 +71,7 @@ import hsk.practice.myvoca.data.toWordClass
 import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.MyVocaText
 import hsk.practice.myvoca.ui.components.WordContent
+import hsk.practice.myvoca.ui.components.WordEmptyIndicator
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.state.UiState
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
@@ -124,7 +126,9 @@ private fun Loading(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.surface)
     ) {
         if (uiState.loading) {
             LoadingIndicator(modifier = Modifier.align(Alignment.Center))
@@ -214,21 +218,28 @@ private fun Content(
                     vocabularySize = data.currentWordState.size,
                     queryState = data.queryState,
                     submitState = data.submitState,
+                    bottomSheetState = scaffoldState.bottomSheetState,
                     onClearButtonClicked = onClearButtonClicked,
                     onSubmitButtonClicked = onSubmitButtonClicked,
                 )
             }
         },
     ) { innerPadding ->
-        Column(
-            modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
         ) {
-            AllWords(
-                modifier = Modifier.padding(innerPadding),
-                words = data.currentWordState,
-                onWordUpdate = onWordUpdate,
-                onWordDelete = onWordDelete
-            )
+            if (data.currentWordState.isEmpty()) {
+                WordEmptyIndicator()
+            } else {
+                AllWords(
+                    modifier = Modifier.fillMaxSize(),
+                    words = data.currentWordState,
+                    onWordUpdate = onWordUpdate,
+                    onWordDelete = onWordDelete
+                )
+            }
         }
     }
 }
@@ -238,6 +249,7 @@ private fun Header(
     vocabularySize: Int,
     queryState: VocabularyQuery,
     submitState: Boolean,
+    bottomSheetState: SheetState,
     onClearButtonClicked: () -> Unit,
     onSubmitButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
@@ -254,11 +266,17 @@ private fun Header(
             modifier = Modifier.align(Alignment.CenterVertically)
         )
         Spacer(modifier = Modifier.weight(1f))
-        SearchOptionClearButton(
-            queryState = queryState,
-            onButtonClicked = onClearButtonClicked
-        )
+        AnimatedVisibility(
+            visible = queryState != VocabularyQuery(),
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            SearchOptionClearButton(
+                onButtonClicked = onClearButtonClicked
+            )
+        }
         ShowSearchOptionButton(
+            bottomSheetState = bottomSheetState,
             onButtonClicked = onSubmitButtonClicked
         )
     }
@@ -266,36 +284,44 @@ private fun Header(
 
 @Composable
 private fun SearchOptionClearButton(
-    queryState: VocabularyQuery,
     onButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    if (queryState != VocabularyQuery()) {
-        TextButton(
-            onClick = onButtonClicked,
-            modifier = modifier
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Refresh,
-                contentDescription = stringResource(R.string.initialize_search_options),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-            MyVocaText(
-                text = stringResource(R.string.initialization),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
+    TextButton(
+        onClick = onButtonClicked,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Refresh,
+            contentDescription = stringResource(R.string.initialize_search_options),
+            tint = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        MyVocaText(
+            text = stringResource(R.string.initialization),
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            style = MaterialTheme.typography.bodyLarge
+        )
     }
 }
 
 @Composable
 private fun ShowSearchOptionButton(
+    bottomSheetState: SheetState,
     onButtonClicked: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     TextButton(
-        onClick = onButtonClicked,
+        onClick = {
+            onButtonClicked()
+            if (bottomSheetState.hasExpandedState) {
+                coroutineScope.launch {
+                    bottomSheetState.partialExpand()
+                }
+            }
+        },
         modifier = modifier
     ) {
         Icon(
@@ -328,7 +354,9 @@ private fun HeaderText(
 }
 
 @Composable
-private fun QueryHeader(modifier: Modifier = Modifier) {
+private fun QueryHeader(
+    modifier: Modifier = Modifier
+) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
@@ -347,7 +375,7 @@ private fun QueryOptions(
     onQueryWordChanged: (String) -> Unit,
     onOptionWordClassClick: (String) -> Unit,
     onSortStateClick: (SortState) -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -436,7 +464,7 @@ private fun QueryWord(
     text: String,
     onTextChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
-    focusManager: FocusManager = LocalFocusManager.current,
+    focusManager: FocusManager = LocalFocusManager.current
 ) {
     BasicTextField(
         value = text,
@@ -445,7 +473,7 @@ private fun QueryWord(
         textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onBackground),
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
     )
 }
 
@@ -490,17 +518,17 @@ private fun WordClassChip(
     Row(
         modifier = modifier
             .padding(horizontal = 4.dp)
-            .background(color = background, shape = MaterialTheme.shapes.medium)
-            .clip(RoundedCornerShape(12.dp))
+            .background(color = background, shape = MaterialTheme.shapes.large)
+            .clip(RoundedCornerShape(percent = 50))
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.large
             )
             .clickable { onClick(className) },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AnimatedVisibility(selected) {
+        AnimatedVisibility(visible = selected) {
             Icon(
                 imageVector = Icons.Filled.Check,
                 contentDescription = stringResource(R.string.selected, className),
@@ -513,8 +541,8 @@ private fun WordClassChip(
             modifier = Modifier.padding(
                 start = if (selected) 4.dp else 8.dp,
                 end = 8.dp,
-                top = 4.dp,
-                bottom = 4.dp
+                top = 6.dp,
+                bottom = 6.dp
             ),
             color = textColor
         )
@@ -531,13 +559,13 @@ private fun QuerySortState(
     Row(
         modifier = modifier
             .height(40.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(percent = 50))
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                shape = MaterialTheme.shapes.large
+                shape = MaterialTheme.shapes.extraLarge
             ),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         sortStates.forEach { sortState ->
             SortStateChip(
@@ -569,12 +597,12 @@ private fun SortStateChip(
             .fillMaxSize()
             .background(background)
             .clickable { onClick(sortState) },
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.Center
     ) {
         MyVocaText(
             text = sortState.korean,
             color = textColor,
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -591,13 +619,15 @@ private fun AllWords(
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
     LazyVerticalGrid(
-        modifier = modifier.background(color = MaterialTheme.colorScheme.background),
+        modifier = modifier,
         state = listState,
         columns = GridCells.Adaptive(minSize = min(screenWidth, 330.dp)),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         if (words.isEmpty()) {
-            // TODO 단어가 존재하지 않는 경우, 검색 결과가 존재하지 않는 경우
+            item {
+                WordEmptyIndicator()
+            }
         } else {
             items(
                 items = words,

@@ -43,6 +43,7 @@ import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.MyVocaText
 import hsk.practice.myvoca.ui.components.WordContent
+import hsk.practice.myvoca.ui.components.WordEmptyIndicator
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import hsk.practice.myvoca.util.getTimeDiffString
 import hsk.practice.myvoca.work.setPeriodicTodayWordWork
@@ -153,7 +154,7 @@ private fun TodayWordItems(
     ) {
         if (todayWords.isEmpty()) {
             item {
-                TodayWordEmptyIndicator()
+                WordEmptyIndicator()
             }
         } else {
             items(todayWords) { todayWord ->
@@ -166,16 +167,6 @@ private fun TodayWordItems(
         item {
             Spacer(modifier = Modifier.height(10.dp))
         }
-    }
-}
-
-@Composable
-private fun TodayWordEmptyIndicator() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        MyVocaText(
-            text = stringResource(R.string.nothing_yet),
-            modifier = Modifier.align(Alignment.Center)
-        )
     }
 }
 

@@ -130,7 +130,7 @@
     <string name="web_client_id">711192236974-vbjufot9iln0ttfnu44l7ai69l0dlljp.apps.googleusercontent.com</string>
 
     <!--    for home screen-->
-    <string name="nothing_yet">아직 아무것도 없습니다.</string>
+    <string name="please_register_the_word_first">먼저 단어를 등록해 주세요.</string>
     <string name="refresh_today_word">오늘의 단어 새로고침하기</string>
     <string name="last_updated">마지막 업데이트: %1$s</string>
     <string name="what_is_today_word">오늘의 단어란?</string>
