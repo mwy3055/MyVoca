@@ -1,7 +1,5 @@
 package hsk.practice.myvoca.ui.screens.allword
 
-import android.content.Context
-import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,7 +15,6 @@ import hsk.practice.myvoca.module.IoDispatcher
 import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImplList
 import hsk.practice.myvoca.room.vocabulary.toVocabularyList
-import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.state.UiState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -121,13 +118,8 @@ class AllWordViewModel @Inject constructor(
         refreshWords()
     }
 
-    fun onWordUpdate(word: VocabularyImpl, context: Context) {
-        val intent = Intent(context, AddWordActivity::class.java).apply {
-            putExtra(AddWordActivity.updateWordId, word.id)
-        }
-        viewModelScope.launch(computingDispatcher) {
-            context.startActivity(intent)
-        }
+    fun onWordUpdate(vocabularyImpl: VocabularyImpl?) {
+        _allWordUiState.copyData(updateWord = vocabularyImpl)
     }
 
     fun onWordDelete(word: VocabularyImpl) = viewModelScope.launch(ioDispatcher) {
@@ -163,6 +155,7 @@ private fun MutableStateFlow<UiState<AllWordData>>.copyData(
     sortState: SortState? = null,
     queryState: VocabularyQuery? = null,
     currentWordState: List<VocabularyImpl>? = null,
+    updateWord: VocabularyImpl? = null,
     deletedWord: VocabularyImpl? = null,
     restoreWord: VocabularyImpl? = null,
 ) {
@@ -172,6 +165,7 @@ private fun MutableStateFlow<UiState<AllWordData>>.copyData(
             sortState = sortState ?: data.sortState,
             queryState = queryState ?: data.queryState,
             currentWordState = currentWordState?.toImmutableList() ?: data.currentWordState,
+            updateWord = updateWord ?: data.updateWord,
             deletedWord = deletedWord ?: data.deletedWord,
             restoreWord = restoreWord ?: data.restoreWord
         )
@@ -183,6 +177,7 @@ data class AllWordData(
     val sortState: SortState = SortState.defaultValue,
     val queryState: VocabularyQuery = VocabularyQuery(),
     val currentWordState: ImmutableList<VocabularyImpl> = persistentListOf(),
+    val updateWord: VocabularyImpl? = null,
     val deletedWord: VocabularyImpl? = null,
     val restoreWord: VocabularyImpl? = null
 )

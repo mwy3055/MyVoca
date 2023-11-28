@@ -2,7 +2,7 @@
 
 package hsk.practice.myvoca.ui.screens.allword
 
-import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.*
 import androidx.compose.animation.core.CubicBezierEasing
@@ -70,6 +70,7 @@ import hsk.practice.myvoca.data.toWordClass
 import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.MyVocaText
 import hsk.practice.myvoca.ui.components.WordContent
+import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.state.UiState
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import kotlinx.collections.immutable.ImmutableList
@@ -84,6 +85,17 @@ fun AllWordScreen(
     viewModel: AllWordViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.allWordUiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = uiState.data?.updateWord) {
+        if (uiState.data?.updateWord != null) {
+            val intent = Intent(context, AddWordActivity::class.java).apply {
+                putExtra(AddWordActivity.updateWordId, uiState.data!!.updateWord!!.id)
+            }
+            context.startActivity(intent)
+            viewModel.onWordUpdate(null)
+        }
+    }
 
     Loading(
         uiState = uiState,
@@ -106,7 +118,7 @@ private fun Loading(
     onOptionWordClassClick: (String) -> Unit,
     onSortStateClick: (SortState) -> Unit,
     onClearButtonClicked: () -> Unit,
-    onWordUpdate: (VocabularyImpl, Context) -> Unit,
+    onWordUpdate: (VocabularyImpl) -> Unit,
     onWordDelete: (VocabularyImpl) -> Unit,
     onWordRestore: (VocabularyImpl) -> Unit,
     modifier: Modifier = Modifier
@@ -141,7 +153,7 @@ private fun Content(
     onOptionWordClassClick: (String) -> Unit,
     onSortStateClick: (SortState) -> Unit,
     onClearButtonClicked: () -> Unit,
-    onWordUpdate: (VocabularyImpl, Context) -> Unit,
+    onWordUpdate: (VocabularyImpl) -> Unit,
     onWordDelete: (VocabularyImpl) -> Unit,
     onWordRestore: (VocabularyImpl) -> Unit,
     modifier: Modifier = Modifier
@@ -569,12 +581,11 @@ private fun SortStateChip(
 @Composable
 private fun AllWords(
     words: ImmutableList<VocabularyImpl>,
-    onWordUpdate: (VocabularyImpl, Context) -> Unit,
+    onWordUpdate: (VocabularyImpl) -> Unit,
     onWordDelete: (VocabularyImpl) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyGridState()
-    val context = LocalContext.current
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
     LazyVerticalGrid(
@@ -600,7 +611,7 @@ private fun AllWords(
                     word = word
                 ) {
                     IconButton(
-                        onClick = { onWordUpdate(word, context) },
+                        onClick = { onWordUpdate(word) },
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Edit,
@@ -679,7 +690,7 @@ private fun ContentsPreview() {
             },
             onSortStateClick = {},
             onClearButtonClicked = {},
-            onWordUpdate = { _, _ -> },
+            onWordUpdate = {},
             onWordDelete = {},
             onWordRestore = {}
         )
@@ -692,7 +703,7 @@ private fun WordItemsPreview() {
     MyVocaTheme {
         AllWords(
             words = fakeData.toImmutableList(),
-            onWordUpdate = { _, _ -> },
+            onWordUpdate = {},
             onWordDelete = {}
         )
     }
