@@ -75,6 +75,7 @@ class AllWordViewModel @Inject constructor(
      */
     fun onSubmitButtonClicked() {
         refreshWords()
+        _allWordUiState.copyData(submitState = true)
     }
 
     private fun onQueryChanged(query: VocabularyQuery) {
@@ -114,6 +115,7 @@ class AllWordViewModel @Inject constructor(
         _allWordUiState.copyData(
             sortState = SortState.defaultValue,
             queryState = VocabularyQuery(),
+            submitState = false
         )
         refreshWords()
     }
@@ -142,9 +144,11 @@ private fun Collection<VocabularyImpl>.sortedBy(selector: SortState): List<Vocab
         SortState.Alphabet -> {
             this.sortedBy { it.eng }
         }
+
         SortState.Latest -> {
             this.sortedByDescending { it.addedTime }
         }
+
         SortState.Random -> {
             this.shuffled()
         }
@@ -155,6 +159,7 @@ private fun MutableStateFlow<UiState<AllWordData>>.copyData(
     sortState: SortState? = null,
     queryState: VocabularyQuery? = null,
     currentWordState: List<VocabularyImpl>? = null,
+    submitState: Boolean? = null,
     updateWord: VocabularyImpl? = null,
     deletedWord: VocabularyImpl? = null,
     restoreWord: VocabularyImpl? = null,
@@ -164,6 +169,7 @@ private fun MutableStateFlow<UiState<AllWordData>>.copyData(
         val newData = data.copy(
             sortState = sortState ?: data.sortState,
             queryState = queryState ?: data.queryState,
+            submitState = submitState ?: data.submitState,
             currentWordState = currentWordState?.toImmutableList() ?: data.currentWordState,
             updateWord = updateWord ?: data.updateWord,
             deletedWord = deletedWord ?: data.deletedWord,
@@ -176,6 +182,7 @@ private fun MutableStateFlow<UiState<AllWordData>>.copyData(
 data class AllWordData(
     val sortState: SortState = SortState.defaultValue,
     val queryState: VocabularyQuery = VocabularyQuery(),
+    val submitState: Boolean = false,
     val currentWordState: ImmutableList<VocabularyImpl> = persistentListOf(),
     val updateWord: VocabularyImpl? = null,
     val deletedWord: VocabularyImpl? = null,

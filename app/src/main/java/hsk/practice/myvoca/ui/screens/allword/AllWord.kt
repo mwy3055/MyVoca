@@ -213,6 +213,7 @@ private fun Content(
                 Header(
                     vocabularySize = data.currentWordState.size,
                     isQueryState = data.queryState != VocabularyQuery(),
+                    submitState = data.submitState,
                     onClearButtonClicked = onClearButtonClicked,
                     onSubmitButtonClicked = onSubmitButtonClicked,
                 )
@@ -236,6 +237,7 @@ private fun Content(
 private fun Header(
     vocabularySize: Int,
     isQueryState: Boolean,
+    submitState: Boolean,
     onClearButtonClicked: () -> Unit,
     onSubmitButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
@@ -248,7 +250,7 @@ private fun Header(
     ) {
         HeaderText(
             vocabularySize = vocabularySize,
-            isQueryState = isQueryState,
+            submitState = submitState,
             modifier = Modifier.align(Alignment.CenterVertically)
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -313,11 +315,11 @@ private fun ShowSearchOptionButton(
 @Composable
 private fun HeaderText(
     vocabularySize: Int,
-    isQueryState: Boolean,
+    submitState: Boolean,
     modifier: Modifier = Modifier
 ) {
     MyVocaText(
-        text = if (isQueryState) stringResource(R.string.search_results_count, vocabularySize)
+        text = if (submitState) stringResource(R.string.search_results_count, vocabularySize)
         else stringResource(R.string.total_words_count, vocabularySize),
         style = MaterialTheme.typography.bodyLarge,
         fontWeight = FontWeight.Bold,
