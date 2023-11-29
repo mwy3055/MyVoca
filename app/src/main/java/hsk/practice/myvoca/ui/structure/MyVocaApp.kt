@@ -1,5 +1,11 @@
 package hsk.practice.myvoca.ui.structure
 
+import android.app.Activity
+import android.content.Intent
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -9,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
@@ -17,6 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import hsk.practice.myvoca.R
 import hsk.practice.myvoca.ui.components.MyVocaBottomAppBar
 import hsk.practice.myvoca.ui.components.MyVocaTopAppBar
 import hsk.practice.myvoca.ui.screens.allword.AllWordScreen
@@ -31,6 +39,11 @@ fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
     MyVocaTheme {
         val systemUiController = rememberSystemUiController()
         val systemBarColor = MaterialTheme.colorScheme.surface
+        val context = LocalContext.current
+        val allScreens = MyVocaScreen.values().toList().toImmutableList()
+        val navController = rememberNavController()
+        val backStackEntry by navController.currentBackStackEntryAsState()
+        val currentScreen = MyVocaScreen.fromRoute(backStackEntry?.destination?.route)
 
         LaunchedEffect(key1 = true) {
             onLaunch()
@@ -39,14 +52,36 @@ fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
             )
         }
 
-        val allScreens = MyVocaScreen.values().toList().toImmutableList()
-        val navController = rememberNavController()
-        val backStackEntry by navController.currentBackStackEntryAsState()
-        val currentScreen = MyVocaScreen.fromRoute(backStackEntry?.destination?.route)
+        val resultLauncher =
+            rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val word = result.data?.getStringExtra("word") ?: ""
+                    val actionType = result.data?.getStringExtra("actionType") ?: ""
+                    if (word.isNotEmpty()) {
+                        when(actionType) {
+                            "add" -> {
+                                Toast.makeText(
+                                    context, context.getString(R.string.add_word_complete, word),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            "update" -> {
+                                Toast.makeText(
+                                    context, context.getString(R.string.update_word_complete, word),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
+                }
+            }
 
         Scaffold(
             topBar = {
-                MyVocaTopAppBar(currentScreen = currentScreen)
+                MyVocaTopAppBar(
+                    currentScreen = currentScreen,
+                    resultLauncher = resultLauncher
+                )
             },
             bottomBar = {
                 MyVocaBottomAppBar(
@@ -64,6 +99,7 @@ fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
             }
         ) { innerPadding ->
             MyVocaNavGraph(
+                resultLauncher = resultLauncher,
                 modifier = Modifier.padding(innerPadding),
                 navController = navController
             )
@@ -88,6 +124,7 @@ private fun NavOptionsBuilder.clearPopUpStack() {
 
 @Composable
 fun MyVocaNavGraph(
+    resultLauncher: ActivityResultLauncher<Intent>,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
@@ -102,7 +139,7 @@ fun MyVocaNavGraph(
             HomeScreen()
         }
         composable(MyVocaScreen.AllWord.name) {
-            AllWordScreen()
+            AllWordScreen(resultLauncher = resultLauncher)
         }
         composable(MyVocaScreen.Quiz.name) {
             QuizScreen()

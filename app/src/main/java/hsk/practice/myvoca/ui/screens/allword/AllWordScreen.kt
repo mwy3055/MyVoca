@@ -4,6 +4,7 @@ package hsk.practice.myvoca.ui.screens.allword
 
 import android.content.Intent
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.animation.*
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
@@ -31,6 +32,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -84,6 +87,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AllWordScreen(
+    resultLauncher: ActivityResultLauncher<Intent>,
     viewModel: AllWordViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.allWordUiState.collectAsStateWithLifecycle()
@@ -94,7 +98,7 @@ fun AllWordScreen(
             val intent = Intent(context, AddWordActivity::class.java).apply {
                 putExtra(AddWordActivity.updateWordId, uiState.data!!.updateWord!!.id)
             }
-            context.startActivity(intent)
+            resultLauncher.launch(intent)
             viewModel.onWordUpdate(null)
         }
     }
@@ -175,7 +179,7 @@ private fun Content(
                 val snackbarResult = scaffoldState.snackbarHostState
                     .showSnackbar(
                         message = context.getString(
-                            R.string.has_been_deleted,
+                            R.string.delete_word_complete,
                             it.eng
                         ),
                         actionLabel = context.getString(R.string.undo),
@@ -235,7 +239,7 @@ private fun Content(
         Box(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                .padding(16.dp)
         ) {
             if (data.currentWordState.isEmpty()) {
                 WordEmptyIndicator()
@@ -640,34 +644,38 @@ private fun AllWords(
                 items = words,
                 key = { it.id },
             ) { word ->
-                WordContent(
-                    word = word,
-                    modifier = Modifier.animateItemPlacement(
-                        tween(
-                            durationMillis = 500,
-                            easing = CubicBezierEasing(0.7f, 0.1f, 0.3f, 0.9f)
-                        )
-                    )
+                Card (
+                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
                 ) {
-                    IconButton(
-                        onClick = { onWordUpdate(word) },
+                    WordContent(
+                        word = word,
+                        modifier = Modifier.animateItemPlacement(
+                            tween(
+                                durationMillis = 500,
+                                easing = CubicBezierEasing(0.7f, 0.1f, 0.3f, 0.9f)
+                            )
+                        )
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Edit,
-                            contentDescription = stringResource(
-                                R.string.update_the_word,
-                                word.eng
+                        IconButton(
+                            onClick = { onWordUpdate(word) },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Edit,
+                                contentDescription = stringResource(
+                                    R.string.update_the_word,
+                                    word.eng
+                                )
                             )
-                        )
-                    }
-                    IconButton(onClick = { onWordDelete(word) }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_delete_outline_24),
-                            contentDescription = stringResource(
-                                R.string.delete_the_word,
-                                word.eng
+                        }
+                        IconButton(onClick = { onWordDelete(word) }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_delete_outline_24),
+                                contentDescription = stringResource(
+                                    R.string.delete_the_word,
+                                    word.eng
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }
