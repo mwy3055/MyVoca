@@ -137,10 +137,14 @@ private fun TodayWords(
         enableRefresh = enableRefresh,
         onRefreshTodayWord = onRefreshTodayWord
     )
-    TodayWordItems(
-        todayWords = todayWords,
-        onTodayWordCheckboxChange = onTodayWordCheckboxChange
-    )
+    if (todayWords.isEmpty()) {
+        WordEmptyIndicator()
+    } else {
+        TodayWordItems(
+            todayWords = todayWords,
+            onTodayWordCheckboxChange = onTodayWordCheckboxChange
+        )
+    }
 }
 
 @Composable
@@ -152,17 +156,11 @@ private fun TodayWordItems(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        if (todayWords.isEmpty()) {
-            item {
-                WordEmptyIndicator()
-            }
-        } else {
-            items(todayWords) { todayWord ->
-                TodayWordContent(
-                    todayWord = todayWord,
-                    onTodayWordCheckboxChange = onTodayWordCheckboxChange
-                )
-            }
+        items(todayWords) { todayWord ->
+            TodayWordContent(
+                todayWord = todayWord,
+                onTodayWordCheckboxChange = onTodayWordCheckboxChange
+            )
         }
         item {
             Spacer(modifier = Modifier.height(10.dp))

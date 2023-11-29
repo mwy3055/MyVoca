@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -323,12 +324,14 @@ private fun ShowSearchOptionButton(
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     TextButton(
         onClick = {
             onButtonClicked()
             if (bottomSheetState.hasExpandedState) {
                 coroutineScope.launch {
+                    keyboardController?.hide()
                     bottomSheetState.partialExpand()
                 }
             }
