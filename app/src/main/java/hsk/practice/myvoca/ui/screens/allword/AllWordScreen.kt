@@ -108,7 +108,8 @@ fun AllWordScreen(
         onClearButtonClicked = viewModel::onClearOption,
         onWordUpdate = viewModel::onWordUpdate,
         onWordDelete = viewModel::onWordDelete,
-        onWordRestore = viewModel::onWordRestore
+        onWordRestore = viewModel::onWordRestore,
+        onWordDeleteCompleteUpdate = viewModel::onWordDeleteCompleteUpdate
     )
 }
 
@@ -123,6 +124,7 @@ private fun Loading(
     onWordUpdate: (VocabularyImpl) -> Unit,
     onWordDelete: (VocabularyImpl) -> Unit,
     onWordRestore: (VocabularyImpl) -> Unit,
+    onWordDeleteCompleteUpdate: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -144,6 +146,7 @@ private fun Loading(
                 onWordUpdate = onWordUpdate,
                 onWordDelete = onWordDelete,
                 onWordRestore = onWordRestore,
+                onWordDeleteCompleteUpdate = onWordDeleteCompleteUpdate,
             )
         }
     }
@@ -160,30 +163,34 @@ private fun Content(
     onWordUpdate: (VocabularyImpl) -> Unit,
     onWordDelete: (VocabularyImpl) -> Unit,
     onWordRestore: (VocabularyImpl) -> Unit,
+    onWordDeleteCompleteUpdate: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val scaffoldState = rememberBottomSheetScaffoldState()
 
-    LaunchedEffect(key1 = data.deletedWord) {
-        data.deletedWord?.let {
-            val snackbarResult = scaffoldState.snackbarHostState
-                .showSnackbar(
-                    message = context.getString(
-                        R.string.has_been_deleted,
-                        it.eng
-                    ),
-                    actionLabel = context.getString(R.string.undo),
-                    duration = SnackbarDuration.Short
-                )
-            when (snackbarResult) {
-                SnackbarResult.ActionPerformed -> {
-                    onWordRestore(data.deletedWord)
-                }
+    LaunchedEffect(key1 = data.deleteWordComplete) {
+        if (data.deleteWordComplete) {
+            data.deletedWord?.let {
+                val snackbarResult = scaffoldState.snackbarHostState
+                    .showSnackbar(
+                        message = context.getString(
+                            R.string.has_been_deleted,
+                            it.eng
+                        ),
+                        actionLabel = context.getString(R.string.undo),
+                        duration = SnackbarDuration.Short
+                    )
+                when (snackbarResult) {
+                    SnackbarResult.ActionPerformed -> {
+                        onWordRestore(data.deletedWord)
+                    }
 
-                SnackbarResult.Dismissed -> Unit
+                    SnackbarResult.Dismissed -> Unit
+                }
             }
         }
+        onWordDeleteCompleteUpdate(false)
     }
 
     BottomSheetScaffold(
@@ -634,13 +641,13 @@ private fun AllWords(
                 key = { it.id },
             ) { word ->
                 WordContent(
+                    word = word,
                     modifier = Modifier.animateItemPlacement(
                         tween(
                             durationMillis = 500,
                             easing = CubicBezierEasing(0.7f, 0.1f, 0.3f, 0.9f)
                         )
-                    ),
-                    word = word
+                    )
                 ) {
                     IconButton(
                         onClick = { onWordUpdate(word) },
@@ -724,7 +731,8 @@ private fun ContentsPreview() {
             onClearButtonClicked = {},
             onWordUpdate = {},
             onWordDelete = {},
-            onWordRestore = {}
+            onWordRestore = {},
+            onWordDeleteCompleteUpdate = { _ -> }
         )
     }
 }

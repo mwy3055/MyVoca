@@ -21,7 +21,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -127,15 +126,16 @@ class AllWordViewModel @Inject constructor(
     fun onWordDelete(word: VocabularyImpl) = viewModelScope.launch(ioDispatcher) {
         persistence.deleteVocabulary(listOf(word).toVocabularyList())
         _allWordUiState.copyData(deletedWord = word)
-        delay(50L)
-        _allWordUiState.copyData(deletedWord = null)
+        onWordDeleteCompleteUpdate(flag = true)
+    }
+
+    fun onWordDeleteCompleteUpdate(flag: Boolean) {
+        _allWordUiState.copyData(deleteWordComplete = flag)
     }
 
     fun onWordRestore(word: VocabularyImpl) = viewModelScope.launch(ioDispatcher) {
         persistence.insertVocabulary(listOf(word).toVocabularyList())
-        _allWordUiState.copyData(restoreWord = word)
-        delay(50L)
-        _allWordUiState.copyData(restoreWord = null)
+        _allWordUiState.copyData(deletedWord = null)
     }
 }
 
@@ -162,7 +162,7 @@ private fun MutableStateFlow<UiState<AllWordData>>.copyData(
     submitState: Boolean? = null,
     updateWord: VocabularyImpl? = null,
     deletedWord: VocabularyImpl? = null,
-    restoreWord: VocabularyImpl? = null,
+    deleteWordComplete: Boolean? = null
 ) {
     synchronized(this) {
         val data = value.data ?: AllWordData()
@@ -173,7 +173,7 @@ private fun MutableStateFlow<UiState<AllWordData>>.copyData(
             currentWordState = currentWordState?.toImmutableList() ?: data.currentWordState,
             updateWord = updateWord ?: data.updateWord,
             deletedWord = deletedWord ?: data.deletedWord,
-            restoreWord = restoreWord ?: data.restoreWord
+            deleteWordComplete = deleteWordComplete ?: data.deleteWordComplete
         )
         this.value = this.value.copy(data = newData)
     }
@@ -186,7 +186,7 @@ data class AllWordData(
     val currentWordState: ImmutableList<VocabularyImpl> = persistentListOf(),
     val updateWord: VocabularyImpl? = null,
     val deletedWord: VocabularyImpl? = null,
-    val restoreWord: VocabularyImpl? = null
+    val deleteWordComplete: Boolean = false,
 )
 
 enum class SortState(val korean: String) {
