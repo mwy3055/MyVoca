@@ -14,7 +14,7 @@ import androidx.compose.ui.zIndex
 @Composable
 fun LoadingIndicator(
     modifier: Modifier = Modifier,
-    backgroundColor: Color = Color.Gray.copy(alpha = 0.6f),
+    backgroundColor: Color = Color.Gray.copy(alpha = 0.2f),
     circleAlign: Alignment = Alignment.Center,
     circleFraction: Float = 0.35f,
 ) {
