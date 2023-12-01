@@ -40,7 +40,7 @@ fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
         val systemUiController = rememberSystemUiController()
         val systemBarColor = MaterialTheme.colorScheme.surface
         val context = LocalContext.current
-        val allScreens = MyVocaScreen.values().toList().toImmutableList()
+        val allScreens = MyVocaScreen.entries.toImmutableList()
         val navController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentScreen = MyVocaScreen.fromRoute(backStackEntry?.destination?.route)

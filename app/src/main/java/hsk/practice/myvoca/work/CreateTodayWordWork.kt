@@ -100,7 +100,7 @@ fun setPeriodicTodayWordWork(workManager: WorkManager) {
         .build()
     workManager.enqueueUniquePeriodicWork(
         createTodayWordWorkerTag,
-        ExistingPeriodicWorkPolicy.REPLACE,
+        ExistingPeriodicWorkPolicy.UPDATE,
         periodicWork
     )
 }
