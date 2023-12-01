@@ -1,10 +1,12 @@
 package hsk.practice.myvoca.ui.screens.home
 
+import android.content.Intent
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,9 +17,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Help
-import androidx.compose.material.icons.outlined.Autorenew
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
@@ -32,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,9 +44,11 @@ import androidx.work.WorkManager
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.data.TodayWordImpl
 import hsk.practice.myvoca.data.fakeData
+import hsk.practice.myvoca.ui.components.AddWordButton
 import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.MyVocaText
 import hsk.practice.myvoca.ui.components.WordContent
+import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import hsk.practice.myvoca.util.getTimeDiffString
 import hsk.practice.myvoca.work.setPeriodicTodayWordWork
@@ -110,14 +116,13 @@ private fun Content(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         TodayWordTitle(
             titleText = if (data.todayWords.isEmpty()) stringResource(R.string.no_registerd_word)
             else stringResource(R.string.words_are_registed, data.totalWordCount),
-            modifier = modifier.padding(top = 16.dp)
         )
+        Spacer(modifier = Modifier.height(21.dp))
         TodayWords(
             todayWords = data.todayWords,
             lastUpdatedTime = data.todayWordsLastUpdatedTime,
@@ -146,7 +151,7 @@ private fun TodayWords(
         showTodayWordHelp = showTodayWordHelp,
         enableRefresh = enableRefresh,
         onRefreshTodayWord = onRefreshTodayWord,
-        modifier = modifier.padding(top = 21.dp)
+        modifier = modifier
     )
     Spacer(modifier.height(21.dp))
     Box(
@@ -173,7 +178,8 @@ private fun TodayWordItems(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(bottom = 16.dp)
     ) {
         items(
             items = todayWords,
@@ -183,9 +189,6 @@ private fun TodayWordItems(
                 todayWord = todayWord,
                 onTodayWordCheckboxChange = onTodayWordCheckboxChange
             )
-        }
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

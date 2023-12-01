@@ -241,7 +241,7 @@ private fun Content(
         Box(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
         ) {
             when {
                 data.currentWords.isEmpty() && data.submitState -> {
@@ -644,6 +644,7 @@ private fun AllWords(
         state = listState,
         columns = GridCells.Adaptive(minSize = min(screenWidth, 330.dp)),
         verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         if (words.isEmpty()) {
             item {
@@ -689,6 +690,7 @@ private fun AllWords(
                     }
                 }
             }
+            item {}
         }
     }
 }
