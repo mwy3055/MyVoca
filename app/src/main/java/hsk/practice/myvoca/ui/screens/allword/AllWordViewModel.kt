@@ -1,7 +1,5 @@
 package hsk.practice.myvoca.ui.screens.allword
 
-import android.content.Context
-import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,14 +15,12 @@ import hsk.practice.myvoca.module.IoDispatcher
 import hsk.practice.myvoca.module.LocalVocaPersistence
 import hsk.practice.myvoca.room.vocabulary.toVocabularyImplList
 import hsk.practice.myvoca.room.vocabulary.toVocabularyList
-import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.state.UiState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -68,7 +64,7 @@ class AllWordViewModel @Inject constructor(
             Log.d("AllWordViewModel", "$data, $result")
             _allWordUiState.value = allWordUiState.value.copy(
                 loading = false,
-                data = data.copy(currentWordState = result.toImmutableList())
+                data = data.copy(currentWords = result.toImmutableList())
             )
         }
     }
@@ -78,6 +74,7 @@ class AllWordViewModel @Inject constructor(
      */
     fun onSubmitButtonClicked() {
         refreshWords()
+        _allWordUiState.copyData(submitState = true)
     }
 
     private fun onQueryChanged(query: VocabularyQuery) {
@@ -117,31 +114,28 @@ class AllWordViewModel @Inject constructor(
         _allWordUiState.copyData(
             sortState = SortState.defaultValue,
             queryState = VocabularyQuery(),
+            submitState = false
         )
         refreshWords()
     }
 
-    fun onWordUpdate(word: VocabularyImpl, context: Context) {
-        val intent = Intent(context, AddWordActivity::class.java).apply {
-            putExtra(AddWordActivity.updateWordId, word.id)
-        }
-        viewModelScope.launch(computingDispatcher) {
-            context.startActivity(intent)
-        }
+    fun onWordUpdate(vocabularyImpl: VocabularyImpl?) {
+        _allWordUiState.copyData(updateWord = vocabularyImpl)
     }
 
     fun onWordDelete(word: VocabularyImpl) = viewModelScope.launch(ioDispatcher) {
         persistence.deleteVocabulary(listOf(word).toVocabularyList())
         _allWordUiState.copyData(deletedWord = word)
-        delay(50L)
-        _allWordUiState.copyData(deletedWord = null)
+        onWordDeleteCompleteUpdate(flag = true)
+    }
+
+    fun onWordDeleteCompleteUpdate(flag: Boolean) {
+        _allWordUiState.copyData(deleteWordComplete = flag)
     }
 
     fun onWordRestore(word: VocabularyImpl) = viewModelScope.launch(ioDispatcher) {
         persistence.insertVocabulary(listOf(word).toVocabularyList())
-        _allWordUiState.copyData(restoreWord = word)
-        delay(50L)
-        _allWordUiState.copyData(restoreWord = null)
+        _allWordUiState.copyData(deletedWord = null)
     }
 }
 
@@ -150,9 +144,11 @@ private fun Collection<VocabularyImpl>.sortedBy(selector: SortState): List<Vocab
         SortState.Alphabet -> {
             this.sortedBy { it.eng }
         }
+
         SortState.Latest -> {
             this.sortedByDescending { it.addedTime }
         }
+
         SortState.Random -> {
             this.shuffled()
         }
@@ -162,18 +158,22 @@ private fun Collection<VocabularyImpl>.sortedBy(selector: SortState): List<Vocab
 private fun MutableStateFlow<UiState<AllWordData>>.copyData(
     sortState: SortState? = null,
     queryState: VocabularyQuery? = null,
-    currentWordState: List<VocabularyImpl>? = null,
+    currentWords: List<VocabularyImpl>? = null,
+    submitState: Boolean? = null,
+    updateWord: VocabularyImpl? = null,
     deletedWord: VocabularyImpl? = null,
-    restoreWord: VocabularyImpl? = null,
+    deleteWordComplete: Boolean? = null
 ) {
     synchronized(this) {
         val data = value.data ?: AllWordData()
         val newData = data.copy(
             sortState = sortState ?: data.sortState,
             queryState = queryState ?: data.queryState,
-            currentWordState = currentWordState?.toImmutableList() ?: data.currentWordState,
+            submitState = submitState ?: data.submitState,
+            currentWords = currentWords?.toImmutableList() ?: data.currentWords,
+            updateWord = updateWord ?: data.updateWord,
             deletedWord = deletedWord ?: data.deletedWord,
-            restoreWord = restoreWord ?: data.restoreWord
+            deleteWordComplete = deleteWordComplete ?: data.deleteWordComplete
         )
         this.value = this.value.copy(data = newData)
     }
@@ -182,9 +182,11 @@ private fun MutableStateFlow<UiState<AllWordData>>.copyData(
 data class AllWordData(
     val sortState: SortState = SortState.defaultValue,
     val queryState: VocabularyQuery = VocabularyQuery(),
-    val currentWordState: ImmutableList<VocabularyImpl> = persistentListOf(),
+    val submitState: Boolean = false,
+    val currentWords: ImmutableList<VocabularyImpl> = persistentListOf(),
+    val updateWord: VocabularyImpl? = null,
     val deletedWord: VocabularyImpl? = null,
-    val restoreWord: VocabularyImpl? = null
+    val deleteWordComplete: Boolean = false,
 )
 
 enum class SortState(val korean: String) {

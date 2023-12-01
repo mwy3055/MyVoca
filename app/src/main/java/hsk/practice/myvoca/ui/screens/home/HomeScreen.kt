@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -88,9 +89,7 @@ private fun Loading(
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier.fillMaxSize()
-    ) {
+    Box(modifier = modifier.fillMaxSize()) {
         if (data.loading) {
             LoadingIndicator()
         }
@@ -117,13 +116,13 @@ private fun Content(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp),
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         TodayWordTitle(
             titleText = if (data.todayWords.isEmpty()) stringResource(R.string.no_registerd_word)
             else stringResource(R.string.words_are_registed, data.totalWordCount),
-            modifier = modifier.padding(top = 16.dp)
         )
+        Spacer(modifier = Modifier.height(21.dp))
         TodayWords(
             todayWords = data.todayWords,
             lastUpdatedTime = data.todayWordsLastUpdatedTime,
@@ -152,7 +151,7 @@ private fun TodayWords(
         showTodayWordHelp = showTodayWordHelp,
         enableRefresh = enableRefresh,
         onRefreshTodayWord = onRefreshTodayWord,
-        modifier = modifier.padding(top = 21.dp)
+        modifier = modifier
     )
     Spacer(modifier.height(21.dp))
     Box(
@@ -179,7 +178,8 @@ private fun TodayWordItems(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(bottom = 16.dp)
     ) {
         items(
             items = todayWords,
@@ -354,7 +354,7 @@ private fun TodayWordTitle(
 ) {
     MyVocaText(
         text = titleText,
-        modifier = modifier,
+        modifier = Modifier.fillMaxWidth(),
         maxLines = 2,
         style = MaterialTheme.typography.headlineLarge,
     )

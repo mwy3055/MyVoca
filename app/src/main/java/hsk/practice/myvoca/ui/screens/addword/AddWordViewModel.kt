@@ -54,11 +54,19 @@ class AddWordViewModel @Inject constructor(
     }
 
     private fun updateTargetWord(word: VocabularyImpl) {
+        val meaningExistStatuses = mutableListOf<MeaningExistStatus>()
+        for (i in 1..word.meaning.size) {
+            meaningExistStatuses.add(
+                MeaningExistStatus.NOT_EXISTS
+            )
+        }
         updateTarget = word
         updateUiState(
             screenType = UpdateWord,
             word = word.eng,
+            wordExistStatus = WordExistStatus.NOT_EXISTS,
             meanings = word.meaning,
+            meaningExistStatuses = meaningExistStatuses.toImmutableList(),
             memo = word.memo ?: ""
         )
     }
