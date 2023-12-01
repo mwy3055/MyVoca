@@ -21,7 +21,7 @@ import kotlinx.coroutines.withContext
 class FirestoreDownloadWordsWork @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val database: RoomVocaDatabase
+    private val database: RoomVocaDatabase,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -63,7 +63,7 @@ class FirestoreDownloadWordsWork @AssistedInject constructor(
 
     private suspend fun startDownloadAndAwait(
         reference: CollectionReference,
-        onFailure: (Throwable) -> Unit = {}
+        onFailure: (Throwable) -> Unit = {},
     ): QuerySnapshot {
         return reference.get().addOnFailureListener(onFailure).await()
     }
@@ -88,7 +88,7 @@ private const val downloadWorkTag = "FirestoreDownloadWork"
 
 fun setFirestoreDownloadWork(
     workManager: WorkManager,
-    userId: String
+    userId: String,
 ) {
     val data = workDataOf(FirestoreDownloadWordsWork.userIdKey to userId)
     val work = OneTimeWorkRequestBuilder<FirestoreDownloadWordsWork>()

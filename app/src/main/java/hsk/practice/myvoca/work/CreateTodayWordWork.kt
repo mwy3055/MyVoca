@@ -25,7 +25,7 @@ class CreateTodayWordWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val database: RoomVocaDatabase,
-    private val dataStore: PreferencesDataStore
+    private val dataStore: PreferencesDataStore,
 ) : CoroutineWorker(context, workerParams) {
 
     private val todayWordSize = 5
@@ -73,14 +73,14 @@ class CreateTodayWordWorker @AssistedInject constructor(
         writeLogToFile(
             context = applicationContext,
             filename = "today-word-worker.txt",
-            log = "Save Today word - $todayWords"
+            log = "Save Today word - $todayWords",
         )
     }
 
     private suspend fun setLastUpdatedTime() {
         dataStore.setPreference(
             MyVocaPreferencesKey.todayWordLastUpdatedKey,
-            LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+            LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
         )
     }
 

@@ -31,7 +31,7 @@ import javax.inject.Inject
 class AllWordViewModel @Inject constructor(
     @LocalVocaPersistence private val persistence: VocaPersistence,
     @ComputingDispatcher private val computingDispatcher: CoroutineDispatcher,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _allWordUiState = MutableStateFlow(UiState<AllWordData>(loading = true))
@@ -64,7 +64,7 @@ class AllWordViewModel @Inject constructor(
             Log.d("AllWordViewModel", "$data, $result")
             _allWordUiState.value = allWordUiState.value.copy(
                 loading = false,
-                data = data.copy(currentWords = result.toImmutableList())
+                data = data.copy(currentWords = result.toImmutableList()),
             )
         }
     }
@@ -114,7 +114,7 @@ class AllWordViewModel @Inject constructor(
         _allWordUiState.copyData(
             sortState = SortState.defaultValue,
             queryState = VocabularyQuery(),
-            submitState = false
+            submitState = false,
         )
         refreshWords()
     }
@@ -162,7 +162,7 @@ private fun MutableStateFlow<UiState<AllWordData>>.copyData(
     submitState: Boolean? = null,
     updateWord: VocabularyImpl? = null,
     deletedWord: VocabularyImpl? = null,
-    deleteWordComplete: Boolean? = null
+    deleteWordComplete: Boolean? = null,
 ) {
     synchronized(this) {
         val data = value.data ?: AllWordData()
@@ -173,7 +173,7 @@ private fun MutableStateFlow<UiState<AllWordData>>.copyData(
             currentWords = currentWords?.toImmutableList() ?: data.currentWords,
             updateWord = updateWord ?: data.updateWord,
             deletedWord = deletedWord ?: data.deletedWord,
-            deleteWordComplete = deleteWordComplete ?: data.deleteWordComplete
+            deleteWordComplete = deleteWordComplete ?: data.deleteWordComplete,
         )
         this.value = this.value.copy(data = newData)
     }

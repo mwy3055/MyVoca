@@ -9,11 +9,11 @@ import kotlin.math.min
 @Composable
 fun StaggeredGrid(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Layout(
         content = content,
-        modifier = modifier
+        modifier = modifier,
     ) { measurables, constraints ->
         // Don't constrain child views further, measure them with given constraints
         val sizes = mutableListOf<Size>()
@@ -49,7 +49,7 @@ fun StaggeredGrid(
             places.zip(placeables).forEach { (place, placeable) ->
                 placeable.place(
                     x = place.x,
-                    y = place.y
+                    y = place.y,
                 )
             }
         }
@@ -58,10 +58,10 @@ fun StaggeredGrid(
 
 private data class Size(
     val width: Int,
-    val height: Int
+    val height: Int,
 )
 
 private data class Place(
     val x: Int,
-    val y: Int
+    val y: Int,
 )

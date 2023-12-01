@@ -32,7 +32,9 @@ import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor(@ApplicationContext context: Context) : ViewModel() {
+class ProfileViewModel @Inject constructor(
+    @ApplicationContext context: Context,
+) : ViewModel() {
 
     private val workManager = WorkManager.getInstance(context)
 
@@ -51,17 +53,17 @@ class ProfileViewModel @Inject constructor(@ApplicationContext context: Context)
         val uploadData = UploadActionData(
             onClick = onUploadClick,
             onConfirm = this::onUploadConfirm,
-            onDismiss = this::onUploadDismiss
+            onDismiss = this::onUploadDismiss,
         )
         val downloadData = DownloadActionData(
             onClick = onDownloadClick,
             onConfirm = this::onDownloadConfirm,
-            onDismiss = this::onDownloadDismiss
+            onDismiss = this::onDownloadDismiss,
         )
 
         _profileScreenData.value = profileScreenData.value.copy(
             uploadActionData = uploadData,
-            downloadActionData = downloadData
+            downloadActionData = downloadData,
         )
 
         MyFirebaseAuth.addAuthStateListener { auth ->
@@ -88,7 +90,7 @@ class ProfileViewModel @Inject constructor(@ApplicationContext context: Context)
     /* Event listeners for Compose UI */
     fun onLoginButtonClick(
         context: Context,
-        launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
+        launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
     ) = MyFirebaseAuth.launchGoogleLogin(context, launcher)
 
     fun onTryLogin(result: ActivityResult) = MyFirebaseAuth.tryGoogleLogin(result)
@@ -99,7 +101,7 @@ class ProfileViewModel @Inject constructor(@ApplicationContext context: Context)
                 uid = user.uid,
                 username = user.displayName,
                 email = user.email,
-                profileImageUrl = user.photoUrl
+                profileImageUrl = user.photoUrl,
             )
         } else {
             null
@@ -170,7 +172,7 @@ class ProfileViewModel @Inject constructor(@ApplicationContext context: Context)
 data class ProfileScreenData(
     val user: UserImpl? = null,
     val uploadActionData: UploadActionData = UploadActionData(),
-    val downloadActionData: DownloadActionData = DownloadActionData()
+    val downloadActionData: DownloadActionData = DownloadActionData(),
 ) {
     fun copy(
         showUploadDialog: Boolean = uploadActionData.showUploadDialog,
@@ -178,18 +180,18 @@ data class ProfileScreenData(
     ): ProfileScreenData {
         val newUploadData = uploadActionData.copy(
             showUploadDialog = showUploadDialog,
-            uploadProgress = uploadProgress
+            uploadProgress = uploadProgress,
         )
         return this.copy(uploadActionData = newUploadData)
     }
 
     fun copy(
         showDownloadDialog: Boolean = downloadActionData.showDownloadDialog,
-        downloadPossible: Boolean? = downloadActionData.downloadPossible
+        downloadPossible: Boolean? = downloadActionData.downloadPossible,
     ): ProfileScreenData {
         val newDownloadData = downloadActionData.copy(
             showDownloadDialog = showDownloadDialog,
-            downloadPossible = downloadPossible
+            downloadPossible = downloadPossible,
         )
         return this.copy(downloadActionData = newDownloadData)
     }
@@ -197,7 +199,7 @@ data class ProfileScreenData(
 
 data class ProfileAction(
     val icon: ImageVector,
-    val text: UiText
+    val text: UiText,
 )
 
 data class UploadActionData(
@@ -205,11 +207,11 @@ data class UploadActionData(
     val uploadProgress: Float? = null,
     val onClick: () -> Unit = {},
     val onConfirm: () -> Unit = {},
-    val onDismiss: () -> Unit = {}
+    val onDismiss: () -> Unit = {},
 ) {
     val actionData: ProfileAction = ProfileAction(
         icon = Icons.Outlined.FileUpload,
-        text = UiText.StringResource(R.string.back_up_word)
+        text = UiText.StringResource(R.string.back_up_word),
     )
 
     val uploading: Boolean
@@ -223,7 +225,7 @@ data class DownloadActionData(
     val downloadPossible: Boolean? = null,
     val onClick: () -> Unit = {},
     val onConfirm: () -> Unit = {},
-    val onDismiss: () -> Unit = {}
+    val onDismiss: () -> Unit = {},
 ) {
     val actionData: ProfileAction = ProfileAction(
         icon = Icons.Outlined.FileDownload,

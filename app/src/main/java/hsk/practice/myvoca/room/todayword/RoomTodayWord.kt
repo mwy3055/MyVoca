@@ -11,5 +11,5 @@ data class RoomTodayWord(
     val todayWordId: Int = 0,
     @ColumnInfo(name = "vocabulary_id")
     val vocabularyId: Int,
-    val checked: Boolean
+    val checked: Boolean,
 )

@@ -29,7 +29,7 @@ object VocaRepositoryModule {
     @RoomVocaRepository
     @Provides
     fun provideRoomVocaRepository(
-        @LocalVocaPersistence vocaPersistence: VocaPersistence
+        @LocalVocaPersistence vocaPersistence: VocaPersistence,
     ): VocaRepository = VocaRepository(vocaPersistence)
 
     @FakeVocaRepository

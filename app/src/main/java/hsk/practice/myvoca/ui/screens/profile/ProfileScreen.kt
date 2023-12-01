@@ -55,7 +55,7 @@ import hsk.practice.myvoca.ui.theme.MyVocaTheme
 
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val data by viewModel.profileScreenData.collectAsStateWithLifecycle()
 
@@ -83,23 +83,23 @@ private fun Content(
         ProfileImage(
             modifier = Modifier
                 .padding(start = 20.dp),
-            imageUrl = user?.profileImageUrl
+            imageUrl = user?.profileImageUrl,
         )
 
         Box(
             modifier = Modifier.height(48.dp),
-            contentAlignment = Alignment.CenterStart
+            contentAlignment = Alignment.CenterStart,
         ) {
             if (user == null) {
                 Login(
                     onTryLogin = onTryLogin,
-                    onLoginButtonClick = onLoginButtonClick
+                    onLoginButtonClick = onLoginButtonClick,
                 )
             } else {
                 UserInfo(
                     username = user.username ?: stringResource(R.string.unknown_name),
                     email = user.email ?: stringResource(R.string.unknown_email),
-                    onLogout = onLogout
+                    onLogout = onLogout,
                 )
             }
         }
@@ -119,7 +119,7 @@ private fun Content(
 @Composable
 private fun ProfileImage(
     modifier: Modifier = Modifier,
-    imageUrl: Uri?
+    imageUrl: Uri?,
 ) {
     val imageSize = 150
     val modifierWithSize = modifier.size(imageSize.dp)
@@ -149,12 +149,12 @@ private fun ProfileImage(
 private fun UserInfo(
     username: String,
     email: String,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Column(
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         ) {
             Username(username = username)
             UserEmail(email = email)
@@ -174,7 +174,7 @@ private fun LogOutButton(onLogout: () -> Unit) {
 private fun UserEmail(email: String) {
     MyVocaText(
         text = email,
-        style = MaterialTheme.typography.displayLarge
+        style = MaterialTheme.typography.displayLarge,
     )
 }
 
@@ -182,14 +182,14 @@ private fun UserEmail(email: String) {
 private fun Username(username: String) {
     MyVocaText(
         text = username,
-        style = MaterialTheme.typography.headlineSmall
+        style = MaterialTheme.typography.headlineSmall,
     )
 }
 
 @Composable
 private fun Login(
     onTryLogin: (ActivityResult) -> Unit,
-    onLoginButtonClick: (Context, ManagedActivityResultLauncher<Intent, ActivityResult>) -> Unit
+    onLoginButtonClick: (Context, ManagedActivityResultLauncher<Intent, ActivityResult>) -> Unit,
 ) {
     val googleLoginLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
@@ -247,14 +247,14 @@ private fun UserActionUploadWords(
             .clickable(enabled = enabled, onClick = data.onClick)
             .aspectRatio(1f)
             .alpha(alpha),
-        verticalArrangement = Arrangement.SpaceEvenly
+        verticalArrangement = Arrangement.SpaceEvenly,
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
                 imageVector = actionData.icon,
                 contentDescription = actionData.text.asString(),
                 modifier = Modifier.fillMaxSize(fraction = actionIconFraction),
-                tint = color
+                tint = color,
             )
             if (data.uploadProgress != null) {
                 CircularProgressIndicator(
@@ -285,12 +285,12 @@ private fun UserActionDownloadWords(data: DownloadActionData) {
             .clickable(enabled = enabled, onClick = data.onClick)
             .aspectRatio(1f)
             .alpha(contentAlpha),
-        verticalArrangement = Arrangement.SpaceEvenly
+        verticalArrangement = Arrangement.SpaceEvenly,
     ) {
         Icon(
             imageVector = actionData.icon,
             contentDescription = actionData.text.asString(),
-            modifier = Modifier.fillMaxSize(fraction = actionIconFraction)
+            modifier = Modifier.fillMaxSize(fraction = actionIconFraction),
         )
         MyVocaText(text = actionData.text.asString())
     }
@@ -303,7 +303,7 @@ private fun UserActionDownloadWords(data: DownloadActionData) {
 @Composable
 private fun UploadDialog(
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     AlertDialog(
         title = { MyVocaText(text = stringResource(R.string.back_up_your_words)) },
@@ -323,14 +323,14 @@ private fun UploadDialog(
                 MyVocaText(text = stringResource(R.string.cancellation))
             }
         },
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
     )
 }
 
 @Composable
 private fun DownloadDialog(
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     AlertDialog(
         title = { MyVocaText(text = stringResource(R.string.restore_words)) },
@@ -350,7 +350,7 @@ private fun DownloadDialog(
                 MyVocaText(text = stringResource(id = R.string.cancellation))
             }
         },
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
     )
 }
 

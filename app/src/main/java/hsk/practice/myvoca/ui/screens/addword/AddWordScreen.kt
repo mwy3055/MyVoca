@@ -92,14 +92,14 @@ fun AddWordScreen(
                 showWebView = uiState.showWebView,
                 onHideWebView = viewModel::onHideWebView,
                 onClose = onClose,
-                elevation = 16.dp
+                elevation = 16.dp,
             )
-        }
+        },
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(innerPadding),
         ) {
             Content(
                 data = uiState,
@@ -112,7 +112,7 @@ fun AddWordScreen(
                 onMeaningDelete = viewModel::onMeaningDelete,
                 onMemoUpdate = viewModel::onMemoUpdate,
                 onShowWebView = viewModel::onShowWebView,
-                onUpdateWebViewUrl = viewModel::onUpdateWebViewUrl
+                onUpdateWebViewUrl = viewModel::onUpdateWebViewUrl,
             )
 
             if (uiState.showWebView) {
@@ -131,7 +131,7 @@ fun AddWordScreen(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .fillMaxHeight(0.5f)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
                 )
             }
         }
@@ -161,18 +161,18 @@ private fun TopBar(
             if (showWebView) {
                 TopBarCompleteButton(
                     textColor = MaterialTheme.colorScheme.onSurface,
-                    onHideWebView = onHideWebView
+                    onHideWebView = onHideWebView,
                 )
             } else {
                 TopBarSaveButton(
                     onAddWord = onAddWord,
                     onClose = onClose,
                     addButtonEnabled = addButtonEnabled,
-                    textColor = MaterialTheme.colorScheme.onSurface.copy(alpha = textAlpha)
+                    textColor = MaterialTheme.colorScheme.onSurface.copy(alpha = textAlpha),
                 )
             }
         },
-        elevation = elevation
+        elevation = elevation,
     )
 }
 
@@ -184,7 +184,7 @@ private fun TopBarTitle(screenType: ScreenType) {
     }
     MyVocaText(
         text = title,
-        color = MaterialTheme.colorScheme.onSurface
+        color = MaterialTheme.colorScheme.onSurface,
     )
 }
 
@@ -193,7 +193,7 @@ private fun TopBarCloseButton(onClose: () -> Unit) {
     IconButton(onClick = onClose) {
         Icon(
             imageVector = Icons.Outlined.Close,
-            contentDescription = stringResource(R.string.close_the_screen)
+            contentDescription = stringResource(R.string.close_the_screen),
         )
     }
 }
@@ -213,11 +213,12 @@ private fun TopBarSaveButton(
             onAddWord()
             onClose()
         },
-        enabled = addButtonEnabled
+        modifier = modifier,
+        enabled = addButtonEnabled,
     ) {
         MyVocaText(
             text = stringResource(R.string.save),
-            color = textColor
+            color = textColor,
         )
     }
 }
@@ -234,10 +235,11 @@ private fun TopBarCompleteButton(
             focusManager.clearFocus()
             onHideWebView()
         },
+        modifier = modifier,
     ) {
         MyVocaText(
             text = stringResource(R.string.complete),
-            color = textColor
+            color = textColor,
         )
     }
 }
@@ -262,7 +264,7 @@ private fun Content(
             .fillMaxHeight(if (data.showWebView) 0.5f else 1f)
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(top = 16.dp, start = 16.dp)
+            .padding(top = 16.dp, start = 16.dp),
     ) {
         EssentialTitle()
         Word(
@@ -272,7 +274,7 @@ private fun Content(
             onWordUpdate = onWordUpdate,
             onWordClear = onWordClear,
             onShowWebView = onShowWebView,
-            onUpdateWebViewUrl = onUpdateWebViewUrl
+            onUpdateWebViewUrl = onUpdateWebViewUrl,
         )
         Meanings(
             meanings = data.meanings,
@@ -280,7 +282,7 @@ private fun Content(
             onMeaningCheck = onMeaningCheck,
             onMeaningAdd = onMeaningAdd,
             onMeaningUpdate = onMeaningUpdate,
-            onMeaningDelete = onMeaningDelete
+            onMeaningDelete = onMeaningDelete,
         )
         Spacer(modifier = Modifier.height(10.dp))
         OptionalTitle()
@@ -289,7 +291,7 @@ private fun Content(
             onMemoUpdate = onMemoUpdate,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(end = 16.dp)
+                .padding(end = 16.dp),
         )
     }
 }
@@ -300,7 +302,8 @@ private fun EssentialTitle(
 ) {
     MyVocaText(
         text = stringResource(R.string.required_inputs),
-        style = MaterialTheme.typography.headlineSmall
+        modifier = modifier,
+        style = MaterialTheme.typography.headlineSmall,
     )
 }
 
@@ -310,7 +313,8 @@ private fun OptionalTitle(
 ) {
     MyVocaText(
         text = stringResource(R.string.selective_inputs),
-        style = MaterialTheme.typography.headlineSmall
+        modifier = modifier,
+        style = MaterialTheme.typography.headlineSmall,
     )
 }
 
@@ -324,7 +328,7 @@ private fun Word(
     onShowWebView: () -> Unit,
     onUpdateWebViewUrl: () -> Unit,
     modifier: Modifier = Modifier,
-    focusManager: FocusManager = LocalFocusManager.current
+    focusManager: FocusManager = LocalFocusManager.current,
 ) {
     LaunchedEffect(word) {
         loadStatus(word)
@@ -341,16 +345,16 @@ private fun Word(
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     OutlinedTextField(
                         modifier = Modifier.weight(1f),
@@ -370,7 +374,7 @@ private fun Word(
                                     Icon(
                                         imageVector = statusIcon,
                                         contentDescription = stringResource(R.string.status_icon_description),
-                                        tint = iconColor
+                                        tint = iconColor,
                                     )
                                 }
                             }
@@ -378,7 +382,7 @@ private fun Word(
                         singleLine = true,
                         isError = (status == WordExistStatus.DUPLICATE),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
+                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                     )
                     IconButton(
                         onClick = {
@@ -398,13 +402,13 @@ private fun Word(
                     targetValue = if (status == WordExistStatus.DUPLICATE) iconColor else Color.Transparent,
                     animationSpec = tween(
                         durationMillis = 300,
-                    )
+                    ),
                 )
                 MyVocaText(
                     text = stringResource(R.string.this_word_has_already_been_registerd),
                     modifier = Modifier.padding(start = 16.dp, top = 4.dp),
                     style = MaterialTheme.typography.bodySmall,
-                    color = duplicateTextColor
+                    color = duplicateTextColor,
                 )
             }
         }
@@ -425,7 +429,7 @@ private fun Meanings(
         modifier = modifier,
     ) {
         MeaningChips(
-            onMeaningAdd = onMeaningAdd
+            onMeaningAdd = onMeaningAdd,
         )
         Spacer(modifier = Modifier.height(16.dp))
         if (meanings.isEmpty()) {
@@ -433,7 +437,7 @@ private fun Meanings(
                 modifier = Modifier
                     .height(meaningHeight)
                     .fillMaxWidth()
-                    .padding(end = 16.dp)
+                    .padding(end = 16.dp),
             )
         } else {
             MeaningsContent(
@@ -441,7 +445,7 @@ private fun Meanings(
                 statusList = statusList,
                 onMeaningCheck = onMeaningCheck,
                 onMeaningUpdate = onMeaningUpdate,
-                onMeaningDelete = onMeaningDelete
+                onMeaningDelete = onMeaningDelete,
             )
         }
     }
@@ -454,14 +458,16 @@ private fun MeaningChips(
     onMeaningAdd: (WordClassImpl) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyRow {
+    LazyRow(
+        modifier = modifier,
+    ) {
         items(
             items = WordClassImpl.actualValues(),
             key = { it.korean },
         ) {
             WordClassChip(
                 wordClass = it,
-                onMeaningAdd = onMeaningAdd
+                onMeaningAdd = onMeaningAdd,
             )
         }
     }
@@ -477,20 +483,20 @@ private fun WordClassChip(
         modifier = modifier.padding(4.dp),
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.primaryContainer,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimaryContainer)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimaryContainer),
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .clickable { onMeaningAdd(wordClass) }
+                .clickable { onMeaningAdd(wordClass) },
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)
+                modifier = Modifier.padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Add,
-                    contentDescription = stringResource(R.string.add_icon_description)
+                    contentDescription = stringResource(R.string.add_icon_description),
                 )
                 WordClassChipText(wordClass = wordClass)
             }
@@ -510,12 +516,12 @@ private fun WordClassChipIcon(
             .size(30.dp)
             .background(
                 color = Color.Transparent,
-                shape = CircleShape
+                shape = CircleShape,
             ),
     ) {
         Icon(
             imageVector = Icons.Outlined.Add,
-            contentDescription = stringResource(R.string.add_icon_description, wordClass)
+            contentDescription = stringResource(R.string.add_icon_description, wordClass),
         )
     }
 }
@@ -527,7 +533,7 @@ private fun WordClassChipText(
 ) {
     MyVocaText(
         text = wordClass.korean,
-        modifier = modifier.padding(end = 4.dp)
+        modifier = modifier.padding(end = 4.dp),
     )
 }
 
@@ -541,12 +547,12 @@ private fun MeaningsEmptyIndicator(
                 .fillMaxWidth()
                 .padding(vertical = 8.dp, horizontal = 16.dp),
             horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             MyVocaText(
                 text = stringResource(R.string.please_add_a_meaning),
                 color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
         }
     }
@@ -566,7 +572,7 @@ private fun MeaningsContent(
         modifier = modifier
             .fillMaxWidth()
             .height(meaningHeight)
-            .verticalScroll(scrollState)
+            .verticalScroll(scrollState),
     ) {
         meanings.forEachIndexed { index, meaning ->
             Meaning(
@@ -575,7 +581,7 @@ private fun MeaningsContent(
                 statusList = statusList,
                 onMeaningCheck = onMeaningCheck,
                 onMeaningUpdate = onMeaningUpdate,
-                onMeaningDelete = onMeaningDelete
+                onMeaningDelete = onMeaningDelete,
             )
         }
     }
@@ -600,22 +606,22 @@ private fun Meaning(
         focusedContainerColor = Color.Transparent,
         unfocusedContainerColor = Color.Transparent,
         disabledContainerColor = Color.Transparent,
-        errorContainerColor = Color.Transparent
+        errorContainerColor = Color.Transparent,
     )
     val statusIcon = getMeaningStatusIcon(statusList[index])
     val iconColor = getMeaningStatusIconColor(statusList[index])
 
     Row(
         modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(
             modifier = Modifier
                 .weight(1f)
-                .height(84.dp)
+                .height(84.dp),
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 OutlinedTextField(
                     modifier = Modifier
@@ -655,8 +661,7 @@ private fun Meaning(
                     singleLine = true,
                     isError = (statusList[index] == MeaningExistStatus.DUPLICATE),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }
-                    )
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 )
                 IconButton(
                     onClick = { onMeaningDelete(index) },
@@ -667,8 +672,8 @@ private fun Meaning(
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         contentDescription = stringResource(
                             R.string.delete_the_meaning,
-                            meaning.content
-                        )
+                            meaning.content,
+                        ),
                     )
                 }
             }
@@ -676,7 +681,7 @@ private fun Meaning(
                 targetValue = if (statusList[index] == MeaningExistStatus.DUPLICATE) iconColor else Color.Transparent,
                 animationSpec = tween(
                     durationMillis = 300,
-                )
+                ),
             )
             MyVocaText(
                 text = stringResource(R.string.this_meaning_has_already_been_registerd),
@@ -780,7 +785,7 @@ private fun AddWordScreenPreview() {
                 onMeaningDelete = {},
                 onMemoUpdate = {},
                 onShowWebView = {},
-                onUpdateWebViewUrl = {}
+                onUpdateWebViewUrl = {},
             )
         }
     }
@@ -797,7 +802,7 @@ private fun MeaningPreview() {
             statusList = persistentListOf(),
             onMeaningCheck = { _, _ -> },
             onMeaningUpdate = { _, _ -> },
-            onMeaningDelete = {}
+            onMeaningDelete = {},
         )
     }
 }
@@ -814,7 +819,7 @@ private fun TopBarPreview() {
             showWebView = false,
             onHideWebView = {},
             onClose = {},
-            elevation = 16.dp
+            elevation = 16.dp,
         )
     }
 }

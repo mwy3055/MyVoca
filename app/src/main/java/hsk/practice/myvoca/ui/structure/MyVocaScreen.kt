@@ -8,7 +8,7 @@ import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class MyVocaScreen(
-    val icon: ImageVector
+    val icon: ImageVector,
 ) {
     Home(
         icon = Icons.Outlined.Home
@@ -26,7 +26,7 @@ enum class MyVocaScreen(
     companion object {
         fun fromRoute(route: String?): MyVocaScreen {
             return route?.let {
-                values().firstOrNull { screen -> route.substringBefore("/") == screen.name }
+                entries.firstOrNull { screen -> route.substringBefore("/") == screen.name }
             } ?: Home
         }
     }

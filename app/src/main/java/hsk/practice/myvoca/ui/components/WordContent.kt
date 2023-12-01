@@ -47,7 +47,7 @@ import kotlinx.collections.immutable.toImmutableList
 fun WordContent(
     word: VocabularyImpl,
     modifier: Modifier = Modifier,
-    iconContent: @Composable RowScope.() -> Unit = {}
+    iconContent: @Composable RowScope.() -> Unit = {},
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
@@ -56,7 +56,7 @@ fun WordContent(
         word = word,
         expanded = expanded,
         onExpanded = { expanded = !it },
-        iconContent = iconContent
+        iconContent = iconContent,
     )
 }
 
@@ -67,22 +67,22 @@ fun WordContent(
     onExpanded: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     showExpandButton: Boolean = true,
-    iconContent: @Composable RowScope.() -> Unit = {}
+    iconContent: @Composable RowScope.() -> Unit = {},
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.primaryContainer)
             .padding(start = 12.dp, top = 6.dp, bottom = 6.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         if (word.id != 0) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 WordTitle(
                     title = word.eng,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
                 iconContent()
             }
@@ -92,7 +92,7 @@ fun WordContent(
                     meanings = word.meaning,
                     showExpandButton = showExpandButton,
                     expanded = expanded,
-                    onClick = onExpanded
+                    onClick = onExpanded,
                 )
             }
         }
@@ -102,7 +102,7 @@ fun WordContent(
 @Composable
 fun WordTitle(
     title: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     MyVocaText(
         modifier = modifier,
@@ -117,7 +117,7 @@ fun WordMeanings(
     modifier: Modifier = Modifier,
     showExpandButton: Boolean = true,
     expanded: Boolean = false,
-    onClick: (Boolean) -> Unit = {}
+    onClick: (Boolean) -> Unit = {},
 ) {
     val textStyle = LocalTextStyle.current
     val meaningsTruncated = meanings.size >= 3
@@ -126,25 +126,25 @@ fun WordMeanings(
     val (firstMeanings, lastMeanings) = getTruncatedMeanings(meaningsTruncated, meanings)
     Row(
         modifier = if (canExpand) modifier.clickable { onClick(expanded) }
-        else modifier.fillMaxWidth()
+        else modifier.fillMaxWidth(),
     ) {
         Column(
             modifier = Modifier
                 .weight(1f)
                 .animateContentSize(),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             firstMeanings.forEach { meaning ->
                 WordMeaning(
                     meaning = meaning,
-                    textStyle = textStyle
+                    textStyle = textStyle,
                 )
             }
             if (expanded) {
                 lastMeanings.forEach { meaning ->
                     WordMeaning(
                         meaning = meaning,
-                        textStyle = textStyle
+                        textStyle = textStyle,
                     )
                 }
             }
@@ -156,12 +156,12 @@ fun WordMeanings(
             )
             IconButton(
                 onClick = { onClick(expanded) },
-                modifier = Modifier.align(Alignment.Bottom)
+                modifier = Modifier.align(Alignment.Bottom),
             ) {
                 Icon(
                     imageVector = Icons.Filled.ExpandMore,
                     contentDescription = null,
-                    modifier = Modifier.rotate(iconAngle)
+                    modifier = Modifier.rotate(iconAngle),
                 )
             }
         }
@@ -180,18 +180,18 @@ private fun getTruncatedMeanings(meaningsTruncated: Boolean, meanings: List<Mean
 fun WordMeaning(
     meaning: MeaningImpl,
     textStyle: TextStyle,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colorScheme.secondary)
-                .padding(horizontal = 4.dp, vertical = 2.dp)
+                .padding(horizontal = 4.dp, vertical = 2.dp),
         ) {
             MyVocaText(
                 text = meaning.type.korean.first().toString(),
@@ -222,7 +222,7 @@ fun WordContentPreview() {
         ).toImmutableList(),
         addedTime = currentTime,
         lastEditedTime = currentTime,
-        memo = ""
+        memo = "",
     )
 
     var expanded by remember { mutableStateOf(false) }
@@ -230,11 +230,11 @@ fun WordContentPreview() {
         WordContent(
             word = word,
             expanded = expanded,
-            onExpanded = { expanded = !it }
+            onExpanded = { expanded = !it },
         ) {
             Icon(
                 imageVector = Icons.Outlined.Add,
-                contentDescription = null
+                contentDescription = null,
             )
         }
     }

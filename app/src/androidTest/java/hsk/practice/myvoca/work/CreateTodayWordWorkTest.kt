@@ -61,13 +61,13 @@ class CreateTodayWordWorkTest {
                 override fun createWorker(
                     appContext: Context,
                     workerClassName: String,
-                    workerParameters: WorkerParameters
+                    workerParameters: WorkerParameters,
                 ): ListenableWorker {
                     return CreateTodayWordWorker(
                         context,
                         workerParameters,
                         database,
-                        dataStore
+                        dataStore,
                     )
                 }
             }).build()

@@ -46,7 +46,7 @@ import kotlinx.collections.immutable.toImmutableList
 @Composable
 fun QuizScreen(
     modifier: Modifier = Modifier,
-    viewModel: QuizViewModel = hiltViewModel()
+    viewModel: QuizViewModel = hiltViewModel(),
 ) {
     val quizScreenData by viewModel.quizScreenData.collectAsStateWithLifecycle()
 
@@ -54,7 +54,7 @@ fun QuizScreen(
         quizScreenData = quizScreenData,
         onOptionClick = viewModel::onQuizOptionSelected,
         onCloseDialog = viewModel::onResultDialogClose,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -66,14 +66,14 @@ private fun Loading(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier.background(MaterialTheme.colorScheme.surface)
+        modifier = modifier.background(MaterialTheme.colorScheme.surface),
     ) {
         when (quizScreenData.quizState) {
             is QuizAvailable -> {
                 QuizContent(
                     quiz = quizScreenData.quiz,
                     quizStat = quizScreenData.quizStat,
-                    onOptionClick = onOptionClick
+                    onOptionClick = onOptionClick,
                 )
             }
 
@@ -85,7 +85,7 @@ private fun Loading(
                 LoadingIndicator(
                     modifier = Modifier
                         .fillMaxSize()
-                        .align(Alignment.Center)
+                        .align(Alignment.Center),
                 )
             }
         }
@@ -107,13 +107,13 @@ private fun QuizNotAvailable(
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         MyVocaText(
             text = stringResource(R.string.need_more_words, need),
             color = Color.Black,
             style = MaterialTheme.typography.headlineSmall,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(16.dp))
         AddWordButton(
@@ -131,7 +131,7 @@ private fun QuizContent(
     quiz: Quiz,
     quizStat: QuizStat,
     onOptionClick: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val versusViewState =
         rememberVersusViewState(leftValue = quizStat.correct, rightValue = quizStat.wrong)
@@ -139,7 +139,7 @@ private fun QuizContent(
         modifier = modifier
             .fillMaxSize()
             .padding(start = 16.dp, end = 16.dp, bottom = 32.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Spacer(modifier = Modifier.weight(1f))
         QuizTitle(quiz.answer)
@@ -147,13 +147,13 @@ private fun QuizContent(
         QuizOptions(
             modifier = Modifier.weight(8f),
             options = quiz.quizWords,
-            onOptionClick = onOptionClick
+            onOptionClick = onOptionClick,
         )
         VersusView(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            versusViewState = versusViewState
+            versusViewState = versusViewState,
         )
     }
 }
@@ -176,7 +176,7 @@ private fun QuizTitle(
                 if (result.didOverflowWidth) {
                     updateTextStyle(textStyle.copy(fontSize = textStyle.fontSize * 0.9))
                 }
-            }
+            },
         )
     }
 }
@@ -189,13 +189,13 @@ private fun QuizOptions(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         options.forEachIndexed { index, option ->
             QuizOption(
                 index = index,
                 option = option,
-                onOptionClick = onOptionClick
+                onOptionClick = onOptionClick,
             )
         }
     }
@@ -216,7 +216,7 @@ private fun QuizOption(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer
+            disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ),
         elevation = CardDefaults.cardElevation(4.dp),
 
@@ -247,15 +247,15 @@ private fun Result(
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd
+                contentAlignment = Alignment.CenterEnd,
             ) {
                 TextButton(
-                    onClick = { onCloseDialog(resultData) }
+                    onClick = { onCloseDialog(resultData) },
                 ) {
                     MyVocaText(
                         text = stringResource(id = R.string.check),
                         color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                 }
             }
@@ -267,7 +267,7 @@ private fun Result(
         text = {
             WordContent(resultData.answer)
         },
-        containerColor = MaterialTheme.colorScheme.primaryContainer
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
     )
 }
 
@@ -284,7 +284,7 @@ private fun QuizNotAvailablePreview() {
 private fun QuizScreenPreview() {
     val quiz = Quiz(
         quizWords = fakeData.distinctRandoms(quizSize).toImmutableList(),
-        answerIndex = (0 until quizSize).random()
+        answerIndex = (0 until quizSize).random(),
     )
     val quizStat = QuizStat(10, 5)
 
@@ -296,7 +296,7 @@ private fun QuizScreenPreview() {
             QuizContent(
                 quiz = quiz,
                 quizStat = quizStat,
-                onOptionClick = { text = it.toString() }
+                onOptionClick = { text = it.toString() },
             )
         }
     }
