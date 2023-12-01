@@ -1,5 +1,6 @@
 package hsk.practice.myvoca.ui.screens.home
 
+import android.content.Intent
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -15,9 +16,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Help
-import androidx.compose.material.icons.outlined.Autorenew
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
@@ -32,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,9 +43,11 @@ import androidx.work.WorkManager
 import hsk.practice.myvoca.R
 import hsk.practice.myvoca.data.TodayWordImpl
 import hsk.practice.myvoca.data.fakeData
+import hsk.practice.myvoca.ui.components.AddWordButton
 import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.MyVocaText
 import hsk.practice.myvoca.ui.components.WordContent
+import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 import hsk.practice.myvoca.ui.theme.MyVocaTheme
 import hsk.practice.myvoca.util.getTimeDiffString
 import hsk.practice.myvoca.work.setPeriodicTodayWordWork
@@ -53,6 +58,7 @@ import java.time.ZoneOffset
 
 @Composable
 fun HomeScreen(
+    modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val homeScreenData by viewModel.homeScreenData.collectAsStateWithLifecycle()
@@ -68,7 +74,8 @@ fun HomeScreen(
         onHelpClose = viewModel::onCloseAlertDialog,
         showTodayWordHelp = viewModel::showTodayWordHelp,
         onRefreshTodayWord = viewModel::onRefreshTodayWord,
-        onTodayWordCheckboxChange = viewModel::onTodayWordCheckboxChange
+        onTodayWordCheckboxChange = viewModel::onTodayWordCheckboxChange,
+        modifier = modifier
     )
 }
 
@@ -78,9 +85,12 @@ private fun Loading(
     onHelpClose: () -> Unit,
     showTodayWordHelp: (Boolean) -> Unit,
     onRefreshTodayWord: () -> Unit,
-    onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
+    onTodayWordCheckboxChange: (HomeTodayWord) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = modifier.fillMaxSize()
+    ) {
         if (data.loading) {
             LoadingIndicator()
         }
@@ -101,15 +111,19 @@ private fun Content(
     data: HomeScreenData,
     showTodayWordHelp: (Boolean) -> Unit,
     onRefreshTodayWord: () -> Unit,
-    onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
+    onTodayWordCheckboxChange: (HomeTodayWord) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
     ) {
-        Title(size = data.totalWordCount)
+        TodayWordTitle(
+            titleText = if (data.todayWords.isEmpty()) stringResource(R.string.no_registerd_word)
+            else stringResource(R.string.words_are_registed, data.totalWordCount),
+            modifier = modifier.padding(top = 16.dp)
+        )
         TodayWords(
             todayWords = data.todayWords,
             lastUpdatedTime = data.todayWordsLastUpdatedTime,
@@ -128,73 +142,107 @@ private fun TodayWords(
     enableRefresh: Boolean,
     showTodayWordHelp: (Boolean) -> Unit,
     onRefreshTodayWord: () -> Unit,
-    onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
+    onTodayWordCheckboxChange: (HomeTodayWord) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     TodayWordHeader(
+        titleTextStyle = MaterialTheme.typography.titleLarge,
+        showUpdateInfo = !todayWords.isEmpty(),
         lastUpdatedTime = lastUpdatedTime,
         showTodayWordHelp = showTodayWordHelp,
         enableRefresh = enableRefresh,
-        onRefreshTodayWord = onRefreshTodayWord
+        onRefreshTodayWord = onRefreshTodayWord,
+        modifier = modifier.padding(top = 21.dp)
     )
-    TodayWordItems(
-        todayWords = todayWords,
-        onTodayWordCheckboxChange = onTodayWordCheckboxChange
-    )
+    Spacer(modifier.height(21.dp))
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        if (todayWords.isEmpty()) {
+            TodayWordEmptyIndicator(
+                modifier = modifier.align(Alignment.Center)
+            )
+        } else {
+            TodayWordItems(
+                todayWords = todayWords,
+                onTodayWordCheckboxChange = onTodayWordCheckboxChange
+            )
+        }
+    }
 }
 
 @Composable
 private fun TodayWordItems(
     todayWords: ImmutableList<HomeTodayWord>,
-    onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
+    onTodayWordCheckboxChange: (HomeTodayWord) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        if (todayWords.isEmpty()) {
-            item {
-                TodayWordEmptyIndicator()
-            }
-        } else {
-            items(todayWords) { todayWord ->
-                TodayWordContent(
-                    todayWord = todayWord,
-                    onTodayWordCheckboxChange = onTodayWordCheckboxChange
-                )
-            }
-        }
-        item {
-            Spacer(modifier = Modifier.height(10.dp))
+        items(
+            items = todayWords,
+            key = { it.hashCode() }
+        ) { todayWord ->
+            TodayWordContent(
+                todayWord = todayWord,
+                onTodayWordCheckboxChange = onTodayWordCheckboxChange
+            )
         }
     }
 }
 
 @Composable
-private fun TodayWordEmptyIndicator() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        MyVocaText(
-            text = stringResource(R.string.nothing_yet),
-            modifier = Modifier.align(Alignment.Center)
-        )
+private fun TodayWordEmptyIndicator(
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    Box(
+        modifier = modifier.fillMaxSize()
+    ) {
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            MyVocaText(
+                text = stringResource(R.string.please_register_the_word_first),
+                style = MaterialTheme.typography.headlineMedium
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            AddWordButton(
+                onClick = {
+                    context.startActivity(
+                        Intent(context, AddWordActivity::class.java)
+                    )
+                }
+            )
+        }
     }
 }
 
 @Composable
 private fun TodayWordHeader(
+    titleTextStyle: TextStyle,
+    showUpdateInfo: Boolean,
     lastUpdatedTime: Long,
     showTodayWordHelp: (Boolean) -> Unit,
     enableRefresh: Boolean,
-    onRefreshTodayWord: () -> Unit
+    onRefreshTodayWord: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val lastUpdatedTimeString = getTimeDiffString(anotherTime = lastUpdatedTime)
     Row(
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        HeaderTitle()
+        HeaderTitle(titleTextStyle = titleTextStyle)
         HelpIcon(showTodayWordHelp = showTodayWordHelp)
         Spacer(modifier = Modifier.weight(1f))
-        LastUpdateTimeText(lastUpdatedTimeString = lastUpdatedTimeString)
+        if (showUpdateInfo) {
+            LastUpdateTimeText(lastUpdatedTimeString = lastUpdatedTimeString)
+        }
         RefreshIcon(
             onRefreshTodayWord = onRefreshTodayWord,
             enableRefresh = enableRefresh
@@ -203,116 +251,161 @@ private fun TodayWordHeader(
 }
 
 @Composable
-private fun RefreshIcon(onRefreshTodayWord: () -> Unit, enableRefresh: Boolean) {
+private fun RefreshIcon(
+    onRefreshTodayWord: () -> Unit,
+    enableRefresh: Boolean,
+    modifier: Modifier = Modifier,
+) {
     IconButton(
         onClick = onRefreshTodayWord,
+        modifier = modifier,
         enabled = enableRefresh
     ) {
         Icon(
-            imageVector = Icons.Outlined.Autorenew,
-            contentDescription = stringResource(R.string.refresh_today_word)
+            imageVector = Icons.Outlined.Refresh,
+            contentDescription = stringResource(R.string.refresh_today_word),
+            tint = if (enableRefresh) MaterialTheme.colorScheme.onSurface
+            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
         )
     }
 }
 
 @Composable
-private fun LastUpdateTimeText(lastUpdatedTimeString: String) {
+private fun LastUpdateTimeText(
+    lastUpdatedTimeString: String,
+    modifier: Modifier = Modifier
+) {
     MyVocaText(
         text = stringResource(R.string.last_updated, lastUpdatedTimeString),
-        style = MaterialTheme.typography.bodySmall
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier,
+        style = MaterialTheme.typography.bodyMedium
     )
 }
 
 @Composable
-private fun HelpIcon(showTodayWordHelp: (Boolean) -> Unit) {
+private fun HelpIcon(
+    showTodayWordHelp: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
     IconButton(
-        onClick = { showTodayWordHelp(true) }
+        onClick = { showTodayWordHelp(true) },
+        modifier = modifier,
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Outlined.Help,
-            contentDescription = stringResource(R.string.what_is_today_word)
+            contentDescription = stringResource(R.string.what_is_today_word),
+            tint = MaterialTheme.colorScheme.onSurface
         )
     }
 }
 
 @Composable
-private fun HeaderTitle() {
+private fun HeaderTitle(
+    titleTextStyle: TextStyle,
+    modifier: Modifier = Modifier
+) {
     MyVocaText(
-        text = stringResource(R.string.today_word),
-        style = MaterialTheme.typography.titleLarge
+        text = stringResource(id = R.string.today_word),
+        modifier = modifier,
+        style = titleTextStyle
     )
 }
 
 @Composable
 private fun TodayWordContent(
     todayWord: HomeTodayWord,
-    onTodayWordCheckboxChange: (HomeTodayWord) -> Unit
+    onTodayWordCheckboxChange: (HomeTodayWord) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val alpha by animateFloatAsState(targetValue = if (todayWord.todayWord.checked) 0.6f else 1f)
     val elevation by animateDpAsState(targetValue = if (todayWord.todayWord.checked) 0.dp else 6.dp)
+
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = elevation),
-        modifier = Modifier.alpha(alpha)
+        colors = CardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            disabledContentColor = MaterialTheme.colorScheme.primaryContainer,
+            disabledContainerColor = MaterialTheme.colorScheme.onPrimaryContainer
+        )
     ) {
         Box {
             WordContent(
                 word = todayWord.vocabulary,
                 showExpandButton = false,
                 expanded = true,
-                onExpanded = {}
-            )
-            Checkbox(
-                checked = todayWord.todayWord.checked,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp),
-                onCheckedChange = { onTodayWordCheckboxChange(todayWord) }
-            )
+                onExpanded = {},
+                modifier = modifier.alpha(alpha),
+            ) {
+                Checkbox(
+                    checked = todayWord.todayWord.checked,
+                    onCheckedChange = { onTodayWordCheckboxChange(todayWord) },
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun Title(size: Int = 0) {
-    val titleText = if (size == 0) stringResource(R.string.no_registerd_word) else stringResource(
-        R.string.words_are_registed,
-        size
-    )
+private fun TodayWordTitle(
+    titleText: String,
+    modifier: Modifier = Modifier
+) {
     MyVocaText(
         text = titleText,
+        modifier = modifier,
         maxLines = 2,
-        style = MaterialTheme.typography.headlineMedium,
-        modifier = Modifier.fillMaxWidth()
+        style = MaterialTheme.typography.headlineLarge,
     )
 }
 
 @Composable
 private fun TodayWordHelp(
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     AlertDialog(
+        onDismissRequest = onClose,
+        modifier = modifier,
         title = {
-            MyVocaText(text = stringResource(id = R.string.what_is_today_word))
+            MyVocaText(
+                text = stringResource(id = R.string.what_is_today_word),
+                style = MaterialTheme.typography.titleLarge
+            )
         },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                MyVocaText(text = stringResource(R.string.memorize_new_words_everyday_words_are_updated_everyday))
-                MyVocaText(text = stringResource(R.string.memorized_words_can_be_separated_by_a_check_mark))
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                MyVocaText(
+                    text = stringResource(R.string.memorize_new_word_everyday_and_check_memorized_word),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                MyVocaText(
+                    text = stringResource(R.string.words_are_update_everyday),
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
         },
         confirmButton = {
             Box(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.CenterEnd
             ) {
                 TextButton(onClick = onClose) {
-                    MyVocaText(text = stringResource(R.string.check))
+                    MyVocaText(
+                        text = stringResource(R.string.check),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
             }
         },
-        onDismissRequest = onClose
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurface
     )
 }
 
