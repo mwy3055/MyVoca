@@ -56,7 +56,6 @@ import kotlinx.collections.immutable.toImmutableList
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-// TODO 단어 추가 스낵바?
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
