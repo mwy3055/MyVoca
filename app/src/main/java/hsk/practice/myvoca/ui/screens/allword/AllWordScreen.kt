@@ -74,6 +74,7 @@ import hsk.practice.myvoca.data.fakeData
 import hsk.practice.myvoca.data.toWordClass
 import hsk.practice.myvoca.ui.components.LoadingIndicator
 import hsk.practice.myvoca.ui.components.MyVocaText
+import hsk.practice.myvoca.ui.components.SearchResultEmptyIndicator
 import hsk.practice.myvoca.ui.components.WordContent
 import hsk.practice.myvoca.ui.components.WordEmptyIndicator
 import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
@@ -227,7 +228,7 @@ private fun Content(
                         .background(MaterialTheme.colorScheme.outline)
                 )
                 Header(
-                    vocabularySize = data.currentWordState.size,
+                    vocabularySize = data.currentWords.size,
                     queryState = data.queryState,
                     submitState = data.submitState,
                     bottomSheetState = scaffoldState.bottomSheetState,
@@ -242,15 +243,21 @@ private fun Content(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-            if (data.currentWordState.isEmpty()) {
-                WordEmptyIndicator()
-            } else {
-                AllWords(
-                    modifier = Modifier.fillMaxSize(),
-                    words = data.currentWordState,
-                    onWordUpdate = onWordUpdate,
-                    onWordDelete = onWordDelete
-                )
+            when {
+                data.currentWords.isEmpty() && data.submitState -> {
+                    SearchResultEmptyIndicator()
+                }
+                data.currentWords.isEmpty() && !data.submitState -> {
+                    WordEmptyIndicator()
+                }
+                else -> {
+                    AllWords(
+                        modifier = Modifier.fillMaxSize(),
+                        words = data.currentWords,
+                        onWordUpdate = onWordUpdate,
+                        onWordDelete = onWordDelete
+                    )
+                }
             }
         }
     }
@@ -724,7 +731,7 @@ private fun ContentsPreview() {
     MyVocaTheme {
         Content(
             data = AllWordData(
-                currentWordState = fakeData.toImmutableList(),
+                currentWords = fakeData.toImmutableList(),
                 queryState = VocabularyQuery(word = word)
             ),
             onSubmitButtonClicked = { },

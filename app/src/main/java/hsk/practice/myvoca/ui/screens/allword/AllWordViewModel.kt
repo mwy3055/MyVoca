@@ -64,7 +64,7 @@ class AllWordViewModel @Inject constructor(
             Log.d("AllWordViewModel", "$data, $result")
             _allWordUiState.value = allWordUiState.value.copy(
                 loading = false,
-                data = data.copy(currentWordState = result.toImmutableList())
+                data = data.copy(currentWords = result.toImmutableList())
             )
         }
     }
@@ -158,7 +158,7 @@ private fun Collection<VocabularyImpl>.sortedBy(selector: SortState): List<Vocab
 private fun MutableStateFlow<UiState<AllWordData>>.copyData(
     sortState: SortState? = null,
     queryState: VocabularyQuery? = null,
-    currentWordState: List<VocabularyImpl>? = null,
+    currentWords: List<VocabularyImpl>? = null,
     submitState: Boolean? = null,
     updateWord: VocabularyImpl? = null,
     deletedWord: VocabularyImpl? = null,
@@ -170,7 +170,7 @@ private fun MutableStateFlow<UiState<AllWordData>>.copyData(
             sortState = sortState ?: data.sortState,
             queryState = queryState ?: data.queryState,
             submitState = submitState ?: data.submitState,
-            currentWordState = currentWordState?.toImmutableList() ?: data.currentWordState,
+            currentWords = currentWords?.toImmutableList() ?: data.currentWords,
             updateWord = updateWord ?: data.updateWord,
             deletedWord = deletedWord ?: data.deletedWord,
             deleteWordComplete = deleteWordComplete ?: data.deleteWordComplete
@@ -183,7 +183,7 @@ data class AllWordData(
     val sortState: SortState = SortState.defaultValue,
     val queryState: VocabularyQuery = VocabularyQuery(),
     val submitState: Boolean = false,
-    val currentWordState: ImmutableList<VocabularyImpl> = persistentListOf(),
+    val currentWords: ImmutableList<VocabularyImpl> = persistentListOf(),
     val updateWord: VocabularyImpl? = null,
     val deletedWord: VocabularyImpl? = null,
     val deleteWordComplete: Boolean = false,

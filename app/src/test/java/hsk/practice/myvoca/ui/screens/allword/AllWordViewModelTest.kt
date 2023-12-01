@@ -91,8 +91,8 @@ class AllWordViewModelTest {
         viewModel.onSortStateClicked(sortAlphabet)
         assertThat(uiData.sortState).isEqualTo(sortAlphabet)
 
-        val sortedWords = uiData.currentWordState.sortedBy { it.eng }
-        assertThat(uiData.currentWordState).isEqualTo(sortedWords)
+        val sortedWords = uiData.currentWords.sortedBy { it.eng }
+        assertThat(uiData.currentWords).isEqualTo(sortedWords)
     }
 
     @Test
@@ -120,6 +120,6 @@ class AllWordViewModelTest {
         val sample = TestSampleData.getSampleVocaImpl()
         viewModel.onWordDelete(sample).join()
 
-        assertThat(uiData.currentWordState).doesNotContain(sample)
+        assertThat(uiData.currentWords).doesNotContain(sample)
     }
 }
