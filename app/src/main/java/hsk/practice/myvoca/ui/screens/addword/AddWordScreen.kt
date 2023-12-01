@@ -662,8 +662,9 @@ private fun Meaning(
                     onClick = { onMeaningDelete(index) },
                     modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
                 ) {
-                    Image(
+                    Icon(
                         painter = painterResource(R.drawable.baseline_delete_outline_24),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         contentDescription = stringResource(
                             R.string.delete_the_meaning,
                             meaning.content
