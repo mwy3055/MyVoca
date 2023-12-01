@@ -338,12 +338,12 @@ private fun TodayWordContent(
                 expanded = true,
                 onExpanded = {},
                 modifier = modifier.alpha(alpha),
-            )
-            Checkbox(
-                checked = todayWord.todayWord.checked,
-                modifier = Modifier.align(Alignment.TopEnd),
-                onCheckedChange = { onTodayWordCheckboxChange(todayWord) },
-            )
+            ) {
+                Checkbox(
+                    checked = todayWord.todayWord.checked,
+                    onCheckedChange = { onTodayWordCheckboxChange(todayWord) },
+                )
+            }
         }
     }
 }
