@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,9 +74,12 @@ fun WordContent(
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.primaryContainer)
             .padding(start = 12.dp, top = 6.dp, bottom = 6.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         if (word.id != 0) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 WordTitle(
                     title = word.eng,
                     modifier = Modifier.weight(1f)
@@ -83,12 +87,14 @@ fun WordContent(
                 iconContent()
             }
             Spacer(modifier = Modifier.height(4.dp))
-            WordMeanings(
-                meanings = word.meaning,
-                showExpandButton = showExpandButton,
-                expanded = expanded,
-                onClick = onExpanded
-            )
+            CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyLarge) {
+                WordMeanings(
+                    meanings = word.meaning,
+                    showExpandButton = showExpandButton,
+                    expanded = expanded,
+                    onClick = onExpanded
+                )
+            }
         }
     }
 }
@@ -150,8 +156,7 @@ fun WordMeanings(
             )
             IconButton(
                 onClick = { onClick(expanded) },
-                modifier = Modifier
-                    .align(Alignment.Bottom)
+                modifier = Modifier.align(Alignment.Bottom)
             ) {
                 Icon(
                     imageVector = Icons.Filled.ExpandMore,
