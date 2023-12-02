@@ -19,9 +19,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
@@ -82,12 +82,12 @@ private fun Content(
     ) {
         ProfileImage(
             modifier = Modifier
-                .padding(start = 20.dp),
+                .padding(start = 10.dp),
             imageUrl = user?.profileImageUrl,
         )
-
+        Spacer(modifier = Modifier.padding(vertical = 6.dp))
         Box(
-            modifier = Modifier.height(48.dp),
+            modifier = Modifier.wrapContentHeight(),
             contentAlignment = Alignment.CenterStart,
         ) {
             if (user == null) {
@@ -121,7 +121,7 @@ private fun ProfileImage(
     modifier: Modifier = Modifier,
     imageUrl: Uri?,
 ) {
-    val imageSize = 150
+    val imageSize = 100
     val modifierWithSize = modifier.size(imageSize.dp)
     if (imageUrl == null) {
         Icon(
@@ -174,7 +174,7 @@ private fun LogOutButton(onLogout: () -> Unit) {
 private fun UserEmail(email: String) {
     MyVocaText(
         text = email,
-        style = MaterialTheme.typography.displayLarge,
+        style = MaterialTheme.typography.titleLarge,
     )
 }
 
@@ -182,7 +182,7 @@ private fun UserEmail(email: String) {
 private fun Username(username: String) {
     MyVocaText(
         text = username,
-        style = MaterialTheme.typography.headlineSmall,
+        style = MaterialTheme.typography.titleLarge,
     )
 }
 
