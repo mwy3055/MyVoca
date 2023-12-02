@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "711192236974-9ghjgas4h390neom0ba5d2jgbp8o0qka.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hsk.practice.myvoca",
+            "certificate_hash": "121ea3e160a00b902dcb8ce3d9b29f32d091e5a4"
+          }
+        },
+        {
           "client_id": "711192236974-hala9abbnb0vo7lmu97pvkbksae9upe3.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -60,34 +68,18 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:711192236974:android:0702e3e26fa3238e7eae3f",
+        "mobilesdk_app_id": "1:711192236974:android:0402bf59d82e20fc7eae3f",
         "android_client_info": {
           "package_name": "hsk.practice.myvoca.debug"
         }
       },
       "oauth_client": [
         {
-          "client_id": "711192236974-82ioba8odm7nro8nfs30dn4nerjba3tf.apps.googleusercontent.com",
+          "client_id": "711192236974-n9ch7fqt0ts0meojf9ro48s5u9e2f15a.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "hsk.practice.myvoca.debug",
-            "certificate_hash": "dc5e84b7f68095ae17d89a9962754e6aca677b3b"
-          }
-        },
-        {
-          "client_id": "711192236974-hala9abbnb0vo7lmu97pvkbksae9upe3.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "hsk.practice.myvoca.debug",
-            "certificate_hash": "6c0d69d4d837197b7ceae91626bffdc76e374782"
-          }
-        },
-        {
-          "client_id": "711192236974-kcfde90d1ucv85m35s59r0fkdulbe8o8.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "hsk.practice.myvoca.debug",
-            "certificate_hash": "f815bf3587470a6d12ccc191569e579132a87a68"
+            "certificate_hash": "121ea3e160a00b902dcb8ce3d9b29f32d091e5a4"
           }
         },
         {
