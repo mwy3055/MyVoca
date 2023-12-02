@@ -77,6 +77,7 @@ object MyFirebaseAuth {
 
     private fun onGoogleLoginFail(e: Exception) {
         Logger.w("Google sign in failed: $e")
+        e.printStackTrace()
     }
 
     fun logout() {
