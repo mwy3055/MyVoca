@@ -5,14 +5,29 @@ package hsk.practice.myvoca.ui.screens.allword
 import android.content.Intent
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -29,7 +44,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -45,7 +62,12 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -241,15 +263,17 @@ private fun Content(
         Box(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                .padding(horizontal = 12.dp),
         ) {
             when {
                 data.currentWords.isEmpty() && data.submitState -> {
                     SearchResultEmptyIndicator()
                 }
+
                 data.currentWords.isEmpty() && !data.submitState -> {
                     WordEmptyIndicator()
                 }
+
                 else -> {
                     AllWords(
                         modifier = Modifier.fillMaxSize(),
@@ -645,6 +669,7 @@ private fun AllWords(
         columns = GridCells.Adaptive(minSize = min(screenWidth, 330.dp)),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(vertical = 12.dp)
     ) {
         if (words.isEmpty()) {
             item {
@@ -655,7 +680,7 @@ private fun AllWords(
                 items = words,
                 key = { it.id },
             ) { word ->
-                Card (
+                Card(
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
                 ) {
                     WordContent(
@@ -690,7 +715,6 @@ private fun AllWords(
                     }
                 }
             }
-            item {}
         }
     }
 }
