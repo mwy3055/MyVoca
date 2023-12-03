@@ -9,9 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -86,7 +84,6 @@ fun WordContent(
                 )
                 iconContent()
             }
-            Spacer(modifier = Modifier.height(4.dp))
             CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyLarge) {
                 WordMeanings(
                     meanings = word.meaning,
