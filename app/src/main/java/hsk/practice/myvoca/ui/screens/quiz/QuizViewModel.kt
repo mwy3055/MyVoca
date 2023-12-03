@@ -27,7 +27,7 @@ class QuizViewModel @Inject constructor(
     @LocalVocaPersistence private val vocaPersistence: VocaPersistence,
     private val preferences: PreferencesDataStore,
     @ComputingDispatcher private val computingDispatcher: CoroutineDispatcher,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private var quizAvailable: Boolean = false
@@ -44,7 +44,7 @@ class QuizViewModel @Inject constructor(
                 vocaPersistence.getAllVocabulary(),
                 preferences.getPreferenceFlow(MyVocaPreferencesKey.quizCorrectKey, 0),
                 preferences.getPreferenceFlow(MyVocaPreferencesKey.quizWrongKey, 0),
-                resultDataFlow
+                resultDataFlow,
             ) { allVocabulary, correct, wrong, quizResultData ->
                 // Check if quiz data should be reloaded
                 val value = quizScreenData.value
@@ -82,7 +82,7 @@ class QuizViewModel @Inject constructor(
                         QuizScreenData(
                             quizState = QuizNotAvailable,
                             numberVocabularyNeed = vocabularyRequired - allVocabulary.size,
-                            quizStat = QuizStat(correct, wrong)
+                            quizStat = QuizStat(correct, wrong),
                         )
                     }
                 }
@@ -95,7 +95,7 @@ class QuizViewModel @Inject constructor(
     private fun makeNewQuizData(
         allVocabulary: List<Vocabulary>,
         correct: Int,
-        wrong: Int
+        wrong: Int,
     ): QuizScreenData {
         val quizList = allVocabulary
             .distinct()
@@ -108,7 +108,7 @@ class QuizViewModel @Inject constructor(
             quizState = QuizAvailable,
             numberVocabularyNeed = vocabularyRequired - allVocabulary.size,
             quiz = Quiz(quizWords = quizList, answerIndex = answerIndex),
-            quizStat = QuizStat(correct, wrong)
+            quizStat = QuizStat(correct, wrong),
         )
     }
 

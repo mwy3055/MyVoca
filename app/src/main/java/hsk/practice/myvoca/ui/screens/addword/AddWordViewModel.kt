@@ -67,7 +67,7 @@ class AddWordViewModel @Inject constructor(
             wordExistStatus = WordExistStatus.NOT_EXISTS,
             meanings = word.meaning,
             meaningExistStatuses = meaningExistStatuses.toImmutableList(),
-            memo = word.memo ?: ""
+            memo = word.memo ?: "",
         )
     }
 
@@ -144,7 +144,7 @@ class AddWordViewModel @Inject constructor(
 
         updateUiState(
             meanings = newMeanings,
-            meaningExistStatuses = newStatusList
+            meaningExistStatuses = newStatusList,
         )
     }
 
@@ -157,7 +157,7 @@ class AddWordViewModel @Inject constructor(
         }
         updateUiState(
             meanings = newMeanings,
-            meaningExistStatuses = newStatuses
+            meaningExistStatuses = newStatuses,
         )
     }
 
@@ -211,7 +211,7 @@ class AddWordViewModel @Inject constructor(
         updateUiState(
             webViewUrl = UiText.StringResource(
                 resId = R.string.web_view_url,
-                uiStateFlow.value.word
+                uiStateFlow.value.word,
             )
         )
     }
@@ -224,7 +224,7 @@ class AddWordViewModel @Inject constructor(
         meaningExistStatuses: ImmutableList<MeaningExistStatus> = uiStateFlow.value.meaningExistStatuses,
         memo: String = uiStateFlow.value.memo,
         showWebView: Boolean = uiStateFlow.value.showWebView,
-        webViewUrl: UiText = uiStateFlow.value.webViewUrl
+        webViewUrl: UiText = uiStateFlow.value.webViewUrl,
     ) {
         _uiStateFlow.value = AddWordScreenData(
             screenType = screenType,
@@ -234,7 +234,7 @@ class AddWordViewModel @Inject constructor(
             meaningExistStatuses = meaningExistStatuses,
             memo = memo,
             showWebView = showWebView,
-            webViewUrl = webViewUrl
+            webViewUrl = webViewUrl,
         )
     }
 }
@@ -248,14 +248,14 @@ enum class WordExistStatus {
     NOT_EXISTS,
     DUPLICATE,
     LOADING,
-    WORD_EMPTY
+    WORD_EMPTY,
 }
 
 enum class MeaningExistStatus {
     NOT_EXISTS,
     DUPLICATE,
     LOADING,
-    MEANING_EMPTY
+    MEANING_EMPTY,
 }
 
 data class AddWordScreenData(
@@ -275,7 +275,7 @@ data class AddWordScreenData(
             meaning = meanings.toImmutableList(),
             addedTime = current,
             lastEditedTime = current,
-            memo = memo
+            memo = memo,
         )
     }
 

@@ -13,7 +13,7 @@ data class VocabularyImpl(
     val meaning: ImmutableList<MeaningImpl> = persistentListOf(),
     val addedTime: Long = 0L,
     val lastEditedTime: Long = 0L,
-    val memo: String? = ""
+    val memo: String? = "",
 ) {
     val answerString: String
         get() = "$eng: ${meaning.joinToString("; ") { it.content }}"
@@ -25,7 +25,7 @@ data class VocabularyImpl(
             meaning = persistentListOf(),
             addedTime = System.currentTimeMillis(),
             lastEditedTime = System.currentTimeMillis(),
-            memo = ""
+            memo = "",
         )
     }
 }
@@ -43,13 +43,13 @@ val fakeData: List<VocabularyImpl> = (1..20).map { index ->
         }.toImmutableList(),
         addedTime = currentTime,
         lastEditedTime = currentTime,
-        memo = ""
+        memo = "",
     )
 }
 
 data class MeaningImpl(
     val type: WordClassImpl = WordClassImpl.UNKNOWN,
-    val content: String = ""
+    val content: String = "",
 )
 
 enum class WordClassImpl(val korean: String) {
@@ -64,20 +64,20 @@ enum class WordClassImpl(val korean: String) {
     UNKNOWN("???");
 
     companion object {
-        fun findByKorean(korean: String) = values().find { it.korean == korean }
+        fun findByKorean(korean: String) = entries.find { it.korean == korean }
 
-        fun actualValues(): List<WordClassImpl> = values().removed(UNKNOWN)
+        fun actualValues(): List<WordClassImpl> = entries.toTypedArray().removed(UNKNOWN)
     }
 }
 
 fun MeaningImpl.toMeaning() = Meaning(
     type = type.toWordClass(),
-    content = content
+    content = content,
 )
 
 fun Meaning.toMeaningImpl() = MeaningImpl(
     type = type.toWordClassImpl(),
-    content = content
+    content = content,
 )
 
 fun WordClassImpl.toWordClass() = WordClass.valueOf(name)

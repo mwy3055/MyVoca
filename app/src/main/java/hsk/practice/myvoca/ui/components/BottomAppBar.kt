@@ -44,12 +44,12 @@ fun MyVocaBottomAppBar(
 ) {
     Surface(
         modifier = modifier,
-        color = MaterialTheme.colorScheme.secondaryContainer
+        color = MaterialTheme.colorScheme.secondaryContainer,
     ) {
         Row(
             modifier = Modifier.selectableGroup(),
             horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             allScreens.forEach { screen ->
                 MyVocaTab(
@@ -57,7 +57,7 @@ fun MyVocaBottomAppBar(
                     text = screen.name.uppercase(Locale.getDefault()),
                     icon = screen.icon,
                     onSelected = { onTabSelected(screen) },
-                    selected = (currentScreen == screen)
+                    selected = (currentScreen == screen),
                 )
             }
         }
@@ -80,13 +80,13 @@ private fun MyVocaTab(
         tween<Color>(
             durationMillis = durationMillis,
             easing = LinearEasing,
-            delayMillis = TabFadeInDelay
+            delayMillis = TabFadeInDelay,
         )
     }
 
     val tabTintColor by animateColorAsState(
         targetValue = color,
-        animationSpec = animationSpec
+        animationSpec = animationSpec,
     )
     Box(
         modifier = modifier
@@ -99,16 +99,16 @@ private fun MyVocaTab(
                 indication = rememberRipple(
                     bounded = true,
                     radius = Dp.Unspecified,
-                    color = Color.Unspecified
+                    color = Color.Unspecified,
                 )
             ),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Icon(
             imageVector = icon,
             contentDescription = text,
             modifier = Modifier.size(32.dp),
-            tint = tabTintColor
+            tint = tabTintColor,
         )
     }
 }
@@ -119,9 +119,9 @@ private fun MyVocaTab(
 fun MyVocaBottomAppBarPreview() {
     MyVocaTheme {
         MyVocaBottomAppBar(
-            allScreens = MyVocaScreen.values().toList().toImmutableList(),
+            allScreens = MyVocaScreen.entries.toImmutableList(),
             onTabSelected = { },
-            currentScreen = MyVocaScreen.Home
+            currentScreen = MyVocaScreen.Home,
         )
     }
 }

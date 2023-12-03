@@ -20,7 +20,7 @@ import java.util.*
 class FirestoreUploadWordsWork @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val database: RoomVocaDatabase
+    private val database: RoomVocaDatabase,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -72,7 +72,7 @@ class FirestoreUploadWordsWork @AssistedInject constructor(
                 },
                 onFailure = { throwable ->
                     throw throwable
-                }
+                },
             )
         }
     }
@@ -105,7 +105,7 @@ private const val uploadWorkTag = "FirestoreUploadWork"
 
 fun setFirestoreUploadWork(
     workManager: WorkManager,
-    userId: String
+    userId: String,
 ): UUID {
     val data = workDataOf(FirestoreUploadWordsWork.userIdKey to userId)
     val work = OneTimeWorkRequestBuilder<FirestoreUploadWordsWork>()

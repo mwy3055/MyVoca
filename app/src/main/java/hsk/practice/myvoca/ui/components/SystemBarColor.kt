@@ -10,7 +10,7 @@ fun SystemBarColor(systemBarColor: Color) {
     val systemUiController = rememberSystemUiController()
     SideEffect {
         systemUiController.setStatusBarColor(
-            color = systemBarColor
+            color = systemBarColor,
         )
     }
 }

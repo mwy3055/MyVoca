@@ -24,13 +24,13 @@ import kotlinx.coroutines.delay
 @Composable
 fun Splash(
     loadApp: suspend () -> Unit = {},
-    onLaunch: suspend () -> Unit = {}
+    onLaunch: suspend () -> Unit = {},
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         SplashNavGraph(
             loadApp = loadApp,
             navController = rememberNavController(),
-            onLaunch = onLaunch
+            onLaunch = onLaunch,
         )
     }
 }
@@ -42,16 +42,16 @@ private const val MyVocaAppName = "main_app"
 private fun SplashNavGraph(
     loadApp: suspend () -> Unit,
     navController: NavHostController,
-    onLaunch: suspend () -> Unit
+    onLaunch: suspend () -> Unit,
 ) {
     NavHost(
         navController = navController,
-        startDestination = SplashName
+        startDestination = SplashName,
     ) {
         composable(SplashName) {
             SplashScreen(
                 loadApp = loadApp,
-                navController = navController
+                navController = navController,
             )
         }
         composable(MyVocaAppName) {
@@ -63,7 +63,7 @@ private fun SplashNavGraph(
 @Composable
 private fun SplashScreen(
     loadApp: suspend () -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     LaunchedEffect(true) {
         loadApp()
@@ -85,13 +85,13 @@ private fun Background() {
             color = lineColor,
             start = Offset(x = canvasWidth * 2 / 3, y = -100f),
             end = Offset(x = -250f, y = canvasHeight * 2 / 3),
-            strokeWidth = 350f
+            strokeWidth = 350f,
         )
         drawLine(
             color = lineColor,
             start = Offset(x = -250f, y = canvasHeight * 2 / 3),
             end = Offset(x = canvasWidth * 4 / 3, y = canvasHeight * 8 / 9),
-            strokeWidth = 350f
+            strokeWidth = 350f,
         )
     }
 }
@@ -103,17 +103,17 @@ private fun Logo() {
             .fillMaxSize()
             .zIndex(zIndex = 1f),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         MyVocaText(
             text = "나만의 단어장",
             style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground,
         )
         MyVocaText(
             text = "MyVoca",
             style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground,
         )
     }
 }
@@ -124,7 +124,7 @@ private fun SplashScreenPreview() {
     MyVocaTheme {
         SplashScreen(
             loadApp = { delay(1000L) },
-            navController = rememberNavController()
+            navController = rememberNavController(),
         )
     }
 }

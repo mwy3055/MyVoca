@@ -11,15 +11,15 @@ import hsk.practice.myvoca.R
 
 @Composable
 fun SearchResultEmptyIndicator(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         MyVocaText(
             text = stringResource(R.string.no_search_results),
             modifier = Modifier.align(Alignment.Center),
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
         )
     }
 }

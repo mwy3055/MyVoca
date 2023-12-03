@@ -7,12 +7,12 @@ import java.io.Serializable
 
 @Entity
 data class RoomVocabulary(
-    @kotlin.jvm.JvmField @PrimaryKey(autoGenerate = true) var id: Int,
-    @kotlin.jvm.JvmField var eng: String,
-    @kotlin.jvm.JvmField var kor: String?,
-    @kotlin.jvm.JvmField @ColumnInfo(name = "add_time") var addedTime: Long,
-    @kotlin.jvm.JvmField @ColumnInfo(name = "last_update") var lastEditedTime: Long,
-    @kotlin.jvm.JvmField var memo: String?
+    @JvmField @PrimaryKey(autoGenerate = true) var id: Int,
+    @JvmField var eng: String,
+    @JvmField var kor: String?,
+    @JvmField @ColumnInfo(name = "add_time") var addedTime: Long,
+    @JvmField @ColumnInfo(name = "last_update") var lastEditedTime: Long,
+    @JvmField var memo: String?,
 ) : Serializable {
 
     companion object {
@@ -22,11 +22,11 @@ data class RoomVocabulary(
             "널입니다.",
             System.currentTimeMillis() / 1000,
             System.currentTimeMillis() / 1000,
-            ""
+            "",
         )
     }
 
-    override fun equals(other: Any?) = id == (other as? RoomVocabulary)?.id ?: false
+    override fun equals(other: Any?) = id == ((other as? RoomVocabulary)?.id ?: false)
 
     override fun hashCode(): Int {
         var result = id

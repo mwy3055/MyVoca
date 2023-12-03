@@ -10,18 +10,19 @@ import hsk.practice.myvoca.data.WordClassImpl
 import hsk.practice.myvoca.room.todayword.RoomTodayWord
 import hsk.practice.myvoca.room.vocabulary.RoomVocabulary
 import hsk.practice.myvoca.room.vocabulary.toJson
+import kotlinx.collections.immutable.toImmutableList
 
 object AndroidTestSampleData {
     fun getSampleVoca(
         id: Int = 3,
         eng: String = "test",
         meaning: List<Meaning> = listOf(Meaning(WordClass.NOUN, "테스트")),
-        memo: String = ""
+        memo: String = "",
     ) = Vocabulary.create(
         id = id,
         eng = eng,
         meaning = meaning,
-        memo = memo
+        memo = memo,
     )
 
     fun getSampleVocabularies() = (3..10).map {
@@ -32,7 +33,7 @@ object AndroidTestSampleData {
         id: Int = 3,
         eng: String = "test",
         kor: String = listOf(Meaning(WordClass.NOUN, "테스트")).toJson(),
-        memo: String = ""
+        memo: String = "",
     ): RoomVocabulary {
         val currentTime = System.currentTimeMillis()
         return RoomVocabulary(
@@ -41,7 +42,7 @@ object AndroidTestSampleData {
             kor = kor,
             addedTime = currentTime,
             lastEditedTime = currentTime,
-            memo = memo
+            memo = memo,
         )
     }
 
@@ -53,16 +54,16 @@ object AndroidTestSampleData {
         id: Int = 3,
         eng: String = "test",
         meaning: List<MeaningImpl> = listOf(MeaningImpl(WordClassImpl.NOUN, "테스트")),
-        memo: String = ""
+        memo: String = "",
     ): VocabularyImpl {
         val currentTime = System.currentTimeMillis()
         return VocabularyImpl(
             id = id,
             eng = eng,
-            meaning = meaning,
+            meaning = meaning.toImmutableList(),
             addedTime = currentTime,
             lastEditedTime = currentTime,
-            memo = memo
+            memo = memo,
         )
     }
 
@@ -73,7 +74,7 @@ object AndroidTestSampleData {
     fun getSampleRoomTodayWord() = RoomTodayWord(
         todayWordId = 3,
         vocabularyId = 3,
-        checked = false
+        checked = false,
     )
 
     fun getSampleTodayWord() = getSampleTodayWords()[0]

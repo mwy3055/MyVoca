@@ -76,7 +76,7 @@ fun VocabularyImpl.toRoomVocabulary(): RoomVocabulary = RoomVocabulary(
     kor = meaning.toJson(),
     addedTime = addedTime,
     lastEditedTime = lastEditedTime,
-    memo = memo
+    memo = memo,
 )
 
 fun VocabularyImpl.toVocabulary(): Vocabulary = Vocabulary(
@@ -85,5 +85,5 @@ fun VocabularyImpl.toVocabulary(): Vocabulary = Vocabulary(
     meaning = meaning.map { it.toMeaning() },
     addedTime = addedTime,
     lastEditedTime = lastEditedTime,
-    memo = memo
+    memo = memo,
 )

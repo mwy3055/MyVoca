@@ -60,7 +60,7 @@ import java.time.ZoneOffset
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val homeScreenData by viewModel.homeScreenData.collectAsStateWithLifecycle()
 
@@ -76,7 +76,7 @@ fun HomeScreen(
         showTodayWordHelp = viewModel::showTodayWordHelp,
         onRefreshTodayWord = viewModel::onRefreshTodayWord,
         onTodayWordCheckboxChange = viewModel::onTodayWordCheckboxChange,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -87,7 +87,7 @@ private fun Loading(
     showTodayWordHelp: (Boolean) -> Unit,
     onRefreshTodayWord: () -> Unit,
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         if (data.loading) {
@@ -100,7 +100,7 @@ private fun Loading(
             data = data,
             showTodayWordHelp = showTodayWordHelp,
             onRefreshTodayWord = onRefreshTodayWord,
-            onTodayWordCheckboxChange = onTodayWordCheckboxChange
+            onTodayWordCheckboxChange = onTodayWordCheckboxChange,
         )
     }
 }
@@ -111,12 +111,12 @@ private fun Content(
     showTodayWordHelp: (Boolean) -> Unit,
     onRefreshTodayWord: () -> Unit,
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp),
     ) {
         TodayWordTitle(
             titleText = if (data.todayWords.isEmpty()) stringResource(R.string.no_registerd_word)
@@ -129,7 +129,7 @@ private fun Content(
             enableRefresh = data.totalWordCount > 0,
             showTodayWordHelp = showTodayWordHelp,
             onRefreshTodayWord = onRefreshTodayWord,
-            onTodayWordCheckboxChange = onTodayWordCheckboxChange
+            onTodayWordCheckboxChange = onTodayWordCheckboxChange,
         )
     }
 }
@@ -151,11 +151,11 @@ private fun TodayWords(
         showTodayWordHelp = showTodayWordHelp,
         enableRefresh = enableRefresh,
         onRefreshTodayWord = onRefreshTodayWord,
-        modifier = modifier
+        modifier = modifier,
     )
     Spacer(modifier.height(21.dp))
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         if (todayWords.isEmpty()) {
             TodayWordEmptyIndicator(
@@ -164,7 +164,7 @@ private fun TodayWords(
         } else {
             TodayWordItems(
                 todayWords = todayWords,
-                onTodayWordCheckboxChange = onTodayWordCheckboxChange
+                onTodayWordCheckboxChange = onTodayWordCheckboxChange,
             )
         }
     }
@@ -174,20 +174,20 @@ private fun TodayWords(
 private fun TodayWordItems(
     todayWords: ImmutableList<HomeTodayWord>,
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(bottom = 16.dp)
+        contentPadding = PaddingValues(bottom = 16.dp),
     ) {
         items(
             items = todayWords,
-            key = { it.hashCode() }
+            key = { it.hashCode() },
         ) { todayWord ->
             TodayWordContent(
                 todayWord = todayWord,
-                onTodayWordCheckboxChange = onTodayWordCheckboxChange
+                onTodayWordCheckboxChange = onTodayWordCheckboxChange,
             )
         }
     }
@@ -195,19 +195,19 @@ private fun TodayWordItems(
 
 @Composable
 private fun TodayWordEmptyIndicator(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         Column(
             modifier = Modifier.align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             MyVocaText(
                 text = stringResource(R.string.please_register_the_word_first),
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.headlineMedium,
             )
             Spacer(modifier = Modifier.height(16.dp))
             AddWordButton(
@@ -215,7 +215,7 @@ private fun TodayWordEmptyIndicator(
                     context.startActivity(
                         Intent(context, AddWordActivity::class.java)
                     )
-                }
+                },
             )
         }
     }
@@ -235,7 +235,7 @@ private fun TodayWordHeader(
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         HeaderTitle(titleTextStyle = titleTextStyle)
         HelpIcon(showTodayWordHelp = showTodayWordHelp)
@@ -245,7 +245,7 @@ private fun TodayWordHeader(
         }
         RefreshIcon(
             onRefreshTodayWord = onRefreshTodayWord,
-            enableRefresh = enableRefresh
+            enableRefresh = enableRefresh,
         )
     }
 }
@@ -259,7 +259,7 @@ private fun RefreshIcon(
     IconButton(
         onClick = onRefreshTodayWord,
         modifier = modifier,
-        enabled = enableRefresh
+        enabled = enableRefresh,
     ) {
         Icon(
             imageVector = Icons.Outlined.Refresh,
@@ -273,7 +273,7 @@ private fun RefreshIcon(
 @Composable
 private fun LastUpdateTimeText(
     lastUpdatedTimeString: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     MyVocaText(
         text = stringResource(R.string.last_updated, lastUpdatedTimeString),
@@ -286,7 +286,7 @@ private fun LastUpdateTimeText(
 @Composable
 private fun HelpIcon(
     showTodayWordHelp: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = { showTodayWordHelp(true) },
@@ -295,7 +295,7 @@ private fun HelpIcon(
         Icon(
             imageVector = Icons.AutoMirrored.Outlined.Help,
             contentDescription = stringResource(R.string.what_is_today_word),
-            tint = MaterialTheme.colorScheme.onSurface
+            tint = MaterialTheme.colorScheme.onSurface,
         )
     }
 }
@@ -303,12 +303,12 @@ private fun HelpIcon(
 @Composable
 private fun HeaderTitle(
     titleTextStyle: TextStyle,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     MyVocaText(
         text = stringResource(id = R.string.today_word),
         modifier = modifier,
-        style = titleTextStyle
+        style = titleTextStyle,
     )
 }
 
@@ -316,7 +316,7 @@ private fun HeaderTitle(
 private fun TodayWordContent(
     todayWord: HomeTodayWord,
     onTodayWordCheckboxChange: (HomeTodayWord) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val alpha by animateFloatAsState(targetValue = if (todayWord.todayWord.checked) 0.6f else 1f)
     val elevation by animateDpAsState(targetValue = if (todayWord.todayWord.checked) 0.dp else 6.dp)
@@ -327,7 +327,7 @@ private fun TodayWordContent(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             disabledContentColor = MaterialTheme.colorScheme.primaryContainer,
-            disabledContainerColor = MaterialTheme.colorScheme.onPrimaryContainer
+            disabledContainerColor = MaterialTheme.colorScheme.onPrimaryContainer,
         )
     ) {
         Box {
@@ -350,11 +350,11 @@ private fun TodayWordContent(
 @Composable
 private fun TodayWordTitle(
     titleText: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     MyVocaText(
         text = titleText,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         maxLines = 2,
         style = MaterialTheme.typography.headlineLarge,
     )
@@ -363,7 +363,7 @@ private fun TodayWordTitle(
 @Composable
 private fun TodayWordHelp(
     onClose: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AlertDialog(
         onDismissRequest = onClose,
@@ -371,41 +371,41 @@ private fun TodayWordHelp(
         title = {
             MyVocaText(
                 text = stringResource(id = R.string.what_is_today_word),
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
             )
         },
         text = {
             Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 MyVocaText(
                     text = stringResource(R.string.memorize_new_word_everyday_and_check_memorized_word),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 MyVocaText(
                     text = stringResource(R.string.words_are_update_everyday),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
         },
         confirmButton = {
             Box(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd
+                contentAlignment = Alignment.CenterEnd,
             ) {
                 TextButton(onClick = onClose) {
                     MyVocaText(
                         text = stringResource(R.string.check),
                         color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
                     )
                 }
             }
         },
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         titleContentColor = MaterialTheme.colorScheme.onSurface,
-        textContentColor = MaterialTheme.colorScheme.onSurface
+        textContentColor = MaterialTheme.colorScheme.onSurface,
     )
 }
 
@@ -418,13 +418,13 @@ private fun ContentPreview() {
         todayWords = fakeData.subList(0, 5).map { voca ->
             HomeTodayWord(TodayWordImpl(wordId = voca.id), voca)
         }.toImmutableList(),
-        todayWordsLastUpdatedTime = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+        todayWordsLastUpdatedTime = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
     )
     MyVocaTheme {
         Content(data,
             showTodayWordHelp = {},
             onRefreshTodayWord = {},
-            onTodayWordCheckboxChange = {}
+            onTodayWordCheckboxChange = {},
         )
     }
 }

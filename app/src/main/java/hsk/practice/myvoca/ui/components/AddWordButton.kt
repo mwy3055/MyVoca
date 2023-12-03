@@ -27,17 +27,17 @@ fun AddWordButton(
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.primary,
             disabledContainerColor = MaterialTheme.colorScheme.surface,
-            disabledContentColor = MaterialTheme.colorScheme.primary
+            disabledContentColor = MaterialTheme.colorScheme.primary,
         )
     ) {
         Icon(
             imageVector = Icons.Outlined.Add,
-            contentDescription = stringResource(R.string.click_to_add_word)
+            contentDescription = stringResource(R.string.click_to_add_word),
         )
         MyVocaText(
             text = stringResource(R.string.go_to_add_word),
             fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }

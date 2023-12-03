@@ -28,7 +28,9 @@ import kotlin.coroutines.CoroutineContext
  * Implemented as singleton to keep the data persistence across the whole app.
  */
 @Singleton
-class VocaPersistenceRoom @Inject constructor(@ApplicationContext context: Context) :
+class VocaPersistenceRoom @Inject constructor(
+    @ApplicationContext context: Context,
+) :
     VocaPersistence, CoroutineScope {
 
     @EntryPoint

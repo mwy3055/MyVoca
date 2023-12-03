@@ -59,7 +59,7 @@ class HomeViewModel @Inject constructor(
                 todayWordPersistence.loadActualTodayWords(),
                 dataStore.getPreferenceFlow(
                     MyVocaPreferencesKey.todayWordLastUpdatedKey,
-                    LocalDateTime.MIN.toEpochSecond(ZoneOffset.UTC)
+                    LocalDateTime.MIN.toEpochSecond(ZoneOffset.UTC),
                 )
             ) { size, todayWords, actualTodayWords, lastUpdated ->
                 val data = homeScreenData.value
@@ -72,7 +72,7 @@ class HomeViewModel @Inject constructor(
                     loading = false,
                     totalWordCount = size,
                     todayWords = todayWordList,
-                    todayWordsLastUpdatedTime = lastUpdated
+                    todayWordsLastUpdatedTime = lastUpdated,
                 )
             }.collect { _homeScreenData.value = it }
         }
@@ -80,7 +80,7 @@ class HomeViewModel @Inject constructor(
 
     private fun createHomeTodayWords(
         todayWords: List<TodayWord>,
-        actualList: List<Vocabulary>
+        actualList: List<Vocabulary>,
     ): List<HomeTodayWord> {
         Log.d("HomeViewModel", "$todayWords, $actualList")
         return todayWords.map { today ->
@@ -121,7 +121,7 @@ private fun MutableStateFlow<HomeScreenData>.copyData(
     totalWordCount: Int = value.totalWordCount,
     todayWords: ImmutableList<HomeTodayWord> = value.todayWords,
     todayWordsLastUpdatedTime: Long = value.todayWordsLastUpdatedTime,
-    showTodayWordHelp: Boolean = value.showTodayWordHelp
+    showTodayWordHelp: Boolean = value.showTodayWordHelp,
 ) {
     synchronized(this) {
         value.copy(
@@ -129,14 +129,14 @@ private fun MutableStateFlow<HomeScreenData>.copyData(
             totalWordCount = totalWordCount,
             todayWords = todayWords,
             todayWordsLastUpdatedTime = todayWordsLastUpdatedTime,
-            showTodayWordHelp = showTodayWordHelp
+            showTodayWordHelp = showTodayWordHelp,
         ).also { value = it }
     }
 }
 
 data class HomeTodayWord(
     val todayWord: TodayWordImpl,
-    val vocabulary: VocabularyImpl
+    val vocabulary: VocabularyImpl,
 )
 
 data class HomeScreenData(
@@ -144,6 +144,6 @@ data class HomeScreenData(
     val totalWordCount: Int = 0,
     val todayWords: ImmutableList<HomeTodayWord> = persistentListOf(),
     val todayWordsLastUpdatedTime: Long = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
-    val showTodayWordHelp: Boolean = false
+    val showTodayWordHelp: Boolean = false,
 )
 

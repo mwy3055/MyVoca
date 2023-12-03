@@ -35,7 +35,7 @@ import hsk.practice.myvoca.ui.components.MyVocaText
 
 fun VersusViewState(
     leftValue: Int = 0,
-    rightValue: Int = 0
+    rightValue: Int = 0,
 ): VersusViewState = VersusViewStateImpl(leftValue, rightValue)
 
 private val VersusViewStateSaver = listSaver(
@@ -46,17 +46,17 @@ private val VersusViewStateSaver = listSaver(
 @Composable
 fun rememberVersusViewState(
     leftValue: Int = 0,
-    rightValue: Int = 0
+    rightValue: Int = 0,
 ) = rememberSaveable(leftValue, rightValue, saver = VersusViewStateSaver) {
     VersusViewState(
         leftValue,
-        rightValue
+        rightValue,
     )
 }
 
 private class VersusViewStateImpl(
     leftValue: Int = 0,
-    rightValue: Int = 0
+    rightValue: Int = 0,
 ) : VersusViewState {
     private var _leftValue by mutableStateOf(leftValue, structuralEqualityPolicy())
 
@@ -79,7 +79,7 @@ fun VersusView(
     modifier: Modifier = Modifier,
     versusViewState: VersusViewState = rememberVersusViewState(),
     leftColor: Color = MaterialTheme.colorScheme.tertiaryContainer,
-    rightColor: Color = MaterialTheme.colorScheme.errorContainer
+    rightColor: Color = MaterialTheme.colorScheme.errorContainer,
 ) {
     val leftValue = versusViewState.leftValue
     val rightValue = versusViewState.rightValue
@@ -88,7 +88,7 @@ fun VersusView(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.dp)),
     ) {
         CompositionLocalProvider(LocalContentColor provides leftColor) {
             if (leftValue > 0) {
@@ -96,13 +96,13 @@ fun VersusView(
                     modifier = Modifier
                         .weight((leftValue / gcd).toFloat()),
                     align = Alignment.CenterStart,
-                    value = leftValue
+                    value = leftValue,
                 )
             }
         }
         if (leftValue > 0 && rightValue > 0) {
             Canvas(
-                modifier = Modifier.size(50.dp)
+                modifier = Modifier.size(50.dp),
             ) {
                 val leftPath = Path().apply {
                     moveTo(0f, 0f)
@@ -127,7 +127,7 @@ fun VersusView(
                     modifier = Modifier
                         .weight((rightValue / gcd).toFloat()),
                     align = Alignment.CenterEnd,
-                    value = rightValue
+                    value = rightValue,
                 )
             }
         }
@@ -148,7 +148,7 @@ fun VersusElement(
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioHighBouncy,
                 )
-            )
+            ),
     ) {
         MyVocaText(
             text = value.toString(),
@@ -156,7 +156,7 @@ fun VersusElement(
                 .padding(vertical = 12.dp, horizontal = 16.dp)
                 .align(align),
             color = contentColorFor(backgroundColor = background),
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge,
         )
     }
 }
@@ -169,7 +169,7 @@ fun VersusViewPreview() {
         modifier = Modifier
             .height(50.dp)
             .padding(10.dp),
-        versusViewState = versusViewState
+        versusViewState = versusViewState,
     )
 }
 
@@ -181,6 +181,6 @@ fun VersusViewPreview_Zero() {
         modifier = Modifier
             .height(50.dp)
             .padding(10.dp),
-        versusViewState = versusViewState
+        versusViewState = versusViewState,
     )
 }

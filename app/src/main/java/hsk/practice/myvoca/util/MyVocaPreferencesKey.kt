@@ -16,7 +16,9 @@ import javax.inject.Inject
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-class PreferencesDataStore @Inject constructor(@ApplicationContext val context: Context) {
+class PreferencesDataStore @Inject constructor(
+    @ApplicationContext val context: Context,
+) {
     fun <T> getPreferenceFlow(key: Preferences.Key<T>, default: T): Flow<T> =
         context.dataStore.data.map { preferences ->
             preferences[key] ?: default

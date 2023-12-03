@@ -18,19 +18,19 @@ import hsk.practice.myvoca.ui.screens.addword.AddWordActivity
 
 @Composable
 fun WordEmptyIndicator(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         Column(
             modifier = Modifier.align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             MyVocaText(
                 text = stringResource(R.string.please_register_the_word_first),
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.headlineMedium,
             )
             Spacer(modifier = Modifier.height(16.dp))
             AddWordButton(
@@ -38,7 +38,7 @@ fun WordEmptyIndicator(
                     context.startActivity(
                         Intent(context, AddWordActivity::class.java)
                     )
-                }
+                },
             )
         }
     }

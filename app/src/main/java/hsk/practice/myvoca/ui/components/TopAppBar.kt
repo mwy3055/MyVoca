@@ -30,7 +30,7 @@ import hsk.practice.myvoca.ui.theme.MyVocaTheme
 fun MyVocaTopAppBar(
     currentScreen: MyVocaScreen,
     modifier: Modifier = Modifier,
-    resultLauncher: ActivityResultLauncher<Intent>? = null
+    resultLauncher: ActivityResultLauncher<Intent>? = null,
 ) {
     TopAppBar(
         title = {
@@ -39,7 +39,7 @@ fun MyVocaTopAppBar(
         actions = {
             MyVocaTopActions(
                 currentScreen = currentScreen,
-                resultLauncher = resultLauncher!!
+                resultLauncher = resultLauncher!!,
             )
         },
         modifier = modifier.shadow(elevation = 12.dp)
@@ -49,7 +49,7 @@ fun MyVocaTopAppBar(
 @Composable
 private fun MyVocaTopTitle(
     currentScreen: MyVocaScreen,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     MyVocaText(
         text = if (currentScreen == MyVocaScreen.Quiz) stringResource(R.string.quiz_screen_title)
@@ -62,17 +62,17 @@ private fun MyVocaTopTitle(
 
 @Composable
 private fun MyVocaTopNavigationIcon(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = {},
         modifier = modifier,
-        enabled = false
+        enabled = false,
     ) {
         Icon(
             imageVector = Icons.Filled.ContentPaste,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurface
+            tint = MaterialTheme.colorScheme.onSurface,
         )
     }
 }
@@ -81,7 +81,7 @@ private fun MyVocaTopNavigationIcon(
 private fun MyVocaTopActions(
     currentScreen: MyVocaScreen,
     resultLauncher: ActivityResultLauncher<Intent>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (currentScreen in listOf(MyVocaScreen.Home, MyVocaScreen.AllWord)) {
         val context = LocalContext.current
@@ -90,12 +90,12 @@ private fun MyVocaTopActions(
             onClick = {
                 resultLauncher.launch(getAddWordActivityIntent(context))
             },
-            modifier = modifier
+            modifier = modifier,
         ) {
             Icon(
                 imageVector = Icons.Outlined.Add,
                 contentDescription = stringResource(R.string.you_can_add_new_word),
-                tint = contentColorFor(MaterialTheme.colorScheme.surface)
+                tint = contentColorFor(MaterialTheme.colorScheme.surface),
             )
         }
     }

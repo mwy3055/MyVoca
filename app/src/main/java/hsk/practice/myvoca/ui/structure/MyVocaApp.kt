@@ -40,7 +40,7 @@ fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
         val systemUiController = rememberSystemUiController()
         val systemBarColor = MaterialTheme.colorScheme.surface
         val context = LocalContext.current
-        val allScreens = MyVocaScreen.values().toList().toImmutableList()
+        val allScreens = MyVocaScreen.entries.toImmutableList()
         val navController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentScreen = MyVocaScreen.fromRoute(backStackEntry?.destination?.route)
@@ -48,7 +48,7 @@ fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
         LaunchedEffect(key1 = true) {
             onLaunch()
             systemUiController.setStatusBarColor(
-                color = systemBarColor
+                color = systemBarColor,
             )
         }
 
@@ -80,7 +80,7 @@ fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
             topBar = {
                 MyVocaTopAppBar(
                     currentScreen = currentScreen,
-                    resultLauncher = resultLauncher
+                    resultLauncher = resultLauncher,
                 )
             },
             bottomBar = {
@@ -94,14 +94,14 @@ fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
                             navigateTo(navController, screen)
                         }
                     },
-                    currentScreen = currentScreen
+                    currentScreen = currentScreen,
                 )
             }
         ) { innerPadding ->
             MyVocaNavGraph(
                 resultLauncher = resultLauncher,
                 modifier = Modifier.padding(innerPadding),
-                navController = navController
+                navController = navController,
             )
         }
     }
@@ -109,7 +109,7 @@ fun MyVocaApp(onLaunch: suspend () -> Unit = {}) {
 
 private fun navigateTo(
     navController: NavHostController,
-    screen: MyVocaScreen
+    screen: MyVocaScreen,
 ) {
     navController.navigate(screen.name) {
         if (screen == MyVocaScreen.Home) {
@@ -126,13 +126,13 @@ private fun NavOptionsBuilder.clearPopUpStack() {
 fun MyVocaNavGraph(
     resultLauncher: ActivityResultLauncher<Intent>,
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
 ) {
     // NavHost 밖에서 만들면 화면 전환에 상관없이 유지된다.
     NavHost(
         navController = navController,
         startDestination = MyVocaScreen.Home.name,
-        modifier = modifier
+        modifier = modifier,
     ) {
         // NavHost 안에서 만들면 매번 새로운 객체가 생성된다.
         composable(MyVocaScreen.Home.name) {

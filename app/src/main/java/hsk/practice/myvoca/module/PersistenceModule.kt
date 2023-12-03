@@ -32,12 +32,12 @@ object PersistenceModule {
     @LocalVocaPersistence
     @Provides
     fun provideVocaPersistenceDatabase(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
     ): VocaPersistence = VocaPersistenceRoom(context)
 
     @LocalTodayWordPersistence
     @Provides
     fun provideTodayWordDatabase(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
     ): TodayWordPersistence = TodayWordPersistenceRoom(context)
 }

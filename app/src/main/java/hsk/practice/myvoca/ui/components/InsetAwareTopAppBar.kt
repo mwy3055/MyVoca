@@ -31,12 +31,12 @@ fun InsetAwareTopAppBar(
     actions: @Composable RowScope.() -> Unit = {},
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = 4.dp
+    elevation: Dp = 4.dp,
 ) {
     Surface(
         color = backgroundColor,
         shadowElevation = elevation,
-        modifier = modifier
+        modifier = modifier,
     ) {
         TopAppBar(
             title = title,
@@ -46,7 +46,7 @@ fun InsetAwareTopAppBar(
                 containerColor = Color.Transparent,
                 navigationIconContentColor = contentColor,
                 titleContentColor = contentColor,
-                actionIconContentColor = contentColor
+                actionIconContentColor = contentColor,
             ),
             modifier = Modifier
                 .statusBarsPadding()
